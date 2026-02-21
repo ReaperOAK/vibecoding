@@ -1,8 +1,8 @@
 # Vibecoding Multi-Agent System Architecture
 
-> **Version:** 1.0.0
+> **Version:** 2.0.0
 > **Owner:** ReaperOAK (CTO / Supervisor Orchestrator)
-> **Last Updated:** 2026-02-21
+> **Last Updated:** 2025-07-24
 
 ---
 
@@ -29,33 +29,33 @@ destructive operations through human approval gates.
 
 ```
 ReaperOAK (Supervisor / CTO)
-├── ProductManager    — Requirements, PRDs, user stories
-├── Architect         — System design, API contracts, schemas
-├── Backend           — Server-side code, APIs, DB logic
-├── Frontend          — UI/UX, components, responsive design
-├── QA                — Testing, E2E, boundary validation
-├── Security          — Vulnerability scanning, OWASP, secrets
-├── DevOps            — CI/CD, infrastructure, deployment
-├── Documentation     — Docs, READMEs, ADRs, changelogs
-├── Research          — Technical spikes, library evaluation
-└── CIReviewer        — PR review, code diff analysis
+├── ProductManager    — PRDs, INVEST user stories, acceptance criteria, scope mgmt
+├── Architect         — Well-Architected design, API contracts, DB schemas, ADRs
+├── Backend           — TDD server-side code, APIs, DB logic, RFC 7807 errors
+├── Frontend          — WCAG 2.2 AA UI, Core Web Vitals, responsive components
+├── QA                — Test pyramid, Playwright E2E, boundary analysis, SFDPOT
+├── Security          — OWASP Top 10 audit, STRIDE threats, CVSS scoring, CVE scan
+├── DevOps            — GitHub Actions CI/CD, Dockerfiles, IaC, deploy strategies
+├── Documentation     — Diátaxis docs, ADRs, runbooks, changelogs, API reference
+├── Research          — Evidence-based spikes, library eval, license analysis
+└── CIReviewer        — Severity-rated PR review, security checks, coverage gaps
 ```
 
 ### Agent Authority Matrix
 
-| Agent | Can Read | Can Write | Can Execute | Cannot Do |
-|-------|----------|-----------|-------------|-----------|
-| **ReaperOAK** | Everything | systemPatterns, decisionLog, activeContext, progress | Delegate, validate, approve | Direct file edits in multi-agent mode |
-| **ProductManager** | All memory bank | activeContext, progress | GitHub issues | Edit code, deploy, modify architecture |
-| **Architect** | All memory bank, codebase | activeContext, progress | Analysis tools | Edit production code, deploy |
-| **Backend** | Assigned files, systemPatterns | Source code (scoped dirs) | Terminal, tests | Frontend files, infra, security config |
-| **Frontend** | Assigned files, systemPatterns | UI source (scoped dirs) | Terminal, browser | Backend files, infra, DB schemas |
-| **QA** | All source, test dirs | Test files only | Terminal, browser | Production code, infra, deploy |
-| **Security** | Everything (read-only audit) | riskRegister, activeContext | Scanners | Production code, deploy, merge |
-| **DevOps** | Infra files, CI/CD configs | CI/CD, Dockerfiles, IaC | Terminal, deploy (staging) | Application code, merge to main |
-| **Documentation** | All source, all docs | Documentation files only | Analysis tools | Code, infra, deploy |
-| **Research** | External sources, codebase | activeContext, progress | Web fetch, search | Code, infra, deploy, merge |
-| **CIReviewer** | PR diffs, codebase | PR comments only | Analysis tools | Merge, deploy, edit source |
+| Agent | Domain Expertise | Can Read | Can Write | Can Execute | Cannot Do |
+|-------|-----------------|----------|-----------|-------------|-----------|
+| **ReaperOAK** | Orchestration, QA integration | Everything | systemPatterns, decisionLog, activeContext, progress | Delegate, validate, approve | Direct file edits in multi-agent mode |
+| **ProductManager** | INVEST stories, Given-When-Then criteria, PRDs | All memory bank | activeContext, progress | GitHub issues | Edit code, deploy, modify architecture |
+| **Architect** | Well-Architected Pillars, API contracts, DB schemas, ADRs | All memory bank, codebase | activeContext, progress | Analysis tools | Edit production code, deploy |
+| **Backend** | TDD, RFC 7807 errors, N+1 detection, migration safety | Assigned files, systemPatterns | Source code (scoped dirs) | Terminal, tests | Frontend files, infra, security config |
+| **Frontend** | WCAG 2.2 AA, Core Web Vitals, state mgmt, responsive | Assigned files, systemPatterns | UI source (scoped dirs) | Terminal, browser | Backend files, infra, DB schemas |
+| **QA** | Test pyramid, SFDPOT/HICCUPS, Playwright, boundary analysis | All source, test dirs | Test files only | Terminal, browser | Production code, infra, deploy |
+| **Security** | OWASP Top 10, STRIDE, CVSS v3.1, LLM Top 10, CVE scan | Everything (read-only audit) | riskRegister, activeContext | Scanners | Production code, deploy, merge |
+| **DevOps** | GitHub Actions, Docker multi-stage, Terraform, deploy strategies | Infra files, CI/CD configs | CI/CD, Dockerfiles, IaC | Terminal, deploy (staging) | Application code, merge to main |
+| **Documentation** | Diátaxis framework, ADRs, runbooks, audience adaptation | All source, all docs | Documentation files only | Analysis tools | Code, infra, deploy |
+| **Research** | Evidence-based eval, source credibility, license analysis | External sources, codebase | activeContext, progress | Web fetch, search | Code, infra, deploy, merge |
+| **CIReviewer** | Severity-rated review, code smells, security/test/arch checks | PR diffs, codebase | PR comments only | Analysis tools | Merge, deploy, edit source |
 
 ---
 

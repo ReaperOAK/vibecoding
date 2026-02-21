@@ -293,27 +293,27 @@ For long operations, use async/background execution when available.
 The following instruction files are authoritative for their domains and must be
 followed:
 
-- Accessibility: `.github/instructions/a11y.instructions.md`
+- Accessibility: `docs/instructions/a11y.instructions.md`
 - Docker/Containerization:
-  `.github/instructions/containerization-docker-best-practices.instructions.md`
-- DevOps: `.github/instructions/devops-core-principles.instructions.md`
+  `docs/instructions/containerization-docker-best-practices.instructions.md`
+- DevOps: `docs/instructions/devops-core-principles.instructions.md`
 - CI/CD:
-  `.github/instructions/github-actions-ci-cd-best-practices.instructions.md`
-- Documentation: `.github/instructions/markdown.instructions.md`
-- Memory Bank: `.github/instructions/memory-bank.instructions.md`
-- NestJS: `.github/instructions/nestjs.instructions.md`
-- Next.js: `.github/instructions/nextjs.instructions.md`
-- Performance: `.github/instructions/performance-optimization.instructions.md`
-- Playwright: `.github/instructions/playwright-typescript.instructions.md`
-- React Native: `.github/instructions/react-native.instructions.md`
-- Security/OWASP: `.github/instructions/security-and-owasp.instructions.md`
-- Shell: `.github/instructions/shell.instructions.md`
-- Terraform (SAP BTP): `.github/instructions/terraform-sap-btp.instructions.md`
-- TypeScript: `.github/instructions/typescript-5-es2022.instructions.md`
+  `docs/instructions/github-actions-ci-cd-best-practices.instructions.md`
+- Documentation: `docs/instructions/markdown.instructions.md`
+- Memory Bank: `docs/instructions/memory-bank.instructions.md`
+- NestJS: `docs/instructions/nestjs.instructions.md`
+- Next.js: `docs/instructions/nextjs.instructions.md`
+- Performance: `docs/instructions/performance-optimization.instructions.md`
+- Playwright: `docs/instructions/playwright-typescript.instructions.md`
+- React Native: `docs/instructions/react-native.instructions.md`
+- Security/OWASP: `docs/instructions/security-and-owasp.instructions.md`
+- Shell: `docs/instructions/shell.instructions.md`
+- Terraform (SAP BTP): `docs/instructions/terraform-sap-btp.instructions.md`
+- TypeScript: `docs/instructions/typescript-5-es2022.instructions.md`
 - Docs-on-change:
-  `.github/instructions/update-docs-on-code-change.instructions.md`
+  `docs/instructions/update-docs-on-code-change.instructions.md`
 - Gilfoyle review persona:
-  `.github/instructions/gilfoyle-code-review.instructions.md`
+  `docs/instructions/gilfoyle-code-review.instructions.md`
 
 # 8. Engineering Guardrails
 
