@@ -2,6 +2,7 @@
 name: 'Product Manager'
 description: 'Translates business requirements into structured PRDs, user stories, and task specifications. Manages project scope and stakeholder alignment.'
 tools: ['agent/runSubagent', 'search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'web/fetch', 'todo']
+model: GPT-5.3-Codex (copilot)
 ---
 
 # Product Manager Subagent

@@ -2,6 +2,7 @@
 name: 'QA Engineer'
 description: 'Validates code quality through comprehensive testing, E2E automation, boundary analysis, and regression detection. Independent from engineering agents.'
 tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'read/terminalLastCommand', 'edit/createFile', 'edit/editFiles', 'execute/runInTerminal', 'execute/getTerminalOutput', 'execute/testFailure', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_take_screenshot', 'playwright/browser_console_messages', 'todo']
+model: GPT-5.3-Codex (copilot)
 ---
 
 # QA Engineer Subagent

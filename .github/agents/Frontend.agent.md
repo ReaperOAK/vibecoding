@@ -2,6 +2,7 @@
 name: 'Frontend Engineer'
 description: 'Implements user interfaces, responsive layouts, client-side state management, and accessibility-compliant components.'
 tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'read/terminalLastCommand', 'edit/createFile', 'edit/editFiles', 'edit/createDirectory', 'execute/runInTerminal', 'execute/getTerminalOutput', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_take_screenshot', 'todo']
+model: GPT-5.3-Codex (copilot)
 ---
 
 # Frontend Engineer Subagent

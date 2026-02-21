@@ -2,6 +2,7 @@
 name: 'Security Auditor'
 description: 'Performs security audits, OWASP compliance checks, dependency scanning, and threat modeling. Operates as an automated red team with read-only code access.'
 tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'execute/runInTerminal', 'execute/getTerminalOutput', 'web/fetch', 'todo']
+model: GPT-5.3-Codex (copilot)
 ---
 
 # Security Auditor Subagent

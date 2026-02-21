@@ -2,6 +2,7 @@
 name: 'Documentation Writer'
 description: 'Maintains all project documentation including READMEs, ADRs, API docs, changelogs, and inline code documentation. Ensures docs stay synchronized with code.'
 tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFiles', 'edit/createDirectory', 'web/fetch', 'todo']
+model: GPT-5.3-Codex (copilot)
 ---
 
 # Documentation Writer Subagent

@@ -2,6 +2,7 @@
 name: 'Backend Engineer'
 description: 'Implements server-side logic, APIs, database operations, and backend services. Follows TDD and produces idiomatic, production-ready code.'
 tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'read/terminalLastCommand', 'edit/createFile', 'edit/editFiles', 'edit/createDirectory', 'execute/runInTerminal', 'execute/getTerminalOutput', 'todo']
+model: GPT-5.3-Codex (copilot)
 ---
 
 # Backend Engineer Subagent

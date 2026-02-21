@@ -2,6 +2,7 @@
 name: 'Architect'
 description: 'Designs system architecture, API contracts, database schemas, and component relationships. Establishes technical standards that all engineering agents must follow.'
 tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'web/fetch', 'web/githubRepo', 'todo']
+model: GPT-5.3-Codex (copilot)
 ---
 
 # Architect Subagent

@@ -2,6 +2,7 @@
 name: 'Research Analyst'
 description: 'Performs technical deep-dives, library evaluations, technology spikes, and competitive analysis. Produces actionable research reports with evidence.'
 tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'web/fetch', 'web/githubRepo', 'io.github.upstash/context7/resolve-library-id', 'io.github.upstash/context7/get-library-docs', 'todo']
+model: GPT-5.3-Codex (copilot)
 ---
 
 # Research Analyst Subagent

@@ -2,6 +2,7 @@
 name: 'DevOps Engineer'
 description: 'Manages CI/CD pipelines, containerization, infrastructure-as-code, and deployment automation. Ensures build reliability and operational excellence.'
 tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'read/terminalLastCommand', 'edit/createFile', 'edit/editFiles', 'edit/createDirectory', 'execute/runInTerminal', 'execute/getTerminalOutput', 'execute/awaitTerminal', 'execute/killTerminal', 'todo']
+model: GPT-5.3-Codex (copilot)
 ---
 
 # DevOps Engineer Subagent

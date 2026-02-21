@@ -2,6 +2,7 @@
 name: 'CI Reviewer'
 description: 'Performs automated code review on pull requests, analyzing diffs for correctness, convention adherence, security issues, and test coverage gaps.'
 tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'search/changes', 'read/readFile', 'read/problems', 'web/fetch', 'todo']
+model: GPT-5.3-Codex (copilot)
 ---
 
 # CI Reviewer Subagent
