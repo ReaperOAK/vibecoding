@@ -1,0 +1,10 @@
+# Logs from AI agent sessions
+logs/
+
+# Processing files (temporary, per-session)
+Copilot-Processing.md
+Claude-Processing.md
+
+# OS files
+.DS_Store
+Thumbs.db

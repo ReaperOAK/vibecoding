@@ -489,3 +489,41 @@ domains and are loaded from `docs/instructions/`:
 | Task Implementation | `task-implementation.instructions.md` |
 | Thought Logging | `copilot-thought-logging.instructions.md` |
 | TypeScript | `typescript-5-es2022.instructions.md` |
+
+---
+
+## 17. Claude Code Integration
+
+The vibecoding system supports **dual-agent operation** with both GitHub Copilot
+and Claude Code. Both agents share the same memory bank, instruction files, and
+governance principles.
+
+### Claude Code Configuration
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `CLAUDE.md` | Repository root | Primary instruction file (equivalent to `ReaperOAK.agent.md`) |
+| `.claude/settings.json` | `.claude/` | Hooks configuration for governance and logging |
+| `.claude/hooks/` | `.claude/hooks/` | Governance audit, prompt logging, session logging |
+| `.claude/commands/` | `.claude/commands/` | Slash commands (memory-bank-read, memory-bank-update, review, plan, security-audit, debug) |
+
+### Shared Resources (Agent-Agnostic)
+
+| Resource | Location | Used By |
+|----------|----------|---------|
+| Memory Bank | `.github/memory-bank/` | Both Copilot and Claude Code |
+| Instruction Files | `docs/instructions/` | Both Copilot and Claude Code |
+| Architecture Docs | `.github/ARCHITECTURE.md` | Both |
+| Security Guardrails | `.github/security.agentic-guardrails.md` | Both |
+| Cross-Cutting Protocols | `.github/agents/_cross-cutting-protocols.md` | Both |
+
+### Agent-Specific Resources
+
+| Resource | Copilot | Claude Code |
+|----------|---------|-------------|
+| Agent Definitions | `.github/agents/*.agent.md` | `CLAUDE.md` |
+| Hooks Config | `.github/hooks/*/hooks.json` | `.claude/settings.json` |
+| Hook Scripts | `.github/hooks/*/` | `.claude/hooks/` |
+| Log Directory | `logs/copilot/` | `logs/claude-code/` |
+| Slash Commands | N/A (built-in) | `.claude/commands/` |
+| Multi-Agent | `agent/runSubagent` tool | `Task` tool with subagent types |

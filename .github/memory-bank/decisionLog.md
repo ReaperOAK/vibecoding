@@ -100,3 +100,24 @@
   positive risk)
 - **Consequences:** Slightly slower merge cadence but dramatically safer
 - **Status:** Active
+
+### DEC-006: Dual-Agent Support (GitHub Copilot + Claude Code)
+
+- **Date:** 2026-02-23
+- **Context:** Vibecoding system was exclusively configured for GitHub Copilot.
+  Need to support Claude Code as an alternative/complementary agent.
+- **Decision:** Add Claude Code configuration alongside existing Copilot setup.
+  Both agents share the same memory bank, instruction files, and governance
+  principles. Each has its own configuration format: Copilot uses
+  `.github/agents/*.agent.md`, Claude Code uses `CLAUDE.md` + `.claude/`.
+- **Rationale:** Agent-agnostic design allows team members to use their preferred
+  tool. Shared memory bank and instruction files ensure consistency regardless
+  of which agent is active. No Copilot configs are modified.
+- **Alternatives:** Replace Copilot with Claude Code (rejected: reduces
+  flexibility), create separate instruction sets (rejected: maintenance burden
+  and drift risk)
+- **Consequences:** Must maintain two configuration surfaces (`.github/agents/`
+  for Copilot, `.claude/` + `CLAUDE.md` for Claude Code). Instruction files in
+  `docs/instructions/` and memory bank in `.github/memory-bank/` are shared by
+  both. Log directories separated (`logs/copilot/` vs `logs/claude-code/`).
+- **Status:** Active
