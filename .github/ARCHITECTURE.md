@@ -1,6 +1,6 @@
 # Vibecoding Multi-Agent System Architecture
 
-> **Version:** 2.0.0
+> **Version:** 3.0.0
 > **Owner:** ReaperOAK (CTO / Supervisor Orchestrator)
 > **Last Updated:** 2025-07-24
 
@@ -10,8 +10,8 @@
 
 This architecture implements a **Supervisor Pattern** multi-agent vibecoding
 system with ReaperOAK as the singular CTO and orchestrator. All subagents
-operate within bounded scopes, follow Plan-Act-Reflect loops, and route
-destructive operations through human approval gates.
+operate within bounded scopes, follow Plan-Act-Reflect loops with RUG
+discipline, and route destructive operations through human approval gates.
 
 ### Design Principles
 
@@ -22,6 +22,10 @@ destructive operations through human approval gates.
 5. **Immutable truth sources** — `systemPatterns.md` and `decisionLog.md` are
    controlled by ReaperOAK only
 6. **Human-in-the-loop for destructive ops** — always
+7. **Confidence-gated progression** — no phase transition without assessed confidence
+8. **DAG-first decomposition** — all multi-task work starts with dependency graph
+9. **Evidence over assertion** — every claim requires tool output or file reference
+10. **Governance by default** — hooks and guardrails active in every session
 
 ---
 
@@ -29,37 +33,113 @@ destructive operations through human approval gates.
 
 ```
 ReaperOAK (Supervisor / CTO)
-├── ProductManager    — PRDs, INVEST user stories, acceptance criteria, scope mgmt
-├── Architect         — Well-Architected design, API contracts, DB schemas, ADRs
-├── Backend           — TDD server-side code, APIs, DB logic, RFC 7807 errors
-├── Frontend          — WCAG 2.2 AA UI, Core Web Vitals, responsive components
-├── QA                — Test pyramid, Playwright E2E, boundary analysis, SFDPOT
-├── Security          — OWASP Top 10 audit, STRIDE threats, CVSS scoring, CVE scan
-├── DevOps            — GitHub Actions CI/CD, Dockerfiles, IaC, deploy strategies
-├── Documentation     — Diátaxis docs, ADRs, runbooks, changelogs, API reference
-├── Research          — Evidence-based spikes, library eval, license analysis
-└── CIReviewer        — Severity-rated PR review, security checks, coverage gaps
+│
+├── Cross-Cutting Protocols ─── _cross-cutting-protocols.md (inherited by ALL)
+│
+├── ProductManager    — EARS requirements, INVEST stories, DDD context mapping
+├── Architect         — Well-Architected design, DAG decomposition, ADRs
+├── Backend           — TDD, Object Calisthenics, RFC 7807, spec-driven dev
+├── Frontend          — WCAG 2.2 AA, Core Web Vitals, Component Calisthenics
+├── QA                — Test pyramid, mutation testing, property-based testing
+├── Security          — STRIDE, OWASP Top 10, SARIF, SBOM, policy-as-config
+├── DevOps            — GitOps, SLO/SLI, chaos engineering, policy-as-code
+├── Documentation     — Diátaxis, Flesch-Kincaid scoring, doc-as-code CI
+├── Research          — Bayesian confidence, evidence hierarchy, PoC standards
+└── CIReviewer        — Cognitive complexity, fitness functions, SARIF reports
 ```
 
 ### Agent Authority Matrix
 
 | Agent | Domain Expertise | Can Read | Can Write | Can Execute | Cannot Do |
 |-------|-----------------|----------|-----------|-------------|-----------|
-| **ReaperOAK** | Orchestration, QA integration | Everything | systemPatterns, decisionLog, activeContext, progress | Delegate, validate, approve | Direct file edits in multi-agent mode |
-| **ProductManager** | INVEST stories, Given-When-Then criteria, PRDs | All memory bank | activeContext, progress | GitHub issues | Edit code, deploy, modify architecture |
-| **Architect** | Well-Architected Pillars, API contracts, DB schemas, ADRs | All memory bank, codebase | activeContext, progress | Analysis tools | Edit production code, deploy |
-| **Backend** | TDD, RFC 7807 errors, N+1 detection, migration safety | Assigned files, systemPatterns | Source code (scoped dirs) | Terminal, tests | Frontend files, infra, security config |
-| **Frontend** | WCAG 2.2 AA, Core Web Vitals, state mgmt, responsive | Assigned files, systemPatterns | UI source (scoped dirs) | Terminal, browser | Backend files, infra, DB schemas |
-| **QA** | Test pyramid, SFDPOT/HICCUPS, Playwright, boundary analysis | All source, test dirs | Test files only | Terminal, browser | Production code, infra, deploy |
-| **Security** | OWASP Top 10, STRIDE, CVSS v3.1, LLM Top 10, CVE scan | Everything (read-only audit) | riskRegister, activeContext | Scanners | Production code, deploy, merge |
-| **DevOps** | GitHub Actions, Docker multi-stage, Terraform, deploy strategies | Infra files, CI/CD configs | CI/CD, Dockerfiles, IaC | Terminal, deploy (staging) | Application code, merge to main |
-| **Documentation** | Diátaxis framework, ADRs, runbooks, audience adaptation | All source, all docs | Documentation files only | Analysis tools | Code, infra, deploy |
-| **Research** | Evidence-based eval, source credibility, license analysis | External sources, codebase | activeContext, progress | Web fetch, search | Code, infra, deploy, merge |
-| **CIReviewer** | Severity-rated review, code smells, security/test/arch checks | PR diffs, codebase | PR comments only | Analysis tools | Merge, deploy, edit source |
+| **ReaperOAK** | Orchestration, DAG construction, QA integration | Everything | systemPatterns, decisionLog, activeContext, progress | Delegate, validate, approve | Direct file edits in multi-agent mode |
+| **ProductManager** | EARS notation, INVEST stories, DDD context mapping | All memory bank | activeContext, progress | GitHub issues | Edit code, deploy, modify architecture |
+| **Architect** | Well-Architected Pillars, API contracts, DAG task graphs | All memory bank, codebase | activeContext, progress | Analysis tools | Edit production code, deploy |
+| **Backend** | TDD, Object Calisthenics, RFC 7807, N+1 detection | Assigned files, systemPatterns | Source code (scoped dirs) | Terminal, tests | Frontend files, infra, security config |
+| **Frontend** | WCAG 2.2 AA, Core Web Vitals, Component Calisthenics | Assigned files, systemPatterns | UI source (scoped dirs) | Terminal, browser | Backend files, infra, DB schemas |
+| **QA** | Test pyramid, mutation testing, SFDPOT/HICCUPS, Playwright | All source, test dirs | Test files only | Terminal, browser | Production code, infra, deploy |
+| **Security** | OWASP Top 10, STRIDE, SARIF, SBOM, policy-as-config | Everything (read-only audit) | riskRegister, activeContext | Scanners | Production code, deploy, merge |
+| **DevOps** | GitOps, SLO/SLI, Docker multi-stage, chaos engineering | Infra files, CI/CD configs | CI/CD, Dockerfiles, IaC | Terminal, deploy (staging) | Application code, merge to main |
+| **Documentation** | Diátaxis, Flesch-Kincaid, doc-as-code CI pipeline | All source, all docs | Documentation files only | Analysis tools | Code, infra, deploy |
+| **Research** | Bayesian confidence, evidence hierarchy, license analysis | External sources, codebase | activeContext, progress | Web fetch, search | Code, infra, deploy, merge |
+| **CIReviewer** | Cognitive complexity, fitness functions, SARIF | PR diffs, codebase | PR comments only | Analysis tools | Merge, deploy, edit source |
+
+### Structured Autonomy Levels
+
+Each agent operates at a defined autonomy level. ReaperOAK can adjust
+levels based on task criticality.
+
+| Level | Name | Behavior | Approval Required |
+|-------|------|----------|-------------------|
+| **L1** | Supervised | Agent proposes actions, waits for approval before each step | Every action |
+| **L2** | Guided | Agent executes within pre-approved scope, reports after completion | Scope changes only |
+| **L3** | Autonomous | Agent executes independently within delegation packet boundaries | Destructive ops only |
+
+**Default Autonomy Assignments:**
+
+| Agent | Default Level | Rationale |
+|-------|:------------:|-----------|
+| Backend | L2 | Scoped writes, needs freedom within boundaries |
+| Frontend | L2 | Same as Backend |
+| QA | L3 | Test-only writes, low risk |
+| Security | L2 | Read-only audit but findings affect decisions |
+| DevOps | L1 | Infrastructure changes require careful oversight |
+| Documentation | L3 | Doc-only writes, low risk |
+| Research | L3 | Read-only, no write risk |
+| CIReviewer | L3 | Read-only, comment-only output |
+| ProductManager | L2 | Defines scope, needs validation |
+| Architect | L2 | Designs affect everything downstream |
 
 ---
 
-## 3. Delegation Packet Format
+## 3. Context Engineering Framework
+
+### 3.1 Context Loading Strategy
+
+At session start, ReaperOAK loads context using a 4-priority system:
+
+| Priority | Category | Action | Budget |
+|----------|----------|--------|--------|
+| **P0** | Critical | Load fully — delegation packet, active errors, systemPatterns | 30% |
+| **P1** | High | Load fully — activeContext.md, relevant source files | 25% |
+| **P2** | Medium | Summarize — decisionLog.md, progress.md, prior session notes | 25% |
+| **P3** | Low | Skip / load on demand — historical logs, completed task archives | 20% |
+
+### 3.2 Context Budget Declaration
+
+Every delegation packet includes a context budget:
+
+```yaml
+contextBudget:
+  totalTokens: 20000
+  allocation:
+    delegationPacket: 2000
+    sourceFiles: 10000
+    memoryBank: 3000
+    crossCuttingProtocols: 3000
+    reserve: 2000
+  filesLoaded:
+    - path: "src/api/auth.ts"
+      priority: P0
+      tokens: 1500
+    - path: ".github/agents/_cross-cutting-protocols.md"
+      priority: P0
+      tokens: 2500
+```
+
+### 3.3 Context Freshness Rules
+
+| Source | Max Age | Refresh Trigger |
+|--------|---------|-----------------|
+| Active errors | Real-time | Every tool call |
+| Source files | Current session | File modification detected |
+| Memory bank | Current session | Memory bank write detected |
+| External docs | 24 hours | Research agent re-fetches |
+| Decision log | Permanent | Never expires |
+
+---
+
+## 4. Delegation Packet Format
 
 Every task delegated from ReaperOAK to a subagent uses this canonical format:
 
@@ -68,6 +148,7 @@ packet:
   taskId: "TASK-{timestamp}-{seq}"
   delegatedBy: "ReaperOAK"
   assignedTo: "{subagent-name}"
+  autonomyLevel: "L1 | L2 | L3"
   objective: "Clear, measurable description of what must be accomplished"
   successCriteria:
     - "Criterion 1: specific, verifiable"
@@ -82,15 +163,59 @@ packet:
   requiredOutputFormat: "Description of expected deliverable shape"
   evidenceExpectations:
     - "Test results, screenshots, logs, etc."
+  contextBudget:
+    totalTokens: 20000
+    priorityFiles: ["file1.ts", "file2.ts"]
+  confidenceThreshold: 70
   priority: "P0 | P1 | P2 | P3"
   dependencies:
     - "TASK-ID of prerequisite tasks"
   timeoutBudget: "max iterations or token budget"
+  crossCuttingProtocols: ".github/agents/_cross-cutting-protocols.md"
 ```
 
 ---
 
-## 4. Task State Machine
+## 5. DAG-First Task Decomposition
+
+### 5.1 DAG Construction
+
+Every multi-agent objective is decomposed into a DAG before execution:
+
+```mermaid
+graph TD
+    A[ProductManager: Requirements] --> C[Architect: Design]
+    B[Research: Library Eval] --> C
+    C --> D[Security: Threat Model]
+    C --> F[Frontend: UI Components]
+    D --> E[Backend: Implementation]
+    E --> G[QA: Test Suite]
+    F --> G
+    G --> H[Documentation: API Docs]
+    G --> I[CIReviewer: Final Review]
+    H --> J[DevOps: CI/CD Pipeline]
+    I --> J
+```
+
+### 5.2 Parallel Batch Execution
+
+Tasks with no inter-dependencies execute in parallel batches:
+
+```
+Batch 1: [ProductManager, Research]     ← no dependencies
+Batch 2: [Architect]                    ← depends on Batch 1
+Batch 3: [Security, Frontend]          ← can parallelize
+Batch 4: [Backend]                     ← depends on Security
+Batch 5: [QA]                          ← depends on Backend + Frontend
+Batch 6: [Documentation, CIReviewer]   ← depends on QA
+Batch 7: [DevOps]                      ← depends on Docs + Review
+```
+
+See `orchestration.rules.md` §2 for full DAG protocol.
+
+---
+
+## 6. Task State Machine
 
 Every task follows this deterministic state flow:
 
@@ -106,25 +231,15 @@ Every task follows this deterministic state flow:
                      │                   │
                      ▼                   ▼
                 ┌──────────┐      ┌──────────────┐
-                │ ESCALATED│      │ IN_PROGRESS  │ (retry)
+                │ ESCALATED│      │ IN_PROGRESS  │ (retry ≤ 3)
                 └──────────┘      └──────────────┘
 ```
 
-**State Definitions:**
-
-| State | Description | Owner |
-|-------|-------------|-------|
-| PENDING | Task queued, dependencies not met | ReaperOAK |
-| IN_PROGRESS | Subagent actively working | Assigned subagent |
-| REVIEW | Work done, awaiting QA validation | ReaperOAK + QA |
-| MERGED | Validated and integrated | ReaperOAK |
-| BLOCKED | Cannot proceed, dependency issue | ReaperOAK |
-| REJECTED | QA failed, needs rework | ReaperOAK |
-| ESCALATED | Requires human intervention | Human |
+See `orchestration.rules.md` §1 for full state definitions and transitions.
 
 ---
 
-## 5. Merge Protocol
+## 7. Merge Protocol
 
 1. Subagent completes work → signals REVIEW state
 2. ReaperOAK's Reviewer lane validates:
@@ -132,6 +247,8 @@ Every task follows this deterministic state flow:
    - Correctness/syntax validation
    - No forbidden file modifications
    - Evidence expectations met
+   - Self-reflection quality score ≥ 7/10
+   - Token consumption within budget
 3. If validation passes → MERGED state
 4. If validation fails → REJECTED state with fix delta → back to IN_PROGRESS
 5. File conflict detection:
@@ -141,47 +258,35 @@ Every task follows this deterministic state flow:
 
 ---
 
-## 6. Parallel Execution Rules
+## 8. Parallel Execution Rules
 
-### Parallel-Safe Operations
+See `orchestration.rules.md` §5 for full parallelism model.
 
-| Operation Type | Parallel-Safe? | Condition |
-|---------------|---------------|-----------|
-| Read-only analysis | ✅ Always | No conditions |
-| Write to different files | ✅ Yes | Files don't share dependencies |
-| Write to same file | ❌ Never | Must be sequential |
-| Independent test suites | ✅ Yes | No shared state |
-| External API calls | ✅ If idempotent | GET requests, read-only APIs |
-| Database mutations | ❌ Never | Must be sequential |
-| Infrastructure changes | ❌ Never | Must be sequential + approved |
-
-### Concurrency Limit
-
+Key constraints:
 - Maximum 4 parallel subagents at any time
 - Each parallel batch requires pre-declared file ownership
 - No two subagents may claim the same file in a parallel batch
+- Integration validation gate runs after every batch
 
 ---
 
-## 7. Conflict Resolution Policy
+## 9. Conflict Resolution Policy
 
-1. **Intra-agent conflict** (subagent disagrees with its own prior output):
-   → Re-run with explicit context of the contradiction
-2. **Inter-agent conflict** (two subagents produce conflicting outputs):
-   → ReaperOAK resolves using `systemPatterns.md` as canonical truth
-   → If `systemPatterns.md` is insufficient → `decisionLog.md` entry + human gate
-3. **Agent vs. instruction conflict** (subagent output contradicts instruction file):
-   → Instruction file wins. Subagent re-runs constrained to instruction rules.
-4. **Precedence hierarchy:**
+1. **Intra-agent conflict:** Re-run with explicit context of the contradiction
+2. **Inter-agent conflict:** ReaperOAK resolves using `systemPatterns.md`
+3. **Agent vs. instruction conflict:** Instruction file wins always
+4. **Confidence disagreement:** Higher-evidence position wins
+5. **Precedence hierarchy:**
 
    ```
    Human directive > ReaperOAK decision > systemPatterns.md >
-   domain instruction > general instruction > agent default behavior
+   domain instruction > cross-cutting protocols > general instruction >
+   agent default behavior
    ```
 
 ---
 
-## 8. Human Approval Gate Triggers
+## 10. Human Approval Gate Triggers
 
 The following operations **ALWAYS** halt and require explicit human approval:
 
@@ -197,20 +302,23 @@ The following operations **ALWAYS** halt and require explicit human approval:
 | Privilege escalation for any agent | Governance |
 | Merge to main/production branch | Release |
 | Secret/credential rotation | Security |
+| Autonomy level elevation | Governance |
 
 ---
 
-## 9. Plan-Act-Reflect Loop (All Subagents)
+## 11. Plan-Act-Reflect Loop (All Subagents)
 
-Every subagent follows this cognitive loop:
+Every subagent follows this cognitive loop with RUG discipline:
 
 ```
 ┌──────────────────────────────────┐
-│           PLAN                    │
-│  1. State intended approach       │
-│  2. Identify required tool calls  │
-│  3. List file modifications       │
-│  4. Declare assumptions           │
+│           PLAN (RUG)              │
+│  1. READ: Load delegation packet  │
+│  2. UNDERSTAND: State objective   │
+│     in own words, list assumptions│
+│  3. Identify required tool calls  │
+│  4. List file modifications       │
+│  5. Declare confidence level      │
 └──────────────┬───────────────────┘
                ▼
 ┌──────────────────────────────────┐
@@ -222,18 +330,23 @@ Every subagent follows this cognitive loop:
 └──────────────┬───────────────────┘
                ▼
 ┌──────────────────────────────────┐
-│          REFLECT                  │
+│       REFLECT (Self-Score)        │
 │  1. Review stdout/stderr          │
-│  2. Summarize what succeeded      │
-│  3. Summarize what failed         │
-│  4. Determine: retry or complete  │
+│  2. Score quality (5 dimensions)  │
+│     - Correctness: ?/10           │
+│     - Completeness: ?/10          │
+│     - Convention: ?/10            │
+│     - Clarity: ?/10               │
+│     - Impact: ?/10                │
+│  3. Gate: average ≥ 7 to submit   │
+│  4. If < 7: iterate (max 3x)     │
 │  5. Update activeContext.md       │
 └──────────────────────────────────┘
 ```
 
 ---
 
-## 10. Memory Bank Integration
+## 12. Memory Bank Integration
 
 Located at `.github/memory-bank/`:
 
@@ -254,7 +367,65 @@ Located at `.github/memory-bank/`:
 
 ---
 
-## 11. Security Guardrails
+## 13. Governance & Observability
+
+### 13.1 Governance Hooks
+
+Active hooks in `.github/hooks/`:
+
+| Hook | Events | Purpose |
+|------|--------|---------|
+| `governance-audit` | sessionStart, sessionEnd, userPromptSubmitted | Threat detection, STRIDE-aligned scanning |
+| `session-logger` | sessionStart, sessionEnd, userPromptSubmitted | Session activity tracking |
+| `session-auto-commit` | sessionEnd | Auto-commit changes at session end |
+
+### 13.2 Audit Trail Format
+
+Every governance event produces a JSON log entry:
+
+```json
+{
+  "timestamp": "2025-01-15T10:30:00Z",
+  "event": "prompt_scanned",
+  "governance_level": "standard",
+  "status": "clean"
+}
+```
+
+Threat events include detailed evidence:
+
+```json
+{
+  "timestamp": "2025-01-15T10:31:00Z",
+  "event": "threat_detected",
+  "governance_level": "standard",
+  "threat_count": 1,
+  "max_severity": 0.9,
+  "threats": [
+    {
+      "category": "prompt_injection",
+      "severity": 0.9,
+      "description": "Instruction override",
+      "evidence": "ignore previous instructions"
+    }
+  ]
+}
+```
+
+### 13.3 Observability Metrics
+
+| Metric | Source | Purpose |
+|--------|--------|---------|
+| Tasks completed / session | Orchestration state machine | Throughput |
+| Average retries / task | Task retry counter | Quality signal |
+| Token consumption / agent | Token budget tracker | Cost control |
+| Confidence trend | Confidence gate assessments | Risk detection |
+| Threat detection rate | Governance audit logs | Security posture |
+| DAG completion % | Checkpoint protocol | Progress visibility |
+
+---
+
+## 14. Security Guardrails
 
 See `.github/security.agentic-guardrails.md` for full specification.
 
@@ -266,10 +437,13 @@ Key constraints:
 - Memory bank entries are validated before persistence
 - Token runaway detection halts infinite loops
 - MCP servers are treated as untrusted by default
+- SARIF output format for machine-parseable security findings
+- SBOM generation for supply chain transparency
+- Policy-as-config for governance rules (YAML, not hardcoded)
 
 ---
 
-## 12. CI/CD AI Integration
+## 15. CI/CD AI Integration
 
 See `.github/workflows/ai-*.yml` for workflow definitions.
 
@@ -287,3 +461,31 @@ All workflows:
 - Comment findings on PRs
 - Require human approval for write operations
 - Fail safely (no recursion, bounded execution)
+
+---
+
+## 16. Instruction File Authority
+
+The following instruction files are authoritative references for their
+domains and are loaded from `docs/instructions/`:
+
+| Domain | Instruction File |
+|--------|-----------------|
+| Accessibility | `a11y.instructions.md` |
+| Agent Safety | `agent-safety.instructions.md` |
+| AI Prompt Engineering | `ai-prompt-engineering-safety-best-practices.instructions.md` |
+| Context Engineering | `context-engineering.instructions.md` |
+| Docker/Containers | `containerization-docker-best-practices.instructions.md` |
+| DevOps | `devops-core-principles.instructions.md` |
+| CI/CD | `github-actions-ci-cd-best-practices.instructions.md` |
+| Markdown | `markdown.instructions.md` |
+| Memory Bank | `memory-bank.instructions.md` |
+| Performance | `performance-optimization.instructions.md` |
+| Playwright | `playwright-typescript.instructions.md` |
+| Security/OWASP | `security-and-owasp.instructions.md` |
+| Shell | `shell.instructions.md` |
+| Spec-Driven Workflow | `spec-driven-workflow-v1.instructions.md` |
+| Surgical Edits | `taming-copilot.instructions.md` |
+| Task Implementation | `task-implementation.instructions.md` |
+| Thought Logging | `copilot-thought-logging.instructions.md` |
+| TypeScript | `typescript-5-es2022.instructions.md` |

@@ -1,9 +1,10 @@
 # Orchestration Rules
 
-> **Version:** 1.0.0
+> **Version:** 2.0.0
 > **Owner:** ReaperOAK (CTO / Supervisor Orchestrator)
 > **Authority:** This file defines the canonical rules for task execution,
-> concurrency, and integration validation. All agents MUST comply.
+> concurrency, DAG construction, confidence-gated progression, and integration
+> validation. All agents MUST comply.
 
 ---
 
@@ -62,7 +63,195 @@ stateDiagram-v2
 
 ---
 
-## 2. Concurrency Model
+## 2. DAG Construction Protocol
+
+### 2.1 Task Decomposition into DAG
+
+ReaperOAK MUST decompose every multi-agent objective into a **Directed Acyclic
+Graph** (DAG) before delegating. The DAG makes dependencies explicit, enables
+maximum parallelism, and prevents circular delegation.
+
+```yaml
+dag:
+  objective: "Implement user authentication feature"
+  constructed: "2025-01-15T10:00:00Z"
+  criticalPath: ["TASK-001", "TASK-003", "TASK-005", "TASK-007"]
+  estimatedDuration: "4 batches"
+  
+  nodes:
+    - id: "TASK-001"
+      agent: "ProductManager"
+      description: "Write EARS requirements for auth feature"
+      dependencies: []
+      estimatedTokens: 8000
+      
+    - id: "TASK-002"
+      agent: "Research"
+      description: "Evaluate auth libraries (passport, lucia, better-auth)"
+      dependencies: []
+      estimatedTokens: 12000
+      
+    - id: "TASK-003"
+      agent: "Architect"
+      description: "Design auth architecture with API contracts"
+      dependencies: ["TASK-001", "TASK-002"]
+      estimatedTokens: 15000
+      
+    - id: "TASK-004"
+      agent: "Security"
+      description: "Threat model for auth system"
+      dependencies: ["TASK-003"]
+      estimatedTokens: 10000
+      
+    - id: "TASK-005"
+      agent: "Backend"
+      description: "Implement auth endpoints"
+      dependencies: ["TASK-003", "TASK-004"]
+      estimatedTokens: 25000
+      
+    - id: "TASK-006"
+      agent: "Frontend"
+      description: "Implement login/register UI"
+      dependencies: ["TASK-003"]
+      estimatedTokens: 20000
+      
+    - id: "TASK-007"
+      agent: "QA"
+      description: "Write auth test suite"
+      dependencies: ["TASK-005", "TASK-006"]
+      estimatedTokens: 15000
+      
+  parallelBatches:
+    - batch: 1
+      tasks: ["TASK-001", "TASK-002"]  # No dependencies
+    - batch: 2
+      tasks: ["TASK-003"]              # Depends on batch 1
+    - batch: 3
+      tasks: ["TASK-004", "TASK-006"]  # Can run in parallel
+    - batch: 4
+      tasks: ["TASK-005"]              # Depends on TASK-004
+    - batch: 5
+      tasks: ["TASK-007"]              # Depends on TASK-005, TASK-006
+```
+
+### 2.2 DAG Validation Rules
+
+Before executing a DAG:
+
+1. **Acyclicity check:** No circular dependencies allowed
+2. **Completeness check:** Every task has an assigned agent
+3. **Scope isolation:** No two tasks in the same batch write to the same files
+4. **Critical path identification:** Highlight the longest dependency chain
+5. **Token budget validation:** Sum of all estimated tokens < session budget
+6. **No orphan tasks:** Every task is reachable from the DAG root
+
+### 2.3 DAG Checkpoint Protocol
+
+After each batch completes:
+
+```yaml
+checkpoint:
+  batchId: "BATCH-003"
+  completedAt: "2025-01-15T10:35:00Z"
+  tasksCompleted: ["TASK-004", "TASK-006"]
+  tasksRemaining: ["TASK-005", "TASK-007"]
+  tokensBurned: 45000
+  tokensRemaining: 155000
+  confidenceLevel: "HIGH"
+  blockers: []
+  memoryBankUpdated: true
+  nextBatch: "BATCH-004"
+```
+
+If a session expires mid-DAG, the checkpoint enables exact resumption.
+
+---
+
+## 3. Confidence-Gated Progression
+
+### 3.1 Confidence Assessment Protocol
+
+Before transitioning between major phases (Analysis → Design → Implementation
+→ Validation), ReaperOAK MUST assess confidence:
+
+| Level | Range | Action |
+|-------|-------|--------|
+| **HIGH** | 90-100% | Proceed to next phase immediately |
+| **MEDIUM** | 70-89% | Proceed with explicit risk acknowledgment |
+| **LOW** | 50-69% | Halt. Gather more context before proceeding |
+| **INSUFFICIENT** | <50% | Escalate to human for clarification |
+
+### 3.2 Confidence Factors
+
+| Factor | Weight | Source |
+|--------|--------|--------|
+| Requirements clarity | 25% | ProductManager deliverable completeness |
+| Architecture fitness | 20% | Architect ADR + fitness function results |
+| Codebase understanding | 20% | Files read / files relevant ratio |
+| Test coverage plan | 15% | QA test matrix completeness |
+| Security assessment | 10% | Security threat model coverage |
+| Prior art availability | 10% | Research evidence strength |
+
+### 3.3 Confidence Declaration Format
+
+```yaml
+confidenceGate:
+  phase: "Design → Implementation"
+  assessedBy: "ReaperOAK"
+  timestamp: "2025-01-15T10:30:00Z"
+  overallConfidence: 85
+  factors:
+    requirementsClarity: 90
+    architectureFitness: 85
+    codebaseUnderstanding: 80
+    testCoveragePlan: 75
+    securityAssessment: 90
+    priorArtAvailability: 85
+  decision: "PROCEED"
+  risks:
+    - "Test coverage plan needs expansion for edge cases"
+  mitigations:
+    - "QA will add boundary analysis in parallel with implementation"
+```
+
+---
+
+## 4. RUG Discipline (Read-Understand-Generate)
+
+### 4.1 Mandatory RUG Sequence
+
+Every agent MUST follow this sequence before generating any output:
+
+1. **READ:** Gather all relevant context
+   - Read delegation packet completely
+   - Read referenced files and memory bank entries
+   - Read cross-cutting protocols
+   
+2. **UNDERSTAND:** Confirm comprehension before acting
+   - State the objective in your own words
+   - List assumptions being made
+   - Identify what you know vs. what you're uncertain about
+   - Declare confidence level
+   
+3. **GENERATE:** Produce output only after R and U are complete
+   - Generate output constrained to understood scope
+   - Flag any gaps discovered during generation
+   - Self-reflect on output quality before submitting
+
+### 4.2 RUG Violation Detection
+
+ReaperOAK detects RUG violations when:
+
+| Signal | Detection | Action |
+|--------|-----------|--------|
+| Output references files not read | Agent mentions file content without tool call | REJECTED + retry |
+| Assumptions not declared | Agent proceeds without listing assumptions | Warning on first offense, REJECTED on second |
+| Confidence not stated | Agent skips confidence declaration | REJECTED + mandatory declaration |
+| Hallucinated content | Output contains unverifiable claims | REJECTED + evidence demand |
+
+---
+
+## 5. Concurrency Model
 
 ### Parallel Execution Categories
 
@@ -116,7 +305,7 @@ Since we operate in a file-system environment without true locks:
 
 ---
 
-## 3. Integration Validation Gate
+## 6. Integration Validation Gate
 
 After every parallel batch completes, ReaperOAK runs an integration
 validation gate before proceeding:
@@ -129,6 +318,7 @@ validation gate before proceeding:
 4. **Syntax validation:** All modified files parse without errors
 5. **Convention check:** All changes follow `systemPatterns.md` conventions
 6. **Dependency check:** No circular or broken imports introduced
+7. **Confidence re-assessment:** Update confidence based on gate results
 
 ### Gate Outcomes
 
@@ -139,10 +329,51 @@ validation gate before proceeding:
 | Test failure | Route failing module to QA for investigation |
 | Syntax error | Route to originating agent for fix |
 | Convention violation | Route to originating agent with specific rule reference |
+| Confidence drop below 70% | Halt and reassess DAG |
 
 ---
 
-## 4. Rollback Strategy
+## 7. Cost & Token Tracking
+
+### 7.1 Token Budget Management
+
+Every DAG has a token budget. ReaperOAK tracks consumption:
+
+```yaml
+tokenBudget:
+  sessionTotal: 200000
+  allocated:
+    ProductManager: 15000
+    Architect: 20000
+    Backend: 40000
+    Frontend: 35000
+    QA: 25000
+    Security: 15000
+    DevOps: 15000
+    Documentation: 15000
+    Research: 15000
+    CIReviewer: 5000
+  consumed:
+    ProductManager: 8200
+    Architect: 0
+    # ... updated in real-time
+  remaining: 191800
+  burnRate: "8200 tokens / 2 tasks"
+  projectedOverrun: false
+```
+
+### 7.2 Budget Enforcement
+
+| Threshold | Action |
+|-----------|--------|
+| 70% consumed | Log warning, assess remaining work |
+| 85% consumed | Compress remaining tasks, reduce scope if needed |
+| 95% consumed | Complete only critical-path tasks |
+| 100% consumed | Checkpoint state, prepare handoff note |
+
+---
+
+## 8. Rollback Strategy
 
 ### Task-Level Rollback
 
@@ -179,7 +410,7 @@ If the system enters an irrecoverable state:
 
 ---
 
-## 5. Infinite Loop Detection Heuristic
+## 9. Infinite Loop Detection Heuristic
 
 ### Detection Criteria
 
@@ -193,6 +424,7 @@ A task is suspected of infinite looping if ANY of the following are true:
 | Execution time | > 15 minutes per task | Warn at 10min, halt at 15min |
 | File unchanged after edit | Agent claims edit but diff shows no change | Increment retry, warn |
 | Circular delegation | Agent A delegates to B, B delegates back to A | Immediate halt |
+| Confidence regression | Confidence drops below entry level after 2 retries | Escalate |
 
 ### Prevention Mechanisms
 
@@ -215,7 +447,7 @@ A task is suspected of infinite looping if ANY of the following are true:
 
 ---
 
-## 6. Delegation Protocol
+## 10. Delegation Protocol
 
 ### Pre-Delegation Checklist (ReaperOAK)
 
@@ -230,6 +462,8 @@ Before delegating any task:
 - [ ] Dependencies are resolved (all prerequisite tasks MERGED)
 - [ ] File ownership declared (for parallel batches)
 - [ ] Timeout budget assigned
+- [ ] Confidence level assessed (≥70% to proceed)
+- [ ] Cross-cutting protocols reference included
 
 ### Post-Delegation Checklist (ReaperOAK)
 
@@ -242,10 +476,12 @@ After receiving subagent output:
 - [ ] No forbidden actions were taken
 - [ ] Memory bank entries are properly formatted and timestamped
 - [ ] No hallucinated capabilities claimed
+- [ ] Self-reflection quality score ≥ 7/10
+- [ ] Token consumption within budget
 
 ---
 
-## 7. Communication Protocol
+## 11. Communication Protocol
 
 ### Agent-to-Orchestrator Communication
 
@@ -273,10 +509,35 @@ through ReaperOAK. This ensures:
 error:
   taskId: string
   agent: string
-  errorType: "compile" | "test" | "runtime" | "scope_violation" | "blocked"
+  errorType: "compile" | "test" | "runtime" | "scope_violation" | "blocked" | "confidence_insufficient"
   message: string
   stackTrace: string  # if applicable
   attemptedFix: string  # what the agent tried
   retryCount: number
+  confidenceLevel: number
   recommendation: string  # what should happen next
 ```
+
+---
+
+## 12. Governance Hooks Integration
+
+The following hooks are deployed in `.github/hooks/` and activate
+automatically during Copilot sessions:
+
+| Hook | Trigger | Purpose |
+|------|---------|---------|
+| `governance-audit` | sessionStart, sessionEnd, userPromptSubmitted | Threat detection, audit logging |
+| `session-logger` | sessionStart, sessionEnd, userPromptSubmitted | Session activity tracking |
+| `session-auto-commit` | sessionEnd | Auto-commit changes at session end |
+
+### Governance Levels
+
+| Level | Behavior |
+|-------|----------|
+| `open` | Log only, no blocking |
+| `standard` | Log + warn on threats (default) |
+| `strict` | Log + block prompts with threat signals |
+| `locked` | Log + block + require human approval for all tool use |
+
+Configuration: Set `GOVERNANCE_LEVEL` environment variable in hooks.json.
