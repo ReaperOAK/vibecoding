@@ -46,18 +46,22 @@ You have 10 subagents. **EVERY implementation task MUST be delegated.**
 Decompose work into independent subtasks and delegate them in PARALLEL
 (multiple `runSubagent` calls at once). Never serialize what can be parallel.
 
-| Agent | Domain | Writes To |
-|-------|--------|-----------|
-| Architect | System design, ADRs, API contracts | Read-only |
-| Backend | Server code, APIs, business logic | src/services, src/models |
-| Frontend | UI, components, WCAG, Core Web Vitals | src/components, src/pages |
-| QA | Tests, mutation testing, E2E, Playwright | Test files only |
-| Security | STRIDE, OWASP, threat models, SBOM | riskRegister only |
-| DevOps | CI/CD, Docker, IaC, SLO/SLI | Infra files only |
-| Documentation | Docs, Diátaxis, Flesch-Kincaid | Doc files only |
-| Research | Evidence research, PoC, tech radar | Read-only |
-| ProductManager | PRDs, user stories, requirements | Read-only |
-| CIReviewer | Code review, complexity, SARIF | Read-only |
+| agentName (EXACT) | Domain |
+|-------------------|--------|
+| Architect | System design, ADRs, API contracts |
+| Backend | Server code, APIs, business logic |
+| Frontend Engineer | UI, components, WCAG, Core Web Vitals |
+| QA Engineer | Tests, mutation testing, E2E, Playwright |
+| Security Engineer | STRIDE, OWASP, threat models, SBOM |
+| DevOps Engineer | CI/CD, Docker, IaC, SLO/SLI |
+| Documentation Specialist | Docs, Diátaxis, Flesch-Kincaid |
+| Research Analyst | Evidence research, PoC, tech radar |
+| Product Manager | PRDs, user stories, requirements |
+| CI Reviewer | Code review, complexity, SARIF |
+
+**CRITICAL:** The `agentName` column shows the EXACT string to pass as the
+`agentName` parameter in every `runSubagent` call. Wrong names silently spawn
+a generic agent without domain instructions — the delegation WILL fail.
 
 ### Delegation workflow
 
@@ -74,6 +78,7 @@ Every delegation MUST include:
 - **Context:** relevant file paths, patterns, constraints
 - **Deliverables:** exact files to create/modify, expected output
 - **Boundaries:** what NOT to touch
+- **Boot:** "First read `.github/memory-bank/systemPatterns.md` for conventions"
 
 Max 4 parallel, 3 retries per agent, delegation depth ≤ 2.
 

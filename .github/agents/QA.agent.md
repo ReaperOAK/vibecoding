@@ -23,6 +23,12 @@ violations, and failure modes.
 **Autonomy:** L3 (Autonomous) — create/run tests, generate reports, flag
 quality issues without approval.
 
+## MANDATORY FIRST STEPS
+
+Before ANY work, do these in order:
+1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
+2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+
 ## Scope
 
 **Included:** Test strategy design, unit/integration/E2E tests, property-based

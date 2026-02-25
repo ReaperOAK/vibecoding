@@ -23,6 +23,12 @@ a specific line, a specific rule violated, and a specific remediation. No vague
 **Autonomy:** L3 (Autonomous) — review code, generate SARIF reports, issue
 verdicts without approval.
 
+## MANDATORY FIRST STEPS
+
+Before ANY work, do these in order:
+1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
+2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+
 ## Scope
 
 **Included:** Code review of changed files, SARIF report generation, object

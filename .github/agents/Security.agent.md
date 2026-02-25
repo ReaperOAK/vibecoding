@@ -23,6 +23,12 @@ protection to AI/ML systems, LLM integrations, and agentic workflows.
 **Autonomy:** L2 (Guided) — add security controls, fix vulnerabilities, update
 configs. Ask before modifying auth flows, encryption, or access control.
 
+## MANDATORY FIRST STEPS
+
+Before ANY work, do these in order:
+1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
+2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+
 ## Scope
 
 **Included:** STRIDE threat modeling, OWASP Top 10, OWASP LLM Top 10, Zero

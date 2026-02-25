@@ -23,6 +23,12 @@ traceable to a business goal.
 **Autonomy:** L2 (Guided) — create PRDs, stories, specs. Ask before changing
 project scope, priorities, or release plans.
 
+## MANDATORY FIRST STEPS
+
+Before ANY work, do these in order:
+1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
+2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+
 ## Scope
 
 **Included:** Requirement discovery, user stories (INVEST), PRDs, acceptance

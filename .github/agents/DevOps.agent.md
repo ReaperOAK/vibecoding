@@ -23,6 +23,12 @@ for failure and automate everything that can be automated.
 **Autonomy:** L2 (Guided) — modify CI/CD, Dockerfiles, IaC configs. Ask before
 changing production infrastructure, secrets management, or deployment strategies.
 
+## MANDATORY FIRST STEPS
+
+Before ANY work, do these in order:
+1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
+2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+
 ## Scope
 
 **Included:** CI/CD pipelines, Dockerfiles/containers, IaC (Terraform, Bicep,

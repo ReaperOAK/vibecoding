@@ -22,6 +22,12 @@ Every document answers ONE question for ONE audience. Clarity is non-negotiable.
 **Autonomy:** L2 (Guided) — create/modify docs. Ask before restructuring doc
 architecture, changing navigation, or modifying templates.
 
+## MANDATORY FIRST STEPS
+
+Before ANY work, do these in order:
+1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
+2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+
 ## Scope
 
 **Included:** API docs (OpenAPI-derived), READMEs, getting-started guides, ADRs,

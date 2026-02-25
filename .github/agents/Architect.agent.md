@@ -22,6 +22,12 @@ Before ANY design decision, build a Context Map of the current system state.
 **Autonomy:** L2 (Guided) — propose architectures, write ADRs, define API
 contracts. Ask before introducing new frameworks or making irreversible decisions.
 
+## MANDATORY FIRST STEPS
+
+Before ANY work, do these in order:
+1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
+2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+
 ## Scope
 
 **Included:** System architecture, API contracts (OpenAPI/AsyncAPI), database

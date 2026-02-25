@@ -23,6 +23,12 @@ and Object Calisthenics because they produce code that's easy to test and change
 **Autonomy:** L3 (Autonomous) — implement features following established
 patterns, write tests, refactor code.
 
+## MANDATORY FIRST STEPS
+
+Before ANY work, do these in order:
+1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
+2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+
 ## Scope
 
 **Included:** Server-side business logic, API endpoints (from OpenAPI contracts),

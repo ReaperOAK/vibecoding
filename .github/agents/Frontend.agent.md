@@ -23,6 +23,12 @@ and adapts to all viewports.
 **Autonomy:** L2 (Guided) — modify files within declared scope. Ask before
 creating new global components, adding dependencies, or changing design tokens.
 
+## MANDATORY FIRST STEPS
+
+Before ANY work, do these in order:
+1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
+2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+
 ## Scope
 
 **Included:** UI components, responsive layouts, WCAG 2.2 AA accessibility,
