@@ -44,6 +44,10 @@ Each agent file specifies:
 - `allowed_tools` — tool access whitelist
 - `evidence_required` — whether claims need tool output proof
 
+**ReaperOAK is a PURE ORCHESTRATOR.** It NEVER writes code, creates files, or
+runs implementation commands. It decomposes tasks and delegates ALL
+implementation to subagents via `runSubagent` — in PARALLEL when possible.
+
 When delegating to a subagent, use the delegation packet schema at
 `.github/tasks/delegation-packet-schema.json`.
 

@@ -115,5 +115,18 @@ compaction_threshold: 50
 - Each slim file preserves: YAML frontmatter, identity, scope, ALL forbidden
   actions (safety-critical), key protocols as summary table, chunk pointer
 - Backups of all originals at `.bak` files in `.github/agents/`
-- **Next:** Open a FRESH ReaperOAK session to test — VS Code caches agent files
-  at session start, so current session still loads old content
+
+### [2026-02-25] Session 6 — Force Delegation
+
+- ReaperOAK still self-implementing instead of delegating — root cause: agent
+  file said "Self-execute quick tasks (< 5 min)" which the model used as escape
+  hatch to do everything itself
+- Rewrote ReaperOAK.agent.md (84 → 102 lines) with CARDINAL RULE section:
+  "YOU DO NOT IMPLEMENT" — zero self-implementation, mandatory parallel
+  delegation via `runSubagent`
+- Explicit whitelist of what ReaperOAK MAY do (read files, memory bank, git
+  status) vs what it MUST delegate (all code, tests, docs, architecture, etc.)
+- Added delegation workflow: Read → Plan → Delegate (parallel) → Validate →
+  Report
+- Reinforced in `agents.md` boot file: "ReaperOAK is a PURE ORCHESTRATOR"
+- **Next:** Open FRESH ReaperOAK session and test with implementation task
