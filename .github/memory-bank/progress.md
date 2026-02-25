@@ -40,6 +40,16 @@ append_only: true
 | Claude Code slash commands | Claude Code | 5 commands in `.claude/commands/` (memory-bank-read, memory-bank-update, review, plan, security-audit, debug) | ✅ Complete |
 | Memory bank update for dual-agent support | Claude Code | `activeContext.md` and `progress.md` updated | ✅ Complete |
 
+### [2026-02-24] System Hardening & Context Optimization
+
+| Task | Agent | Evidence | Status |
+|------|-------|----------|--------|
+| Phases A-K: Full system build | ReaperOAK | All 11 phases complete — agents, orchestration, security, chunks, catalog, guardian, hooks, workflows | ✅ Complete |
+| Boot files created | ReaperOAK | `copilot-instructions.md` (45 lines) + `agents.md` (80 lines) | ✅ Complete |
+| Instructions folder deleted | User | `.github/instructions/` removed — chunks sole source | ✅ Complete |
+| catalog.yml cleaned | ReaperOAK | Stale instruction file refs removed | ✅ Complete |
+| Context bloat fix — all 12 files slimmed | ReaperOAK | 7,787 → 826 total lines (89% reduction), `wc -l` verified | ✅ Complete |
+
 ---
 
 ## In Progress
@@ -48,7 +58,7 @@ append_only: true
 
 | Task | Agent | Started | Status |
 |------|-------|---------|--------|
-| Phase 4: Subagent Generation | ReaperOAK | 2026-02-21 | 🔄 In Progress |
+| _None_ | — | — | — |
 
 ---
 
@@ -58,11 +68,8 @@ append_only: true
 
 | Task | Priority | Dependencies |
 |------|----------|-------------|
-| Phase 5: Parallel Execution Framework | P0 | Phase 4 |
-| Phase 6: CI/CD AI Integration | P1 | Phase 5 |
-| Phase 7: Security Hardening | P0 | Phase 4 |
-| Phase 8: ReaperOAK Upgrade | P0 | Phase 4-7 |
-| Phase 9: Final Validation | P0 | Phase 8 |
+| Smoke test: fresh ReaperOAK session | P0 | Context bloat fix |
+| Begin actual project development | P1 | Smoke test pass |
 
 ---
 

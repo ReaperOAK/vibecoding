@@ -95,3 +95,25 @@ compaction_threshold: 50
 - Integrated Claude Code as a vibecoding agent alongside GitHub Copilot
 - Created CLAUDE.md, .claude/settings.json, hooks, and slash commands
 - Full dual-agent support now operational
+### [2026-02-24] Sessions 3-5 — Context Bloat Fix
+
+- Completed all 11 hardening phases (A-K): subagent files, orchestration rules,
+  security guardrails, chunk system, catalog, cross-cutting protocols,
+  guardian, locks, sandbox, observability, hooks, workflows
+- Created boot files: `.github/copilot-instructions.md` (45 lines) +
+  `agents.md` at repo root (80 lines) — auto-load chain for all sessions
+- User deleted `.github/instructions/` folder — chunks are sole source of truth
+- Cleaned `catalog.yml` of stale references to deleted instruction files
+- **Context bloat diagnosed:** agent files were 585-1,052 lines each, consuming
+  too much context window, preventing delegation behavior
+- **All 12 agent files slimmed** (total: 7,787 → 826 lines, ~89% reduction):
+  - ReaperOAK: 1,052 → 84 lines
+  - Architect: 666 → 61 | Backend: 711 → 68 | Frontend: 716 → 64
+  - QA: 774 → 66 | Security: 769 → 65 | DevOps: 780 → 69
+  - Documentation: 807 → 68 | Research: 704 → 68 | ProductManager: 585 → 67
+  - CIReviewer: 614 → 65 | _cross-cutting-protocols: 493 → 81
+- Each slim file preserves: YAML frontmatter, identity, scope, ALL forbidden
+  actions (safety-critical), key protocols as summary table, chunk pointer
+- Backups of all originals at `.bak` files in `.github/agents/`
+- **Next:** Open a FRESH ReaperOAK session to test — VS Code caches agent files
+  at session start, so current session still loads old content
