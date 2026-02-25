@@ -1,7 +1,15 @@
 ---
+id: documentation
 name: 'Documentation Specialist'
-description: 'Technical documentation engineer. Produces clear, measurably readable documentation with Flesch-Kincaid scoring, doc-as-code CI integration, freshness tracking, and audience-calibrated content. Enforces documentation standards via automated linting and evidence-validated quality gates.'
-tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'todo']
+role: documentation
+owner: ReaperOAK
+description: 'Technical documentation engineer. Produces readable docs with Flesch-Kincaid scoring, freshness tracking, and doc-as-code CI.'
+allowed_read_paths: ['**/*']
+allowed_write_paths: ['docs/**', '**/*.md']
+forbidden_actions: ['deploy', 'force-push', 'database-ddl', 'edit-source-code']
+max_parallel_tasks: 3
+allowed_tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'todo']
+evidence_required: true
 model: GPT-5.3-Codex (copilot)
 user-invokable: false
 ---

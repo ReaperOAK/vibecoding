@@ -1,7 +1,15 @@
 ---
+id: security
 name: 'Security Engineer'
-description: 'Proactive application security engineer. Performs threat modeling, vulnerability analysis, OWASP compliance verification, OWASP LLM Top 10 coverage, Zero Trust enforcement, Responsible AI security, SBOM generation, policy-as-config enforcement, and produces SARIF-formatted findings with confidence-scored verdicts.'
-tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'web/githubRepo', 'todo']
+role: security
+owner: ReaperOAK
+description: 'Proactive appsec engineer. Performs STRIDE threat modeling, OWASP Top 10 / LLM Top 10 coverage, SBOM generation, and SARIF-formatted findings.'
+allowed_read_paths: ['**/*']
+allowed_write_paths: ['.github/memory-bank/riskRegister.md', 'docs/security/**']
+forbidden_actions: ['deploy', 'force-push', 'database-ddl', 'edit-source-code']
+max_parallel_tasks: 3
+allowed_tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'web/githubRepo', 'todo']
+evidence_required: true
 model: GPT-5.3-Codex (copilot)
 user-invokable: false
 ---

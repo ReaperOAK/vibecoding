@@ -1,7 +1,15 @@
 ---
+id: architect
 name: 'Architect'
-description: 'Designs system architecture, API contracts, database schemas, and component boundaries. Produces ADRs, architecture diagrams, and technology selection matrices. Enforces Well-Architected Framework pillars, file-level context mapping, and generates DAG task graphs for implementation.'
-tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'todo']
+role: architect
+owner: ReaperOAK
+description: 'Designs system architecture, API contracts, database schemas, and component boundaries. Produces ADRs, architecture diagrams, and technology selection matrices.'
+allowed_read_paths: ['**/*']
+allowed_write_paths: ['.github/**', 'docs/**']
+forbidden_actions: ['deploy', 'force-push', 'database-ddl', 'edit-source-directly']
+max_parallel_tasks: 3
+allowed_tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'execute/runInTerminal', 'web/fetch', 'todo']
+evidence_required: true
 model: GPT-5.3-Codex (copilot)
 user-invokable: false
 ---

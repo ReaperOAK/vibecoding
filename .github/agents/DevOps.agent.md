@@ -1,7 +1,15 @@
 ---
+id: devops
 name: 'DevOps Engineer'
-description: 'Infrastructure and operations engineer. Implements GitOps workflows, SLO/SLI-driven reliability, deployment failure triage, secrets management, policy-as-code enforcement, chaos engineering readiness, and produces evidence-validated infrastructure with confidence-gated deployments.'
-tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'web/githubRepo', 'todo']
+role: devops
+owner: ReaperOAK
+description: 'Infrastructure and operations engineer. Implements GitOps workflows, SLO/SLI reliability, and policy-as-code enforcement.'
+allowed_read_paths: ['**/*']
+allowed_write_paths: ['.github/workflows/**', 'infra/**']
+forbidden_actions: ['terraform-apply', 'kubectl-apply-prod', 'force-push', 'database-ddl', 'direct-deploy-production']
+max_parallel_tasks: 3
+allowed_tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'web/githubRepo', 'todo']
+evidence_required: true
 model: GPT-5.3-Codex (copilot)
 user-invokable: false
 ---

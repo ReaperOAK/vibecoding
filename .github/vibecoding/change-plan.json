@@ -1,0 +1,393 @@
+{
+  "version": "2.0.0",
+  "generated": "2025-07-19",
+  "generator": "ReaperOAK",
+  "description": "Complete inventory of files created and modified across hardening Phases A–K",
+  "phases": {
+    "A": {
+      "name": "Discovery & Indexing",
+      "files_created": [
+        {
+          "path": ".github/vibecoding/index.json",
+          "reason": "Context index mapping every .github file to token-efficient chunk references"
+        },
+        {
+          "path": ".github/vibecoding/catalog.yml",
+          "reason": "Tag registry with 14 domain tags for cross-cutting lookup"
+        },
+        {
+          "path": ".github/vibecoding/chunks/*.chunk.yml",
+          "reason": "91 YAML chunk files, each ≤4000 tokens, for progressive context loading",
+          "count": 91
+        }
+      ]
+    },
+    "B": {
+      "name": "Agent Frontmatter + Instruction Micropolicies",
+      "files_modified": [
+        {
+          "path": ".github/agents/Architect.agent.md",
+          "reason": "Added canonical YAML schema (id, role, owner, read/write paths, forbidden_actions, tools)"
+        },
+        {
+          "path": ".github/agents/Backend.agent.md",
+          "reason": "Added canonical YAML schema"
+        },
+        {
+          "path": ".github/agents/CIReviewer.agent.md",
+          "reason": "Added canonical YAML schema"
+        },
+        {
+          "path": ".github/agents/DevOps.agent.md",
+          "reason": "Added canonical YAML schema"
+        },
+        {
+          "path": ".github/agents/Documentation.agent.md",
+          "reason": "Added canonical YAML schema"
+        },
+        {
+          "path": ".github/agents/Frontend.agent.md",
+          "reason": "Added canonical YAML schema"
+        },
+        {
+          "path": ".github/agents/ProductManager.agent.md",
+          "reason": "Added canonical YAML schema"
+        },
+        {
+          "path": ".github/agents/QA.agent.md",
+          "reason": "Added canonical YAML schema"
+        },
+        {
+          "path": ".github/agents/ReaperOAK.agent.md",
+          "reason": "Added canonical YAML schema"
+        },
+        {
+          "path": ".github/agents/Research.agent.md",
+          "reason": "Added canonical YAML schema"
+        },
+        {
+          "path": ".github/agents/Security.agent.md",
+          "reason": "Added canonical YAML schema"
+        },
+        {
+          "path": ".github/instructions/a11y.instructions.md",
+          "reason": "Added micropolicy header (id, domain_tags, precedence, owner_agent, immutable, token_cost_target)"
+        },
+        {
+          "path": ".github/instructions/agent-safety.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/ai-prompt-engineering-safety-best-practices.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/containerization-docker-best-practices.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/context-engineering.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/copilot-thought-logging.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/devops-core-principles.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/gilfoyle-code-review.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/github-actions-ci-cd-best-practices.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/markdown.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/memory-bank.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/mermaid.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/nestjs.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/nextjs.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/performance-optimization.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/playwright-typescript.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/react-native.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/security-and-owasp.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/shell.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/spec-driven-workflow-v1.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/taming-copilot.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/task-implementation.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/terraform-sap-btp.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/todo.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/typescript-5-es2022.instructions.md",
+          "reason": "Added micropolicy header"
+        },
+        {
+          "path": ".github/instructions/update-docs-on-code-change.instructions.md",
+          "reason": "Added micropolicy header"
+        }
+      ]
+    },
+    "C": {
+      "name": "Memory Bank Schema",
+      "files_created": [
+        {
+          "path": ".github/memory-bank/schema.md",
+          "reason": "JSON schemas defining structure for all 6 memory bank files"
+        }
+      ],
+      "files_modified": [
+        {
+          "path": ".github/memory-bank/activeContext.md",
+          "reason": "Added YAML frontmatter with schema fields"
+        },
+        {
+          "path": ".github/memory-bank/decisionLog.md",
+          "reason": "Added YAML frontmatter"
+        },
+        {
+          "path": ".github/memory-bank/productContext.md",
+          "reason": "Added YAML frontmatter"
+        },
+        {
+          "path": ".github/memory-bank/progress.md",
+          "reason": "Added YAML frontmatter"
+        },
+        {
+          "path": ".github/memory-bank/riskRegister.md",
+          "reason": "Added YAML frontmatter"
+        },
+        {
+          "path": ".github/memory-bank/systemPatterns.md",
+          "reason": "Added YAML frontmatter"
+        }
+      ]
+    },
+    "D": {
+      "name": "Delegation & Claim Schemas",
+      "files_created": [
+        {
+          "path": ".github/tasks/delegation-packet-schema.json",
+          "reason": "JSON Schema for delegation packet structure (taskId, agent, autonomyLevel, scope, constraints)"
+        },
+        {
+          "path": ".github/tasks/claim-schema.json",
+          "reason": "JSON Schema for agent claim format"
+        }
+      ]
+    },
+    "E": {
+      "name": "Lockfile & Merge Protocol",
+      "files_created": [
+        {
+          "path": ".github/locks/lockfile-schema.json",
+          "reason": "JSON Schema for agent file locks (owner, paths, ttl, acquired)"
+        },
+        {
+          "path": ".github/tasks/merge-protocol.md",
+          "reason": "Full merge lifecycle: PENDING → VALIDATED → MERGED / REJECTED"
+        }
+      ]
+    },
+    "F": {
+      "name": "CI Workflows",
+      "files_created": [
+        {
+          "path": ".github/workflows/ai-task-runner.yml",
+          "reason": "GitHub Actions workflow to pick tasks from queue and dispatch to agents"
+        },
+        {
+          "path": ".github/workflows/ai-sandbox-merge.yml",
+          "reason": "Workflow to apply patches from sandbox and create PRs"
+        },
+        {
+          "path": ".github/workflows/memory-verify.yml",
+          "reason": "Workflow to verify memory bank YAML frontmatter integrity"
+        }
+      ]
+    },
+    "G": {
+      "name": "Observability & Safety",
+      "files_created": [
+        {
+          "path": ".github/observability/agent-trace-schema.json",
+          "reason": "JSON Schema for agent traces with 17 event types"
+        },
+        {
+          "path": ".github/guardian/STOP_ALL",
+          "reason": "Circuit breaker file (CLEAR / HALT_ALL). Currently set to CLEAR."
+        },
+        {
+          "path": ".github/guardian/loop-detection-rules.md",
+          "reason": "Loop detection signals and token budget tier rules"
+        }
+      ]
+    },
+    "H": {
+      "name": "Summarization Spec",
+      "files_created": [
+        {
+          "path": ".github/vibecoding/summarization-spec.md",
+          "reason": "Session summarizer specification for context compaction across sessions"
+        }
+      ]
+    },
+    "I": {
+      "name": "Sandbox ACLs",
+      "files_created": [
+        {
+          "path": ".github/sandbox/tool-acl.yaml",
+          "reason": "Per-agent tool access control lists mapping agent IDs to allowed/denied tools"
+        }
+      ]
+    },
+    "J": {
+      "name": "Validation Report + Diagram",
+      "files_created": [
+        {
+          "path": ".github/orchestration.mmd",
+          "reason": "Full Mermaid topology diagram of the multi-agent system"
+        }
+      ],
+      "files_modified": [
+        {
+          "path": ".github/VALIDATION-REPORT.md",
+          "reason": "Rewritten to v2.0.0 covering all Phase A–K artifacts (9 sections)"
+        }
+      ]
+    },
+    "K": {
+      "name": "Archive Redundant Files",
+      "files_archived": [
+        {
+          "from": ".github/orchestration.md",
+          "to": ".github/archives/orchestration.md",
+          "reason": "Superseded by orchestration.mmd"
+        },
+        {
+          "from": ".github/instructions/CTO/CTO Playbook.md",
+          "to": ".github/archives/CTO/CTO Playbook.md",
+          "reason": "Human-oriented doc, not a micropolicy instruction file"
+        },
+        {
+          "from": ".github/instructions/CTO/SDLC.md",
+          "to": ".github/archives/CTO/SDLC.md",
+          "reason": "Human-oriented doc, not a micropolicy instruction file"
+        },
+        {
+          "from": ".github/instructions/CTO/Startup Scalability_ Technical Foundations Playbook.md",
+          "to": ".github/archives/CTO/Startup Scalability_ Technical Foundations Playbook.md",
+          "reason": "Human-oriented doc, not a micropolicy instruction file"
+        },
+        {
+          "from": ".github/instructions/SDLC/1. SDLC.md",
+          "to": ".github/archives/SDLC/1. SDLC.md",
+          "reason": "SDLC reference guide, not a micropolicy"
+        },
+        {
+          "from": ".github/instructions/SDLC/2. Project Selection Tactics for Pre-Phase.md",
+          "to": ".github/archives/SDLC/",
+          "reason": "SDLC reference guide"
+        },
+        {
+          "from": ".github/instructions/SDLC/3. PRD for Planning & Discovery.md",
+          "to": ".github/archives/SDLC/",
+          "reason": "SDLC reference guide"
+        },
+        {
+          "from": ".github/instructions/SDLC/4. SRS Creation for Planning & Discovery.md",
+          "to": ".github/archives/SDLC/",
+          "reason": "SDLC reference guide"
+        },
+        {
+          "from": ".github/instructions/SDLC/5. User Stories in Planning & Discovery.md",
+          "to": ".github/archives/SDLC/",
+          "reason": "SDLC reference guide"
+        },
+        {
+          "from": ".github/instructions/SDLC/6. High-Level Project Plan Guide.md",
+          "to": ".github/archives/SDLC/",
+          "reason": "SDLC reference guide"
+        },
+        {
+          "from": ".github/instructions/SDLC/7. Figma Prototypes for Architecture & Design.md",
+          "to": ".github/archives/SDLC/",
+          "reason": "SDLC reference guide"
+        },
+        {
+          "from": ".github/instructions/SDLC/8. Technical Design Doc for Architecture.md",
+          "to": ".github/archives/SDLC/",
+          "reason": "SDLC reference guide"
+        },
+        {
+          "from": ".github/instructions/SDLC/9. API Contract Definition in Architecture.md",
+          "to": ".github/archives/SDLC/",
+          "reason": "SDLC reference guide"
+        },
+        {
+          "from": ".github/instructions/SDLC/10. Implementation Phase Best Practices Guide.md",
+          "to": ".github/archives/SDLC/",
+          "reason": "SDLC reference guide"
+        },
+        {
+          "from": ".github/instructions/SDLC/11. QA Best Practices and Strategy Guide.md",
+          "to": ".github/archives/SDLC/",
+          "reason": "SDLC reference guide"
+        }
+      ]
+    }
+  },
+  "totals": {
+    "files_created": 17,
+    "files_modified": 43,
+    "files_archived": 15,
+    "phases_completed": 11
+  }
+}

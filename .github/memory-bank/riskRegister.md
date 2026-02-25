@@ -1,3 +1,11 @@
+---
+id: risk-register
+version: "1.0"
+owner: [Security, ReaperOAK]
+write_access: [Security, ReaperOAK]
+append_only: true
+---
+
 # Risk Register
 
 > **Schema Version:** 1.0

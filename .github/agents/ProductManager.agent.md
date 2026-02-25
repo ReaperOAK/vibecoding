@@ -1,7 +1,15 @@
 ---
+id: product
 name: 'Product Manager'
-description: 'Translates business requirements into structured PRDs, user stories, and task specifications. Manages project scope, stakeholder alignment, requirement discovery, hypothesis-driven development, and requirement traceability. Operates as the bridge between human intent and engineering execution.'
-tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'todo']
+role: product
+owner: ReaperOAK
+description: 'Translates business requirements into PRDs, user stories, and task specs. Bridges human intent and engineering execution.'
+allowed_read_paths: ['**/*']
+allowed_write_paths: ['docs/**', '.github/memory-bank/productContext.md']
+forbidden_actions: ['deploy', 'force-push', 'database-ddl', 'edit-source-code', 'edit-systemPatterns']
+max_parallel_tasks: 3
+allowed_tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'todo']
+evidence_required: true
 model: GPT-5.3-Codex (copilot)
 user-invokable: false
 ---

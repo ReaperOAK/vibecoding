@@ -1,0 +1,180 @@
+---
+id: sandbox-tool-acl
+version: "1.0"
+description: "Per-agent tool access control lists for sandboxed execution"
+locked_by: ReaperOAK
+immutable: true
+---
+
+# Sandbox Tool ACLs
+
+agents:
+  Architect:
+    allowed:
+      - search/codebase
+      - search/textSearch
+      - search/fileSearch
+      - search/listDirectory
+      - read/readFile
+      - read/problems
+      - edit/createFile (scoped: .github/**, docs/**)
+      - execute/runInTerminal (read-only commands only)
+      - web/fetch (docs only)
+    denied:
+      - edit source files directly
+      - database operations
+      - deploy operations
+      - force-push
+    notes: "May propose architecture but not implement source code changes"
+
+  Backend:
+    allowed:
+      - search/codebase
+      - search/textSearch
+      - search/fileSearch
+      - read/readFile
+      - edit/createFile (scoped: src/**, tests/**)
+      - edit/editFile (scoped: src/**, tests/**)
+      - execute/runInTerminal (test, lint, build only)
+    denied:
+      - database DDL
+      - deploy operations
+      - force-push
+      - edit .github/memory-bank/systemPatterns.md
+      - edit .github/memory-bank/decisionLog.md
+    notes: "May write source and test files within scope"
+
+  Frontend:
+    allowed:
+      - search/codebase
+      - search/textSearch
+      - search/fileSearch
+      - read/readFile
+      - edit/createFile (scoped: src/components/**, src/pages/**, src/styles/**)
+      - edit/editFile (scoped: src/components/**, src/pages/**, src/styles/**)
+      - execute/runInTerminal (test, lint, build only)
+    denied:
+      - backend source modifications
+      - database operations
+      - deploy operations
+      - force-push
+    notes: "May write frontend source and test files within scope"
+
+  QA:
+    allowed:
+      - search/codebase
+      - search/textSearch
+      - search/fileSearch
+      - read/readFile
+      - edit/createFile (scoped: tests/**, e2e/**)
+      - execute/runInTerminal (test, playwright, lint only)
+      - read-only DB dump
+    denied:
+      - source code edits (non-test files)
+      - deploy operations
+      - database DDL
+      - force-push
+    notes: "May run tests and write test files only"
+
+  Security:
+    allowed:
+      - search/codebase
+      - search/textSearch
+      - search/fileSearch
+      - search/usages
+      - read/readFile
+      - edit/createFile (scoped: .github/memory-bank/riskRegister.md)
+      - execute/runInTerminal (security scan tools only)
+      - web/fetch (CVE databases, security advisories)
+    denied:
+      - source code edits
+      - deploy operations
+      - database operations
+      - force-push
+    notes: "May scan and report only; writes limited to riskRegister.md"
+
+  DevOps:
+    allowed:
+      - search/codebase
+      - search/textSearch
+      - search/fileSearch
+      - read/readFile
+      - edit/createFile (scoped: .github/workflows/**, infra/**)
+      - edit/editFile (scoped: .github/workflows/**, infra/**)
+      - execute/runInTerminal (terraform plan, docker build, helm template)
+    denied:
+      - terraform apply (requires human sign-off)
+      - kubectl apply to production
+      - database operations
+      - force-push
+      - direct-deploy-production
+    notes: "May generate infra plans but not apply them"
+
+  ProductManager:
+    allowed:
+      - search/codebase
+      - search/textSearch
+      - read/readFile
+      - edit/createFile (scoped: .github/memory-bank/productContext.md, docs/specs/**)
+    denied:
+      - source code edits
+      - infrastructure changes
+      - deploy operations
+      - force-push
+    notes: "May write product context and specifications only"
+
+  Research:
+    allowed:
+      - search/codebase
+      - search/textSearch
+      - search/fileSearch
+      - read/readFile
+      - web/fetch
+      - web/githubRepo
+    denied:
+      - any file writes
+      - deploy operations
+      - database operations
+      - force-push
+    notes: "Read-only research agent; produces reports via delegation response"
+
+  Documentation:
+    allowed:
+      - search/codebase
+      - search/textSearch
+      - read/readFile
+      - edit/createFile (scoped: docs/**, README.md, CHANGELOG.md)
+      - edit/editFile (scoped: docs/**, README.md, CHANGELOG.md)
+    denied:
+      - source code edits
+      - infrastructure changes
+      - deploy operations
+      - force-push
+    notes: "May write documentation files only"
+
+  CIReviewer:
+    allowed:
+      - search/codebase
+      - search/textSearch
+      - search/fileSearch
+      - read/readFile
+      - read/problems
+      - execute/runInTerminal (lint, test, build-check only)
+    denied:
+      - any file writes
+      - deploy operations
+      - database operations
+      - force-push
+    notes: "Read-only reviewer; produces SARIF reports via delegation response"
+
+# Apply Proposal Requirements
+apply_proposal:
+  description: "Any operation that applies infrastructure changes"
+  requires:
+    - agent produces apply_proposal.json with full plan
+    - human reviews and approves via PR labeled HUMAN_APPROVAL
+    - ReaperOAK validates approval signature
+    - only then may DevOps execute apply
+  format:
+    type: object
+    required: [action, target, plan_output, risk_assessment, rollback_plan]

@@ -1,7 +1,15 @@
 ---
+id: research
 name: 'Research Analyst'
-description: 'Technical research analyst. Conducts evidence-based technology research with Bayesian confidence updating, systematic contradiction detection, time-bound validity tracking, and structured recommendation frameworks. Produces actionable research reports with traceable evidence chains.'
-tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'web/githubRepo', 'todo']
+role: research
+owner: ReaperOAK
+description: 'Technical research analyst. Conducts evidence-based research with Bayesian confidence, contradiction detection, and structured recommendations.'
+allowed_read_paths: ['**/*']
+allowed_write_paths: ['docs/research/**']
+forbidden_actions: ['deploy', 'force-push', 'database-ddl', 'edit-source-code']
+max_parallel_tasks: 3
+allowed_tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'web/githubRepo', 'todo']
+evidence_required: true
 model: GPT-5.3-Codex (copilot)
 user-invokable: false
 ---

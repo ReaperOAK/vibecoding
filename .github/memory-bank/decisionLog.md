@@ -1,3 +1,12 @@
+---
+id: decision-log
+version: "1.0"
+owner: ReaperOAK
+write_access: [ReaperOAK]
+append_only: true
+immutable_to_subagents: true
+---
+
 # Decision Log
 
 > **Schema Version:** 1.0

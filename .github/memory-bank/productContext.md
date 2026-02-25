@@ -1,3 +1,11 @@
+---
+id: product-context
+version: "1.0"
+owner: [ReaperOAK, ProductManager]
+write_access: [ReaperOAK, ProductManager]
+append_only: false
+---
+
 # Product Context
 
 > **Schema Version:** 1.0

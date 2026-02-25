@@ -1,3 +1,12 @@
+---
+id: system-patterns
+version: "1.0"
+owner: ReaperOAK
+write_access: [ReaperOAK]
+append_only: true
+immutable_to_subagents: true
+---
+
 # System Patterns
 
 > **Schema Version:** 1.0

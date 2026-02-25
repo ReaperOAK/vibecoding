@@ -1,7 +1,15 @@
 ---
+id: qa
 name: 'QA Engineer'
-description: 'Comprehensive quality assurance engineer. Designs and executes test strategies including TDD verification, mutation testing, property-based testing, spec-derived test generation, concurrency testing, E2E browser testing, and performance benchmarking. Produces evidence-validated quality reports with confidence-gated verdicts.'
-tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'todo']
+role: qa
+owner: ReaperOAK
+description: 'Designs and executes test strategies: TDD, mutation testing, property-based testing, E2E browser testing, and performance benchmarking.'
+allowed_read_paths: ['**/*']
+allowed_write_paths: ['tests/**', '**/*.spec.*', '**/*.test.*']
+forbidden_actions: ['deploy', 'force-push', 'database-ddl', 'edit-source-logic']
+max_parallel_tasks: 3
+allowed_tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'todo']
+evidence_required: true
 model: GPT-5.3-Codex (copilot)
 user-invokable: false
 ---

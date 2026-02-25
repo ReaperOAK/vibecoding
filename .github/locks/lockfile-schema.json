@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lockfile-v1",
+  "title": "File Lock Schema",
+  "description": "Lock file format for preventing concurrent modifications",
+  "type": "object",
+  "required": ["path_locked", "lock_owner", "lock_ts", "ttl_seconds", "lock_hash"],
+  "properties": {
+    "path_locked": {
+      "type": "string",
+      "description": "File or directory path being locked"
+    },
+    "lock_owner": {
+      "type": "string",
+      "description": "Agent ID holding the lock"
+    },
+    "lock_ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp of lock acquisition"
+    },
+    "ttl_seconds": {
+      "type": "integer",
+      "minimum": 30,
+      "maximum": 3600,
+      "default": 600,
+      "description": "Lock expiration time in seconds"
+    },
+    "lock_hash": {
+      "type": "string",
+      "description": "SHA-256 of locked file content at lock time"
+    },
+    "heartbeat_ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last heartbeat timestamp for active lock verification"
+    }
+  },
+  "additionalProperties": false
+}

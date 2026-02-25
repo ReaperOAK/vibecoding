@@ -1,3 +1,12 @@
+---
+id: active-context
+version: "1.0"
+owner: Shared
+write_access: [ALL]
+append_only: true
+compaction_threshold: 50
+---
+
 # Active Context
 
 > **Schema Version:** 1.0

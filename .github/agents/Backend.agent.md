@@ -1,7 +1,15 @@
 ---
+id: backend
 name: 'Backend'
-description: 'Implements server-side logic, APIs, database operations, and business rules using TDD. Follows SOLID principles, object calisthenics, spec-driven development from OpenAPI contracts, and produces evidence-verified code with automated test proof.'
-tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'todo']
+role: backend
+owner: ReaperOAK
+description: 'Implements server-side logic, APIs, database operations, and business rules using TDD with SOLID principles and spec-driven development.'
+allowed_read_paths: ['**/*']
+allowed_write_paths: ['src/**', 'tests/**']
+forbidden_actions: ['deploy', 'force-push', 'database-ddl', 'edit-systemPatterns', 'edit-decisionLog']
+max_parallel_tasks: 3
+allowed_tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'todo']
+evidence_required: true
 model: GPT-5.3-Codex (copilot)
 user-invokable: false
 ---

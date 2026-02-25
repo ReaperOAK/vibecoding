@@ -1,7 +1,15 @@
 ---
+id: frontend
 name: 'Frontend Engineer'
-description: 'Implements user interfaces, responsive layouts, client-side state management, and accessibility-compliant components. Enforces WCAG 2.2 AA, Core Web Vitals optimization, component calisthenics, and design-token-driven styling with evidence-backed quality gates.'
-tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'web/githubRepo', 'browser/snapshot', 'todo']
+role: frontend
+owner: ReaperOAK
+description: 'Implements UIs, responsive layouts, state management, and WCAG 2.2 AA compliant components with Core Web Vitals optimization.'
+allowed_read_paths: ['**/*']
+allowed_write_paths: ['src/components/**', 'src/pages/**', 'src/styles/**', 'tests/**']
+forbidden_actions: ['deploy', 'force-push', 'database-ddl', 'edit-systemPatterns', 'edit-decisionLog']
+max_parallel_tasks: 3
+allowed_tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'search/usages', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'web/fetch', 'web/githubRepo', 'browser/snapshot', 'todo']
+evidence_required: true
 model: GPT-5.3-Codex (copilot)
 user-invokable: false
 ---

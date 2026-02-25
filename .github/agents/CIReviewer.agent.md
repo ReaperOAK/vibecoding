@@ -1,7 +1,15 @@
 ---
+id: cireviewer
 name: 'CI Reviewer'
-description: 'Automated code review gatekeeper. Enforces object calisthenics, cognitive complexity thresholds, architecture fitness functions, specification adherence, and produces SARIF-formatted review findings with severity-weighted verdicts and priority-based comment formatting. Final quality gate before merge.'
-tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'execute/runInTerminal', 'todo']
+role: cireviewer
+owner: ReaperOAK
+description: 'Automated code review gatekeeper. Enforces complexity thresholds, fitness functions, and produces SARIF-formatted findings.'
+allowed_read_paths: ['**/*']
+allowed_write_paths: []
+forbidden_actions: ['deploy', 'force-push', 'database-ddl', 'file-write']
+max_parallel_tasks: 3
+allowed_tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'execute/runInTerminal', 'todo']
+evidence_required: true
 model: GPT-5.3-Codex (copilot)
 user-invokable: false
 ---

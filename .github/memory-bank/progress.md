@@ -1,3 +1,11 @@
+---
+id: progress
+version: "1.0"
+owner: Shared
+write_access: [ALL]
+append_only: true
+---
+
 # Progress
 
 > **Schema Version:** 1.0
