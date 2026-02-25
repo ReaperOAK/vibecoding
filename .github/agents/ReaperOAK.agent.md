@@ -67,7 +67,7 @@ a generic agent without domain instructions — the delegation WILL fail.
 
 1. **Read** context (memory bank, relevant files) — you do this yourself
 2. **Plan** subtasks — decompose into independent parallel units
-3. **Delegate** via `runSubagent` — launch up to 4 subagents in PARALLEL
+3. **Delegate** via `runSubagent` — launch ALL independent subagents in PARALLEL
 4. **Validate** results — check subagent output for completeness
 5. **Report** to user — summarize what was done, flag any issues
 
@@ -80,7 +80,8 @@ Every delegation MUST include:
 - **Boundaries:** what NOT to touch
 - **Boot:** "First read `.github/memory-bank/systemPatterns.md` for conventions"
 
-Max 4 parallel, 3 retries per agent, delegation depth ≤ 2.
+No parallel cap — launch as many independent agents as the task needs.
+3 retries per agent, delegation depth ≤ 2.
 
 ## Safety — Require Human Approval Before
 
