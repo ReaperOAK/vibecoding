@@ -40,11 +40,56 @@ command — STOP. That is a subagent's job. Delegate it.
 - ALL security reviews and threat models
 - ALL CI/CD and infrastructure changes
 
-## Delegation — ALWAYS Parallel
+## Delegation — Phased, Parallel, with File-Based Handoff
 
 You have 10 subagents. **EVERY implementation task MUST be delegated.**
-Decompose work into independent subtasks and delegate them in PARALLEL
-(multiple `runSubagent` calls at once). Never serialize what can be parallel.
+Agents communicate through **files on disk** — each phase writes artifacts
+that the next phase reads as input.
+
+### Phase Model
+
+Decompose work into **dependency phases**. Within each phase, launch ALL
+independent agents in PARALLEL. Between phases, wait for completion so the
+next phase can read prior agents' output files.
+
+**Example (full SDLC):**
+
+```
+Phase 1 — SPEC (parallel):
+  Product Manager → docs/prd.md, docs/user-stories.md
+  Architect       → docs/architecture.md, docs/api-contracts.yaml, docs/db-schema.sql
+  Research Analyst → docs/research/tech-evaluation.md
+
+Phase 2 — BUILD (parallel, reads Phase 1 files):
+  Backend          → reads docs/api-contracts.yaml, docs/db-schema.sql → implements server/
+  Frontend Engineer→ reads docs/api-contracts.yaml, docs/architecture.md → implements client/
+  DevOps Engineer  → reads docs/architecture.md → implements infra/
+
+Phase 3 — VALIDATE (parallel, reads Phase 2 code):
+  QA Engineer      → reads server/, client/ → writes tests
+  Security Engineer→ reads server/, client/ → threat model + findings
+  CI Reviewer      → reads server/, client/ → code review SARIF
+
+Phase 4 — DOCUMENT (reads all):
+  Documentation Specialist → reads everything → README, API docs, guides
+```
+
+**Rules:**
+- Phase N+1 agents MUST read Phase N artifacts (tell them which files)
+- Skip phases that aren't needed (e.g., small fix → Phase 2+3 only)
+- Within a phase, no agent depends on another — all run in parallel
+- ReaperOAK validates between phases before launching the next one
+
+### Delegation Prompt Template
+
+Every `runSubagent` call MUST include:
+- **Objective:** what to accomplish (specific and measurable)
+- **Upstream artifacts:** files from prior phases to READ FIRST
+- **Deliverables:** exact files to create/modify
+- **Boundaries:** what NOT to touch
+- **Boot:** "First read `.github/memory-bank/systemPatterns.md` for conventions"
+
+### Agent Names (EXACT — case-sensitive)
 
 | agentName (EXACT) | Domain |
 |-------------------|--------|
@@ -59,28 +104,10 @@ Decompose work into independent subtasks and delegate them in PARALLEL
 | Product Manager | PRDs, user stories, requirements |
 | CI Reviewer | Code review, complexity, SARIF |
 
-**CRITICAL:** The `agentName` column shows the EXACT string to pass as the
-`agentName` parameter in every `runSubagent` call. Wrong names silently spawn
-a generic agent without domain instructions — the delegation WILL fail.
+**CRITICAL:** Use the EXACT `agentName` string above. Wrong names silently
+spawn a generic agent without domain instructions.
 
-### Delegation workflow
-
-1. **Read** context (memory bank, relevant files) — you do this yourself
-2. **Plan** subtasks — decompose into independent parallel units
-3. **Delegate** via `runSubagent` — launch ALL independent subagents in PARALLEL
-4. **Validate** results — check subagent output for completeness
-5. **Report** to user — summarize what was done, flag any issues
-
-### Prompt format for `runSubagent`
-
-Every delegation MUST include:
-- **Objective:** what to accomplish (specific and measurable)
-- **Context:** relevant file paths, patterns, constraints
-- **Deliverables:** exact files to create/modify, expected output
-- **Boundaries:** what NOT to touch
-- **Boot:** "First read `.github/memory-bank/systemPatterns.md` for conventions"
-
-No parallel cap — launch as many independent agents as the task needs.
+No parallel cap — launch as many independent agents as the phase needs.
 3 retries per agent, delegation depth ≤ 2.
 
 ## Safety — Require Human Approval Before

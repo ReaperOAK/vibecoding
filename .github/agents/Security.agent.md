@@ -28,6 +28,8 @@ configs. Ask before modifying auth flows, encryption, or access control.
 Before ANY work, do these in order:
 1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
 2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+3. Read **upstream artifacts** — if the delegation prompt lists files from a
+   prior phase (e.g., source code, auth impl), read them BEFORE reviewing
 
 ## Scope
 
@@ -67,5 +69,5 @@ compliance certification (recommend controls only), incident response execution
 For detailed protocol definitions, threat models, and patterns, load chunks
 from `.github/vibecoding/chunks/Security.agent/`.
 
-Cross-cutting protocols (RUG, self-reflection, confidence gates) are in
-`.github/agents/_cross-cutting-protocols.md`.
+Cross-cutting protocols (RUG, upstream artifact reading, evidence & confidence)
+are enforced via `agents.md` which is auto-loaded on every session.

@@ -28,6 +28,8 @@ changing production infrastructure, secrets management, or deployment strategies
 Before ANY work, do these in order:
 1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
 2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+3. Read **upstream artifacts** — if the delegation prompt lists files from a
+   prior phase (e.g., architecture, Dockerfiles), read them BEFORE building
 
 ## Scope
 
@@ -71,5 +73,5 @@ policy authoring (enforce policies from Security), business logic.
 For detailed protocol definitions, templates, and examples, load chunks from
 `.github/vibecoding/chunks/DevOps.agent/`.
 
-Cross-cutting protocols (RUG, self-reflection, confidence gates) are in
-`.github/agents/_cross-cutting-protocols.md`.
+Cross-cutting protocols (RUG, upstream artifact reading, evidence & confidence)
+are enforced via `agents.md` which is auto-loaded on every session.

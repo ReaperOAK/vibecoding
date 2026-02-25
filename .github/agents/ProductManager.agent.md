@@ -28,6 +28,8 @@ project scope, priorities, or release plans.
 Before ANY work, do these in order:
 1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
 2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+3. Read **upstream artifacts** — if the delegation prompt lists files from a
+   prior phase, read them BEFORE writing requirements
 
 ## Scope
 
@@ -69,5 +71,5 @@ Frontend), security policy (→ Security), CI/CD (→ DevOps), test implementati
 For detailed protocol definitions, templates, and frameworks, load chunks from
 `.github/vibecoding/chunks/ProductManager.agent/`.
 
-Cross-cutting protocols (RUG, self-reflection, confidence gates) are in
-`.github/agents/_cross-cutting-protocols.md`.
+Cross-cutting protocols (RUG, upstream artifact reading, evidence & confidence)
+are enforced via `agents.md` which is auto-loaded on every session.

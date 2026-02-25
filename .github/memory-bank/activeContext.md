@@ -129,4 +129,25 @@ compaction_threshold: 50
 - Added delegation workflow: Read → Plan → Delegate (parallel) → Validate →
   Report
 - Reinforced in `agents.md` boot file: "ReaperOAK is a PURE ORCHESTRATOR"
-- **Next:** Open FRESH ReaperOAK session and test with implementation task
+
+### [2026-02-26] Session 7 — Cross-Agent Communication
+
+- Tested Kanban build: ReaperOAK successfully delegated to 4 agents in parallel
+  but (a) did all the thinking itself (architecture, API contracts, DB schema)
+  instead of letting Architect do it, (b) agents couldn't see each other's
+  output — Backend didn't read Architect's contracts, QA didn't read Backend's code
+- **Root cause:** No dependency model — all agents launched flat in parallel with
+  specs baked into the prompt by ReaperOAK, bypassing domain expertise
+- **Fix: Phased Delegation with File-Based Handoff**
+  - ReaperOAK now uses dependency phases (SPEC → BUILD → VALIDATE → DOCUMENT)
+  - Within each phase: all agents run in parallel (no cap)
+  - Between phases: ReaperOAK validates, then launches next phase
+  - Each phase's files on disk become the next phase's input
+  - Delegation prompt template now includes "Upstream artifacts" field
+- All 10 subagent MANDATORY FIRST STEPS updated: step 3 = "Read upstream
+  artifacts listed in delegation prompt BEFORE starting"
+- Cross-cutting protocols: added §6 "Cross-Agent Communication (File-Based
+  Handoff)" — agents must read upstream, align with prior contracts, write
+  clean deliverables, and stop+report if upstream is missing
+- **Next:** Fresh ReaperOAK session, re-test with Kanban prompt — expect phased
+  execution with Architect/PM first, then Backend/Frontend/DevOps, then QA/Security

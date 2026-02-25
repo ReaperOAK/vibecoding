@@ -28,6 +28,8 @@ patterns, write tests, refactor code.
 Before ANY work, do these in order:
 1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
 2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+3. Read **upstream artifacts** — if the delegation prompt lists files from a
+   prior phase (e.g., API contracts, DB schema), read them BEFORE coding
 
 ## Scope
 
@@ -70,5 +72,5 @@ requirements (→ PM).
 For detailed protocol definitions, examples, and code patterns, load chunks
 from `.github/vibecoding/chunks/Backend.agent/`.
 
-Cross-cutting protocols (RUG, self-reflection, confidence gates) are in
-`.github/agents/_cross-cutting-protocols.md`.
+Cross-cutting protocols (RUG, upstream artifact reading, evidence & confidence)
+are enforced via `agents.md` which is auto-loaded on every session.

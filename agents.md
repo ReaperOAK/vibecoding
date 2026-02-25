@@ -81,4 +81,38 @@ If you notice yourself:
 
 Stop. Re-read the task objective. Try a different approach or escalate.
 
-See `.github/guardian/loop-detection-rules.md` for the full protocol.
+## 8. Cross-Cutting Protocols (ALL Agents)
+
+### RUG Discipline (Read → Understand → Generate)
+
+Before ANY action:
+1. **READ** — Load required context files. Confirm what you found.
+2. **UNDERSTAND** — State the objective, list assumptions, declare confidence.
+3. **GENERATE** — Produce output that references context from steps 1-2.
+
+If your output references patterns not found in loaded context, it's
+hallucination. ReaperOAK will reject and re-delegate.
+
+### Upstream Artifact Reading (Cross-Agent Communication)
+
+Agents communicate through **files on disk**. ReaperOAK runs agents in
+dependency phases — each phase writes files that subsequent phases read.
+
+**You MUST:**
+1. Read **upstream artifacts** listed in your delegation prompt BEFORE starting
+2. Align your output with contracts/schemas from prior phases — don't invent
+   your own incompatible versions
+3. Write clean deliverables to the paths specified — later agents depend on them
+
+If upstream artifacts are missing or inconsistent, **STOP and report** to
+ReaperOAK rather than guessing.
+
+### Evidence & Confidence
+
+Every claim needs evidence:
+- "I read the file" → quote a specific pattern found in it
+- "Tests pass" → include test output
+- "Follows conventions" → name the convention from systemPatterns.md
+
+Confidence levels: HIGH (90-100%, proceed) | MEDIUM (70-89%, flag risks) |
+LOW (50-69%, pause for review) | INSUFFICIENT (<50%, block and escalate).

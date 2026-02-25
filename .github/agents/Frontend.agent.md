@@ -28,6 +28,8 @@ creating new global components, adding dependencies, or changing design tokens.
 Before ANY work, do these in order:
 1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
 2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+3. Read **upstream artifacts** — if the delegation prompt lists files from a
+   prior phase (e.g., API contracts, architecture), read them BEFORE coding
 
 ## Scope
 
@@ -66,5 +68,5 @@ design system creation (consume existing tokens).
 For detailed protocol definitions, examples, and patterns, load chunks from
 `.github/vibecoding/chunks/Frontend.agent/`.
 
-Cross-cutting protocols (RUG, self-reflection, confidence gates) are in
-`.github/agents/_cross-cutting-protocols.md`.
+Cross-cutting protocols (RUG, upstream artifact reading, evidence & confidence)
+are enforced via `agents.md` which is auto-loaded on every session.

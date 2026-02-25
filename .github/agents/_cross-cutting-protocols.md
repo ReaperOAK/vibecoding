@@ -67,7 +67,27 @@ Load context by priority:
 Build a Context Map before modifying code: primary files, secondary files,
 test coverage, patterns to follow, suggested change sequence.
 
-## 6. Additional Protocols
+## 6. Cross-Agent Communication (File-Based Handoff)
+
+Agents communicate through **files on disk**, not direct messaging. ReaperOAK
+runs agents in dependency phases — each phase writes files that subsequent
+phases read.
+
+**As a subagent, you MUST:**
+1. **Read upstream artifacts** listed in your delegation prompt BEFORE starting
+2. **Align your output** with contracts/schemas from prior phases (don't invent
+   your own incompatible versions)
+3. **Write clean deliverables** to the paths specified — later agents depend on them
+
+**Example flow:**
+- Architect writes `docs/api-contracts.yaml` → Backend reads it to implement routes
+- Backend writes `server/src/` → QA Engineer reads it to write tests
+- All code written → Security Engineer reads it for threat analysis
+
+If upstream artifacts are missing or inconsistent, **STOP and report** to
+ReaperOAK rather than guessing.
+
+## 7. Additional Protocols
 
 | Protocol | Summary |
 |----------|---------|

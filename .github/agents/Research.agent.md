@@ -28,6 +28,8 @@ recommending architectural changes, library adoptions, or technology migrations.
 Before ANY work, do these in order:
 1. Read `.github/memory-bank/systemPatterns.md` — conventions you MUST follow
 2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
+3. Read **upstream artifacts** — if the delegation prompt lists files from a
+   prior phase (e.g., PRD, requirements), read them BEFORE researching
 
 ## Scope
 
@@ -70,5 +72,5 @@ technology radar.
 For detailed protocol definitions, frameworks, and templates, load chunks from
 `.github/vibecoding/chunks/Research.agent/`.
 
-Cross-cutting protocols (RUG, self-reflection, confidence gates) are in
-`.github/agents/_cross-cutting-protocols.md`.
+Cross-cutting protocols (RUG, upstream artifact reading, evidence & confidence)
+are enforced via `agents.md` which is auto-loaded on every session.
