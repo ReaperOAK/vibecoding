@@ -151,3 +151,45 @@ compaction_threshold: 50
   clean deliverables, and stop+report if upstream is missing
 - **Next:** Fresh ReaperOAK session, re-test with Kanban prompt — expect phased
   execution with Architect/PM first, then Backend/Frontend/DevOps, then QA/Security
+
+## Session 8 — Self-Improving System Migration (2025-07-25)
+
+### Current Focus
+- Completed full migration to self-improving multi-agent architecture
+- All 6 subsystems designed and implemented
+
+### Changes Made
+1. **Shared Context Layer** — Created workflow-state.json, artifacts-manifest.json, feedback-log.md in memory bank
+2. **UIDesigner Agent** — New agent with Google Stitch integration, Playwright visual validation, component specs
+3. **Self-Improvement System** — Proposals directory, RETROSPECTIVE phase, auto-reject rules
+4. **ReaperOAK Upgrade** — 6-phase SDLC (added RETROSPECTIVE), state management obligations, proposal handling
+5. **Schema Extensions** — Delegation packet: phase, upstream_artifacts, mcp_grants, fix_loop_context, output_contract fields
+6. **Architecture Update** — ARCHITECTURE.md v4.0.0 with UIDesigner, shared context layer, §18 self-improvement
+7. **Catalog + ACL** — UIDesigner entries in catalog.yml, tool-acl.yaml, design: tag
+
+### Validation Results
+- QA: PASS (1 MEDIUM fixed, 2 LOW noted)
+- Security: CONDITIONAL PASS (5 MEDIUM — 2 fixed, 3 accepted as design-level, 3 LOW — 1 fixed)
+- CI: PASS (2 warnings fixed, 1 suggestion noted)
+- Fix loop: 1 iteration — all actionable findings resolved
+
+### Files Created (7)
+- `.github/agents/UIDesigner.agent.md`
+- `.github/vibecoding/chunks/UIDesigner.agent/chunk-01.yaml`
+- `.github/vibecoding/chunks/UIDesigner.agent/chunk-02.yaml`
+- `.github/proposals/.gitkeep`
+- `.github/memory-bank/workflow-state.json`
+- `.github/memory-bank/artifacts-manifest.json`
+- `.github/memory-bank/feedback-log.md`
+
+### Files Modified (7)
+- `.github/agents/ReaperOAK.agent.md` — RETROSPECTIVE, UIDesigner, state mgmt, proposals
+- `.github/vibecoding/catalog.yml` — UIDesigner + design tag
+- `.github/sandbox/tool-acl.yaml` — UIDesigner section
+- `.github/tasks/delegation-packet-schema.json` — UIDesigner + 5 new fields
+- `.github/memory-bank/schema.md` — 3 new file schemas + riskRegister writers fix
+- `.github/ARCHITECTURE.md` — v4.0.0, UIDesigner, shared context, self-improvement
+- `.github/copilot-instructions.md` — updated repo structure
+
+### Architecture Document
+- Full design at `docs/architecture/self-improving-system.md` (1,466 lines)

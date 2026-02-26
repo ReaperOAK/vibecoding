@@ -50,7 +50,7 @@ that the next phase reads as input.
 **Not one-shot — iterate until quality gates pass.**
 
 ```
-SPEC → BUILD → VALIDATE ──→ PASS → DOCUMENT
+SPEC → BUILD → VALIDATE ──→ PASS → DOCUMENT → RETROSPECTIVE
                   │
                   └─ FAIL → FIX (re-delegate to BUILD with findings)
                               └─→ re-VALIDATE
@@ -60,11 +60,12 @@ SPEC → BUILD → VALIDATE ──→ PASS → DOCUMENT
 
 | Phase | Agents (parallel) | Outputs |
 |-------|------------------|---------|
-| 1. SPEC | PM, Architect, Research | `docs/prd.md`, `docs/architecture.md`, `docs/api-contracts.yaml` |
+| 1. SPEC | PM, Architect, UIDesigner, Research | `docs/prd.md`, `docs/architecture.md`, `docs/api-contracts.yaml`, `docs/design-specs/` |
 | 2. BUILD | Backend, Frontend, DevOps | `server/`, `client/`, `infra/` |
 | 3. VALIDATE | QA, Security, CI Reviewer | `docs/reviews/{qa,security,ci}-report.md` |
 | 4. GATE | ReaperOAK reads all reports | PASS → Phase 5 · FAIL → re-run Phase 2 with findings |
 | 5. DOCUMENT | Documentation Specialist | README, API docs, guides |
+| 6. RETROSPECTIVE | All agents (optional) | `.github/proposals/PROP-*.md` |
 
 **Rules:**
 - Phase N+1 reads Phase N artifacts (tell agents which files in delegation)
@@ -94,6 +95,8 @@ Every `runSubagent` call MUST include:
 - **Findings:** (fix loop only) review reports the agent must address
 - **Deliverables:** exact files to create/modify
 - **Boundaries:** what NOT to touch
+- **Phase:** which SDLC phase (SPEC/BUILD/VALIDATE/DOCUMENT/RETROSPECTIVE)
+- **Output contract:** deliverables dir, required files, quality threshold
 
 ### Agent Names (EXACT — case-sensitive)
 
@@ -109,6 +112,7 @@ Every `runSubagent` call MUST include:
 | Research Analyst | Evidence research, PoC, tech radar |
 | Product Manager | PRDs, user stories, requirements |
 | CI Reviewer | Code review, complexity, SARIF |
+| UIDesigner | UI mockups, design specs, component specs |
 
 **CRITICAL:** Use the EXACT `agentName` string above. Wrong names silently
 spawn a generic agent without domain instructions.
@@ -124,6 +128,41 @@ No parallel cap — launch as many independent agents as the phase needs.
 - Schema migrations (alter/drop columns)
 - API breaking changes
 - Any irreversible data loss
+
+## State Management
+
+Update these files at every phase transition:
+
+### workflow-state.json
+- Set `current_phase` when entering a new phase
+- Update agent statuses as delegations complete
+- Increment `fix_loop_count` on BUILD→VALIDATE retries
+- Record blockers when agents report `status: blocked`
+- Set `overall_status` to `completed` or `failed` at pipeline end
+
+### artifacts-manifest.json
+- After each agent completes, record artifacts with SHA-256 hash
+- Track `created_by` agent and `phase`
+- Build dependency graph (Frontend output depends on UIDesigner specs, etc.)
+
+### feedback-log.md
+- Present agent feedback entries to relevant BUILD agents in fix loops
+- Surface high-severity entries as gate blockers
+
+## Proposal Handling
+
+During RETROSPECTIVE phase:
+1. Invite agents to write proposals to `.github/proposals/`
+2. Validate proposal format (required fields, target path, rollback plan)
+3. Auto-reject proposals that:
+   - Violate any agent's forbidden actions
+   - Target `systemPatterns.md`, `decisionLog.md`, or `STOP_ALL`
+   - Attempt autonomy level elevation
+   - Remove forbidden actions from any agent
+   - Modify human approval gate triggers
+4. Present valid proposals to user for approval
+5. If approved: delegate implementation to appropriate agent, verify, merge
+6. Track metrics: proposals submitted, accepted, rejected per session
 
 ## Chunk Routing
 
@@ -143,5 +182,6 @@ Add task-specific tags from `.github/vibecoding/catalog.yml` when relevant.
 | Research Analyst | `Research.agent/` | `cto:` |
 | Product Manager | `ProductManager.agent/` | `sdlc:` |
 | CI Reviewer | `CIReviewer.agent/` | `ci:` |
+| UIDesigner | `UIDesigner.agent/` | `design:`, `accessibility:` |
 
 Chunk paths: `.github/vibecoding/chunks/{dir}/chunk-NN.yaml`

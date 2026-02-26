@@ -90,8 +90,59 @@ fields:
   mitigation: string
   status: enum [OPEN, MITIGATED, ACCEPTED, CLOSED]
   predecessor_hash: string (sha256)
-writers: ["Security"]
+writers: ["Security", "ReaperOAK"]
 append_only: true
+```
+
+### workflow-state.json
+```yaml
+format: JSON
+fields:
+  session_id: string (SESSION-YYYYMMDD-HHMMSS)
+  started_at: string (ISO8601)
+  overall_status: enum [idle, active, completed, failed]
+  current_phase: enum [SPEC, BUILD, VALIDATE, GATE, DOCUMENT, RETROSPECTIVE]
+  phases: object (per-phase status, agents, outputs)
+  fix_loop_count: integer (0-3)
+  blockers: array of objects
+writers: ["ReaperOAK"]
+append_only: false
+notes: "ReaperOAK-exclusive state machine. Reset per session."
+```
+
+### artifacts-manifest.json
+```yaml
+format: JSON
+fields:
+  session_id: string
+  artifacts: array of objects
+    - path: string (file path)
+      sha256: string
+      created_by: string (agent name)
+      phase: string
+      created_at: string (ISO8601)
+  dependency_graph: object (artifact → upstream artifacts)
+writers: ["ReaperOAK"]
+append_only: false
+notes: "Versioned build outputs tracking. Updated by ReaperOAK after each phase."
+```
+
+### feedback-log.md
+```yaml
+format: Markdown with YAML frontmatter
+entry_format: timestamped blocks
+fields:
+  timestamp: string (ISO8601)
+  from_agent: string (reporter)
+  to_agent: string (target of feedback)
+  category: enum [defect, suggestion, concern, praise]
+  severity: enum [low, medium, high, critical]
+  artifact_path: string (file being reviewed)
+  description: string
+  evidence: string (file refs, test output)
+writers: ["all agents"]
+append_only: true
+notes: "Inter-agent quality signals. Agents append feedback when reviewing other agents' work."
 ```
 
 ## Integrity Rules

@@ -167,6 +167,40 @@ agents:
       - force-push
     notes: "Read-only reviewer; produces SARIF reports via delegation response"
 
+  UIDesigner:
+    allowed:
+      - search/codebase
+      - search/textSearch
+      - search/fileSearch
+      - search/listDirectory
+      - read/readFile
+      - read/problems
+      - edit/createFile (scoped: docs/design-specs/**)
+      - edit/editFile (scoped: docs/design-specs/**)
+      - stitch/create_project
+      - stitch/generate_screen_from_text
+      - stitch/edit_screens
+      - stitch/generate_variants
+      - stitch/get_project
+      - stitch/get_screen
+      - stitch/list_projects
+      - stitch/list_screens
+      - playwright/browser_snapshot
+      - playwright/browser_take_screenshot
+      - playwright/browser_navigate
+      - memory/create_entities
+      - memory/search_nodes
+      - memory/add_observations
+    denied:
+      - source code edits
+      - backend file modifications
+      - infrastructure changes
+      - deploy operations
+      - CI/CD configuration changes
+      - force-push
+      - database operations
+    notes: "May create design specifications and use Stitch/Playwright for visual design only"
+
 # Apply Proposal Requirements
 apply_proposal:
   description: "Any operation that applies infrastructure changes"

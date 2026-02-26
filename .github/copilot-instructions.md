@@ -8,13 +8,15 @@ under a supervisor orchestrator (ReaperOAK).
 
 ```
 .github/
-├── agents/              # 11 agent definitions (*.agent.md)
-├── memory-bank/         # Persistent shared state (6 markdown files + schema)
+├── agents/              # 12 agent definitions (*.agent.md) — includes UIDesigner
+├── memory-bank/         # Persistent shared state (9 files + schema)
+│                        # Includes workflow-state.json, artifacts-manifest.json, feedback-log.md
+├── proposals/           # Self-improvement proposals (PROP-*.md)
 ├── tasks/               # Delegation schemas, claim schemas, merge protocol
 ├── vibecoding/          # Context index, catalog, chunks, specs
 │   ├── index.json       # Master file index (57+ entries with hashes)
-│   ├── catalog.yml      # Semantic tag → chunk mapping (14 domains)
-│   └── chunks/          # Token-budgeted YAML chunks (34 dirs, ~91 files)
+│   ├── catalog.yml      # Semantic tag → chunk mapping (15 domains)
+│   └── chunks/          # Token-budgeted YAML chunks (35 dirs, ~93 files)
 ├── guardian/             # Circuit breaker (STOP_ALL), loop detection rules
 ├── locks/               # File lock schema
 ├── sandbox/             # Tool ACLs per agent
@@ -29,9 +31,11 @@ under a supervisor orchestrator (ReaperOAK).
 ## Architecture
 
 - **Supervisor pattern**: ReaperOAK orchestrates all subagents
-- **10 specialized agents**: Architect, Backend, Frontend, QA, Security,
-  DevOps, Documentation, Research, ProductManager, CIReviewer
+- **11 specialized agents**: Architect, Backend, Frontend, QA, Security,
+  DevOps, Documentation, Research, ProductManager, CIReviewer, UIDesigner
 - **Memory bank**: Git-tracked markdown files for cross-session persistence
+- **Shared context layer**: Pipeline state, artifact tracking, feedback log
+- **Self-improvement loop**: Agents propose infrastructure improvements
 - **Chunk system**: All instruction content pre-chunked to ≤4000 tokens;
   original instruction files removed — chunks in `vibecoding/chunks/` are the
   sole source of truth

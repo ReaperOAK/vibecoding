@@ -1,8 +1,8 @@
 # Vibecoding Multi-Agent System Architecture
 
-> **Version:** 3.0.0
+> **Version:** 4.0.0
 > **Owner:** ReaperOAK (CTO / Supervisor Orchestrator)
-> **Last Updated:** 2025-07-24
+> **Last Updated:** 2025-07-25
 
 ---
 
@@ -45,7 +45,8 @@ ReaperOAK (Supervisor / CTO)
 ├── DevOps            — GitOps, SLO/SLI, chaos engineering, policy-as-code
 ├── Documentation     — Diátaxis, Flesch-Kincaid scoring, doc-as-code CI
 ├── Research          — Bayesian confidence, evidence hierarchy, PoC standards
-└── CIReviewer        — Cognitive complexity, fitness functions, SARIF reports
+├── CIReviewer        — Cognitive complexity, fitness functions, SARIF reports
+└── UIDesigner        — Google Stitch designs, component specs, design tokens
 ```
 
 ### Agent Authority Matrix
@@ -63,6 +64,7 @@ ReaperOAK (Supervisor / CTO)
 | **Documentation** | Diátaxis, Flesch-Kincaid, doc-as-code CI pipeline | All source, all docs | Documentation files only | Analysis tools | Code, infra, deploy |
 | **Research** | Bayesian confidence, evidence hierarchy, license analysis | External sources, codebase | activeContext, progress | Web fetch, search | Code, infra, deploy, merge |
 | **CIReviewer** | Cognitive complexity, fitness functions, SARIF | PR diffs, codebase | PR comments only | Analysis tools | Merge, deploy, edit source |
+| **UIDesigner** | Stitch design generation, component specs, design tokens | User request, PRD, architecture docs | Design specs (docs/design-specs/) | Stitch, Playwright (screenshot/snapshot), Memory | Implement components, modify backend, deploy |
 
 ### Structured Autonomy Levels
 
@@ -89,6 +91,7 @@ levels based on task criticality.
 | CIReviewer | L3 | Read-only, comment-only output |
 | ProductManager | L2 | Defines scope, needs validation |
 | Architect | L2 | Designs affect everything downstream |
+| UIDesigner | L2 | Design outputs affect downstream Frontend work |
 
 ---
 
@@ -202,7 +205,7 @@ graph TD
 Tasks with no inter-dependencies execute in parallel batches:
 
 ```
-Batch 1: [ProductManager, Research]     ← no dependencies
+Batch 1: [ProductManager, Research, UIDesigner]  ← no dependencies
 Batch 2: [Architect]                    ← depends on Batch 1
 Batch 3: [Security, Frontend]          ← can parallelize
 Batch 4: [Backend]                     ← depends on Security
@@ -364,6 +367,18 @@ Located at `.github/memory-bank/`:
 - `systemPatterns.md` and `decisionLog.md` are append-only by ReaperOAK
 - No subagent may delete or overwrite entries in these files
 - Subagents may only append timestamped entries to `activeContext.md` and `progress.md`
+
+### 12.1 Shared Context Layer
+
+Additional state files for pipeline management:
+
+| File | Owner | Write Access | Purpose |
+|------|-------|-------------|----------|
+| `workflow-state.json` | ReaperOAK | ReaperOAK ONLY | Pipeline state machine — tracks current phase, agent statuses, fix loops |
+| `artifacts-manifest.json` | ReaperOAK | ReaperOAK ONLY | Versioned build artifact tracking with SHA-256 hashes |
+| `feedback-log.md` | Shared | All subagents (append) | Inter-agent quality signals and cross-agent feedback |
+
+These files enable session resumption and provide structured state for the iterative SDLC loop.
 
 ---
 
@@ -527,3 +542,36 @@ governance principles.
 | Log Directory | `logs/copilot/` | `logs/claude-code/` |
 | Slash Commands | N/A (built-in) | `.claude/commands/` |
 | Multi-Agent | `agent/runSubagent` tool | `Task` tool with subagent types |
+
+---
+
+## 18. Self-Improvement System
+
+Agents can propose improvements to the infrastructure during the RETROSPECTIVE
+phase. This is controlled evolution — not autonomous self-modification.
+
+### 18.1 Proposal Lifecycle
+
+```
+Agent identifies improvement → Writes proposal → ReaperOAK validates →
+User approves → Agent implements → Verify → Merge
+```
+
+Proposals live in `.github/proposals/` with naming convention
+`PROP-YYYYMMDD-{agent}-{seq}.md`.
+
+### 18.2 Scope Constraints
+
+**Can be proposed:** Chunk improvements, agent config tweaks, new templates,
+workflow additions, catalog updates, tool ACL requests.
+
+**Cannot be proposed:** Changes to systemPatterns/decisionLog, STOP_ALL
+modifications, removal of forbidden actions, autonomy elevation.
+
+### 18.3 RETROSPECTIVE Phase
+
+Phase 6 in the iterative SDLC. After DOCUMENT:
+- Agents review their own performance and identify improvement opportunities
+- Proposals written to `.github/proposals/`
+- ReaperOAK validates and presents to user
+- Approved proposals delegated for implementation in next session

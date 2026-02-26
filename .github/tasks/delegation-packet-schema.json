@@ -44,7 +44,8 @@
         "ProductManager",
         "Research",
         "Documentation",
-        "CIReviewer"
+        "CIReviewer",
+        "UIDesigner"
       ]
     },
     "autonomy_level": {
@@ -137,6 +138,39 @@
       "minimum": 0,
       "maximum": 100,
       "default": 70
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["SPEC", "BUILD", "VALIDATE", "GATE", "DOCUMENT", "RETROSPECTIVE"],
+      "description": "Current SDLC phase this delegation belongs to"
+    },
+    "upstream_artifacts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "File paths from prior phases that agent MUST read before starting"
+    },
+    "mcp_grants": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "MCP server prefixes granted for this task (e.g., 'stitch/', 'playwright/')"
+    },
+    "fix_loop_context": {
+      "type": "object",
+      "properties": {
+        "iteration": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "review_report": { "type": "string", "description": "Path to the review report with findings to fix" },
+        "specific_findings": { "type": "array", "items": { "type": "string" } }
+      },
+      "description": "Present only in fix-loop re-delegations (BUILD phase after VALIDATE failure)"
+    },
+    "output_contract": {
+      "type": "object",
+      "properties": {
+        "deliverables_dir": { "type": "string" },
+        "required_files": { "type": "array", "items": { "type": "string" } },
+        "quality_threshold": { "type": "number", "minimum": 0, "maximum": 10 }
+      },
+      "description": "Structured output expectations for the agent"
     }
   },
   "additionalProperties": false

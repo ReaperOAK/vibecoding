@@ -19,6 +19,9 @@ agent:
   - ".github/agents/ReaperOAK.agent.md"
   - ".github/agents/Research.agent.md"
   - ".github/agents/Security.agent.md"
+  - ".github/agents/UIDesigner.agent.md"
+  - ".github/vibecoding/chunks/UIDesigner.agent/chunk-01.yaml"
+  - ".github/vibecoding/chunks/UIDesigner.agent/chunk-02.yaml"
   - ".github/agents/_cross-cutting-protocols.md"
   - ".github/vibecoding/chunks/Architect.agent/chunk-01.yaml"
   - ".github/vibecoding/chunks/Architect.agent/chunk-02.yaml"
@@ -76,6 +79,13 @@ cto:
   - ".github/vibecoding/chunks/Startup_Scalability__Technical_Foundations_Playbook/chunk-02.yaml"
   - ".github/vibecoding/chunks/Startup_Scalability__Technical_Foundations_Playbook/chunk-03.yaml"
   - ".github/vibecoding/chunks/Startup_Scalability__Technical_Foundations_Playbook/chunk-04.yaml"
+
+design:
+  - ".github/vibecoding/chunks/UIDesigner.agent/chunk-01.yaml"
+  - ".github/vibecoding/chunks/UIDesigner.agent/chunk-02.yaml"
+  - ".github/vibecoding/chunks/7._Figma_Prototypes_for_Architecture___Design/chunk-01.yaml"
+  - ".github/vibecoding/chunks/7._Figma_Prototypes_for_Architecture___Design/chunk-02.yaml"
+  - ".github/vibecoding/chunks/7._Figma_Prototypes_for_Architecture___Design/chunk-03.yaml"
 
 devops:
   - ".github/vibecoding/chunks/DevOps.agent/chunk-01.yaml"
