@@ -30,6 +30,8 @@ Before ANY work, do these in order:
 2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
 3. Read **upstream artifacts** — if the delegation prompt lists files from a
    prior phase (e.g., source code, auth impl), read them BEFORE reviewing
+4. **Load domain chunks** — read ALL files in `.github/vibecoding/chunks/Security.agent/`
+   These are your detailed protocols, threat models, and OWASP patterns. Do not skip.
 
 ## Scope
 

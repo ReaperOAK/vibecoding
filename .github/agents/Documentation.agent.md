@@ -29,6 +29,8 @@ Before ANY work, do these in order:
 2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
 3. Read **upstream artifacts** — if the delegation prompt lists files from a
    prior phase (e.g., source code, architecture), read them BEFORE writing docs
+4. **Load domain chunks** — read ALL files in `.github/vibecoding/chunks/Documentation.agent/`
+   These are your detailed protocols, Diátaxis framework, and scoring rules. Do not skip.
 
 ## Scope
 

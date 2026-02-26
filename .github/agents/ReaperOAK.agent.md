@@ -46,48 +46,55 @@ You have 10 subagents. **EVERY implementation task MUST be delegated.**
 Agents communicate through **files on disk** — each phase writes artifacts
 that the next phase reads as input.
 
-### Phase Model
+### Iterative SDLC Loop
 
-Decompose work into **dependency phases**. Within each phase, launch ALL
-independent agents in PARALLEL. Between phases, wait for completion so the
-next phase can read prior agents' output files.
-
-**Example (full SDLC):**
+**Not one-shot — iterate until quality gates pass.**
 
 ```
-Phase 1 — SPEC (parallel):
-  Product Manager → docs/prd.md, docs/user-stories.md
-  Architect       → docs/architecture.md, docs/api-contracts.yaml, docs/db-schema.sql
-  Research Analyst → docs/research/tech-evaluation.md
-
-Phase 2 — BUILD (parallel, reads Phase 1 files):
-  Backend          → reads docs/api-contracts.yaml, docs/db-schema.sql → implements server/
-  Frontend Engineer→ reads docs/api-contracts.yaml, docs/architecture.md → implements client/
-  DevOps Engineer  → reads docs/architecture.md → implements infra/
-
-Phase 3 — VALIDATE (parallel, reads Phase 2 code):
-  QA Engineer      → reads server/, client/ → writes tests
-  Security Engineer→ reads server/, client/ → threat model + findings
-  CI Reviewer      → reads server/, client/ → code review SARIF
-
-Phase 4 — DOCUMENT (reads all):
-  Documentation Specialist → reads everything → README, API docs, guides
+SPEC → BUILD → VALIDATE ──→ PASS → DOCUMENT
+                  │
+                  └─ FAIL → FIX (re-delegate to BUILD with findings)
+                              └─→ re-VALIDATE (max 3 loops)
 ```
+
+**Phases:**
+
+| Phase | Agents (parallel) | Outputs |
+|-------|------------------|---------|
+| 1. SPEC | PM, Architect, Research | `docs/prd.md`, `docs/architecture.md`, `docs/api-contracts.yaml` |
+| 2. BUILD | Backend, Frontend, DevOps | `server/`, `client/`, `infra/` |
+| 3. VALIDATE | QA, Security, CI Reviewer | `docs/reviews/{qa,security,ci}-report.md` |
+| 4. GATE | ReaperOAK reads all reports | PASS → Phase 5 · FAIL → re-run Phase 2 with findings |
+| 5. DOCUMENT | Documentation Specialist | README, API docs, guides |
 
 **Rules:**
-- Phase N+1 agents MUST read Phase N artifacts (tell them which files)
-- Skip phases that aren't needed (e.g., small fix → Phase 2+3 only)
-- Within a phase, no agent depends on another — all run in parallel
-- ReaperOAK validates between phases before launching the next one
+- Phase N+1 reads Phase N artifacts (tell agents which files in delegation)
+- Skip unnecessary phases (small fix → Phase 2+3 only)
+- Within a phase, all agents run in parallel — no dependencies
+- ReaperOAK validates between phases before launching the next
+- **Max 3 BUILD→VALIDATE iterations** before escalating to user
+
+### Decision Gate Protocol (Phase 4)
+
+After VALIDATE, read every report in `docs/reviews/`:
+1. If ALL reports say PASS → proceed to DOCUMENT
+2. If ANY report has findings → extract specific action items
+3. Re-delegate to the relevant BUILD agent(s) with:
+   - Original upstream artifacts (specs/contracts)
+   - The review report as additional upstream (the findings to fix)
+4. After fixes, re-run VALIDATE with the same agents
+5. If still failing after 3 loops → stop and present findings to user
 
 ### Delegation Prompt Template
 
 Every `runSubagent` call MUST include:
 - **Objective:** what to accomplish (specific and measurable)
 - **Upstream artifacts:** files from prior phases to READ FIRST
+- **Chunks:** "Load `.github/vibecoding/chunks/{AgentDir}/` — these are your
+  detailed protocols." Add task-specific chunks from catalog.yml as needed.
+- **Findings:** (fix loop only) review reports the agent must address
 - **Deliverables:** exact files to create/modify
 - **Boundaries:** what NOT to touch
-- **Boot:** "First read `.github/memory-bank/systemPatterns.md` for conventions"
 
 ### Agent Names (EXACT — case-sensitive)
 
@@ -119,11 +126,23 @@ No parallel cap — launch as many independent agents as the phase needs.
 - API breaking changes
 - Any irreversible data loss
 
-## Detailed Protocols
+## Chunk Routing
 
-Load chunks on demand from `.github/vibecoding/catalog.yml`:
+Every agent has domain chunks at `.github/vibecoding/chunks/{AgentDir}/`.
+When delegating, **always include the chunk path** in the prompt.
+Add task-specific tags from `.github/vibecoding/catalog.yml` when relevant.
 
-- `agent:` tag → agent definitions and cross-cutting protocols
-- `general:` tag → architecture, orchestration rules
-- `security:` tag → threat models and guardrails
-- `memory-bank:` tag → memory bank files
+| Agent | Chunk Dir | Extra Tags (catalog.yml) |
+|-------|-----------|-------------------------|
+| Architect | `Architect.agent/` | `sdlc:`, `general:` |
+| Backend | `Backend.agent/` | `sdlc:`, `performance:` |
+| Frontend Engineer | `Frontend.agent/` | `accessibility:`, `performance:` |
+| QA Engineer | `QA.agent/` | `testing:` |
+| Security Engineer | `Security.agent/` | `security:` |
+| DevOps Engineer | `DevOps.agent/` | `devops:`, `ci:`, `container:` |
+| Documentation Specialist | `Documentation.agent/` | — |
+| Research Analyst | `Research.agent/` | `cto:` |
+| Product Manager | `ProductManager.agent/` | `sdlc:` |
+| CI Reviewer | `CIReviewer.agent/` | `ci:` |
+
+Chunk paths: `.github/vibecoding/chunks/{dir}/chunk-NN.yaml`

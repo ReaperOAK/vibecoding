@@ -30,6 +30,8 @@ Before ANY work, do these in order:
 2. If modifying files: check `.github/guardian/STOP_ALL` — halt if HALT_ALL
 3. Read **upstream artifacts** — if the delegation prompt lists files from a
    prior phase (e.g., source code, API contracts), read them BEFORE testing
+4. **Load domain chunks** — read ALL files in `.github/vibecoding/chunks/QA.agent/`
+   These are your detailed protocols, testing patterns, and checklists. Do not skip.
 
 ## Scope
 

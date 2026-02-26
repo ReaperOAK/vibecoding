@@ -20,19 +20,22 @@ architecture decisions or security concerns.
 Read `.github/guardian/STOP_ALL` before executing any file modifications.
 If the file contains `HALT_ALL`, stop immediately and report to the user.
 
-## 3. Context Loading
+## 3. Context Loading (Mandatory)
 
 All domain guidance is pre-chunked in `.github/vibecoding/chunks/`.
 There are no `.instructions.md` files — chunks are the sole source of truth.
 
-**To load context for a domain:**
+**BEFORE your first action, load your domain chunks:**
 
-1. Check `.github/vibecoding/catalog.yml` for the relevant semantic tag
-2. Read only the chunks listed under that tag
-3. Each chunk is ≤4000 tokens — load only what the current task needs
+1. Read ALL files in `.github/vibecoding/chunks/{YourAgent}.agent/`
+   (e.g., Backend → `Backend.agent/`, Frontend → `Frontend.agent/`)
+   — typically 2 files, ~8000 tokens. These are your detailed protocols.
+2. For task-specific guidance, check `.github/vibecoding/catalog.yml`
+   for relevant semantic tags (e.g., `testing:`, `security:`, `performance:`)
+3. Read additional chunks listed under those tags as needed
 
-**Example:** For accessibility guidance, look up `accessibility:` in
-catalog.yml and read the listed chunk files.
+**If you skip chunk loading, you are operating without your protocols.
+Your output quality will be lower and ReaperOAK may reject your work.**
 
 ## 4. Agent Definitions
 
