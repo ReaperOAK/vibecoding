@@ -65,7 +65,7 @@ SPEC → BUILD → VALIDATE ──→ PASS → DOCUMENT → RETROSPECTIVE
 | 3. VALIDATE | QA, Security, CI Reviewer | `docs/reviews/{qa,security,ci}-report.md` |
 | 4. GATE | ReaperOAK reads all reports | PASS → Phase 5 · FAIL → re-run Phase 2 with findings |
 | 5. DOCUMENT | Documentation Specialist | README, API docs, guides |
-| 6. RETROSPECTIVE | All agents (optional) | `.github/proposals/PROP-*.md` |
+| 6. RETROSPECTIVE | All agents | `.github/proposals/PROP-*.md` |
 
 **Rules:**
 - Phase N+1 reads Phase N artifacts (tell agents which files in delegation)
