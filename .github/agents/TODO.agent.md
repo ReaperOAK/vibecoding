@@ -63,7 +63,7 @@ deploying, merging, or force-pushing.
 | Task Format (Format A) | Bold-text metadata: Status, Priority, Owner, Depends On, Effort, UI Touching |
 | Completion Gates | Two-party verification: owning agent reports, ReaperOAK confirms, TODO Agent updates |
 | UI/UX Flagging | Mark every task with `**UI Touching:** yes/no` for UI/UX Gate enforcement |
-| Governance Rules | Max 3 tasks/agent/cycle, max 12h effort/agent/cycle, max 15 tasks/feature |
+| Governance Rules | Max 1 task/agent/cycle, max 12h effort/agent/cycle |
 
 For detailed protocol definitions, format templates, and governance rules,
 load chunks from `.github/vibecoding/chunks/TODO.agent/`.
