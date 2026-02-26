@@ -1,7 +1,7 @@
 # Vibecoding Semantic Catalog
 # Maps semantic tags to chunk files for on-demand context loading
 # Source instruction files removed — chunks are the sole source of truth
-# Updated: 2026-02-25
+# Updated: 2026-02-26
 
 accessibility:
   - ".github/vibecoding/chunks/a11y.instructions/chunk-01.yaml"
@@ -25,6 +25,9 @@ agent:
   - ".github/agents/TODO.agent.md"
   - ".github/vibecoding/chunks/TODO.agent/chunk-01.yaml"
   - ".github/vibecoding/chunks/TODO.agent/chunk-02.yaml"
+  - ".github/agents/Validator.agent.md"
+  - ".github/vibecoding/chunks/Validator.agent/chunk-01.yaml"
+  - ".github/vibecoding/chunks/Validator.agent/chunk-02.yaml"
   - ".github/agents/_cross-cutting-protocols.md"
   - ".github/vibecoding/chunks/Architect.agent/chunk-01.yaml"
   - ".github/vibecoding/chunks/Architect.agent/chunk-02.yaml"
@@ -105,6 +108,8 @@ general:
   - ".github/vibecoding/chunks/orchestration.rules/chunk-02.yaml"
   - ".github/vibecoding/chunks/TODO.agent/chunk-01.yaml"
   - ".github/vibecoding/chunks/TODO.agent/chunk-02.yaml"
+  - ".github/vibecoding/chunks/Validator.agent/chunk-01.yaml"
+  - ".github/vibecoding/chunks/Validator.agent/chunk-02.yaml"
 
 instruction:
   - ".github/vibecoding/chunks/a11y.instructions/chunk-01.yaml"
@@ -224,10 +229,18 @@ security:
   - ".github/vibecoding/chunks/security.agentic-guardrails/chunk-01.yaml"
   - ".github/vibecoding/chunks/security.agentic-guardrails/chunk-02.yaml"
 
+validation:
+  - ".github/vibecoding/chunks/Validator.agent/chunk-01.yaml"
+  - ".github/vibecoding/chunks/Validator.agent/chunk-02.yaml"
+
 terraform:
   - ".github/vibecoding/chunks/containerization-docker-best-practices.instructions/chunk-01.yaml"
   - ".github/vibecoding/chunks/containerization-docker-best-practices.instructions/chunk-02.yaml"
   - ".github/vibecoding/chunks/containerization-docker-best-practices.instructions/chunk-03.yaml"
+
+sdlc-enforcement:
+  - ".github/vibecoding/chunks/Validator.agent/chunk-01.yaml"
+  - ".github/vibecoding/chunks/Validator.agent/chunk-02.yaml"
 
 testing:
   - ".github/vibecoding/chunks/11._QA_Best_Practices_and_Strategy_Guide/chunk-01.yaml"

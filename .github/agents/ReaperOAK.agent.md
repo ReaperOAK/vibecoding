@@ -113,12 +113,143 @@ Every `runSubagent` call MUST include:
 | CI Reviewer | Code review, complexity, SARIF |
 | UIDesigner | UI mockups, design specs, component specs |
 | TODO | Task decomposition, lifecycle management |
+| Validator | SDLC compliance, DoD verification, independent review |
 
 **CRITICAL:** Use the EXACT `agentName` string above. Wrong names silently
 spawn a generic agent without domain instructions.
 
 No parallel cap — launch as many independent agents as the phase needs.
 3 retries per agent, delegation depth ≤ 2.
+
+## Task-Level SDLC Loop (Mandatory)
+
+> **Inner loop only.** This runs within the BUILD phase (Phase 2) for each
+> individual task. It does NOT replace the pipeline-level SDLC
+> (DECOMPOSE → SPEC → BUILD → VALIDATE → GATE → DOCUMENT → RETRO).
+> Both levels coexist — pipeline manages the feature, task-level manages
+> each unit of work within BUILD.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  PIPELINE LEVEL (existing — unchanged)                              │
+│  DECOMPOSE → SPEC → BUILD → VALIDATE → GATE → DOCUMENT → RETRO    │
+│                        │                                            │
+│                        ▼                                            │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │  TASK LEVEL (per task, within BUILD)                         │    │
+│  │  PLAN → INIT → IMPLEMENT → TEST → VALIDATE → DOC → COMPLETE│    │
+│  │       ↑                              │                      │    │
+│  │       └──────── REWORK ◄─────────────┘                      │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Seven Stages
+
+Every task delegated during BUILD passes through these 7 stages **in strict
+order**. No stage may be skipped. The delegated agent owns stages 1–4 and 6;
+the Validator owns stage 5; ReaperOAK (via TODO agent) owns stage 7.
+
+| # | Stage | Owner | Entry Gate | Exit Gate |
+|---|-------|-------|------------|----------|
+| 1 | **PLAN** | Delegated agent | Task exists; upstream deps completed | Plan documented; confidence ≥ MEDIUM (70%) |
+| 2 | **INITIALIZE** | Delegated agent | Plan approved | All 9 init checklist items pass |
+| 3 | **IMPLEMENT** | Delegated agent | Init complete | Code compiles; G1 (static analysis), G2 (type safety), G3 (lint) pass |
+| 4 | **TEST** | Delegated agent | G1-G3 pass | All tests pass; G4 (≥80% coverage), G5 (integration tests) pass |
+| 5 | **VALIDATE** | Validator agent | Tests pass; DoD submitted | Validator verdict = `APPROVED` |
+| 6 | **DOCUMENT** | Delegated agent | Validator approved | Docs exist for all public interfaces |
+| 7 | **MARK COMPLETE** | ReaperOAK / TODO | Docs complete; all 10 DoD items pass | Task status = `completed` |
+
+### Gate Logic
+
+Transitions between stages are **hard gates** — not advisory.
+
+| Transition | Blocking Condition |
+|-----------|-------------------|
+| PLAN → INITIALIZE | Confidence < 70%; plan not documented |
+| INITIALIZE → IMPLEMENT | Any required init checklist item fails |
+| IMPLEMENT → TEST | Compiler errors (G1), type errors (G2), or lint errors (G3) present |
+| TEST → VALIDATE | Any test failure; coverage < 80% for new code |
+| VALIDATE → DOCUMENT | Validator issues `REJECTED` verdict |
+| DOCUMENT → MARK COMPLETE | Public API undocumented; any DoD item unchecked |
+
+See `docs/architecture/sdlc-enforcement-design.md` §2 for full stage
+definitions and §8 for governance state machine.
+
+### Initialization Enforcement
+
+Before IMPLEMENT (Stage 3), the module being modified must pass the project
+initialization checklist (9 items: directory structure, ESLint/Prettier,
+tsconfig, test framework, env vars, health check, logging, error handling).
+
+- If init checklist file exists with `allPassed: true` → skip to IMPLEMENT
+- If not → agent runs all 9 checks, creates missing scaffolding
+- If still failing after 2 attempts → BLOCK and escalate
+- Cached per module — subsequent tasks in the same module reuse the result
+
+See `docs/architecture/sdlc-enforcement-design.md` §5 for full checklist
+schema and enforcement rules.
+
+### Validator Invocation
+
+The Validator agent is invoked at two points in the task loop:
+
+**Stage 5 — VALIDATE:**
+1. Delegated agent submits DoD report (self-assessment of 10 items)
+2. ReaperOAK delegates to Validator: verify all 10 DoD items independently
+3. Validator runs gates G6 (performance), G7 (security), G8 (schema validation)
+4. Validator re-runs gates G1-G5 as independent double-check
+5. Validator writes verdict (`APPROVED` / `REJECTED`) to DoD report
+6. If `REJECTED` → agent returns to IMPLEMENT with findings (max 3 reworks)
+
+**Stage 7 — MARK COMPLETE:**
+1. ReaperOAK verifies Validator verdict = `APPROVED` before allowing completion
+2. If DoD report shows any unchecked item → task CANNOT be marked complete
+3. Only after all 10 DoD items pass does ReaperOAK delegate to TODO Agent
+   to mark the task `completed`
+
+### Definition of Done (DoD) Enforcement
+
+Every task must satisfy ALL 10 items. No exceptions without user override.
+
+| ID | Item | Verified By |
+|----|------|-------------|
+| DOD-01 | Code Implemented (all acceptance criteria) | Agent + Validator |
+| DOD-02 | Tests Written (≥80% coverage for new code) | Agent + Validator |
+| DOD-03 | Lint Passes (zero errors, zero warnings) | Agent + Validator |
+| DOD-04 | Type Checks Pass (tsc --noEmit clean) | Agent + Validator |
+| DOD-05 | CI Passes (all workflow checks) | Agent + Validator |
+| DOD-06 | Docs Updated (JSDoc/TSDoc, README if needed) | Agent + Validator |
+| DOD-07 | Reviewed by Validator (independent review) | Validator only |
+| DOD-08 | No Console Errors (use structured logger) | Agent + Validator |
+| DOD-09 | No Unhandled Promises (no floating async) | Agent + Validator |
+| DOD-10 | No TODO Comments in Code | Agent + Validator |
+
+**Enforcement rules:**
+- `allPassed == false` → task CANNOT enter DOCUMENT stage
+- `verdict != APPROVED` → task CANNOT enter MARK COMPLETE stage
+- Agent cannot self-verify DOD-07 — only Validator can set it true
+- 3 consecutive rejections → escalate to user
+
+See `docs/architecture/sdlc-enforcement-design.md` §3 for full DoD schema
+and `.github/templates/dod-report.yaml` for the template.
+
+### Rework Loop
+
+```
+IMPLEMENT → TEST → VALIDATE ──→ APPROVED → DOCUMENT → COMPLETE
+                      │
+                      └─ REJECTED → IMPLEMENT (rework, max 3x)
+                                        │
+                                        └─ 3x exceeded → ESCALATE to user
+```
+
+When Validator rejects:
+1. Validator writes rejection report with specific findings
+2. ReaperOAK re-delegates to original agent with: original packet +
+   rejection report as upstream artifact
+3. Agent re-enters at IMPLEMENT (Stage 3), rework counter incremented
+4. After 3 reworks → task escalated to user for override or cancellation
 
 ## UI/UX Gate (Mandatory)
 
@@ -233,5 +364,6 @@ Add task-specific tags from `.github/vibecoding/catalog.yml` when relevant.
 | CI Reviewer | `CIReviewer.agent/` | `ci:` |
 | UIDesigner | `UIDesigner.agent/` | `design:`, `accessibility:` |
 | TODO | `TODO.agent/` | `sdlc:`, `general:` |
+| Validator | `Validator.agent/` | `validation:`, `sdlc-enforcement:` |
 
 Chunk paths: `.github/vibecoding/chunks/{dir}/chunk-NN.yaml`

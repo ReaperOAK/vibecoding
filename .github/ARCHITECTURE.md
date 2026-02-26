@@ -1,8 +1,12 @@
 # Vibecoding Multi-Agent System Architecture
 
-> **Version:** 4.1.0
+> **Version:** 5.0.0
 > **Owner:** ReaperOAK (CTO / Supervisor Orchestrator)
 > **Last Updated:** 2026-02-26
+>
+> **Changelog:** v5.0.0 — SDLC Enforcement Upgrade: 7-stage task-level SDLC
+> loop, Validator agent, Definition of Done framework, initialization
+> enforcement, 8-layer bug-catching strategy, governance state machine
 
 ---
 
@@ -47,7 +51,8 @@ ReaperOAK (Supervisor / CTO)
 ├── Research          — Bayesian confidence, evidence hierarchy, PoC standards
 ├── CIReviewer        — Cognitive complexity, fitness functions, SARIF reports
 ├── UIDesigner        — Google Stitch designs, component specs, design tokens
-└── TODO              — Task decomposition, lifecycle tracking, TODO file management
+├── TODO              — Task decomposition, lifecycle tracking, TODO file management
+└── Validator         — Independent SDLC compliance, DoD enforcement, quality gate verification
 ```
 
 ### Agent Authority Matrix
@@ -67,6 +72,7 @@ ReaperOAK (Supervisor / CTO)
 | **CIReviewer** | Cognitive complexity, fitness functions, SARIF | PR diffs, codebase | PR comments only | Analysis tools | Merge, deploy, edit source |
 | **UIDesigner** | Stitch design generation, component specs, design tokens | User request, PRD, architecture docs | Design specs (docs/design-specs/) | Stitch, Playwright (screenshot/snapshot), Memory | Implement components, modify backend, deploy |
 | **TODO** | Task decomposition, lifecycle tracking, dependency DAGs | All memory bank, codebase, existing TODO files | TODO files (TODO/**/*.md), activeContext, progress | Terminal (todo_visual.py only) | Implement code, modify agents, deploy, write outside TODO/ |
+| **Validator** | DoD compliance, SDLC gates, pattern conformance | Everything (full read-only audit) | Validation reports (`docs/reviews/`), `feedback-log.md` (append) | Linters, type checkers, test runners (read-only) | Modify code, mark tasks, deploy, merge, override rejections |
 
 ### Structured Autonomy Levels
 
@@ -95,6 +101,7 @@ levels based on task criticality.
 | Architect | L2 | Designs affect everything downstream |
 | UIDesigner | L2 | Design outputs affect downstream Frontend work |
 | TODO | L2 | Task files have downstream impact on delegation, needs oversight |
+| Validator | L2 | Rejection authority over task completion requires ReaperOAK oversight |
 
 ---
 
@@ -230,6 +237,50 @@ Batch 7: [DevOps]                      ← depends on Docs + Review
 ```
 
 See `orchestration.rules.md` §2 for full DAG protocol.
+
+### 5.3 Task-Level SDLC Inner Loop (v5.0.0)
+
+Within the BUILD phase, each individual task follows a **7-stage inner loop**
+with hard gates between every transition. This creates a two-level SDLC model:
+
+**Pipeline SDLC (Project-Level)** — managed by ReaperOAK:
+
+```
+DECOMPOSE → SPEC → BUILD → VALIDATE → GATE → DOCUMENT → RETROSPECTIVE
+```
+
+**Task SDLC (Inner Loop within BUILD)** — per task:
+
+```
+PLAN → INITIALIZE → IMPLEMENT → TEST → VALIDATE → DOCUMENT → MARK COMPLETE
+```
+
+| Aspect | Pipeline Level | Task Level |
+|--------|---------------|------------|
+| Scope | Entire project/feature | Single TODO task |
+| Manager | ReaperOAK | Delegated agent + Validator |
+| Phases | 7 phases (DECOMPOSE–RETRO) | 7 stages (PLAN–COMPLETE) |
+| State tracked in | `workflow-state.json` | Task file + DoD report |
+| Gates | Phase transition gates | Stage transition gates (G1–G8) |
+
+```mermaid
+stateDiagram-v2
+    [*] --> PLAN
+    PLAN --> INITIALIZE
+    INITIALIZE --> IMPLEMENT: init checklist passes
+    IMPLEMENT --> TEST: G1-G3 pass
+    TEST --> VALIDATE: G4-G5 pass
+    VALIDATE --> DOCUMENT: Validator approves + G6-G8 pass
+    DOCUMENT --> MARK_COMPLETE: Validator final DoD check
+    MARK_COMPLETE --> [*]
+    VALIDATE --> IMPLEMENT: Validator rejects (max 3)
+```
+
+No stage may be skipped. If the Validator rejects at VALIDATE, the task
+re-enters IMPLEMENT for rework (maximum 3 iterations before user escalation).
+
+> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md`
+> §2 for stage definitions, gate details, rework protocol, and state schema.
 
 ---
 
@@ -622,3 +673,222 @@ Phase 6 in the iterative SDLC. After DOCUMENT:
 - Proposals written to `.github/proposals/`
 - ReaperOAK validates and presents to user
 - Approved proposals delegated for implementation in next session
+
+---
+
+## 19. Validator Agent (v5.0.0)
+
+The **Validator** is an independent compliance reviewer that verifies task
+outputs satisfy the Definition of Done, adhere to the SDLC inner loop stages,
+pass quality gates, and conform to patterns in `systemPatterns.md`. The
+Validator does NOT implement code — it only reads artifacts and writes
+validation reports.
+
+**Definition:** `.github/agents/Validator.agent.md`
+
+| Property | Value |
+|----------|-------|
+| **Autonomy** | L2 (Guided) |
+| **Invocation** | At VALIDATE and MARK COMPLETE stages of every task |
+| **Verdict** | `APPROVED` or `REJECTED` |
+| **Write scope** | `docs/reviews/validation/`, `docs/reviews/dod/`, `feedback-log.md` (append) |
+| **Execute scope** | Linters, type checkers, test runners (read-only verification) |
+| **Cannot** | Modify source code, mark tasks complete, deploy, merge, override own rejections |
+
+**Interaction flow:**
+
+```
+BUILD Agent → submits work → ReaperOAK → delegates review → Validator
+Validator → returns verdict → ReaperOAK → routes to agent (rework) or TODO (complete)
+```
+
+All communication between Validator and BUILD agents flows through ReaperOAK.
+No agent may self-validate — DOD-07 (Reviewed by Validator) can only be set
+by the Validator.
+
+> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md` §7.
+
+---
+
+## 20. Definition of Done Framework (v5.0.0)
+
+Every task must satisfy **10 DoD items** before it can be marked complete.
+The checklist is machine-parseable and enforced by the Validator agent.
+
+| DoD ID | Item | Verified By |
+|--------|------|-------------|
+| DOD-01 | Code Implemented — all acceptance criteria addressed | Agent (self) + Validator |
+| DOD-02 | Tests Written — unit tests, ≥80% coverage for new code | Agent + Validator |
+| DOD-03 | Lint Passes — zero errors and warnings | Agent + Validator |
+| DOD-04 | Type Checks Pass — `tsc --noEmit` clean, no `any` | Agent + Validator |
+| DOD-05 | CI Passes — all workflow checks green | Agent + Validator |
+| DOD-06 | Docs Updated — JSDoc/TSDoc, README if interface changed | Agent + Validator |
+| DOD-07 | Reviewed by Validator — independent compliance check | **Validator only** |
+| DOD-08 | No Console Errors — structured logger only | Agent + Validator |
+| DOD-09 | No Unhandled Promises — no floating promises | Agent + Validator |
+| DOD-10 | No TODO Comments — no TODO/FIXME/HACK/XXX in code | Agent + Validator |
+
+**Enforcement rules:**
+
+- `allPassed == false` → task CANNOT enter DOCUMENT stage
+- `verdict != APPROVED` → task CANNOT enter MARK COMPLETE
+- Agent submits DOD-07 as `false` — only Validator may set it to `true`
+- 3 consecutive Validator rejections → escalate to user
+
+**Template:** `.github/tasks/definition-of-done-template.md`
+
+> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md` §3.
+
+---
+
+## 21. Initialization Enforcement (v5.0.0)
+
+Before any task enters the IMPLEMENT stage, the target module must pass a
+**9-item initialization checklist**. The check runs once per module — subsequent
+tasks reuse the cached result if `all_passed: true` exists on disk.
+
+| Init ID | Item | Applies To |
+|---------|------|------------|
+| INIT-01 | Directory Structure Validated | ALL |
+| INIT-02 | ESLint / Prettier Configured | ALL |
+| INIT-03 | tsconfig.json Present and Consistent | ALL |
+| INIT-04 | Test Framework Configured | ALL |
+| INIT-05 | Environment Variables Documented | ALL |
+| INIT-06 | Health Check Endpoint Present | Backend |
+| INIT-07 | Logging Configured | ALL |
+| INIT-08 | Error Boundaries Present | Frontend |
+| INIT-09 | Sentry / Error Tracking Instrumented | Backend |
+
+**Enforcement rules:**
+
+- Any required item with `status: false` → **BLOCKS IMPLEMENT**
+- Non-applicable items auto-pass based on `module_type`
+- Initialization fails after 2 attempts → BLOCK and escalate to user
+
+**Template:** `.github/tasks/initialization-checklist-template.md`
+
+> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md` §5.
+
+---
+
+## 22. Bug-Catching Strategy (v5.0.0)
+
+Bug catching is distributed across **8 layered gates** that run at different
+stages of the task-level SDLC. Each gate has explicit pass/fail criteria and
+blocking behavior.
+
+| Gate | Name | Runs At | Tool | Pass Criteria | Who Runs |
+|------|------|---------|------|---------------|----------|
+| G1 | Static Analysis | IMPLEMENT | `tsc --noEmit` | Zero compiler errors | Agent |
+| G2 | Type Safety | IMPLEMENT | TypeScript strict mode | No `any` types in new code | Agent |
+| G3 | Linting | IMPLEMENT | ESLint | Zero errors, zero warnings | Agent |
+| G4 | Unit Test Coverage | TEST | Vitest/Jest | ≥80% line coverage, all pass | Agent |
+| G5 | Integration Tests | TEST | Supertest/Playwright | Happy path + error path per endpoint | Agent |
+| G6 | Performance Checks | VALIDATE | Lighthouse/k6 | LCP <2.5s, p95 <500ms | Validator |
+| G7 | Security Checklist | VALIDATE | Manual checklist | Auth, input validation, CORS, secrets | Validator |
+| G8 | Schema Validation | VALIDATE | Zod/Joi, OpenAPI | Runtime schemas match contracts | Validator |
+
+```mermaid
+graph LR
+    subgraph IMPLEMENT
+        G1[G1: Static Analysis] --> G2[G2: Type Safety] --> G3[G3: Linting]
+    end
+    subgraph TEST
+        G4[G4: Unit Coverage ≥80%] --> G5[G5: Integration Tests]
+    end
+    subgraph VALIDATE
+        G6[G6: Performance] --> G7[G7: Security] --> G8[G8: Schema]
+    end
+    G3 --> G4
+    G5 --> G6
+```
+
+Gates G1–G5 are run by the delegated agent (self-check). Gates G6–G8 are run
+by the Validator (independent check). The Validator also independently re-runs
+G1–G5 to prevent false claims.
+
+> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md` §6.
+
+---
+
+## 23. Governance Architecture (v5.0.0)
+
+### 23.1 Blocking Rules
+
+Every transition in the task-level SDLC has an explicit blocking condition.
+These are hard stops, not advisory.
+
+| Transition | Blocking Condition | Enforced By |
+|-----------|-------------------|-------------|
+| PLAN → INITIALIZE | Confidence < 70%; plan not documented | Agent |
+| INITIALIZE → IMPLEMENT | Any required init checklist item fails | Agent |
+| IMPLEMENT → TEST | Compiler errors (G1), type errors (G2), lint errors (G3) | Agent |
+| TEST → VALIDATE | Test failures (G4); missing integration tests (G5) | Agent |
+| VALIDATE → DOCUMENT | Validator verdict is `REJECTED` | Validator |
+| DOCUMENT → MARK COMPLETE | Public API undocumented | Agent |
+| Frontend IMPLEMENT entry | UI/UX design artifacts missing | ReaperOAK |
+
+### 23.2 Rework Loop
+
+When the Validator rejects at VALIDATE:
+
+1. Validator writes rejection report with specific DOD-XX failures
+2. ReaperOAK re-delegates to the original agent with rejection findings
+3. Agent re-enters at IMPLEMENT (Stage 3) with rework counter incremented
+4. **Maximum 3 rework iterations** per task
+5. After 3 rejections → escalate to user (override, cancel, or reassign)
+
+```mermaid
+flowchart TD
+    A[Agent submits work] --> B{Validator reviews}
+    B -->|APPROVED| C[Proceed to DOCUMENT]
+    B -->|REJECTED| D{Rework count < 3?}
+    D -->|Yes| E[Re-delegate with findings]
+    E --> F[Agent fixes at IMPLEMENT]
+    F --> A
+    D -->|No| G[ESCALATE to user]
+```
+
+### 23.3 Loop Detection Updates
+
+Five new signals added to `.github/guardian/loop-detection-rules.md` for
+SDLC enforcement:
+
+| Signal | Detects |
+|--------|---------|
+| SDLC Stage Skip | Agent attempts to bypass a required stage |
+| DoD Non-Compliance | Agent submits with failing DoD items |
+| Initialization Skip | Agent enters IMPLEMENT without passing init checklist |
+| UI/UX Gate Bypass | Frontend task enters IMPLEMENT without design artifacts |
+| Validator Rejection Loop | Same task rejected 3+ times by Validator |
+
+Each signal has DETECT, ACTION, and ESCALATE stages defined in the
+loop detection rules file.
+
+> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md`
+> §8 for the complete governance state machine and failure handling protocol.
+
+---
+
+## 24. SDLC Enforcement File Inventory (v5.0.0)
+
+Files introduced by the SDLC Enforcement Upgrade:
+
+| File | Purpose |
+|------|---------|
+| `.github/agents/Validator.agent.md` | Validator agent definition |
+| `.github/vibecoding/chunks/Validator.agent/chunk-01.yaml` | Validator core validation protocols |
+| `.github/vibecoding/chunks/Validator.agent/chunk-02.yaml` | Validator init/DoD/gate procedures |
+| `.github/tasks/definition-of-done-template.md` | Machine-parseable DoD checklist (10 items) |
+| `.github/tasks/initialization-checklist-template.md` | Project initialization checklist (9 items) |
+| `docs/architecture/sdlc-enforcement-design.md` | Full SDLC enforcement design specification |
+| `docs/reviews/qa-report.md` | QA review report for the upgrade |
+| `docs/reviews/security-report.md` | Security review report for the upgrade |
+
+Runtime artifacts (created per task/module during execution):
+
+| Path Pattern | Purpose |
+|-------------|---------|
+| `docs/reviews/dod/{TASK_ID}-dod.yaml` | Per-task DoD report |
+| `docs/reviews/validation/{TASK_ID}-validation.yaml` | Per-task Validator report |
+| `docs/reviews/init/{MODULE_NAME}-init.yaml` | Per-module initialization checklist |

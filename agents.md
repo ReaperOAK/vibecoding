@@ -18,7 +18,7 @@ architecture decisions or security concerns.
 ## 2. Safety Check (Mandatory)
 
 Read `.github/guardian/STOP_ALL` before executing any file modifications.
-If the file contains `HALT_ALL`, stop immediately and report to the user.
+If the file contains `STOP`, stop immediately and report to the user.
 
 ## 3. Context Loading (Mandatory)
 
@@ -60,6 +60,15 @@ to it or invoke it directly.
 **TODO Agent invocation:** For any multi-step feature request, ReaperOAK
 MUST first delegate to the TODO Agent to decompose the work into granular
 tasks before entering the SPEC phase.
+
+**Validator Agent** is an independent compliance reviewer with special
+authority to **reject task completion**. It verifies Definition of Done
+compliance, SDLC stage adherence, quality gates, and pattern conformance.
+The Validator cannot implement code — it only reads artifacts and writes
+validation reports. Its rejection blocks MARK COMPLETE.
+
+**Validator Agent invocation:** Validator is invoked by ReaperOAK at the
+VALIDATE and MARK COMPLETE stages of every task. No agent may self-validate.
 
 ## 5. Human Approval Required
 
@@ -126,3 +135,28 @@ Every claim needs evidence:
 
 Confidence levels: HIGH (90-100%, proceed) | MEDIUM (70-89%, flag risks) |
 LOW (50-69%, pause for review) | INSUFFICIENT (<50%, block and escalate).
+
+### Task-Level SDLC Compliance
+
+Every task follows a mandatory 7-stage inner loop within the BUILD phase:
+
+```
+PLAN → INITIALIZE → IMPLEMENT → TEST → VALIDATE → DOCUMENT → MARK COMPLETE
+```
+
+**Rules:**
+- No stage may be skipped. Gate enforcement applies between every transition.
+- At INITIALIZE, new modules must complete the initialization checklist at
+  `.github/tasks/initialization-checklist-template.md` before proceeding.
+- At TEST, static analysis, type checking, linting, and coverage gates must pass.
+- At VALIDATE, the Validator agent independently checks Definition of Done
+  compliance using the template at `.github/tasks/definition-of-done-template.md`.
+- At MARK COMPLETE, the Validator agent re-verifies all DoD items. A task
+  cannot be marked complete until all items are checked and verified.
+- If Validator rejects, the task enters a REWORK loop back to the appropriate
+  earlier stage. Max 3 rework iterations before escalation to the user.
+
+**References:**
+- Definition of Done template: `.github/tasks/definition-of-done-template.md`
+- Initialization checklist: `.github/tasks/initialization-checklist-template.md`
+- Full design: `docs/architecture/sdlc-enforcement-design.md`

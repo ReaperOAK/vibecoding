@@ -8,7 +8,7 @@ under a supervisor orchestrator (ReaperOAK).
 
 ```
 .github/
-├── agents/              # 13 agent definitions (*.agent.md) — includes UIDesigner, TODO
+├── agents/              # 14 agent definitions (*.agent.md) — includes UIDesigner, TODO, Validator
 ├── memory-bank/         # Persistent shared state (9 files + schema)
 │                        # Includes workflow-state.json, artifacts-manifest.json, feedback-log.md
 ├── proposals/           # Self-improvement proposals (PROP-*.md)
@@ -27,14 +27,16 @@ under a supervisor orchestrator (ReaperOAK).
 ├── orchestration.rules.md  # DAG protocol, confidence gates, token tracking
 └── security.agentic-guardrails.md  # Threat models, MCP isolation
 TODO/                    # Task decomposition artifacts (managed by TODO Agent)
+docs/
+├── uiux/                # UI/UX design artifacts (wireframes, mockups, specs)
 ```
 
 ## Architecture
 
 - **Supervisor pattern**: ReaperOAK orchestrates all subagents
-- **12 specialized agents**: Architect, Backend, Frontend, QA, Security,
+- **13 specialized agents**: Architect, Backend, Frontend, QA, Security,
   DevOps, Documentation, Research, ProductManager, CIReviewer, UIDesigner,
-  TODO (task decomposition)
+  TODO (task decomposition), Validator (SDLC compliance reviewer)
 - **Memory bank**: Git-tracked markdown files for cross-session persistence
 - **Shared context layer**: Pipeline state, artifact tracking, feedback log
 - **Self-improvement loop**: Agents propose infrastructure improvements

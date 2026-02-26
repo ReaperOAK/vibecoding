@@ -46,7 +46,8 @@
         "Documentation",
         "CIReviewer",
         "UIDesigner",
-        "TODO"
+        "TODO",
+        "Validator"
       ]
     },
     "autonomy_level": {
@@ -182,6 +183,44 @@
         "quality_threshold": { "type": "number", "minimum": 0, "maximum": 10 }
       },
       "description": "Structured output expectations for the agent"
+    },
+    "sdlc_stage": {
+      "type": ["string", "null"],
+      "enum": ["PLAN", "INITIALIZE", "IMPLEMENT", "TEST", "VALIDATE", "DOCUMENT", "MARK_COMPLETE", null],
+      "description": "Current task-level SDLC stage. Null for pipeline-level delegations."
+    },
+    "dod_checklist": {
+      "type": ["object", "null"],
+      "properties": {
+        "code_implemented": { "type": "boolean" },
+        "tests_written": { "type": "boolean" },
+        "lint_passes": { "type": "boolean" },
+        "type_checks_pass": { "type": "boolean" },
+        "ci_passes": { "type": "boolean" },
+        "docs_updated": { "type": "boolean" },
+        "validator_reviewed": { "type": "boolean" },
+        "no_console_errors": { "type": "boolean" },
+        "no_unhandled_promises": { "type": "boolean" },
+        "no_todo_comments": { "type": "boolean" }
+      },
+      "additionalProperties": false,
+      "description": "Definition of Done checklist status. Null until MARK_COMPLETE stage."
+    },
+    "initialization_checklist": {
+      "type": ["object", "null"],
+      "properties": {
+        "directory_structure": { "type": "boolean" },
+        "linter_formatter": { "type": "boolean" },
+        "tsconfig": { "type": "boolean" },
+        "test_framework": { "type": "boolean" },
+        "env_documented": { "type": "boolean" },
+        "health_check": { "type": "boolean" },
+        "logging": { "type": "boolean" },
+        "error_boundaries": { "type": "boolean" },
+        "error_tracking": { "type": "boolean" }
+      },
+      "additionalProperties": false,
+      "description": "Project initialization checklist. Null for non-initialization tasks."
     }
   },
   "additionalProperties": false
