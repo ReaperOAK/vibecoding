@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "task-lock-v1",
+  "title": "Task Lock Schema",
+  "description": "Locks a task to an agent within an execution cycle. Prevents multi-task assignment per agent per cycle and concurrent task execution. Complementary to lockfile-schema.json which locks individual files.",
+  "type": "object",
+  "required": [
+    "taskId",
+    "lockedBy",
+    "lockedAt",
+    "expiresAt",
+    "cycleId",
+    "status"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "pattern": "^[A-Z]+-[A-Z]+\\d{3}$",
+      "description": "The task ID being locked (e.g., ORCH-BE002). Must match a task in the active TODO file."
+    },
+    "lockedBy": {
+      "type": "string",
+      "enum": [
+        "Architect", "Backend", "Frontend Engineer", "QA Engineer",
+        "Security Engineer", "DevOps Engineer", "Documentation Specialist",
+        "Research Analyst", "Product Manager", "CI Reviewer",
+        "UIDesigner", "TODO", "Validator"
+      ],
+      "description": "Agent holding the lock. Must match the agent roster."
+    },
+    "lockedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp when the lock was acquired."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp when the lock auto-releases. Default: lockedAt + 30 minutes."
+    },
+    "cycleId": {
+      "type": "string",
+      "pattern": "^cycle-\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}-\\d+$",
+      "description": "Unique identifier for the execution cycle (e.g., cycle-2026-02-27T14:30-001)."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "released",
+        "expired"
+      ],
+      "default": "active",
+      "description": "Current lock state. 'active' = lock held, 'released' = post-task chain completed, 'expired' = agent did not respond within 30 minutes."
+    }
+  },
+  "additionalProperties": false
+}

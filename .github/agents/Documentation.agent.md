@@ -64,6 +64,62 @@ security policy authoring, design system specification.
 | Doc-as-Code CI | markdownlint, vale, link checking in CI |
 | Templates | Tutorial, How-To, Reference, Explanation, ADR, Runbook |
 
+## Mandatory Update Checklist
+
+When invoked as part of the post-task chain (after Validator approves), the
+Documentation Specialist MUST verify and update the following documentation
+for every completed task:
+
+| ID | Document | Path Pattern | When to Update |
+|---|---|---|---|
+| DOC-01 | Module README | `{module}/README.md` | Always — reflect current functionality |
+| DOC-02 | Architecture Docs | `docs/architecture/*.md` | When architectural patterns change |
+| DOC-03 | API Contracts | `docs/api-contracts.yaml` or equivalent | When endpoints or schemas change |
+| DOC-04 | CHANGELOG | `CHANGELOG.md` (root) | Always — add entry with task ID, date, summary |
+| DOC-05 | Decision Records | `docs/adr/ADR-*.md` | When significant trade-off was made |
+
+### Doc-Update Report
+
+After checking all 5 items, the Documentation Specialist MUST return a
+**doc-update report** to ReaperOAK with this structure:
+
+```yaml
+task_id: "{TASK_ID}"
+doc_update_report:
+  DOC_01:
+    status: "updated" | "confirmed_current" | "not_applicable"
+    path: "{file path}" | null
+    summary: "{what changed}" | "No changes needed — module README is current"
+  DOC_02:
+    status: "updated" | "confirmed_current" | "not_applicable"
+    path: "{file path}" | null
+    summary: "{what changed}"
+  DOC_03:
+    status: "updated" | "confirmed_current" | "not_applicable"
+    path: "{file path}" | null
+    summary: "{what changed}"
+  DOC_04:
+    status: "updated"
+    path: "CHANGELOG.md"
+    summary: "{changelog entry text}"
+  DOC_05:
+    status: "updated" | "not_applicable"
+    path: "{file path}" | null
+    summary: "{what changed}"
+```
+
+### Documentation Specialist Rules
+
+1. DOC-04 (CHANGELOG) MUST always be `updated` — never `not_applicable`
+2. If unable to update a doc due to missing context, report with
+   `status: "blocked"` and `reason: "{explanation}"` — ReaperOAK will resolve
+3. Documentation updates are append-only — never delete existing content
+4. If a task introduces a new module, DOC-01 (README) MUST be `updated`
+5. The doc-update report is the exit gate for the Documentation step in the
+   post-task chain — without it, the task cannot proceed to TODO completion
+
+---
+
 For detailed protocol definitions, templates, and scoring rules, load chunks
 from `.github/vibecoding/chunks/Documentation.agent/`.
 

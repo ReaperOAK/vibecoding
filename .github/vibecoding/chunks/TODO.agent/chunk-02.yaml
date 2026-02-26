@@ -10,27 +10,58 @@ summary: "TODO Agent — Governance, Lifecycle & Completion Protocol. Status tra
 ## 1. Status Transitions
 
 ```
-not_started ──→ in_progress ──→ completed
-     │               │
-     │               ├──→ blocked ──→ in_progress (when blocker resolved)
-     │               │
-     └───────────────┘
-                     │
-                     └──→ blocked ──→ not_started (if reassigned)
+BACKLOG ──→ READY ──→ LOCKED ──→ IMPLEMENTING ──→ VALIDATING ──→ DOCUMENTING ──→ DONE
+  │          │                  │              │
+  │          │                  │              ├──→ REWORK ──→ IMPLEMENTING (rework ≤ 3)
+  │          │                  │              │
+  │          │                  ├──→ REWORK    └──→ BACKLOG (rework > 3, escalated)
+  │          │                  │
+  │          └── READY (lock expired, 30 min timeout)
+  │
+  └── (promoted when all depends_on = DONE)
 ```
+
+**8 States:**
+
+| State | Meaning |
+|-------|--------|
+| `BACKLOG` | Task exists, dependencies not yet met (or escalated from REWORK) |
+| `READY` | All dependencies DONE, eligible for cycle selection |
+| `LOCKED` | Selected for cycle, lock acquired by ReaperOAK |
+| `IMPLEMENTING` | Delegated to subagent, work in progress |
+| `VALIDATING` | Implementation submitted, Validator reviewing |
+| `DOCUMENTING` | Validator approved, Documentation Specialist updating docs |
+| `DONE` | All post-task chain steps complete |
+| `REWORK` | Validator rejected or agent reported failure |
 
 **Transition Rules:**
 
-| From | To | Trigger | Requires |
-|------|----|---------|----------|
-| not_started | in_progress | Agent starts work | Delegation packet issued |
-| in_progress | completed | Agent finishes | Evidence reviewed by ReaperOAK |
-| in_progress | blocked | Dependency incomplete or external blocker | Blocker description |
-| blocked | in_progress | Blocker resolved | Dependency now completed |
-| not_started | blocked | Dependency auto-block | todo_visual.py detects incomplete dep |
+| From | To | Trigger | Guard Condition |
+|------|-----|---------|----------------|
+| BACKLOG | READY | Dependency check | All `depends_on` tasks have status = DONE |
+| READY | LOCKED | Cycle SELECT phase | No file conflicts, agent not locked, priority selected |
+| LOCKED | IMPLEMENTING | `runSubagent` called | Lock is active, agent assignment confirmed |
+| LOCKED | READY | Timer expires | Lock timeout reached (30 min) — auto-release |
+| IMPLEMENTING | VALIDATING | Agent returns evidence | Post-task chain Step 1-2 pass (evidence reviewed) |
+| IMPLEMENTING | REWORK | Agent reports failure | Error evidence provided |
+| VALIDATING | DOCUMENTING | Validator verdict | verdict = APPROVED |
+| VALIDATING | REWORK | Validator verdict | verdict = REJECTED, rework_counter < 3 |
+| DOCUMENTING | DONE | Doc-update report | Documentation Specialist confirms all DOC items |
+| REWORK | IMPLEMENTING | Re-delegation | rework_counter incremented, < 3 |
+| REWORK | BACKLOG | Escalation | rework_counter >= 3, user notified |
+| DONE | REWORK | Post-completion audit or Validator force-revert | Validator | rework_count++ |
 
-**Immutability:** Once a task status is `completed`, it cannot be reverted.
+**Immutability:** Once a task status is `DONE`, it cannot be reverted
+except via a post-completion audit by the Validator (with evidence).
 Tasks can only be archived, never deleted.
+
+**Backward Compatibility:** Legacy status values (`not_started`,
+`in_progress`, `completed`, `blocked`) are automatically mapped to new
+states per the State Mapping table in `ReaperOAK.agent.md`:
+- `not_started` → `BACKLOG` (promoted to READY if all deps DONE)
+- `in_progress` → `IMPLEMENTING`
+- `completed` → `DONE`
+- `blocked` → `BACKLOG` with `blocker_reason` field
 
 ## 2. Two-Party Completion Protocol
 
@@ -67,16 +98,13 @@ A task is marked `completed` ONLY when ALL of these are true:
 
 ### 4.1 Max-Task-Per-Cycle
 
-No subagent receives more than **3 granular tasks** per delegation cycle.
-
-**Exception:** SPEC-phase agents (PM, Architect, UIDesigner, Research) may
-receive up to **5 tasks** per cycle because SPEC tasks are typically smaller.
+No subagent receives more than **1 task** per delegation cycle, enforced via task lock.
 
 | Check Point | Enforcer | Action on Violation |
 |-------------|----------|-------------------|
-| DECOMPOSE output | TODO Agent | Split tasks further if any agent has > 3 |
-| Pre-delegation | ReaperOAK | Refuse delegation with > 3 tasks/agent |
-| Runtime | ReaperOAK | Track delegations per agent per cycle, hard-stop at 3 |
+| DECOMPOSE output | TODO Agent | Split tasks further if any agent has > 1 |
+| Pre-delegation | ReaperOAK | Refuse delegation with > 1 task/agent |
+| Runtime | ReaperOAK | Track delegations per agent per cycle, hard-stop at 1 |
 
 ### 4.2 Stall Detection
 
@@ -100,7 +128,8 @@ P0 task blocked for > 1 cycle  → STOP pipeline, notify user
 ### 4.4 Task Budget
 
 ```
-Per-agent per-cycle budget: max 12h of estimated effort
+Max effort per task: 90 min (split further if exceeded)
+Per-agent per-cycle budget: max 90 min of estimated effort (1 task per cycle, max 90 min per task)
 Per-cycle total budget: max 40h across all agents
 Feature total budget: declared at DECOMPOSE time, tracked against actuals
 ```
@@ -175,8 +204,8 @@ After writing a TODO file, the TODO Agent must:
 1. Run `python3 todo_visual.py --json` to validate format
 2. Confirm all task IDs are unique (no collisions with existing files)
 3. Confirm no circular dependencies exist
-4. Confirm no agent has > 3 tasks (or > 5 for SPEC agents)
-5. Confirm per-agent effort ≤ 12h
+4. Confirm no agent has > 1 task per delegation cycle
+5. Confirm per-agent effort ≤ 90 min
 6. Return task summary + DAG to ReaperOAK
 ```
 
@@ -198,7 +227,7 @@ python3 todo_visual.py --json
 **If validation fails:**
 - Check task header format matches regex: `^(#{2,4})\s+([A-Z][A-Z0-9-]*\d{3,4}):\s*(.+)$`
 - Check bold-text metadata lines are correctly formatted
-- Check status values are one of: `not_started`, `in_progress`, `completed`, `blocked`
+- Check status values are one of: `BACKLOG`, `READY`, `LOCKED`, `IMPLEMENTING`, `VALIDATING`, `DOCUMENTING`, `DONE`, `REWORK` (legacy values `not_started`, `in_progress`, `completed`, `blocked` accepted as aliases)
 - Fix and re-validate before returning results
 
 ## 9. Extended Metadata Fields

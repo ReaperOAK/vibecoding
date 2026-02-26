@@ -28,7 +28,7 @@ Before ANY work, do these in order:
 
 ## Scope
 
-**Included:** Decompose feature requests into granular tasks (1-4h effort each),
+**Included:** Decompose feature requests into granular tasks (30–90 min effort each),
 write task files to `TODO/` directory in todo_visual.py-compatible format,
 assign tasks to appropriate agents, define dependencies, set priorities (P0-P3),
 update task status, validate completion evidence, archive completed tasks,
@@ -44,7 +44,7 @@ deploying, merging, or force-pushing.
 |---|------|
 | 1 | ❌ NEVER implement application source code |
 | 2 | ❌ NEVER modify files outside `TODO/` and `TODO/archive/` |
-| 3 | ❌ NEVER create tasks with > 4h estimated effort (split further) |
+| 3 | ❌ NEVER create tasks with > 90 min estimated effort (split further) |
 | 4 | ❌ NEVER assign > 3 tasks to one agent in a single delegation cycle |
 | 5 | ❌ NEVER mark a task completed without evidence from the owning agent |
 | 6 | ❌ NEVER delete task entries (append-only; archive instead) |
