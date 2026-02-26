@@ -265,11 +265,6 @@ ReaperOAK detects RUG violations when:
 | Infrastructure mutations | ❌ | State dependencies |
 | Memory bank append operations | ✅ | Append-only, timestamped |
 
-### Concurrency Limits
-
-- **Maximum parallel subagents:** 4 per batch
-- **Maximum parallel batches:** 1 (batches execute sequentially)
-- **Maximum total active tasks:** 8 (4 in-progress + 4 in-review)
 
 ### File Ownership Protocol
 
@@ -434,7 +429,7 @@ A task is suspected of infinite looping if ANY of the following are true:
 3. **Progress assertion:** After each Plan-Act-Reflect cycle, agent must
    demonstrate measurable progress (new files, passing tests, etc.). If no
    progress after 2 cycles, escalate.
-4. **Delegation depth limit:** Maximum delegation chain depth of 2 (ReaperOAK
+4. **Delegation depth limit:** imum delegation chain depth of 2 (ReaperOAK
    → Subagent → Sub-subagent). No deeper nesting.
 
 ### Recovery from Detected Loop

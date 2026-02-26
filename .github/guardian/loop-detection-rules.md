@@ -51,10 +51,6 @@ locked_by: ReaperOAK
 - If session budget exceeds 80%, no new delegations permitted
 - At 95%, all agents must wrap up current tasks
 
-### Per-Agent Rate Limiting
-- Max 50 tool calls per task (configurable per delegation packet)
-- Max 3 file write operations per minute (prevent runaway edits)
-- Max 10 search operations per minute
 
 ## Circuit Breaker: STOP_ALL
 

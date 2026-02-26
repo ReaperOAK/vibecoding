@@ -266,7 +266,6 @@ See `orchestration.rules.md` §1 for full state definitions and transitions.
 See `orchestration.rules.md` §5 for full parallelism model.
 
 Key constraints:
-- Maximum 4 parallel subagents at any time
 - Each parallel batch requires pre-declared file ownership
 - No two subagents may claim the same file in a parallel batch
 - Integration validation gate runs after every batch

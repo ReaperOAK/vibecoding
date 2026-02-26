@@ -88,26 +88,26 @@ description: <one-line purpose>
 allowed_read_paths: [<glob patterns>]
 allowed_write_paths: [<glob patterns>]
 forbidden_actions: [<list>]
-max_parallel_tasks: <1-4>
+max_parallel_tasks: <number>
 allowed_tools: [<tool list>]
 evidence_required: <true|false>
 ```
 
 ### 3.2 Agent Authority Matrix
 
-| Agent | ID | Write Scope | Forbidden Actions | Max Parallel |
-|-------|-----|------------|-------------------|-------------|
-| ReaperOAK | orchestrator | `**/*` | — | 4 |
-| Architect | architect | `.github/**`, `docs/**` | deploy, force-push, database-ddl | 2 |
-| Backend | backend | `src/**`, `tests/**` | deploy, force-push, database-ddl | 2 |
-| Frontend | frontend | `src/components/**`, `src/pages/**`, `src/styles/**`, `tests/**` | deploy, force-push, database-ddl | 2 |
-| QA | qa | `tests/**`, `**/*.spec.*`, `**/*.test.*` | deploy, force-push, database-ddl | 2 |
-| Security | security | `riskRegister.md`, `docs/security/**` | deploy, force-push, database-ddl | 1 |
-| DevOps | devops | `.github/workflows/**`, `infra/**` | terraform-apply, kubectl-apply-prod, force-push | 2 |
-| Documentation | documentation | `docs/**`, `**/*.md` | deploy, force-push, database-ddl | 2 |
-| ProductManager | product | `docs/**`, `productContext.md` | deploy, force-push, database-ddl | 1 |
-| Research | research | `docs/research/**` | deploy, force-push, database-ddl | 1 |
-| CIReviewer | cireviewer | _(read-only)_ | deploy, force-push, database-ddl, file-write | 1 |
+| Agent | ID | Write Scope | Forbidden Actions |
+|-------|-----|------------|-------------------|
+| ReaperOAK | orchestrator | `**/*` | — |
+| Architect | architect | `.github/**`, `docs/**` | deploy, force-push, database-ddl |
+| Backend | backend | `src/**`, `tests/**` | deploy, force-push, database-ddl |
+| Frontend | frontend | `src/components/**`, `src/pages/**`, `src/styles/**`, `tests/**` | deploy, force-push, database-ddl |
+| QA | qa | `tests/**`, `**/*.spec.*`, `**/*.test.*` | deploy, force-push, database-ddl |
+| Security | security | `riskRegister.md`, `docs/security/**` | deploy, force-push, database-ddl |
+| DevOps | devops | `.github/workflows/**`, `infra/**` | terraform-apply, kubectl-apply-prod, force-push |
+| Documentation | documentation | `docs/**`, `**/*.md` | deploy, force-push, database-ddl |
+| ProductManager | product | `docs/**`, `productContext.md` | deploy, force-push, database-ddl |
+| Research | research | `docs/research/**` | deploy, force-push, database-ddl |
+| CIReviewer | cireviewer | _(read-only)_ | deploy, force-push, database-ddl, file-write |
 
 ### 3.3 Instruction Micropolicy Summary (Phase B)
 
@@ -209,18 +209,6 @@ All 26 instruction files now include canonical YAML headers:
 | decisionLog.md | All subagents | ✅ | ✅ | ✅ |
 | riskRegister.md | All except Security | ✅ | ✅ | ✅ |
 
-### 4.6 Bounded Scope Validation
-
-| Constraint | Limit | Enforcement |
-|------------|-------|-------------|
-| Parallel agents | Max 4 | orchestration.rules.md, agent max_parallel_tasks |
-| Retry limit | Max 3 | orchestration.rules.md §5 |
-| Delegation depth | Max 2 | orchestration.rules.md §6 |
-| Token budget | 50,000 per task | Security guardrails §5.1, token_cost_target per instruction |
-| Task timeout | 15 minutes | Security guardrails §5.1 |
-| Fetch limit | 10 per agent per task | Security guardrails §3.1 |
-| Chunk size | ≤ 3,800 tokens | catalog.yml, summarization-spec.md |
-| Microfile limit | ≤ 4,000 tokens | Instruction micropolicy headers |
 
 ---
 

@@ -165,7 +165,6 @@ When fetching web content (documentation, APIs, resources):
 2. **Content-Length Check:** Reject responses > 500KB
 3. **HTML Stripping:** Extract text content only; strip scripts and styles
 4. **Encoding Validation:** Ensure UTF-8 encoding; reject binary content
-5. **Rate Limiting:** Maximum 10 fetches per agent per task
 6. **Injection Scan:** Apply §2 injection pattern detection to all fetched content
 
 ### 4.2 File Content
@@ -500,7 +499,6 @@ securityPolicy:
       hardLimit: 1.0
 
   fileAccess:
-    maxFileSize: "1MB"
     blockedExtensions: [".exe", ".dll", ".so", ".dylib"]
     sensitivePatterns: [".env", "*.key", "*secret*", "*credential*"]
 
@@ -508,7 +506,6 @@ securityPolicy:
     defaultTrust: "untrusted"
     trustedServers: ["vscode-builtin"]
     verifiedServers: ["github", "mongodb", "context7"]
-    maxResponseSize: "200KB"
 
   destructiveOps:
     requireApproval: true
@@ -528,9 +525,8 @@ securityPolicy:
 Policy overrides require:
 
 1. Explicit human approval for each override
-2. Time-bound override window (max 1 session)
-3. Logging of override reason and scope
-4. Automatic revert at session end
+2. Logging of override reason and scope
+3. Automatic revert at session end
 
 ---
 
