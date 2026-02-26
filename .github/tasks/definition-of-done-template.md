@@ -220,3 +220,26 @@ Validator approval (DOD-07 verdict) is required before MARK COMPLETE.
 
 > Each boolean maps 1:1 to a DOD-XX item above. Default: all `false`.
 > Agent sets applicable items to `true` with evidence. Validator confirms.
+
+---
+
+## DOD-to-CHK Cross-Reference
+
+The Validator independently verifies DOD items using CHK-01 through CHK-10
+(defined in `.github/agents/Validator.agent.md` → Extended Validation Checklist).
+This table maps each DOD item to the CHK items the Validator uses for
+independent verification.
+
+| DOD Item | DOD Description | Verified By CHK Items | CHK Verification Scope |
+|----------|----------------|----------------------|------------------------|
+| DOD-01 | Code Implemented | CHK-01, CHK-02, CHK-03, CHK-04, CHK-05 | Test existence, assertion quality, lint, no console errors, no TODO comments |
+| DOD-02 | Tests Written | CHK-01, CHK-02 | Test file existence per module + actual assertions in each test file |
+| DOD-03 | Lint Passes | CHK-03 | `npx eslint . --max-warnings 0` — zero errors AND zero warnings |
+| DOD-06 | Docs Updated | CHK-06, CHK-09 | Module README + JSDoc/TSDoc present; CHANGELOG.md updated |
+| DOD-08 | No Console Errors | CHK-04 | `grep -rn "console\.(log\|warn\|error)" {src}/` — zero matches (test files excluded) |
+| DOD-09 | No Unhandled Promises | CHK-10 | `.then()` chains have `.catch()`; `async` functions have try/catch or are awaited |
+| DOD-10 | No TODO Comments | CHK-05 | `grep -rn "// TODO\|// FIXME\|// HACK" {src}/` — zero matches |
+
+**Note:** DOD-04 (Type Checks), DOD-05 (CI Passes), and DOD-07 (Validator
+Reviewed) do not have dedicated CHK items — they are verified through existing
+Validator protocols (gates G1–G8 and the DOD-07 exclusive rule).

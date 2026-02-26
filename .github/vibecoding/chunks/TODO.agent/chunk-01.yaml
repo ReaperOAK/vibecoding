@@ -70,7 +70,7 @@ Every task block in a TODO file follows this structure:
 **Priority:** P1
 **Owner:** {AgentName}
 **Depends On:** {comma-separated IDs or "None"}
-**Effort:** {estimate, e.g., 3h}
+**Effort:** {estimate, 30–90 min}
 
 **SDLC Phase:** SPEC | BUILD | VALIDATE | DOCUMENT
 **UI Touching:** yes | no
@@ -94,7 +94,7 @@ Every task block in a TODO file follows this structure:
 - Status values: `not_started | in_progress | completed | blocked`
 - Priority values: `P0 | P1 | P2 | P3`
 - Owner must be a valid agent name
-- Effort maximum 4h per task (split if larger)
+- Effort maximum 90 min per task (split if larger)
 - UI Touching must be explicitly set on every task
 
 ## 4. File Template for New TODO Files
@@ -160,7 +160,7 @@ Step 4: IDENTIFY affected domains:
         - Tests → QA tasks
         - Documentation → Documentation tasks
 Step 5: DECOMPOSE into atomic tasks:
-        - Each task ≤ 4h effort
+        - Each task ≤ 90 min effort
         - Each task has exactly ONE owner agent
         - Each task has clear, verifiable acceptance criteria
         - Each task references its dependencies
@@ -174,6 +174,59 @@ Step 7: FLAG UI-touching tasks:
         - Ensure Frontend UI tasks depend on a UIDesigner task
 Step 8: WRITE task file(s) to TODO/ directory
 Step 9: VALIDATE by running: python3 todo_visual.py --json
+```
+
+### Beginner-Level Granularity Rules
+
+Target executor: a junior developer with 6 months of experience. Every task
+MUST be executable by someone unfamiliar with the codebase.
+
+| # | Rule | Example |
+|---|------|---------|
+| 1 | Every task MUST include explicit file paths to create or modify | `Modify .github/agents/ReaperOAK.agent.md` |
+| 2 | Every task MUST include function/method names to create or change | `Add function validatePostTaskChain() to orchestrator.ts` |
+| 3 | Every task MUST include specific test cases to write (file + test name) | `Write test "should reject task without Validator approval" in orchestrator.test.ts` |
+| 4 | Every task MUST include validation criteria (how to verify it works) | `Run grep -c "post-task chain" ReaperOAK.agent.md → expect ≥ 3 matches` |
+| 5 | Every task MUST list documentation updates required | `Update README.md § "Completion Protocol" with new 7-step chain` |
+| 6 | "What to do" MUST be a step-by-step implementation outline | Numbered steps with specific actions, not high-level summaries |
+| 7 | Max effort 30–90 min; if a task exceeds 90 min, split it further | Split "Build auth system" → "Create JWT middleware", "Add login endpoint", etc. |
+
+#### Example: Beginner-Level Task
+
+```markdown
+## PROJ-BE042: Add Input Validation to /api/users Endpoint
+
+**Status:** not_started
+**Priority:** P1
+**Owner:** Backend
+**Depends On:** PROJ-BE041
+**Effort:** 45 min
+
+**SDLC Phase:** BUILD
+**UI Touching:** no
+
+**What to do:**
+
+1. Open `server/src/routes/users.ts`
+2. Import `z` from `zod` (already in package.json)
+3. Create a `CreateUserSchema` using `z.object()`:
+   - `name`: `z.string().min(1).max(100)`
+   - `email`: `z.string().email()`
+   - `role`: `z.enum(["admin", "member", "viewer"])`
+4. In the `POST /api/users` handler, add `CreateUserSchema.parse(req.body)` wrapped in try-catch
+5. On `ZodError`, return 400 with `{ error: "Validation failed", details: err.errors }`
+6. Open `server/src/routes/__tests__/users.test.ts`
+7. Add test: "should return 400 for missing name" — POST with `{ email: "a@b.com", role: "admin" }`
+8. Add test: "should return 400 for invalid email" — POST with `{ name: "X", email: "not-email", role: "admin" }`
+9. Add test: "should return 400 for invalid role" — POST with `{ name: "X", email: "a@b.com", role: "superadmin" }`
+10. Add test: "should accept valid input" — POST with `{ name: "X", email: "a@b.com", role: "member" }` → expect 201
+
+**Acceptance Criteria:**
+
+- [ ] `CreateUserSchema` exists in `server/src/routes/users.ts`
+- [ ] POST /api/users returns 400 for invalid input with Zod error details
+- [ ] 4 tests pass in `users.test.ts`
+- [ ] `server/README.md` updated with validation rules
 ```
 
 ## 6. File Naming Convention

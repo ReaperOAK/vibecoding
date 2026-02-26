@@ -127,7 +127,7 @@ When operating in multi-agent mode, follow this loop:
  3. DECOMPOSE  → Build DAG with dependency graph (orchestration.rules.md §2)
  4. OWNERSHIP  → Declare file ownership per agent (no overlaps)
  5. CONFIDENCE → Assess confidence; if < 70%, gather more context
- 6. DELEGATE   → Send delegation packets with autonomy levels
+ 6. DELEGATE   → Execute via Execution Cycles (see §11.2.1 below)
  7. MONITOR    → Track states (PENDING → IN_PROGRESS → REVIEW → MERGED)
  8. VALIDATE   → Run Reviewer lane + self-reflection scoring on every output
  9. RESOLVE    → Handle cross-agent conflicts (§2.6)
@@ -135,6 +135,45 @@ When operating in multi-agent mode, follow this loop:
 11. REFLECT    → Update memory bank, log decisions, assess risks
 12. DELIVER    → Report outcomes with evidence and governance trail
 ```
+
+### 11.2.1 Execution Cycle Protocol
+
+Delegation (step 6) is organized into **execution cycles**. One execution
+cycle = one round of parallel delegations where each subagent receives
+exactly **ONE task**.
+
+Each cycle follows 6 phases:
+
+```
+SELECT → LOCK → DELEGATE → COLLECT → CHAIN → RELEASE
+```
+
+| Phase | Description |
+|-------|-------------|
+| **SELECT** | Identify eligible tasks (status = `READY`, deps satisfied, no file conflicts). Max 1 task per agent. |
+| **LOCK** | Acquire task lock per selected task. If agent already holds a lock in this cycle → REJECT. |
+| **DELEGATE** | Call `runSubagent` for each locked task in parallel (one call per task, one task per agent). |
+| **COLLECT** | Gather results from all parallel agents. |
+| **CHAIN** | Run mandatory post-task chain (Validator → Documentation → TODO) sequentially per task. |
+| **RELEASE** | Release all task locks. Advance cycle counter. Begin next cycle. |
+
+**One-Task-Per-Agent Rule:** Before delegating task T to agent A, verify
+agent A does not already hold a lock in this cycle. If it does, the second
+task MUST wait for the next cycle. Enforced via task lock schema at
+`.github/locks/task-lock-schema.json`.
+
+**Lock Expiry:** If an agent doesn't respond within 30 minutes, the lock
+auto-releases and the task returns to `READY` state.
+
+**Max-Task-Per-Cycle:** All agents (BUILD and SPEC): exactly **1 task per
+cycle**, enforced via task lock. Multiple agents run in parallel within one
+cycle — each has exactly 1 task.
+
+### 11.2.2 Parallel Execution Safety
+
+File conflict detection, dependency-safe selection, deadlock prevention, and
+parallel spawn strategy are defined in **chunk-04**. These rules govern how
+ReaperOAK selects conflict-free task groups before each cycle's DELEGATE phase.
 
 ## 11.3 Authority Rules
 
@@ -151,7 +190,74 @@ When operating in multi-agent mode, follow this loop:
 - **Conflict resolution** is ReaperOAK's exclusive authority — no subagent
   may override another's output.
 
-## 11.4 Memory Bank Protocol
+## 11.4 Mandatory Post-Task Chain (Completion Protocol)
+
+Every completed task MUST traverse the following 7-step chain with zero
+exceptions. No shortcuts. No opt-outs.
+
+| Step | Actor | Action | Failure Path |
+|------|-------|--------|-------------|
+| 1 | Implementing Agent | Reports completion with evidence (file diffs, test output, coverage) | — |
+| 2 | ReaperOAK | Reviews evidence against acceptance criteria from TODO task | → Step 3 (FAIL) or Step 4 (PASS) |
+| 3 | ReaperOAK | If FAIL → re-delegate to implementing agent with findings | Max 3 retries (shared budget), then escalate to user |
+| 4 | Validator | Independent DoD check (all 10 DOD items + CHK items) | → Step 5 (REJECT) or Step 6 (APPROVE) |
+| 5 | ReaperOAK | If Validator REJECTS → re-delegate to implementing agent with Validator findings | Shared retry budget with Step 3 |
+| 6 | Documentation Specialist | Runs mandatory update checklist (DOC-01 through DOC-05), returns doc-update report | If blocked → report to ReaperOAK |
+| 7 | TODO Agent | Marks task status as `DONE` in TODO file | — |
+
+### Retry Budget
+
+The total retry budget across Steps 3 and 5 is **3 combined**:
+- ReaperOAK review failures (Step 3) and Validator rejections (Step 5) share
+  the same `rework_count` counter on the task.
+- After 3 total failures → escalate to user for override or cancellation.
+
+### Post-Task Chain Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant Agent as Implementing Agent
+    participant Oak as ReaperOAK
+    participant Val as Validator
+    participant Doc as Documentation Specialist
+    participant TODO as TODO Agent
+
+    Agent->>Oak: Report completion + evidence
+    Oak->>Oak: Review evidence vs acceptance criteria
+
+    alt Evidence FAILS review
+        Oak->>Agent: Re-delegate with findings (rework_count++)
+        Note over Oak,Agent: Max 3 total retries (shared with Validator)
+    else Evidence PASSES review
+        Oak->>Val: Delegate DoD check
+        Val->>Val: Run 10 DOD items + CHK items independently
+        alt Validator REJECTS
+            Val->>Oak: Return REJECTED + rejection_reasons[]
+            Oak->>Agent: Re-delegate with Validator findings (rework_count++)
+        else Validator APPROVES
+            Val->>Oak: Return APPROVED + validation report
+            Oak->>Doc: Delegate mandatory doc updates
+            Doc->>Doc: Run DOC-01 through DOC-05 checklist
+            Doc->>Oak: Return doc-update report
+            Oak->>TODO: Mark task DONE
+            TODO->>TODO: Update status in TODO file
+        end
+    end
+```
+
+### Enforcement Rule
+
+> **No task may be marked `completed` (or `DONE`) without evidence of ALL
+> THREE post-chain steps:**
+>
+> 1. **Validator verdict** = `APPROVED` (written to `docs/reviews/dod/{TASK_ID}-dod.yaml`)
+> 2. **Documentation confirmation** (doc-update report at `docs/reviews/docs/{TASK_ID}-doc-report.yaml`)
+> 3. **TODO status update** (task status changed to `DONE` in TODO file)
+>
+> If any step is missing, the task remains in its current state and cannot
+> advance. This rule has NO exceptions without explicit user override.
+
+## 11.5 Memory Bank Protocol
 
 At session start:
 
@@ -169,7 +275,7 @@ During work:
 
 Files are in `.github/memory-bank/`.
 
-## 11.5 Failure Recovery
+## 11.6 Failure Recovery
 
 If a subagent fails:
 
@@ -191,7 +297,7 @@ If the system detects an infinite loop:
 
 See `orchestration.rules.md` §9 for loop detection protocol.
 
-## 11.6 Token & Cost Tracking
+## 11.7 Token & Cost Tracking
 
 Every agent operates within a token budget declared in the delegation packet.
 ReaperOAK monitors burn rates and enforces thresholds:

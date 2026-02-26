@@ -69,3 +69,36 @@ from `.github/vibecoding/chunks/UIDesigner.agent/`.
 
 Cross-cutting protocols (RUG, upstream artifact reading, evidence & confidence)
 are enforced via `agents.md` which is auto-loaded on every session.
+
+## Artifact Persistence Protocol
+
+All Stitch-generated design artifacts MUST be persisted to disk before a
+UIDesigner task can be marked as completed. Designs that exist only in
+Stitch's cloud are NOT considered delivered.
+
+### Required Artifacts Per Feature
+
+For every feature the UIDesigner works on, the following artifacts MUST
+exist at `docs/uiux/mockups/{feature-name}/`:
+
+| # | Artifact | Filename Pattern | Description |
+|---|----------|-----------------|-------------|
+| 1 | Screen Mockups | `mockup-{screen-name}.png` | Exported PNG images from Stitch for each screen |
+| 2 | Interaction Spec | `interaction-spec.md` | User interaction flows: click targets, hover effects, navigation paths, form submissions |
+| 3 | Component Hierarchy | `component-hierarchy.md` | Component tree with parent-child relationships, shared components marked |
+| 4 | State Variations | `state-variations.md` | All component states: default, hover, active, focused, disabled, error, loading, empty |
+| 5 | Accessibility Checklist | `accessibility-checklist.md` | WCAG 2.1 AA compliance checklist per component: color contrast, keyboard nav, screen reader labels, focus indicators |
+
+### Persistence Rules
+
+1. **Download First:** After generating mockups in Stitch, use Playwright or
+   Stitch's export API to download all screen images as PNGs
+2. **Directory Convention:** `docs/uiux/mockups/{feature-name}/` where
+   `{feature-name}` is the kebab-case feature identifier from the TODO task
+3. **Blocking Gate:** UIDesigner task status may NOT advance past IMPLEMENTING
+   until all 5 artifact types exist on disk
+4. **Frontend Dependency:** Frontend tasks with `UI Touching: yes` are BLOCKED
+   until all artifacts exist at the expected path — verified by ReaperOAK
+   before Frontend delegation
+5. **Versioning:** If designs are iterated, suffix with `-v2`, `-v3` etc.
+   Keep previous versions (append-only)

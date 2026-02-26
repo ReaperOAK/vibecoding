@@ -59,7 +59,9 @@ SPEC → BUILD → VALIDATE ──→ PASS → DOCUMENT → RETROSPECTIVE
 **Phases:**
 
 | Phase | Agents (parallel) | Outputs |
-|-------|------------------|---------|| 0. DECOMPOSE | TODO | `TODO/{PROJECT}_TODO.md` || 1. SPEC | PM, Architect, UIDesigner, Research | `docs/prd.md`, `docs/architecture.md`, `docs/api-contracts.yaml`, `docs/design-specs/` |
+|-------|------------------|----------|
+| 0. DECOMPOSE | TODO | `TODO/{PROJECT}_TODO.md` |
+| 1. SPEC | PM, Architect, UIDesigner, Research | `docs/prd.md`, `docs/architecture.md`, `docs/api-contracts.yaml`, `docs/design-specs/` |
 | 2. BUILD | Backend, Frontend, DevOps | `server/`, `client/`, `infra/` |
 | 3. VALIDATE | QA, Security, CI Reviewer | `docs/reviews/{qa,security,ci}-report.md` |
 | 4. GATE | ReaperOAK reads all reports | PASS → Phase 5 · FAIL → re-run Phase 2 with findings |
@@ -202,11 +204,15 @@ The Validator agent is invoked at two points in the task loop:
 5. Validator writes verdict (`APPROVED` / `REJECTED`) to DoD report
 6. If `REJECTED` → agent returns to IMPLEMENT with findings (max 3 reworks)
 
-**Stage 7 — MARK COMPLETE:**
+**Stage 7 — MARK COMPLETE (via Mandatory Post-Task Chain):**
 1. ReaperOAK verifies Validator verdict = `APPROVED` before allowing completion
 2. If DoD report shows any unchecked item → task CANNOT be marked complete
 3. Only after all 10 DoD items pass does ReaperOAK delegate to TODO Agent
    to mark the task `completed`
+4. **This stage is enforced by the Mandatory Post-Task Chain** (see
+   §TODO-Driven Delegation → Mandatory Post-Task Chain). All three
+   post-chain steps (Validator → Documentation → TODO) MUST complete
+   before a task reaches `DONE` status.
 
 ### Definition of Done (DoD) Enforcement
 
@@ -268,6 +274,25 @@ After DECOMPOSE, before entering SPEC phase:
 until its UIDesigner dependency task has status `completed` and design specs
 exist on disk.
 
+### Artifact Existence Verification
+
+After UIDesigner reports task completion, ReaperOAK MUST verify artifacts
+exist on disk before allowing Frontend delegation:
+
+```
+ls docs/uiux/mockups/{feature-name}/
+```
+
+**Required files:**
+- At least 1 `mockup-*.png` file
+- `interaction-spec.md`
+- `component-hierarchy.md`
+- `state-variations.md`
+- `accessibility-checklist.md`
+
+If ANY required file is missing → REJECT UIDesigner completion and
+re-delegate with specific missing file list.
+
 ## TODO-Driven Delegation
 
 ReaperOAK delegates individual tasks from the TODO file — never features.
@@ -277,12 +302,13 @@ Before any SDLC work:
 1. Delegate to TODO Agent: decompose user request into granular tasks
 2. Read generated TODO file → count tasks, verify format
 3. Apply UI/UX Gate
-4. Identify SPEC-phase tasks → delegate to SPEC agents (max 5/agent)
-5. After SPEC, identify BUILD-phase tasks → delegate (max 3/agent)
+4. Identify SPEC-phase tasks → delegate to SPEC agents (1 per agent per cycle)
+5. After SPEC, identify BUILD-phase tasks → delegate (1 per agent per cycle)
 
 ### Max-Task-Per-Cycle
-- BUILD agents: max **3 tasks** per delegation cycle
-- SPEC agents: max **5 tasks** per delegation cycle
+- BUILD agents: max **1 task** per delegation cycle (enforced via task lock)
+- SPEC agents: max **1 task** per delegation cycle (enforced via task lock)
+- Multiple agents run in parallel within one cycle — each has exactly 1 task.
 - Violation → reject delegation, re-split via TODO Agent
 
 ### Task-Driven Delegation Template
@@ -294,11 +320,326 @@ Acceptance criteria: {FROM TASK FILE}
 Scope: THIS TASK ONLY
 ```
 
-### Completion Protocol
-1. Agent reports completion with evidence
-2. ReaperOAK reviews evidence against acceptance criteria
-3. If PASS → delegate to TODO Agent: "Mark {ID} completed"
-4. If FAIL → re-delegate to agent with findings (max 3 retries)
+### Completion Protocol — 7-Step Mandatory Post-Task Chain
+
+Every completed task MUST traverse the full post-task chain. No exceptions
+without explicit user override.
+
+| Step | Actor | Action | Failure Path |
+|------|-------|--------|-------------|
+| 1 | Implementing Agent | Reports completion with evidence (artifact paths, test results, confidence level) | — |
+| 2 | ReaperOAK | Reviews evidence against acceptance criteria from TODO task | → Step 3 (FAIL) or Step 4 (PASS) |
+| 3 | ReaperOAK | If FAIL → re-delegate to implementing agent with specific findings | Max 3 retries (shared budget with Step 5), then escalate to user |
+| 4 | Validator | If PASS → independent DoD verification (all DOD items + CHK items) | → Step 5 (REJECT) or Step 6 (APPROVE) |
+| 5 | ReaperOAK | If Validator REJECTS → re-delegate to implementing agent with Validator's findings attached (rework counter incremented) | Max 3 reworks (shared budget with Step 3), then escalate to user |
+| 6 | Documentation Specialist | If Validator APPROVES → mandatory doc updates (README, CHANGELOG, API docs, etc.), returns doc-update report | If blocked → report to ReaperOAK |
+| 7 | TODO Agent | After Documentation Specialist confirms doc-update report → marks task status as completed | — |
+
+#### Retry Budget
+
+The total retry budget across Steps 3 and 5 is **3 combined**:
+- ReaperOAK review failures (Step 3) and Validator rejections (Step 5) share
+  a single `rework_count` counter.
+- When `rework_count` reaches 3 → escalate to user for override or cancellation.
+
+#### Post-Task Chain Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant Agent as Implementing Agent
+    participant Oak as ReaperOAK
+    participant Val as Validator
+    participant Doc as Documentation Specialist
+    participant TODO as TODO Agent
+
+    Agent->>Oak: Step 1: Report completion + evidence
+    Oak->>Oak: Step 2: Review evidence vs acceptance criteria
+
+    alt Step 3: Evidence FAILS review
+        Oak->>Agent: Re-delegate with findings (rework_count++)
+        Note over Oak,Agent: Max 3 total retries (shared with Step 5)
+        Agent->>Oak: Re-report completion + evidence
+    else Evidence PASSES review
+        Oak->>Val: Step 4: Delegate DoD verification
+        Val->>Val: Run independent DoD check
+        alt Step 5: Validator REJECTS
+            Val->>Oak: Return REJECTED + rejection_reasons[]
+            Oak->>Agent: Re-delegate with Validator findings (rework_count++)
+            Note over Oak,Agent: Max 3 total reworks, then escalate
+            Agent->>Oak: Re-report completion + evidence
+        else Step 6: Validator APPROVES
+            Val->>Oak: Return APPROVED + validation report
+            Oak->>Doc: Step 6: Delegate mandatory doc updates
+            Doc->>Doc: Run doc-update checklist (README, CHANGELOG, etc.)
+            Doc->>Oak: Return doc-update report
+            Oak->>TODO: Step 7: Mark task completed
+            TODO->>TODO: Update status in TODO file
+        end
+    end
+```
+
+#### Enforcement Rule
+
+> **ENFORCEMENT:** No task may be marked `completed` without ALL three
+> post-chain confirmations:
+> 1. Validator verdict = `APPROVED`
+> 2. Documentation Specialist doc-update report submitted
+> 3. TODO Agent status update confirmed
+>
+> Bypassing any step is a protocol violation. Only user override can skip.
+
+## Execution Cycle Definition
+
+### Definition
+
+One execution cycle = one round of parallel delegations where each subagent
+receives exactly **ONE task**. Multiple ready tasks with no conflicts →
+multiple parallel subagents, each with 1 task.
+
+### Cycle Lifecycle
+
+Every cycle passes through 6 phases in strict order:
+
+```
+SELECT → LOCK → DELEGATE → COLLECT → CHAIN → RELEASE
+```
+
+| # | Phase | Description |
+|---|-------|-------------|
+| 1 | **SELECT** | Identify eligible tasks: status = `READY`, all dependencies satisfied, no file conflicts with other selected tasks. Assign at most 1 task per agent. |
+| 2 | **LOCK** | For each selected task, acquire a task lock (write lock record to `.github/locks/` conceptually). If an agent already holds a lock in this cycle → **REJECT** the second assignment. |
+| 3 | **DELEGATE** | Call `runSubagent` for each locked task in parallel — one call per task, one task per agent. All calls are non-blocking. |
+| 4 | **COLLECT** | Gather results from all parallel agents. Wait for all delegated agents to return. |
+| 5 | **CHAIN** | Run the mandatory post-task chain for each completed task (Validator → Documentation → TODO). Chains run **sequentially per task**. |
+| 6 | **RELEASE** | Release all task locks after post-task chains complete. Advance cycle counter. Begin next cycle. |
+
+### One-Task-Per-Agent Rule
+
+Before delegating task T to agent A, verify that agent A does not already
+hold a lock in this cycle. If it does, the second task **MUST wait for the
+next cycle.**
+
+Lock enforcement steps:
+1. Check: does agent A already hold a task lock in this cycle? If yes → REJECT.
+2. Check: is task T already locked by another agent? If yes → SKIP.
+3. Acquire lock: write lock record with `taskId`, `lockedBy`, `lockedAt`,
+   `expiresAt`, `cycleId`, `status`.
+4. Lock is released only after the full post-task chain completes OR lock
+   expires (whichever comes first).
+
+### Lock Expiry
+
+If an agent doesn't respond within 30 minutes, the lock is automatically
+released and the task returns to `READY` state.
+
+Lock schema: `.github/locks/task-lock-schema.json`
+
+### Task Lock Schema Reference
+
+Lock records follow the schema at `.github/locks/task-lock-schema.json`:
+
+```json
+{
+  "taskId": "ORCH-BE002",
+  "lockedBy": "Backend",
+  "lockedAt": "2026-02-27T14:30:00Z",
+  "expiresAt": "2026-02-27T15:00:00Z",
+  "cycleId": "cycle-2026-02-27T14:30-001",
+  "status": "active"
+}
+```
+
+**Relationship to file-level locks:** The existing `lockfile-schema.json`
+locks individual *files* (preventing concurrent edits). The task lock schema
+locks *tasks* to *agents* (preventing concurrent assignment). Both schemas
+coexist in `.github/locks/` and are complementary.
+
+## Parallel Execution Safety
+
+### Task Conflict Detection Algorithm
+
+Before selecting N tasks for parallel execution in a cycle, ReaperOAK MUST
+check for file conflicts:
+
+```
+ALGORITHM: FileConflictDetection
+INPUT: Set of eligible tasks T = {t1, t2, ..., tn}
+OUTPUT: Set of conflict-free task groups for current cycle
+
+1. For each task t in T:
+   - Extract write_paths(t) from the task's "What to do" → list of files to create/modify
+2. Build overlap matrix O where O[i][j] = write_paths(ti) ∩ write_paths(tj)
+3. If O[i][j] is non-empty → tasks ti and tj CONFLICT
+4. Select maximum independent set: largest subset of T where NO pair conflicts
+5. If all tasks conflict with each other → select exactly 1 task (serial fallback)
+```
+
+**Rules:**
+- Conflicting tasks MUST NOT run in the same cycle — serialize them across cycles
+- Conflict detection uses file paths only — not line-level analysis (conservative)
+- A task that writes to a file that another task also writes to → CONFLICT, even if different sections
+
+### Dependency-Safe Selection
+
+Only tasks meeting ALL criteria are eligible for a cycle:
+1. Task status = `READY` (all dependencies completed)
+2. Task has no file overlap conflict with already-selected tasks in this cycle
+3. Agent type of the task is not already locked in this cycle (one-task-per-agent)
+
+Selection algorithm:
+```
+SELECT phase:
+1. Get all READY tasks
+2. Sort by priority (P0 first), then by critical path membership
+3. For each task (highest priority first):
+   a. Check: is the task's assigned agent already locked? → skip
+   b. Check: does this task conflict with any already-selected task? → skip
+   c. Select task, lock agent
+4. Return selected set
+```
+
+### Deadlock Prevention
+
+| Scenario | Prevention Rule |
+|----------|----------------|
+| All eligible tasks conflict with each other | Run exactly 1 task (degenerate to serial execution) |
+| Agent doesn't respond within timeout | Lock expires after 30 min, task returns to READY state |
+| Full cycle doesn't complete | Cycle timeout = 2h. Release all locks and escalate to user |
+| Dependency cycle detected | REJECT immediately at SELECT — should not happen if TODO Agent enforced DAG |
+| All tasks blocked on external dependency | Report to user, enter WAIT state |
+
+### Parallel Spawn Strategy
+
+```
+Within a cycle:
+1. SELECT → identify N conflict-free tasks for N agents
+2. LOCK → acquire lock for each task
+3. DELEGATE → call runSubagent for each task (all calls are independent)
+   - Each runSubagent call targets ONE task on ONE agent
+   - Calls are made in parallel (launched together, not sequential)
+4. COLLECT → wait for all agents to return results
+5. CHAIN → for each completed task, run post-task chain:
+   - Validator → Documentation Specialist → TODO Agent
+   - Chains run SEQUENTIALLY (one task's chain completes before next starts)
+   - Reason: prevents race conditions on shared files (CHANGELOG, README)
+6. RELEASE → release all locks, cycle ends
+```
+
+## Execution State Machine
+
+The task lifecycle is governed by an 8-state machine. Every task MUST
+traverse these states in order — no state may be skipped. The state machine
+integrates with the Execution Cycle, the Post-Task Chain, and the Parallel
+Execution Safety rules defined above.
+
+### 8 States
+
+| State | Description | Owner |
+|-------|-------------|-------|
+| **BACKLOG** | Task exists but dependencies not yet satisfied | System (automatic) |
+| **READY** | All dependencies completed — eligible for cycle selection | System (automatic via dep check) |
+| **LOCKED** | Selected for current cycle, lock acquired | ReaperOAK |
+| **IMPLEMENTING** | Delegated to subagent, work in progress | Subagent |
+| **VALIDATING** | Implementation done, Validator reviewing | Validator |
+| **DOCUMENTING** | Validator approved, Documentation Specialist updating docs | Documentation Specialist |
+| **DONE** | All post-task chain steps complete | TODO Agent (marks final) |
+| **REWORK** | Validator rejected or agent reported failure | ReaperOAK (routes back) |
+
+### State Transition Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> BACKLOG : Task created
+    BACKLOG --> READY : All dependencies DONE
+    READY --> LOCKED : Selected for cycle + lock acquired
+    LOCKED --> IMPLEMENTING : Delegated to subagent
+    LOCKED --> READY : Lock expired (30 min timeout)
+    IMPLEMENTING --> VALIDATING : Agent reports completion
+    IMPLEMENTING --> REWORK : Agent reports failure
+    VALIDATING --> DOCUMENTING : Validator APPROVED
+    VALIDATING --> REWORK : Validator REJECTED
+    DOCUMENTING --> DONE : Doc-update report confirmed
+    REWORK --> IMPLEMENTING : Re-delegated (rework ≤ 3)
+    REWORK --> BACKLOG : Rework > 3, escalated to user
+    DONE --> REWORK : post_completion_audit
+    DONE --> [*]
+```
+
+### Transition Rules
+
+Every transition has a defined trigger and guard condition. Invalid
+transitions (e.g., BACKLOG → IMPLEMENTING) are **rejected**.
+
+| From | To | Trigger | Guard Condition |
+|------|-----|---------|----------------|
+| BACKLOG | READY | Dependency check | All `depends_on` tasks have status = DONE |
+| READY | LOCKED | Cycle SELECT phase | No file conflicts, agent not locked, priority selected |
+| LOCKED | IMPLEMENTING | `runSubagent` called | Lock is active, agent assignment confirmed |
+| LOCKED | READY | Timer expires | Lock timeout reached (30 min) — auto-release |
+| IMPLEMENTING | VALIDATING | Agent returns evidence | Post-task chain Step 1-2 pass (evidence reviewed) |
+| IMPLEMENTING | REWORK | Agent reports failure | Error evidence provided |
+| VALIDATING | DOCUMENTING | Validator verdict | verdict = APPROVED |
+| VALIDATING | REWORK | Validator verdict | verdict = REJECTED, rework_counter < 3 |
+| DOCUMENTING | DONE | Doc-update report | Documentation Specialist confirms all DOC items |
+| REWORK | IMPLEMENTING | Re-delegation | rework_counter incremented, < 3 |
+| REWORK | BACKLOG | Escalation | rework_counter >= 3, user notified |
+| DONE | REWORK | Post-completion audit or Validator force-revert | Validator | rework_count++ |
+
+### Failure Rollback Rules
+
+| Failure Mode | State Transition | Recovery Action |
+|--------------|-----------------|----------------|
+| Agent reports failure | IMPLEMENTING → REWORK | ReaperOAK routes to rework; rework_counter++ |
+| Validator rejects | VALIDATING → REWORK | ReaperOAK re-delegates with Validator findings; rework_counter++ |
+| Lock expires (30 min) | LOCKED → READY | Lock auto-released; task eligible for next cycle |
+| Cycle timeout (2h) | All LOCKED/IMPLEMENTING → READY | All locks released; escalate to user |
+| Rework exhausted (≥ 3) | REWORK → BACKLOG | Task returned to BACKLOG; user notified for override |
+
+### Backward Compatibility — State Mapping
+
+Existing TODO files use the old 4-state model. The new states supersede
+them. During migration, old values are normalized on read:
+
+| Old Status | New State | Migration Rule |
+|------------|-----------|---------------|
+| `not_started` | `BACKLOG` | All tasks without started work map to BACKLOG; system checks deps to promote to READY |
+| `in_progress` | `IMPLEMENTING` | Tasks actively being worked on map to IMPLEMENTING |
+| `completed` | `DONE` | Finished tasks map to DONE |
+| `blocked` | `BACKLOG` + blocker flag | Blocked tasks stay in BACKLOG with a `blocked_reason` field |
+
+New tasks MUST use the new state values exclusively. Old tasks get
+normalized when their status next changes.
+
+### Task Metadata Extension
+
+Each task gains two new optional metadata fields:
+
+```markdown
+**Rework Count:** 0
+**Blocker:** (none)
+```
+
+- `Rework Count` starts at 0, increments on each REWORK → IMPLEMENTING
+  transition. Resets to 0 on REWORK → BACKLOG (escalation).
+- `Blocker` is free-text, present only when a task is externally blocked
+  in BACKLOG state.
+
+### Cycle State Integration
+
+The state machine integrates with the Execution Cycle defined above:
+
+| Cycle Phase | State Machine Effect |
+|-------------|---------------------|
+| **SELECT** | Identifies all READY tasks → applies conflict detection → selects subset |
+| **LOCK** | Transitions selected tasks READY → LOCKED |
+| **DELEGATE** | Transitions locked tasks LOCKED → IMPLEMENTING |
+| **COLLECT** | Agents return → tasks transition IMPLEMENTING → VALIDATING |
+| **CHAIN** | Post-task chain runs → VALIDATING → DOCUMENTING → DONE (or REWORK) |
+| **RELEASE** | Locks released, cycle ends, dependency scan promotes BACKLOG → READY |
+
+After every cycle completes (RELEASE phase), ReaperOAK runs a dependency
+scan across all BACKLOG tasks. Any task whose `depends_on` entries are all
+DONE is automatically promoted to READY for the next cycle.
 
 ## Safety — Require Human Approval Before
 
@@ -319,6 +660,47 @@ Update these files at every phase transition:
 - Increment `fix_loop_count` on BUILD→VALIDATE retries
 - Record blockers when agents report `status: blocked`
 - Set `overall_status` to `completed` or `failed` at pipeline end
+
+#### Task-Level State Schema Extension
+
+The existing `workflow-state.json` tracks **pipeline-level** phase status
+(SPEC, BUILD, VALIDATE, etc.). To support the Execution State Machine,
+task-level status tracking should be added. Expected schema extension:
+
+```json
+{
+  "task_states": {
+    "<TASK_ID>": {
+      "status": "BACKLOG | READY | LOCKED | IMPLEMENTING | VALIDATING | DOCUMENTING | DONE | REWORK",
+      "rework_count": 0,
+      "blocker_reason": null,
+      "locked_by": null,
+      "locked_at": null,
+      "last_transition": null,
+      "cycle_id": null
+    }
+  },
+  "task_status": {
+    "type": "string",
+    "enum": ["BACKLOG", "READY", "LOCKED", "IMPLEMENTING", "VALIDATING", "DOCUMENTING", "DONE", "REWORK"]
+  },
+  "rework_count": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 3
+  },
+  "blocker_reason": {
+    "type": ["string", "null"],
+    "default": null
+  }
+}
+```
+
+**Note:** The `overall_status` and phase-level `status` fields remain
+unchanged (they use pipeline states: idle, pending, active, completed,
+failed). Task-level `status` uses the 8-state machine values. These are
+complementary — pipeline level tracks the feature, task level tracks each
+unit of work.
 
 ### artifacts-manifest.json
 - After each agent completes, record artifacts with SHA-256 hash

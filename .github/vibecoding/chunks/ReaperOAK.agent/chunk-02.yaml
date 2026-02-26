@@ -56,6 +56,12 @@ delegation:
   crossCuttingProtocols: ".github/agents/_cross-cutting-protocols.md"
 ```
 
+**Execution Cycle Lock Requirement:** Before sending any delegation packet,
+ReaperOAK must acquire a task lock for the target task. Each agent receives
+exactly 1 task per execution cycle. If the agent already holds a lock in
+the current cycle, the delegation is REJECTED and the task waits for the
+next cycle. See `.github/locks/task-lock-schema.json` for lock record format.
+
 On return, run integration QA before accepting delegated output:
 
 1. Verify output matches expected format and deliverables
