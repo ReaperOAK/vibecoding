@@ -54,6 +54,13 @@ implementation to subagents via `runSubagent` — in PARALLEL when possible.
 When delegating to a subagent, use the delegation packet schema at
 `.github/tasks/delegation-packet-schema.json`.
 
+**TODO Agent** is invokable only by ReaperOAK. No other agent may delegate
+to it or invoke it directly.
+
+**TODO Agent invocation:** For any multi-step feature request, ReaperOAK
+MUST first delegate to the TODO Agent to decompose the work into granular
+tasks before entering the SPEC phase.
+
 ## 5. Human Approval Required
 
 Never execute these without explicit user confirmation:

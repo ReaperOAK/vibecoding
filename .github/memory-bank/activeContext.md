@@ -37,6 +37,12 @@ compaction_threshold: 50
 - **Status:** Building multi-agent infrastructure
 - **Next Steps:** Generate subagent files, create orchestration rules
 
+### [2025-07-26T00:00:00Z] ReaperOAK
+
+- **Focus:** TODO Agent & Execution Governance — fix two architectural flaws
+- **Status:** Complete — all changes validated, fix loop resolved
+- **Next Steps:** Smoke test with real feature request to validate DECOMPOSE phase
+
 ---
 
 ## Recent Changes
@@ -193,3 +199,46 @@ compaction_threshold: 50
 
 ### Architecture Document
 - Full design at `docs/architecture/self-improving-system.md` (1,466 lines)
+
+## Session 9 — TODO Agent & Execution Governance (2025-07-26)
+
+### Current Focus
+- Fixed two architectural flaws: (1) UIDesigner not invoked when required, (2) subagents attempted monolithic execution instead of granular tasks
+- New TODO Agent created for task decomposition
+- SDLC upgraded from 6-phase to 7-phase (DECOMPOSE added as Phase 0)
+- UI/UX Gate enforces UIDesigner invocation for all UI-touching work
+
+### Changes Made
+1. **TODO Agent** — New agent (13th) for granular task decomposition, L2 autonomy, constrained terminal access
+2. **DECOMPOSE Phase** — New Phase 0 in SDLC: ReaperOAK delegates to TODO Agent before SPEC
+3. **UI/UX Gate** — Mandatory check between DECOMPOSE and SPEC, keyword detection, requires UIDesigner tasks for UI work
+4. **TODO-Driven Delegation** — Max 3 tasks/cycle (5 for SPEC), task-driven delegation with specific IDs
+5. **Loop Detection** — 4 new signals: TODO stall, zero-progress cycle, blocked dependency chain, max-task-per-cycle violation
+6. **Architecture Update** — ARCHITECTURE.md v4.1.0 with §10.1 UI/UX Enforcement Gate
+7. **Security Hardening** — runInTerminal constrained to `python todo_visual.py`, allowlist write scope, memory bank write access removed
+
+### Validation Results
+- QA: CONDITIONAL PASS → 2 MEDIUM + 1 LOW findings
+- Security: CONDITIONAL PASS → 1 HIGH + 3 MEDIUM + 3 LOW findings
+- Fix loop 1: All HIGH + MEDIUM findings resolved (5 fixes applied)
+- Post-fix verification: All fixes confirmed
+
+### Files Created (5)
+- `.github/agents/TODO.agent.md` (71 lines)
+- `.github/vibecoding/chunks/TODO.agent/chunk-01.yaml` — decomposition protocol
+- `.github/vibecoding/chunks/TODO.agent/chunk-02.yaml` — governance rules
+- `TODO/.gitkeep` — task files directory
+- `docs/architecture/todo-execution-governance.md` (1,374 lines) — design spec
+
+### Files Modified (7)
+- `.github/agents/ReaperOAK.agent.md` — DECOMPOSE, UI/UX Gate, TODO-Driven Delegation
+- `.github/tasks/delegation-packet-schema.json` — TODO agent, DECOMPOSE phase, todo_task_id
+- `.github/guardian/loop-detection-rules.md` — 4 new signals
+- `.github/vibecoding/catalog.yml` — TODO chunks under agent: and general: tags
+- `.github/sandbox/tool-acl.yaml` — TODO section with allowlist, terminal constraint
+- `.github/ARCHITECTURE.md` — v4.1.0
+- `.github/copilot-instructions.md` — 13 agents, TODO directory
+
+### Reports Generated (2)
+- `docs/reviews/qa-report.md`
+- `docs/reviews/security-report.md`

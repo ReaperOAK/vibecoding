@@ -50,6 +50,18 @@ append_only: true
 | catalog.yml cleaned | ReaperOAK | Stale instruction file refs removed | ✅ Complete |
 | Context bloat fix — all 12 files slimmed | ReaperOAK | 7,787 → 826 total lines (89% reduction), `wc -l` verified | ✅ Complete |
 
+## TODO Agent & Execution Governance — COMPLETED
+
+| Task | Status | Agent | Updated |
+|------|--------|-------|---------|
+| Architecture design (1,374-line spec) | DONE | Architect | 2025-07-26 |
+| TODO.agent.md + chunks (2 files) | DONE | Backend | 2025-07-26 |
+| ReaperOAK DECOMPOSE + UI/UX Gate + TODO Delegation | DONE | Backend | 2025-07-26 |
+| Cross-cutting updates (catalog, ACL, copilot-instructions, agents.md) | DONE | Backend | 2025-07-26 |
+| ARCHITECTURE.md v4.1.0 | DONE | Documentation | 2025-07-26 |
+| QA + Security validation | DONE | QA, Security | 2025-07-26 |
+| Fix loop (5 findings resolved) | DONE | Backend | 2025-07-26 |
+
 ---
 
 ## In Progress
@@ -89,6 +101,7 @@ append_only: true
 |--------|----------------|-------------|------------|
 | Init | 3 | 0 | — |
 | Claude Code Integration | 4 | 0 | — |
+| TODO Agent | 7 | 0 | — |
 
 ## Self-Improving System Migration — COMPLETED
 
@@ -109,3 +122,11 @@ append_only: true
 - Shared context layer: workflow-state.json, artifacts-manifest.json, feedback-log.md
 - Self-improvement proposals system with auto-reject safety rules
 - Enhanced delegation packets with phase, upstream artifacts, MCP grants, output contracts
+
+### System Now Has (Session 9)
+- 13 agents (12 specialized + 1 orchestrator) — TODO Agent added
+- 7-phase SDLC: DECOMPOSE → SPEC → BUILD → VALIDATE → GATE → DOCUMENT → RETROSPECTIVE
+- UI/UX Gate: mandatory UIDesigner invocation for UI-touching work
+- TODO-driven delegation with max-task-per-cycle limits
+- Execution governance: stall detection, zero-progress detection, dependency chain analysis
+- ARCHITECTURE.md at v4.1.0
