@@ -150,7 +150,9 @@ agents:
       - infrastructure changes
       - deploy operations
       - force-push
-    notes: "May write documentation files only"
+      - "edit/createFile (docs/reviews/**)"
+      - "edit/editFile (docs/reviews/**)"
+    notes: "May write documentation files only. Explicitly denied writes to docs/reviews/** (Validator report paths)."
 
   CIReviewer:
     allowed:
@@ -230,6 +232,39 @@ agents:
       denied:
         - "**"
     notes: "Decomposes features into granular tracked tasks; invokable only by ReaperOAK. Write scope is allowlist-only — denied: '**' blocks all paths not explicitly listed in allowed."
+
+  Validator:
+    description: "Independent SDLC compliance reviewer. Read-heavy, write-limited to validation reports."
+    autonomy_level: L2
+    allowed_tools:
+      - search/codebase
+      - search/textSearch
+      - search/fileSearch
+      - search/listDirectory
+      - search/searchResults
+      - search/searchSubagent
+      - read/readFile
+      - read/problems
+      - read/terminalSelection
+      - read/terminalLastCommand
+      - edit/createFile
+      - edit/editFiles
+      - execute/runInTerminal
+      - todo
+    denied_tools:
+      - agent/runSubagent
+      - "web/*"
+      - "github/*"
+      - "stitch/*"
+    tool_constraints:
+      execute/runInTerminal: "Read-only verification commands only (lint, typecheck, test runners). No file modifications."
+    write_scope:
+      allowed:
+        - "docs/reviews/**"
+        - ".github/memory-bank/feedback-log.md"
+      denied:
+        - "**"
+    notes: "Independent SDLC compliance reviewer; invokable only by ReaperOAK at VALIDATE and MARK COMPLETE stages. Write scope is allowlist-only — denied: '**' blocks all paths not explicitly listed in allowed."
 
 # Apply Proposal Requirements
 apply_proposal:

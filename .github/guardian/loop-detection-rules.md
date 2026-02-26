@@ -48,6 +48,31 @@ locked_by: ReaperOAK
 - ACTION: Reject delegation batch, log violation
 - ESCALATE: TODO Agent must further decompose the oversized batch
 
+### Signal: SDLC Stage Skip
+- DETECT: Agent attempts to advance a task past a stage in the 7-stage task loop (PLAN → INITIALIZE → IMPLEMENT → TEST → VALIDATE → DOCUMENT → MARK COMPLETE) without producing required exit-gate evidence for an intermediate stage (e.g., jumping from PLAN to IMPLEMENT without INITIALIZE, or from IMPLEMENT to VALIDATE without TEST)
+- ACTION: Block the stage transition, log the skip attempt with task ID and attempted transition, revert task to its last valid stage
+- ESCALATE: Notify ReaperOAK with evidence of attempted skip; ReaperOAK re-delegates with explicit stage instructions and mandatory gate checks
+
+### Signal: DoD Non-Compliance
+- DETECT: MARK COMPLETE attempted for a task whose DoD report has any item with `status: false`, or no DoD report exists at `docs/reviews/dod/{TASK_ID}-dod.yaml`, or `verdict != APPROVED`
+- ACTION: Block MARK COMPLETE, return task to VALIDATE stage, log non-compliance details (which DoD items failed)
+- ESCALATE: Notify ReaperOAK; if repeated (≥ 2 MARK COMPLETE attempts with failing DoD), flag the owning agent for re-delegation or user intervention
+
+### Signal: Initialization Skip
+- DETECT: Agent enters IMPLEMENT stage (Stage 3) for a task modifying a module that has no passing initialization checklist on disk (`allPassed: true` in `docs/reviews/init/{MODULE}-init.yaml` does not exist or is `false`)
+- ACTION: Block IMPLEMENT, return task to INITIALIZE stage, log violation with module name and missing checklist items
+- ESCALATE: Notify ReaperOAK to re-delegate with explicit INITIALIZE instructions; if module scaffolding cannot be completed after 2 attempts → user notification
+
+### Signal: UI/UX Gate Bypass
+- DETECT: Frontend task with `UI Touching: yes` enters IMPLEMENT (BUILD phase) without: (a) a completed UIDesigner dependency task (`status: completed`), or (b) design artifacts on disk at `docs/uiux/{UID_TASK_ID}-design-spec.md` or `docs/uiux/{UID_TASK_ID}-component-spec.yaml`
+- ACTION: Block the Frontend task from entering IMPLEMENT, set task status to BLOCKED, log bypass attempt with task ID and missing artifact paths
+- ESCALATE: Notify ReaperOAK; require UIDesigner task completion before unblocking. Override requires explicit user approval logged in `decisionLog.md`
+
+### Signal: Validator Rejection Loop
+- DETECT: Validator issues `REJECTED` verdict for the same task ≥ 3 times (rework count reaches maximum of 3)
+- ACTION: Set task status to ESCALATED, halt all further rework attempts for this task, stop the delegated agent from re-entering IMPLEMENT
+- ESCALATE: Notify ReaperOAK → present full rejection history (all 3 rejection reports) to user with options: force-approve (override logged in `decisionLog.md`), cancel task, or reassign to a different agent
+
 ## Token Budget Enforcement
 
 ### Per-Task Budgets
