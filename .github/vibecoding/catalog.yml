@@ -22,6 +22,9 @@ agent:
   - ".github/agents/UIDesigner.agent.md"
   - ".github/vibecoding/chunks/UIDesigner.agent/chunk-01.yaml"
   - ".github/vibecoding/chunks/UIDesigner.agent/chunk-02.yaml"
+  - ".github/agents/TODO.agent.md"
+  - ".github/vibecoding/chunks/TODO.agent/chunk-01.yaml"
+  - ".github/vibecoding/chunks/TODO.agent/chunk-02.yaml"
   - ".github/agents/_cross-cutting-protocols.md"
   - ".github/vibecoding/chunks/Architect.agent/chunk-01.yaml"
   - ".github/vibecoding/chunks/Architect.agent/chunk-02.yaml"
@@ -100,6 +103,8 @@ general:
   - ".github/vibecoding/chunks/ARCHITECTURE/chunk-02.yaml"
   - ".github/vibecoding/chunks/orchestration.rules/chunk-01.yaml"
   - ".github/vibecoding/chunks/orchestration.rules/chunk-02.yaml"
+  - ".github/vibecoding/chunks/TODO.agent/chunk-01.yaml"
+  - ".github/vibecoding/chunks/TODO.agent/chunk-02.yaml"
 
 instruction:
   - ".github/vibecoding/chunks/a11y.instructions/chunk-01.yaml"
@@ -211,6 +216,7 @@ sdlc:
   - ".github/vibecoding/chunks/9._API_Contract_Definition_in_Architecture/chunk-01.yaml"
   - ".github/vibecoding/chunks/9._API_Contract_Definition_in_Architecture/chunk-02.yaml"
   - ".github/vibecoding/chunks/9._API_Contract_Definition_in_Architecture/chunk-03.yaml"
+  - ".github/vibecoding/chunks/TODO.agent/chunk-01.yaml"
 
 security:
   - ".github/vibecoding/chunks/Security.agent/chunk-01.yaml"

@@ -1,0 +1,219 @@
+---
+source: "./.github/agents/TODO.agent.md"
+chunk_index: 2
+token_estimate: 2050
+hash: "37928765b98757dbf56ed15097803cddb16392dfa14310ae3de200eb4f4817ea"
+summary: "TODO Agent — Governance, Lifecycle & Completion Protocol. Status transitions, two-party completion protocol, completion gates, governance rules, UI/UX flagging, input/output contract, todo_visual.py validation."
+---
+# TODO Agent — Governance, Lifecycle & Completion Protocol
+
+## 1. Status Transitions
+
+```
+not_started ──→ in_progress ──→ completed
+     │               │
+     │               ├──→ blocked ──→ in_progress (when blocker resolved)
+     │               │
+     └───────────────┘
+                     │
+                     └──→ blocked ──→ not_started (if reassigned)
+```
+
+**Transition Rules:**
+
+| From | To | Trigger | Requires |
+|------|----|---------|----------|
+| not_started | in_progress | Agent starts work | Delegation packet issued |
+| in_progress | completed | Agent finishes | Evidence reviewed by ReaperOAK |
+| in_progress | blocked | Dependency incomplete or external blocker | Blocker description |
+| blocked | in_progress | Blocker resolved | Dependency now completed |
+| not_started | blocked | Dependency auto-block | todo_visual.py detects incomplete dep |
+
+**Immutability:** Once a task status is `completed`, it cannot be reverted.
+Tasks can only be archived, never deleted.
+
+## 2. Two-Party Completion Protocol
+
+No agent can unilaterally mark its own tasks complete. The flow is:
+
+```
+1. Owning agent completes work → returns evidence to ReaperOAK
+2. ReaperOAK reviews evidence against acceptance criteria
+3. If PASS:
+   a. ReaperOAK delegates to TODO Agent: "Mark {TASK_ID} as completed.
+      Evidence: {evidence_summary}"
+   b. TODO Agent updates task status in the TODO file
+   c. ReaperOAK checks: are downstream tasks now unblocked?
+   d. If yes: select next batch → delegate
+4. If FAIL:
+   a. ReaperOAK re-delegates to same agent with findings (fix loop)
+   b. Max 3 retries per task (from existing loop detection rules)
+   c. After 3 failures: mark task as blocked, escalate to user
+```
+
+## 3. Completion Gates
+
+A task is marked `completed` ONLY when ALL of these are true:
+
+| Gate | Verification | Source |
+|------|-------------|--------|
+| **Deliverables exist** | Files listed in task's "What to do" exist on disk | `read/readFile` |
+| **Acceptance criteria met** | Each criterion checked and passed | Agent evidence |
+| **Quality score ≥ 7/10** | Agent's self-reflection score | Agent output |
+| **No regressions** | Existing tests still pass (if applicable) | Test output |
+| **Format valid** | Output follows project conventions | CIReviewer or lint |
+
+## 4. Governance Rules
+
+### 4.1 Max-Task-Per-Cycle
+
+No subagent receives more than **3 granular tasks** per delegation cycle.
+
+**Exception:** SPEC-phase agents (PM, Architect, UIDesigner, Research) may
+receive up to **5 tasks** per cycle because SPEC tasks are typically smaller.
+
+| Check Point | Enforcer | Action on Violation |
+|-------------|----------|-------------------|
+| DECOMPOSE output | TODO Agent | Split tasks further if any agent has > 3 |
+| Pre-delegation | ReaperOAK | Refuse delegation with > 3 tasks/agent |
+| Runtime | ReaperOAK | Track delegations per agent per cycle, hard-stop at 3 |
+
+### 4.2 Stall Detection
+
+| Signal | Detection | Action |
+|--------|-----------|--------|
+| **Task Progress Stall** | Task `in_progress` for > 2 cycles without status change | Mark STALLED, escalate |
+| **Blocked Chain** | 3+ tasks in a dependency chain all `blocked` | Identify root blocker, escalate to user |
+| **Zero-Progress Cycle** | Full cycle with 0 tasks moving to `completed` | Halt pipeline, require user re-scoping |
+| **Thrashing** | Same task toggled between `in_progress`/`blocked` ≥ 3 times | Force `blocked`, root cause analysis |
+| **Orphan Tasks** | `depends_on` referencing non-existent IDs | todo_visual.py reports `missing_deps`, fix immediately |
+
+### 4.3 Priority Escalation
+
+```
+P3 task blocked for > 3 cycles → auto-escalate to P2
+P2 task blocked for > 2 cycles → auto-escalate to P1
+P1 task blocked for > 1 cycle  → auto-escalate to P0
+P0 task blocked for > 1 cycle  → STOP pipeline, notify user
+```
+
+### 4.4 Task Budget
+
+```
+Per-agent per-cycle budget: max 12h of estimated effort
+Per-cycle total budget: max 40h across all agents
+Feature total budget: declared at DECOMPOSE time, tracked against actuals
+```
+
+If a feature's total estimated effort exceeds **80h**, split it into multiple
+milestones with distinct task files.
+
+## 5. UI/UX Flagging Protocol
+
+Every task MUST be marked with `**UI Touching:** yes | no`. The following
+signals trigger `yes`:
+
+**Task-Level Signals (from title, description, or acceptance criteria):**
+
+| Category | Keywords / Patterns |
+|----------|-------------------|
+| Screen creation | page, screen, view, modal, dialog, drawer, panel, sidebar |
+| Component work | component, widget, card, form, table, chart, graph, list, button, input, dropdown |
+| Visual changes | layout, design, style, theme, color, typography, spacing, responsive, animation, icon |
+| User interaction | user flow, navigation, menu, tab, breadcrumb, search bar, filter, sort, pagination |
+| User-facing | dashboard, settings page, profile, onboarding, landing page, checkout, wizard |
+| Frontend owner | Task owner is "Frontend" or "UIDesigner" |
+
+**Feature-Level Signals:**
+- Any feature that adds/changes what users see → `yes`
+- > 50% of tasks assigned to Frontend → flag all Frontend tasks as `yes`
+
+**Enforcement:** Frontend tasks with `UI Touching: yes` MUST have a
+UIDesigner task in their `depends_on` chain. If missing, the UI/UX Gate
+(run by ReaperOAK between DECOMPOSE and SPEC) will block the pipeline.
+
+## 6. Input/Output Contract
+
+**Input (from ReaperOAK):**
+
+```yaml
+taskId: string             # ReaperOAK's delegation packet ID
+objective: string          # "Decompose feature X into granular tasks"
+featureDescription: string # Full feature description from user
+upstreamArtifacts: string[] # PRD, architecture docs, existing TODO files
+projectPrefix: string     # e.g., "WL", "KB", "TODO"
+maxTasksPerAgent: int      # Default: 3
+targetAgents: string[]     # Agents that should receive tasks (optional)
+```
+
+**Output (to ReaperOAK):**
+
+```yaml
+taskId: string
+status: "complete" | "blocked" | "failed"
+deliverables:
+  taskFile: string          # Path to generated TODO file
+  taskCount: int            # Number of tasks created
+  agentDistribution:        # Tasks per agent
+    - agent: string
+      taskCount: int
+      taskIds: string[]
+  dependencyDAG: string     # Mermaid diagram of task dependencies
+  criticalPath: string[]    # Ordered list of critical-path task IDs
+  uiTouchingTasks: string[] # Task IDs that require UIDesigner
+  estimatedTotalEffort: string # e.g., "32h"
+evidence:
+  todoVisualOutput: string  # Output of `python3 todo_visual.py --json`
+  formatValidation: "PASS" | "FAIL"
+```
+
+## 7. Post-Completion Flow
+
+After writing a TODO file, the TODO Agent must:
+
+```
+1. Run `python3 todo_visual.py --json` to validate format
+2. Confirm all task IDs are unique (no collisions with existing files)
+3. Confirm no circular dependencies exist
+4. Confirm no agent has > 3 tasks (or > 5 for SPEC agents)
+5. Confirm per-agent effort ≤ 12h
+6. Return task summary + DAG to ReaperOAK
+```
+
+If `todo_visual.py` reports parsing errors, fix the task file before
+returning. The `--json` flag produces machine-readable output for
+validation.
+
+## 8. todo_visual.py Validation
+
+Always validate generated TODO files by running:
+
+```bash
+python3 todo_visual.py --json
+```
+
+**Expected:** All tasks appear in the JSON output with correct fields:
+`id`, `title`, `status`, `priority`, `owner`, `depends_on`, `effort`.
+
+**If validation fails:**
+- Check task header format matches regex: `^(#{2,4})\s+([A-Z][A-Z0-9-]*\d{3,4}):\s*(.+)$`
+- Check bold-text metadata lines are correctly formatted
+- Check status values are one of: `not_started`, `in_progress`, `completed`, `blocked`
+- Fix and re-validate before returning results
+
+## 9. Extended Metadata Fields
+
+Beyond what todo_visual.py parses, these metadata fields are tracked in each
+task block for governance purposes:
+
+```markdown
+**SDLC Phase:** SPEC | BUILD | VALIDATE | DOCUMENT
+**Delegation Packet:** PKT-20260226-143000-A1B2C3
+**Completion Evidence:** path/to/evidence or "pending"
+**UI Touching:** yes | no
+**Created:** 2026-02-26T14:30:00Z
+**Updated:** 2026-02-26T15:45:00Z
+```
+
+These fields are invisible to `todo_visual.py` (it ignores unrecognized
+bold-text lines) but essential for governance tracking.

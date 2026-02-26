@@ -201,6 +201,36 @@ agents:
       - database operations
     notes: "May create design specifications and use Stitch/Playwright for visual design only"
 
+  TODO:
+    description: "Task decomposition and lifecycle management agent. runInTerminal is constrained to 'python todo_visual.py' only."
+    autonomy_level: L2
+    allowed_tools:
+      - search/codebase
+      - search/textSearch
+      - search/fileSearch
+      - search/listDirectory
+      - read/readFile
+      - read/problems
+      - edit/createFile
+      - edit/editFiles
+      - execute/runInTerminal  # python todo_visual.py only
+      - todo
+    denied_tools:
+      - agent/runSubagent
+      - web/*
+      - github/*
+      - execute/createAndRunTask
+    tool_constraints:
+      execute/runInTerminal: "ONLY allowed command: python todo_visual.py (with optional flags like --json)"
+    write_scope:
+      allowed:
+        - "TODO/**/*.md"
+        - "TODO/archive/**/*.md"
+        - "TODO/.gitkeep"
+      denied:
+        - "**"
+    notes: "Decomposes features into granular tracked tasks; invokable only by ReaperOAK. Write scope is allowlist-only — denied: '**' blocks all paths not explicitly listed in allowed."
+
 # Apply Proposal Requirements
 apply_proposal:
   description: "Any operation that applies infrastructure changes"

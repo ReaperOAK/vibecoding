@@ -1,8 +1,8 @@
 # Vibecoding Multi-Agent System Architecture
 
-> **Version:** 4.0.0
+> **Version:** 4.1.0
 > **Owner:** ReaperOAK (CTO / Supervisor Orchestrator)
-> **Last Updated:** 2025-07-25
+> **Last Updated:** 2026-02-26
 
 ---
 
@@ -46,7 +46,8 @@ ReaperOAK (Supervisor / CTO)
 ├── Documentation     — Diátaxis, Flesch-Kincaid scoring, doc-as-code CI
 ├── Research          — Bayesian confidence, evidence hierarchy, PoC standards
 ├── CIReviewer        — Cognitive complexity, fitness functions, SARIF reports
-└── UIDesigner        — Google Stitch designs, component specs, design tokens
+├── UIDesigner        — Google Stitch designs, component specs, design tokens
+└── TODO              — Task decomposition, lifecycle tracking, TODO file management
 ```
 
 ### Agent Authority Matrix
@@ -65,6 +66,7 @@ ReaperOAK (Supervisor / CTO)
 | **Research** | Bayesian confidence, evidence hierarchy, license analysis | External sources, codebase | activeContext, progress | Web fetch, search | Code, infra, deploy, merge |
 | **CIReviewer** | Cognitive complexity, fitness functions, SARIF | PR diffs, codebase | PR comments only | Analysis tools | Merge, deploy, edit source |
 | **UIDesigner** | Stitch design generation, component specs, design tokens | User request, PRD, architecture docs | Design specs (docs/design-specs/) | Stitch, Playwright (screenshot/snapshot), Memory | Implement components, modify backend, deploy |
+| **TODO** | Task decomposition, lifecycle tracking, dependency DAGs | All memory bank, codebase, existing TODO files | TODO files (TODO/**/*.md), activeContext, progress | Terminal (todo_visual.py only) | Implement code, modify agents, deploy, write outside TODO/ |
 
 ### Structured Autonomy Levels
 
@@ -92,6 +94,7 @@ levels based on task criticality.
 | ProductManager | L2 | Defines scope, needs validation |
 | Architect | L2 | Designs affect everything downstream |
 | UIDesigner | L2 | Design outputs affect downstream Frontend work |
+| TODO | L2 | Task files have downstream impact on delegation, needs oversight |
 
 ---
 
@@ -181,6 +184,17 @@ packet:
 
 ## 5. DAG-First Task Decomposition
 
+The multi-agent SDLC proceeds through these phases:
+
+```
+DECOMPOSE → SPEC → BUILD → VALIDATE → GATE → DOCUMENT → RETROSPECTIVE
+```
+
+**Phase 0 — DECOMPOSE** is handled by the TODO Agent, which decomposes
+feature-level requests into granular, dependency-ordered tasks before any
+other agent is invoked. See `docs/architecture/todo-execution-governance.md`
+for the full DECOMPOSE protocol.
+
 ### 5.1 DAG Construction
 
 Every multi-agent objective is decomposed into a DAG before execution:
@@ -205,6 +219,7 @@ graph TD
 Tasks with no inter-dependencies execute in parallel batches:
 
 ```
+Batch 0: [TODO Agent]                   ← decomposes feature into tasks
 Batch 1: [ProductManager, Research, UIDesigner]  ← no dependencies
 Batch 2: [Architect]                    ← depends on Batch 1
 Batch 3: [Security, Frontend]          ← can parallelize
@@ -306,6 +321,33 @@ The following operations **ALWAYS** halt and require explicit human approval:
 | Secret/credential rotation | Security |
 | Autonomy level elevation | Governance |
 
+### 10.1 UI/UX Enforcement Gate
+
+A mandatory check between the DECOMPOSE and SPEC phases that ensures
+UIDesigner is invoked for all UI-touching work.
+
+**Gate Protocol:**
+
+1. After DECOMPOSE, ReaperOAK reads the TODO file
+2. Identifies tasks with `**UI Touching:** yes`
+3. If ANY exist:
+   - UIDesigner MUST have assigned tasks in the TODO file
+   - Every Frontend task with `UI Touching: yes` MUST depend on a UIDesigner task
+   - If missing → re-delegate to TODO Agent to add UIDesigner tasks
+4. If NONE → proceed without UIDesigner
+5. Override requires explicit user approval (logged in decisionLog.md)
+
+**UI-Touching Detection Keywords:**
+screen, page, view, modal, dialog, panel, component, widget, form, chart,
+layout, design, style, theme, responsive, dashboard, settings page, navigation,
+user flow, onboarding, landing page.
+
+**Enforcement:** No Frontend task with `UI Touching: yes` may enter BUILD
+until its UIDesigner dependency is `completed` and design specs exist on disk.
+
+See `docs/architecture/todo-execution-governance.md` §7 for the full gate
+logic, pseudocode, and escape hatch protocol.
+
 ---
 
 ## 11. Plan-Act-Reflect Loop (All Subagents)
@@ -378,6 +420,12 @@ Additional state files for pipeline management:
 | `feedback-log.md` | Shared | All subagents (append) | Inter-agent quality signals and cross-agent feedback |
 
 These files enable session resumption and provide structured state for the iterative SDLC loop.
+
+> **TODO State:** As of v4.1.0, `workflow-state.json` includes a `todo_state`
+> object that tracks the active project, task file path, completion percentages,
+> per-agent delegation counts, and UI/UX gate status. This enables ReaperOAK
+> to resume task-driven delegation across sessions. See
+> `docs/architecture/todo-execution-governance.md` §10.2 for the full schema.
 
 ---
 

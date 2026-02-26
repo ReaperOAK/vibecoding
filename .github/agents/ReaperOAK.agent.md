@@ -59,8 +59,7 @@ SPEC → BUILD → VALIDATE ──→ PASS → DOCUMENT → RETROSPECTIVE
 **Phases:**
 
 | Phase | Agents (parallel) | Outputs |
-|-------|------------------|---------|
-| 1. SPEC | PM, Architect, UIDesigner, Research | `docs/prd.md`, `docs/architecture.md`, `docs/api-contracts.yaml`, `docs/design-specs/` |
+|-------|------------------|---------|| 0. DECOMPOSE | TODO | `TODO/{PROJECT}_TODO.md` || 1. SPEC | PM, Architect, UIDesigner, Research | `docs/prd.md`, `docs/architecture.md`, `docs/api-contracts.yaml`, `docs/design-specs/` |
 | 2. BUILD | Backend, Frontend, DevOps | `server/`, `client/`, `infra/` |
 | 3. VALIDATE | QA, Security, CI Reviewer | `docs/reviews/{qa,security,ci}-report.md` |
 | 4. GATE | ReaperOAK reads all reports | PASS → Phase 5 · FAIL → re-run Phase 2 with findings |
@@ -113,12 +112,62 @@ Every `runSubagent` call MUST include:
 | Product Manager | PRDs, user stories, requirements |
 | CI Reviewer | Code review, complexity, SARIF |
 | UIDesigner | UI mockups, design specs, component specs |
+| TODO | Task decomposition, lifecycle management |
 
 **CRITICAL:** Use the EXACT `agentName` string above. Wrong names silently
 spawn a generic agent without domain instructions.
 
 No parallel cap — launch as many independent agents as the phase needs.
 3 retries per agent, delegation depth ≤ 2.
+
+## UI/UX Gate (Mandatory)
+
+After DECOMPOSE, before entering SPEC phase:
+
+1. Read TODO file → find all tasks with `**UI Touching:** yes`
+2. If ANY exist:
+   a. UIDesigner MUST have tasks assigned in the TODO file
+   b. Every Frontend task with `UI Touching: yes` MUST have a `depends_on`
+      pointing to a UIDesigner task (matching `*-UID*` pattern)
+   c. If missing → re-delegate to TODO Agent: "Add UIDesigner tasks for: {list}"
+3. If NONE have UI Touching: yes → proceed without UIDesigner
+4. Override requires explicit user approval (logged in decisionLog.md)
+
+**Hard Rule:** No Frontend task with `UI Touching: yes` may enter BUILD phase
+until its UIDesigner dependency task has status `completed` and design specs
+exist on disk.
+
+## TODO-Driven Delegation
+
+ReaperOAK delegates individual tasks from the TODO file — never features.
+
+### DECOMPOSE Phase (Phase 0)
+Before any SDLC work:
+1. Delegate to TODO Agent: decompose user request into granular tasks
+2. Read generated TODO file → count tasks, verify format
+3. Apply UI/UX Gate
+4. Identify SPEC-phase tasks → delegate to SPEC agents (max 5/agent)
+5. After SPEC, identify BUILD-phase tasks → delegate (max 3/agent)
+
+### Max-Task-Per-Cycle
+- BUILD agents: max **3 tasks** per delegation cycle
+- SPEC agents: max **5 tasks** per delegation cycle
+- Violation → reject delegation, re-split via TODO Agent
+
+### Task-Driven Delegation Template
+Every BUILD-phase delegation MUST reference a specific task ID:
+```
+Objective: Execute task {TODO_TASK_ID}: {TASK_TITLE}
+Upstream artifacts: {COMPLETED DEPENDENCY OUTPUTS}
+Acceptance criteria: {FROM TASK FILE}
+Scope: THIS TASK ONLY
+```
+
+### Completion Protocol
+1. Agent reports completion with evidence
+2. ReaperOAK reviews evidence against acceptance criteria
+3. If PASS → delegate to TODO Agent: "Mark {ID} completed"
+4. If FAIL → re-delegate to agent with findings (max 3 retries)
 
 ## Safety — Require Human Approval Before
 
@@ -183,5 +232,6 @@ Add task-specific tags from `.github/vibecoding/catalog.yml` when relevant.
 | Product Manager | `ProductManager.agent/` | `sdlc:` |
 | CI Reviewer | `CIReviewer.agent/` | `ci:` |
 | UIDesigner | `UIDesigner.agent/` | `design:`, `accessibility:` |
+| TODO | `TODO.agent/` | `sdlc:`, `general:` |
 
 Chunk paths: `.github/vibecoding/chunks/{dir}/chunk-NN.yaml`

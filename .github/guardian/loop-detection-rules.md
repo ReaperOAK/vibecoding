@@ -28,6 +28,26 @@ locked_by: ReaperOAK
 - ACTION: Halt, force BLOCKED status
 - ESCALATE: Root cause analysis required before retry
 
+### Signal: TODO Progress Stall
+- DETECT: Any task in `in_progress` status for > 2 full BUILD→VALIDATE cycles without status change
+- ACTION: Set task status to STALLED, halt owning agent
+- ESCALATE: ReaperOAK re-scopes or reassigns task; notify user if unresolvable
+
+### Signal: Zero-Progress Cycle
+- DETECT: A full BUILD→VALIDATE cycle completes with 0 tasks transitioning to `completed`
+- ACTION: Halt pipeline, flag as systemic issue
+- ESCALATE: Require user intervention — likely scope mismatch or under-decomposition
+
+### Signal: Blocked Dependency Chain
+- DETECT: 3+ tasks in a dependency chain are all `blocked`
+- ACTION: Identify root blocker task, auto-escalate its priority to P0
+- ESCALATE: ReaperOAK attempts to unblock root; if blocked > 1 full cycle → user notification
+
+### Signal: Max-Task-Per-Cycle Violation
+- DETECT: Agent receives > 3 tasks (or > 5 for SPEC-phase agents) in a single delegation cycle
+- ACTION: Reject delegation batch, log violation
+- ESCALATE: TODO Agent must further decompose the oversized batch
+
 ## Token Budget Enforcement
 
 ### Per-Task Budgets

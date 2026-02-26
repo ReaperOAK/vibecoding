@@ -45,7 +45,8 @@
         "Research",
         "Documentation",
         "CIReviewer",
-        "UIDesigner"
+        "UIDesigner",
+        "TODO"
       ]
     },
     "autonomy_level": {
@@ -141,13 +142,23 @@
     },
     "phase": {
       "type": "string",
-      "enum": ["SPEC", "BUILD", "VALIDATE", "GATE", "DOCUMENT", "RETROSPECTIVE"],
+      "enum": ["DECOMPOSE", "SPEC", "BUILD", "VALIDATE", "GATE", "DOCUMENT", "RETROSPECTIVE"],
       "description": "Current SDLC phase this delegation belongs to"
     },
     "upstream_artifacts": {
       "type": "array",
       "items": { "type": "string" },
       "description": "File paths from prior phases that agent MUST read before starting"
+    },
+    "todo_task_id": {
+      "type": ["string", "null"],
+      "pattern": "^[A-Z][A-Z0-9-]*\\d{3,4}$",
+      "description": "Specific TODO task ID this delegation executes. Null for DECOMPOSE-phase delegations."
+    },
+    "todo_acceptance_criteria": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Verifiable acceptance criteria copied from the TODO task"
     },
     "mcp_grants": {
       "type": "array",
