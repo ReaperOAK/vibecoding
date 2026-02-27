@@ -183,3 +183,25 @@ append_only: true
 - **Progressive refinement preserved:** L3 tasks are now "tickets" entering BACKLOG
 - **ARCHITECTURE.md at v7.0.0**
 - OLD model references remain in 8+ out-of-scope files (technical debt — future ticket)
+
+### [2026-02-28] Session 14: Worker-Pool Adaptive Engine v8.0.0
+
+| Task | Agent | Evidence | Status |
+|------|-------|----------|--------|
+| WPAE-BE001: ReaperOAK.agent.md v8.0.0 Rewrite | Backend | 1077 lines, 20 sections, 22 AC met | DONE |
+| WPAE-BE002: Agent Definition Propagation | Backend | 4 files updated, all 6 AC met | DONE |
+| WPAE-BE003: Chunk Content Updates | Backend | 3 chunk files, all 5 AC met | DONE |
+| WPAE-BE004: Schema & Infra Alignment | Backend | 4 infra files, all 6 AC met | DONE |
+| WPAE-BE005: Conceptual v8 Propagation | Backend | 3 files (agents.md, _cross-cutting, TODO), 10 AC met | DONE |
+| ARCHITECTURE.md v8.0.0 Rewrite | Backend | 1728 lines, 32 sections, zero banned terms | DONE |
+
+### System Now Has (Session 14)
+- **Worker-Pool Adaptive Engine v8.0.0** replaces ticket-driven engine v7.0.0
+- **Worker Pool Model:** Each agent role backed by pool of N workers, ephemeral instances, configurable capacity
+- **Updated 9-state machine:** READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → COMMIT → DONE
+- **Two-Layer Orchestration:** Strategic Layer + Execution Layer with SDR-based strategy evolution
+- **Continuous Scheduling:** Event-driven loop, no global cycles, tickets assigned as workers free
+- **SDR Protocol:** Strategic Decision Records with roadmap versioning
+- **10 new event types:** 4 worker pool + 6 strategic events
+- **5-type Conflict Detection:** file path, directory subtree, DB schema, infrastructure, shared config
+- **ARCHITECTURE.md at v8.0.0** (1728 lines, 32 sections)

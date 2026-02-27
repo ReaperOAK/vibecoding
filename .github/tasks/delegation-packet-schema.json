@@ -186,7 +186,7 @@
     },
     "sdlc_stage": {
       "type": ["string", "null"],
-      "enum": ["BACKLOG", "READY", "LOCKED", "IMPLEMENTING", "REVIEW", "VALIDATED", "DOCUMENTED", "COMMITTED", "DONE", null],
+      "enum": ["READY", "LOCKED", "IMPLEMENTING", "QA_REVIEW", "VALIDATION", "DOCUMENTATION", "CI_REVIEW", "COMMIT", "DONE", "REWORK", null],
       "description": "Current ticket state in the 9-state machine. Null if not yet assigned."
     },
     "dod_checklist": {
@@ -204,7 +204,7 @@
         "no_todo_comments": { "type": "boolean" }
       },
       "additionalProperties": false,
-      "description": "Definition of Done checklist status. Null until REVIEW state."
+      "description": "Definition of Done checklist status. Null until QA_REVIEW state."
     },
     "initialization_checklist": {
       "type": ["object", "null"],

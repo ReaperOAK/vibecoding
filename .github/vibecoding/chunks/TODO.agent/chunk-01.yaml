@@ -36,8 +36,8 @@ critical path?
 TODO/ directory, must escalate ambiguous scope decisions to ReaperOAK.
 
 > **Ticket Model:** L3 Actionable Tasks are "tickets" in the ticket-driven
-> model. Each L3 task enters the 9-state machine at BACKLOG. TODO Agent sets
-> the initial state (BACKLOG); ReaperOAK manages all subsequent transitions.
+> model. Each L3 task enters the 9-state machine at READY. TODO Agent sets
+> the initial state (READY); ReaperOAK manages all subsequent transitions.
 
 ## 2. Task ID Convention
 
@@ -79,7 +79,7 @@ Every task block in a TODO file follows this structure:
 ```markdown
 ## {ID}: {Title (max 60 chars)}
 
-**Status:** BACKLOG
+**Status:** READY
 **Priority:** P1
 **Owner:** {AgentName}
 **Depends On:** {comma-separated IDs or "None"}
@@ -104,7 +104,7 @@ Every task block in a TODO file follows this structure:
 
 **Format rules:**
 - Title max 60 characters, no status emoji
-- Status values: `BACKLOG | READY | LOCKED | IMPLEMENTING | REVIEW | VALIDATED | DOCUMENTED | COMMITTED | DONE`
+- Status values: `READY | LOCKED | IMPLEMENTING | QA_REVIEW | VALIDATION | DOCUMENTATION | CI_REVIEW | COMMIT | DONE`
 - Priority values: `P0 | P1 | P2 | P3`
 - Owner must be a valid agent name
 - Effort maximum 90 min per task (split if larger)
@@ -160,7 +160,7 @@ Invoked when ReaperOAK sets `mode: execution_planning` with a target block.
 2. SELECT the ONE block to expand (specified by ReaperOAK)
 3. READ upstream artifacts (PRD, architecture docs) listed in delegation packet
 4. DECOMPOSE the selected block into actionable tasks (2–4 hours effort each).
-   All generated tasks enter **BACKLOG** state by default
+   All generated tasks enter **READY** state by default
 5. Each L3 task MUST include:
    - Full Format A metadata (Section 3)
    - Explicit file paths to create or modify
@@ -175,7 +175,7 @@ Invoked when ReaperOAK sets `mode: execution_planning` with a target block.
    - Set **UI Touching: yes** on any task matching UI signals
    - Ensure Frontend UI tasks depend on a UIDesigner task
 8. WRITE `TODO/tasks/{block-slug}.md` — output file contains tickets
-   entering the 9-state machine (initial state: BACKLOG)
+   entering the 9-state machine (initial state: READY)
 9. VALIDATE by running: `python3 todo_visual.py --json`
 
 **Forbidden in this mode:** generating L4 micro-tasks unless explicitly
@@ -235,7 +235,7 @@ active task files.
    file as input and writes the child layer file as output.
 5. **No layer skipping:** L0→L1→L2→L3 is mandatory. Never jump from L0
    directly to L3 or L4.
-6. **Ticket entry state:** Each expanded L3 task is a ticket entering BACKLOG.
+6. **Ticket entry state:** Each expanded L3 task is a ticket entering READY.
 
 ## 7. File Templates
 

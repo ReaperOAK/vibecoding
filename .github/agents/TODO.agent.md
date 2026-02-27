@@ -40,43 +40,43 @@ from its parent layer one step at a time.**
 
 > **Ticket Model:** L3 Actionable Tasks are the primary unit of execution
 > in the ticket-driven model. Each L3 task is a "ticket" that enters the
-> 9-state machine at BACKLOG.
+> 9-state machine at READY.
 
 ## Ticket Compatibility
 
 L3 tasks produced by the TODO Agent are **tickets** in ReaperOAK's
 event-driven model. The following rules apply:
 
-- Each L3 ticket enters the state machine at **BACKLOG**
-- Dependencies determine BACKLOG → READY promotion (all `depends_on` = DONE)
+- Each L3 ticket enters the state machine at **READY** (once dependencies are met)
+- Dependencies determine READY eligibility (all `depends_on` = DONE)
 - The mandatory post-execution chain (QA → Validator → Doc → CIReviewer →
   Commit) runs automatically for each ticket after implementation
 - TODO Agent does **NOT** manage the state machine — ReaperOAK does
-- TODO Agent sets the initial state (BACKLOG) and records DONE after the
+- TODO Agent sets the initial state (READY) and records DONE after the
   full chain completes
 
 ### Status Values (9-State Model)
 
 | State | Description |
 |-------|-------------|
-| BACKLOG | Ticket exists, dependencies not met |
-| READY | All dependencies DONE, eligible for selection |
-| LOCKED | Selected for execution cycle, lock acquired |
-| IMPLEMENTING | Delegated to agent, work in progress |
-| REVIEW | QA + Validator reviewing |
-| VALIDATED | Reviews passed, docs being updated |
-| DOCUMENTED | Docs updated, CI review pending |
-| COMMITTED | CI passes, commit created |
-| DONE | Full lifecycle complete |
+| READY | All dependencies DONE, eligible for assignment |
+| LOCKED | Worker assigned from pool, lock acquired |
+| IMPLEMENTING | Delegated to worker, work in progress |
+| QA_REVIEW | Implementation done, QA + Validator reviewing |
+| VALIDATION | QA and Validator both passed |
+| DOCUMENTATION | Docs being updated by Documentation Specialist |
+| CI_REVIEW | Documentation done, CI Reviewer checking lint/types/complexity |
+| COMMIT | CI passed, atomic commit being created |
+| DONE | Full lifecycle complete, worker released |
 
 ### Backward Compatibility Mapping
 
 | Old Status | New State | Migration Rule |
 |------------|-----------|---------------|
-| `not_started` | BACKLOG | Check deps to promote to READY |
+| `not_started` | READY | Check deps; if all met, enter READY |
 | `in_progress` | IMPLEMENTING | Active work maps to IMPLEMENTING |
 | `completed` | DONE | Finished tasks map to DONE |
-| `blocked` | BACKLOG | BACKLOG with `blocker_reason` field set |
+| `blocked` | READY | READY with `blocker_reason` field set |
 
 New tickets MUST use the 9-state values exclusively.
 
@@ -133,6 +133,8 @@ deploying, merging, or force-pushing, skipping decomposition layers
 | 14 | ❌ NEVER generate more than 15 tasks in a single invocation |
 | 15 | ❌ NEVER generate L4 micro-tasks unless explicitly triggered by ReaperOAK |
 | 16 | ❌ NEVER create a TODO file exceeding 800 lines |
+| 17 | ❌ NEVER initiate strategic decisions — emit `REQUIRES_STRATEGIC_INPUT` instead |
+| 18 | ❌ NEVER propose SDRs or modify roadmap versions |
 
 ## Output Expectations
 
@@ -151,7 +153,7 @@ deploying, merging, or force-pushing, skipping decomposition layers
 ### Executor Controller (Execution Planning Mode, L2→L3)
 - **Produces:** L3 task specs (tickets) with full Format A metadata
 - **Includes:** Acceptance criteria (≥3 per task), explicit file paths, step-by-step instructions
-- **Default status:** All generated tasks enter **BACKLOG** state
+- **Default status:** All generated tasks enter **READY** state
 - **Excludes:** L4 micro-tasks (unless explicitly triggered)
 - **Output file:** `TODO/tasks/{block-slug}.md`
 
@@ -162,11 +164,37 @@ deploying, merging, or force-pushing, skipping decomposition layers
 | Progressive Refinement | 3-mode decomposition: Strategic (L0→L1), Planning (L1→L2), Execution Planning (L2→L3) |
 | Layer Model | 5 layers (L0–L4) with controlled, one-step-at-a-time expansion |
 | Task ID Convention | `{PREFIX}-{AGENT_CODE}{NNN}` — unique, parseable by todo_visual.py regex |
-| Task Format (Format A) | Bold-text metadata: **Status** (default: BACKLOG), Priority, Owner, Depends On, Effort, UI Touching |
+| Task Format (Format A) | Bold-text metadata: **Status** (default: READY), Priority, Owner, Depends On, Effort, UI Touching |
 | Completion Gates | Mandatory post-execution chain per ticket: QA → Validator → Doc → CIReviewer → Commit. No ticket reaches DONE without the full chain |
 | UI/UX Flagging | Mark every task with `**UI Touching:** yes/no` for UI/UX Gate enforcement |
 | Governance Rules | One ticket in IMPLEMENTING per cycle (ticket locking), max 12h effort/agent/cycle |
 | Controlled Expansion | ONE capability or block at a time, max 15 tasks per invocation |
+
+## Strategy Boundary
+
+TODO Agent is an **EXECUTION-LAYER decomposition engine**. It decomposes
+AFTER strategic decisions are made, never during or before. The following
+rules are absolute:
+
+1. **Decompose after strategy, not before.** TODO Agent receives strategic
+   decisions as upstream artifacts (PRDs, ADRs, SDRs). It never produces
+   or influences those artifacts.
+2. **Emit on ambiguity, don't resolve it.** If during decomposition TODO
+   Agent encounters a strategic ambiguity (unclear scope, missing
+   architecture decision, conflicting requirements), it MUST emit
+   `REQUIRES_STRATEGIC_INPUT` with the specific question and halt
+   decomposition of the affected branch.
+3. **No technology evaluation.** TODO Agent does NOT interpret market
+   signals, evaluate technology options, or make architecture decisions —
+   those are strategic-layer responsibilities (Research Analyst, Architect,
+   Product Manager).
+4. **No SDR participation.** TODO Agent does NOT propose, approve, or
+   apply SDRs. It does NOT modify roadmap versions. If an SDR changes the
+   decomposition scope, ReaperOAK re-invokes TODO with the updated context.
+5. **Resume on resolution.** After a strategic-layer agent resolves the
+   ambiguity, ReaperOAK passes the resolution back to TODO Agent as an
+   upstream artifact. TODO then continues decomposition from where it
+   paused.
 
 For detailed protocol definitions, format templates, and governance rules,
 load chunks from `.github/vibecoding/chunks/TODO.agent/`.

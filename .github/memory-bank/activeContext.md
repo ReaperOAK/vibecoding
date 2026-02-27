@@ -25,6 +25,12 @@ compaction_threshold: 50
 
 <!-- What is the system currently working on? Updated per-session. -->
 
+### [2026-02-28T00:00:00Z] ReaperOAK — Session 14
+
+- **Focus:** Worker-Pool Adaptive Engine v8.0.0 — complete architecture upgrade
+- **Status:** COMPLETE — all core files rewritten/updated
+- **Next Steps:** CAP-02 through CAP-06 BUILD (worker pool data model, continuous scheduling, two-layer enforcement, SDR orchestration, UI/UX hardening)
+
 ### [2026-02-23T00:00:00Z] Claude Code
 
 - **Focus:** Claude Code integration — dual-agent vibecoding support
@@ -48,6 +54,18 @@ compaction_threshold: 50
 ## Recent Changes
 
 <!-- Reverse chronological log of significant changes -->
+
+### [2026-02-28T00:00:00Z] Worker-Pool Adaptive Engine v8.0.0
+
+- **ReaperOAK.agent.md** — COMPLETE REWRITE (811→1077 lines). 20 sections. Worker pool model, two-layer orchestration, continuous scheduling, SDR protocol, updated 9-state machine (READY→LOCKED→IMPLEMENTING→QA_REVIEW→VALIDATION→DOCUMENTATION→CI_REVIEW→COMMIT→DONE), event-driven loop, conflict detection (5 types), two worked examples.
+- **ARCHITECTURE.md** — COMPLETE REWRITE (1194→1728 lines, 32 sections). Version v8.0.0. Added §30 Two-Layer Orchestration Model, §31 Strategic Layer & SDR Protocol. All sections updated with worker pool model, continuous scheduling, SDR references.
+- **agents.md** — Updated (191→233 lines). Worker Pool Model, Two-Layer Orchestration, Strategy Evolution paragraphs added. TODO Agent SDR restriction noted.
+- **_cross-cutting-protocols.md** — Updated (209→241 lines). §8.1 Worker Pool Events (4 types), §10 Strategic Event Types (6 types) added.
+- **TODO.agent.md** — Updated (175→203 lines). Forbidden Actions 17-18 (SDR restrictions). Strategy Boundary section added.
+- **Validator.agent.md** — Updated (256 lines). v8 state names in validation matrix.
+- **Chunk files** — chunk-01.yaml, chunk-02.yaml (TODO.agent), chunk-01.yaml (Validator) updated with v8 states.
+- **Infrastructure** — delegation-packet-schema.json, loop-detection-rules.md, tool-acl.yaml, definition-of-done-template.md all updated with v8 vocabulary.
+- **TODO directory** — Recreated with vision.md (7 capabilities), 7 block files, 2 task files.
 
 ### [2026-02-23T00:00:00Z] Claude Code
 
