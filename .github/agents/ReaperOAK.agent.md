@@ -60,7 +60,7 @@ SPEC → BUILD → VALIDATE ──→ PASS → DOCUMENT → RETROSPECTIVE
 
 | Phase | Agents (parallel) | Outputs |
 |-------|------------------|----------|
-| 0. DECOMPOSE | TODO | `TODO/{PROJECT}_TODO.md` |
+| 0. DECOMPOSE | TODO | `TODO/vision.md`, `TODO/capabilities.md`, `TODO/blocks/*`, `TODO/tasks/*` |
 | 1. SPEC | PM, Architect, UIDesigner, Research | `docs/prd.md`, `docs/architecture.md`, `docs/api-contracts.yaml`, `docs/design-specs/` |
 | 2. BUILD | Backend, Frontend, DevOps | `server/`, `client/`, `infra/` |
 | 3. VALIDATE | QA, Security, CI Reviewer | `docs/reviews/{qa,security,ci}-report.md` |
@@ -295,15 +295,92 @@ re-delegate with specific missing file list.
 
 ## TODO-Driven Delegation
 
-ReaperOAK delegates individual tasks from the TODO file — never features.
+ReaperOAK delegates individual tasks from TODO task files — never features.
+Task files live in the progressive refinement hierarchy:
+- `TODO/tasks/{block-slug}.md` — L3 actionable tasks (primary delegation source)
+- `TODO/blocks/{capability-slug}.md` — L2 block-level progress tracking
+- `TODO/capabilities.md` — L1 capability-level overview
 
-### DECOMPOSE Phase (Phase 0)
-Before any SDLC work:
-1. Delegate to TODO Agent: decompose user request into granular tasks
-2. Read generated TODO file → count tasks, verify format
-3. Apply UI/UX Gate
-4. Identify SPEC-phase tasks → delegate to SPEC agents (1 per agent per cycle)
-5. After SPEC, identify BUILD-phase tasks → delegate (1 per agent per cycle)
+### DECOMPOSE Phase (Phase 0) — Progressive Refinement
+
+Before any SDLC work, invoke the TODO Agent in the appropriate mode based on
+the current decomposition state. Refinement is progressive — each invocation
+expands ONE layer at a time.
+
+#### Mode Selection Decision Logic
+
+Determine the correct TODO Agent mode by checking file existence:
+
+| Condition | Mode | Action |
+|-----------|------|--------|
+| No `TODO/vision.md` exists | **Strategic** (L0→L1) | Invoke TODO Agent to decompose project vision into capabilities |
+| `TODO/vision.md` exists but target capability has no `TODO/blocks/{slug}.md` | **Planning** (L1→L2) | Invoke TODO Agent to expand ONE capability into execution blocks |
+| Blocks exist but target block has no `TODO/tasks/{slug}.md` | **Execution Planning** (L2→L3) | Invoke TODO Agent to generate actionable tasks from ONE block |
+| `TODO/tasks/{slug}.md` exists with L3 tasks | **Skip DECOMPOSE** | Proceed directly to SPEC/BUILD delegation using existing tasks |
+
+#### TODO Agent Delegation Packet Templates
+
+**Strategic Mode (L0→L1):**
+```
+Objective: Decompose project vision into capabilities (L0→L1)
+Mode: strategic
+Input: User's feature description, project context
+Output: TODO/vision.md with L0 vision + L1 capabilities list
+Constraints: Max 7 capabilities, no task IDs, no acceptance criteria
+Chunks: Load .github/vibecoding/chunks/TODO.agent/
+```
+
+**Planning Mode (L1→L2):**
+```
+Objective: Expand capability {CAP_NAME} into execution blocks (L1→L2)
+Mode: planning
+Input: TODO/vision.md or TODO/capabilities.md, target capability: {CAP_NAME}
+Output: TODO/blocks/{capability-slug}.md with 3-5 execution blocks
+Constraints: Max 5 blocks, one capability only, no file-level details
+Chunks: Load .github/vibecoding/chunks/TODO.agent/
+```
+
+**Execution Planning Mode (L2→L3):**
+```
+Objective: Generate actionable tasks for block {BLOCK_NAME} (L2→L3)
+Mode: execution_planning
+Input: TODO/blocks/{capability-slug}.md, target block: {BLOCK_NAME}
+Output: TODO/tasks/{block-slug}.md with L3 tasks (Format A)
+Constraints: Max 15 tasks, full acceptance criteria, explicit file paths
+Chunks: Load .github/vibecoding/chunks/TODO.agent/
+```
+
+#### Progressive Refinement Cycle
+
+```
+Step 1: Strategic Mode → produce TODO/vision.md
+Step 2: For each capability, invoke Planning Mode → produce TODO/blocks/{slug}.md
+Step 3: For each block, invoke Execution Planning Mode → produce TODO/tasks/{slug}.md
+Step 4: Proceed with normal SDLC delegation (SPEC → BUILD → VALIDATE → etc.)
+```
+
+**Rules:**
+- Steps 2 and 3 expand ONE item at a time. Do NOT batch-expand all
+  capabilities or blocks at once.
+- After each mode invocation, read the generated output and verify format
+  before proceeding to the next expansion.
+
+#### Guard Rule
+
+> **NEVER invoke TODO Agent to skip layers (e.g., passing L0 vision directly
+> to Execution Planning Mode).** Each layer MUST be expanded from its parent
+> layer. Strategic → Planning → Execution Planning is the only valid
+> progression order.
+
+#### DECOMPOSE Steps
+
+1. Apply mode selection logic (see decision table above)
+2. Delegate to TODO Agent with the appropriate mode-specific template
+3. Read generated TODO output → verify format and count
+4. If more refinement needed → repeat with next mode
+5. Once L3 tasks exist in `TODO/tasks/` → apply UI/UX Gate
+6. Identify SPEC-phase tasks → delegate to SPEC agents (1 per agent per cycle)
+7. After SPEC, identify BUILD-phase tasks → delegate (1 per agent per cycle)
 
 ### Max-Task-Per-Cycle
 - BUILD agents: max **1 task** per delegation cycle (enforced via task lock)
@@ -312,11 +389,15 @@ Before any SDLC work:
 - Violation → reject delegation, re-split via TODO Agent
 
 ### Task-Driven Delegation Template
-Every BUILD-phase delegation MUST reference a specific task ID:
+Every BUILD-phase delegation MUST reference a specific task ID from
+`TODO/tasks/{block-slug}.md`:
 ```
 Objective: Execute task {TODO_TASK_ID}: {TASK_TITLE}
 Upstream artifacts: {COMPLETED DEPENDENCY OUTPUTS}
 Acceptance criteria: {FROM TASK FILE}
+Task source: TODO/tasks/{block-slug}.md
+Block context: TODO/blocks/{capability-slug}.md
+Capability overview: TODO/capabilities.md
 Scope: THIS TASK ONLY
 ```
 

@@ -55,11 +55,28 @@ When delegating to a subagent, use the delegation packet schema at
 `.github/tasks/delegation-packet-schema.json`.
 
 **TODO Agent** is invokable only by ReaperOAK. No other agent may delegate
-to it or invoke it directly.
+to it or invoke it directly. TODO Agent is a progressive refinement
+decomposition engine with **3 operating modes**:
+
+- **Strategic Mode** (L0→L1): Decomposes project vision into capabilities
+- **Planning Mode** (L1→L2): Expands one capability into execution blocks
+- **Execution Planning Mode** (L2→L3): Expands one block into actionable tasks
+
+TODO Agent operates in one of 3 modes per invocation. ReaperOAK selects
+the appropriate mode based on the current decomposition layer.
 
 **TODO Agent invocation:** For any multi-step feature request, ReaperOAK
-MUST first delegate to the TODO Agent to decompose the work into granular
-tasks before entering the SPEC phase.
+MUST first invoke the TODO Agent in Strategic Mode (L0→L1) to identify
+capabilities, then progressively refine through Planning Mode (L1→L2) and
+Execution Planning Mode (L2→L3) before entering the BUILD phase.
+
+**TODO directory structure:**
+
+- `TODO/vision.md` — L0 vision statement + L1 capabilities list
+- `TODO/capabilities.md` — L1 capability details with status
+- `TODO/blocks/` — L2 execution blocks per capability
+- `TODO/tasks/` — L3 actionable tasks per block
+- `TODO/micro/` — L4 micro-tasks (optional, only when triggered)
 
 **Validator Agent** is an independent compliance reviewer with special
 authority to **reject task completion**. It verifies Definition of Done
