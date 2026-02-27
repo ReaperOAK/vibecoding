@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CROSBIRD PROJECT BOARD — Global Task Visualizer
+ PROJECT BOARD — Global Task Visualizer
 ================================================
 Two-pass global dependency resolution with dual output.
 Read-only: NEVER mutates source .md files.
@@ -25,7 +25,7 @@ from typing import Any
 
 # ─── Logging (never leak local paths into console) ───────────
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
-_log = logging.getLogger("crosbird-board")
+_log = logging.getLogger("board")
 
 # ─── Configuration ───────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent
@@ -379,7 +379,7 @@ def _render_rich(tasks: dict[str, Task], stats: BoardStats) -> None:
     # Banner
     c.print()
     c.print(Panel.fit(
-        f"[bold cyan]CROSBIRD PROJECT BOARD[/]\n"
+        f"[bold cyan] PROJECT BOARD[/]\n"
         f"[dim]{stats.total} tasks · {stats.files_with_tasks} files · {pct}% done[/]",
         border_style="cyan",
     ))
@@ -461,7 +461,7 @@ def _render_rich(tasks: dict[str, Task], stats: BoardStats) -> None:
 def _render_plain(tasks: dict[str, Task], stats: BoardStats) -> None:
     pct = f"{stats.completed / stats.total * 100:.1f}" if stats.total else "0.0"
     print(f"\n{'=' * 52}")
-    print(f"  CROSBIRD PROJECT BOARD  ({stats.total} tasks, {pct}% done)")
+    print(f"   PROJECT BOARD  ({stats.total} tasks, {pct}% done)")
     print(f"{'=' * 52}")
     print(f"  ✅ Completed   {stats.completed}")
     print(f"  📋 Not Started {stats.not_started}")
@@ -595,7 +595,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CROSBIRD Project Board</title>
+<title> Project Board</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -644,7 +644,7 @@ footer{background:#1e293b;border-top:1px solid #334155;padding:8px 24px;text-ali
 </head>
 <body>
 <header>
-  <h1>CROSBIRD Board</h1>
+  <h1> Board</h1>
   <div class="stats-bar">
     <div class="stat"><div class="stat-value" style="color:#22c55e">%%COMPLETED%%</div><div class="stat-label">Done</div></div>
     <div class="stat"><div class="stat-value" style="color:#eab308">%%IN_PROGRESS%%</div><div class="stat-label">WIP</div></div>
@@ -699,7 +699,7 @@ footer{background:#1e293b;border-top:1px solid #334155;padding:8px 24px;text-ali
     </table>
   </div>
 </div>
-<footer>CROSBIRD Project Board &middot; Read-only snapshot &middot; Source files are never modified</footer>
+<footer> Project Board &middot; Read-only snapshot &middot; Source files are never modified</footer>
 <script>
 mermaid.initialize({startOnLoad:true,theme:'dark',flowchart:{useMaxWidth:false,htmlLabels:true,curve:'basis',padding:15},securityLevel:'loose',maxTextSize:500000});
 
