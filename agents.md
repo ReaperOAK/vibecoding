@@ -57,14 +57,19 @@ IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → CO
 When delegating to a subagent, use the delegation packet schema at
 `.github/tasks/delegation-packet-schema.json`.
 
-**Worker Pool Model.** Each agent role is backed by a pool of N workers
-(configurable capacity per role). Multiple workers of the same role can
-process different tickets concurrently — for example, `Backend-W1` and
-`Backend-W2` may implement two independent tickets at the same time. Workers
-are ephemeral instances spawned per ticket and released on completion. Worker
-identity format: `{AgentRole}-W{N}` (e.g., `Backend-W1`, `QA-W2`,
-`Frontend-W1`). Pool capacity is tuned per project; a busy pool emits
-`POOL_EXHAUSTED` and queues tickets until a worker frees up.
+**Worker Pool Model.** Each agent role is backed by an **elastic pool** of
+workers that auto-scales between `minSize` and `maxSize` based on ticket
+backlog. Workers are spawned dynamically per ticket with unique IDs using the
+format `{Role}Worker-{shortUuid}` (e.g., `BackendWorker-a1b2c3`,
+`FrontendWorker-d4e5f6`, `QAWorker-g7h8i9`). Each worker processes EXACTLY
+ONE ticket — no worker reuse across tickets. Workers are stateless, ephemeral
+instances created via `runSubagent` and terminated after ticket completion.
+Pools grow when backlog exceeds active workers and shrink when workers idle
+for more than 10 minutes, maintaining at least `minSize` capacity at all
+times. All conflict-free READY tickets are dispatched in parallel — ReaperOAK
+calls multiple `runSubagent` simultaneously, one per ticket. If a pool reaches
+`maxSize` and more tickets remain in READY, they queue until a worker
+completes and is released.
 
 **Two-Layer Orchestration.** The agent roster is organized into two
 concurrent layers that run simultaneously without phase barriers:

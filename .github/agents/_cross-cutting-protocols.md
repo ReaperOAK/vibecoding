@@ -124,15 +124,19 @@ ReaperOAK's event loop.
 
 ### 8.1 Worker Pool Events
 
-These events are emitted by the worker pool subsystem and consumed by
-ReaperOAK's continuous scheduler.
+These events are emitted by the elastic worker pool subsystem and consumed by
+ReaperOAK's continuous scheduler. Workers are dynamically spawned per ticket
+with unique IDs (`{Role}Worker-{shortUuid}`) and terminated after completion.
+Pools auto-scale between `minSize` and `maxSize` based on ticket backlog.
 
 | Event Type | When Emitted | Payload |
 |-----------|-------------|--------|
 | `WORKER_FREE` | Worker completes ticket and is released | worker_id, pool_role, timestamp, freed_capacity |
 | `WORKER_ASSIGNED` | Worker assigned to ticket | worker_id, pool_role, ticket_id, timestamp |
-| `POOL_EXHAUSTED` | All workers in a pool are busy | pool_role, queued_tickets, timestamp |
-| `POOL_SCALED` | Pool capacity changed | pool_role, old_capacity, new_capacity, reason |
+| `WORKER_SPAWNED` | New worker dynamically created for a ticket | worker_id, pool_role, ticket_id, timestamp |
+| `WORKER_TERMINATED` | Worker removed from pool (completed, failed, violation, or idle timeout) | worker_id, pool_role, reason, timestamp |
+| `POOL_SCALED_UP` | Elastic pool expanded due to backlog growth | pool_role, old_count, new_count, trigger |
+| `POOL_SCALED_DOWN` | Elastic pool contracted due to idle workers | pool_role, old_count, new_count, reason |
 
 ### Event Payload Format
 

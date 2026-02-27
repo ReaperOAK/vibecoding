@@ -1,25 +1,26 @@
 # Vibecoding Multi-Agent System Architecture
 
-> **Version:** 8.0.0
-> **Owner:** ReaperOAK (CTO / Worker-Pool Adaptive Orchestrator)
-> **Last Updated:** 2026-02-27
+> **Version:** 8.1.0
+> **Owner:** ReaperOAK (CTO / Elastic Multi-Worker Parallel Orchestrator)
+> **Last Updated:** 2026-02-28
 >
-> **Changelog:** v8.0.0 — Worker-Pool Adaptive Engine: continuous scheduling,
-> two-layer orchestration (strategic + execution running concurrently),
-> worker pool model with conflict detection, SDR protocol for strategy
-> evolution, event-driven coordination, updated 9-state machine
-> (QA_REVIEW / VALIDATION / DOCUMENTATION / CI_REVIEW / COMMIT naming)
+> **Changelog:** v8.1.0 — Elastic Multi-Worker Parallel Execution Engine:
+> elastic auto-scaling pools (minSize/maxSize), dynamic worker IDs
+> ({Role}Worker-{shortUuid}), parallel batch dispatch, mutual-exclusion
+> conflict type, 4 scaling events (WORKER_SPAWNED, WORKER_TERMINATED,
+> POOL_SCALED_UP, POOL_SCALED_DOWN), worker termination on multi-ticket violation
 
 ---
 
 ## 1. System Overview
 
-This architecture implements a **worker-pool adaptive engine** — a multi-agent
-vibecoding system with ReaperOAK as the singular CTO and orchestrator.
-ReaperOAK continuously schedules work across worker pools, operates a
-two-layer model where strategic discovery and execution run concurrently
-without phase barriers, and drives every ticket through a deterministic
-9-state lifecycle.
+This architecture implements an **elastic multi-worker parallel execution
+engine** — a multi-agent vibecoding system with ReaperOAK as the singular
+CTO and orchestrator. ReaperOAK continuously schedules work across elastic
+auto-scaling pools, dispatches conflict-free ticket batches in parallel,
+operates a two-layer model where strategic discovery and execution run
+concurrently without phase barriers, and drives every ticket through a
+deterministic 9-state lifecycle.
 
 The unit of execution is: **ONE TICKET → FULL LIFECYCLE → COMMIT**.
 There are no phased pipelines or batch feature completions. Scheduling is
@@ -76,21 +77,21 @@ ReaperOAK (Worker-Pool Adaptive Orchestrator / CTO)
 
 ### Layer Assignments
 
-| Agent | Strategic Layer | Execution Layer | Worker Pool Capacity |
+| Agent | Strategic Layer | Execution Layer | Elastic Pool (min-max) |
 |-------|:-:|:-:|:--|
-| **Research** | ✓ | — | 1 |
-| **ProductManager** | ✓ | — | 1 |
-| **Architect** | ✓ | — | 1 |
-| **Security** | ✓ (strategic) | ✓ (execution) | 1 |
-| **UIDesigner** | ✓ (conceptual) | — | 1 |
-| **DevOps** | ✓ (infra planning) | ✓ (execution) | 1 |
-| **TODO** | ✓ (invoked only by ReaperOAK) | — | 1 |
-| **Backend** | — | ✓ | 3 |
-| **Frontend** | — | ✓ | 2 |
-| **QA** | — | ✓ | 2 |
-| **Documentation** | — | ✓ | 1 |
-| **Validator** | — | ✓ | 1 |
-| **CIReviewer** | — | ✓ | 1 |
+| **Research** | ✓ | — | 1-8 |
+| **ProductManager** | ✓ | — | 1-3 |
+| **Architect** | ✓ | — | 1-3 |
+| **Security** | ✓ (strategic) | ✓ (execution) | 1-5 |
+| **UIDesigner** | ✓ (conceptual) | — | 1-3 |
+| **DevOps** | ✓ (infra planning) | ✓ (execution) | 1-5 |
+| **TODO** | ✓ (invoked only by ReaperOAK) | — | 1-3 |
+| **Backend** | — | ✓ | 2-15 |
+| **Frontend** | — | ✓ | 1-10 |
+| **QA** | — | ✓ | 1-8 |
+| **Documentation** | — | ✓ | 1-3 |
+| **Validator** | — | ✓ | 1-3 |
+| **CIReviewer** | — | ✓ | 1-3 |
 
 Strategic and Execution layers run **concurrently**. A strategic agent may
 propose an SDR (§31) while execution workers are processing tickets. SDRs
@@ -241,29 +242,44 @@ Full schema: `.github/tasks/delegation-packet-schema.json`
 
 ## 5. Worker-Pool Adaptive Engine
 
-ReaperOAK operates as a **worker-pool adaptive engine** with continuous
-scheduling. It does NOT run lifecycle phases or batch operations. It reacts
-to events emitted by workers and routes tickets through a 9-state machine
-continuously, assigning work the moment workers become available.
+ReaperOAK operates as an **elastic multi-worker parallel execution engine**
+with continuous scheduling. It does NOT run lifecycle phases or batch
+operations. It reacts to events emitted by workers and routes tickets through
+a 9-state machine continuously, auto-scaling worker pools and dispatching
+conflict-free batches in parallel.
 
 ### 5.1 Continuous Scheduling Algorithm
 
-Scheduling is continuous and event-driven. Tickets are assigned to workers
-the moment they become available — no artificial waits between assignments.
+Scheduling is continuous and event-driven. The scheduler integrates
+auto-scaling, conflict-free batching, and parallel dispatch in every cycle.
 
 ```
 loop forever:
+  # --- AUTO-SCALE PHASE ---
+  for each pool in worker_pool_registry:
+    ready_count = count_tickets(state=READY, role=pool.role)
+    active_count = pool.currentActive
+    if ready_count > active_count and active_count < pool.maxSize:
+      scale_target = min(ready_count, pool.maxSize)
+      # Pool capacity reserved — workers spawned on assignment
+
+  # --- ASSIGNMENT PHASE ---
   ready_tickets = fetch_tickets(state=READY)
-  for ticket in ready_tickets (sorted by priority P0 first, then critical path):
+  batch = []  # Collect conflict-free tickets for parallel dispatch
+
+  for ticket in ready_tickets (sorted by priority P0 first):
     if all_deps_done(ticket):
-      conflicts = detect_conflicts(ticket, in_flight_tickets)
+      conflicts = detect_conflicts(ticket, in_flight_tickets + batch)
       if no conflicts:
-        worker = find_available_worker(ticket.owner_role)
-        if worker:
-          assign(worker, ticket)
-          transition(ticket, LOCKED)
-          launch(worker, ticket)  # runSubagent with delegation packet
-  await next_event()  # TASK_COMPLETED, TASK_FAILED, WORKER_FREE, SDR_PROPOSED, etc.
+        worker_id = spawn_worker(ticket.owner_role)  # Dynamic ID
+        batch.append({ticket, worker_id})
+        transition(ticket, LOCKED)
+
+  # --- PARALLEL DISPATCH PHASE ---
+  # Launch ALL collected workers simultaneously
+  parallel_launch(batch)  # Each entry → runSubagent with delegation packet
+
+  await next_event()
 ```
 
 ### 5.2 Key Properties
@@ -271,8 +287,9 @@ loop forever:
 - **Priority-driven:** P0 tickets are selected before P1, P2, etc.
 - **Conflict-aware:** Two tickets modifying the same resources are serialized (§11)
 - **Event-driven:** The scheduler wakes on events, not on timers
-- **Continuous flow:** A worker finishing one ticket makes it immediately
-  available for the next — no idle wait between assignments
+- **Auto-scaling:** Pools grow and shrink based on ticket backlog
+- **Parallel dispatch:** Conflict-free tickets are launched simultaneously, not sequentially
+- **Continuous flow:** Workers are spawned on demand — no idle wait between assignments
 - **Parallel by default:** Multiple conflict-free tickets run simultaneously
   across different worker pools
 
@@ -309,7 +326,8 @@ entries are DONE.
 **Hard rules:**
 - No worker may implement more than one ticket at a time
 - Every ticket completes its full lifecycle before reaching DONE
-- Workers are ephemeral — assigned per-ticket, released on completion
+- Workers are ephemeral — spawned dynamically per-ticket with unique IDs, released on completion
+- No pre-allocated worker slots — capacity scales based on backlog
 - Conflict-free tickets execute in parallel with no artificial waits
 - The next ticket is assigned immediately when a worker frees up
 
@@ -488,7 +506,7 @@ When a ticket is selected for assignment, ReaperOAK acquires a lock:
 ```json
 {
   "ticketId": "WPAE-BE001",
-  "workerId": "BE-W2",
+  "workerId": "BackendWorker-a1b2c3",
   "poolRole": "Backend",
   "lockedAt": "2026-02-27T14:30:00Z",
   "expiresAt": "2026-02-27T15:00:00Z",
@@ -625,6 +643,10 @@ ReaperOAK's event loop.
 | `REQUEST_RESEARCH` | Any worker | ticket_id, research_question |
 | `REQUIRES_UI_DESIGN` | Any worker | ticket_id, feature_name, ui_requirements |
 | `ESCALATE_TO_PM` | Any worker | ticket_id, ambiguity_description |
+| `WORKER_SPAWNED` | Scheduler | worker_id, role, ticket_id, timestamp |
+| `WORKER_TERMINATED` | Scheduler | worker_id, role, reason, timestamp |
+| `POOL_SCALED_UP` | Scheduler | role, old_count, new_count, trigger |
+| `POOL_SCALED_DOWN` | Scheduler | role, old_count, new_count, reason |
 
 ### 8.2 Event Payload Format
 
@@ -656,6 +678,10 @@ When ReaperOAK receives an event:
 10. **REWORK_TRIGGERED** → Route ticket to REWORK, include rejection report
 11. **STALL_WARNING** → Query worker status, escalate if unresponsive
 12. **LOCK_EXPIRED** → Release lock, return ticket to READY, free worker
+13. **WORKER_SPAWNED** → Log spawn, update pool registry
+14. **WORKER_TERMINATED** → Release resources, check if rework needed
+15. **POOL_SCALED_UP** → Log scaling event, update pool capacity
+16. **POOL_SCALED_DOWN** → Log scaling event, verify minSize maintained
 
 ### 8.4 Emission Rules
 
@@ -761,71 +787,174 @@ git commit -m "[TICKET-ID] <description>"
 
 ## 11. Worker Pool Parallel Execution
 
-ReaperOAK assigns multiple conflict-free tickets to workers from different
-pools simultaneously. Workers are ephemeral — created for a ticket assignment
-and released after completion. Pool capacity is configurable per role.
+ReaperOAK assigns multiple conflict-free tickets to workers from elastic
+auto-scaling pools simultaneously. Workers are ephemeral — spawned dynamically
+per-ticket with unique IDs (`{Role}Worker-{shortUuid}`) and terminated after
+completion. Pools auto-scale between `minSize` and `maxSize` based on ticket
+backlog. There are no pre-allocated worker slots — every worker is created on
+demand.
 
-### 11.1 Worker Pool Registry
+### 11.1 Elastic Pool Registry
+
+Each agent role is backed by an elastic pool that auto-scales based on ticket
+backlog. Pools grow when READY tickets exceed active workers and shrink when
+workers idle for more than 10 minutes, maintaining at least `minSize` capacity.
 
 ```yaml
 worker_pool_registry:
   pools:
     - role: Backend
-      capacity: 3
-      workers:
-        - id: BE-W1
-          status: available  # available | busy | draining
-          current_ticket: null
-          assigned_at: null
-        - id: BE-W2
-          status: busy
-          current_ticket: WPAE-BE001
-          assigned_at: "2026-02-27T14:30:00Z"
-        - id: BE-W3
-          status: available
-          current_ticket: null
-          assigned_at: null
-    - role: Frontend
-      capacity: 2
-      workers:
-        - id: FE-W1
-          status: available
-          current_ticket: null
-          assigned_at: null
-        - id: FE-W2
-          status: available
-          current_ticket: null
-          assigned_at: null
-    - role: QA
-      capacity: 2
-      workers:
-        - id: QA-W1
-          status: available
-          current_ticket: null
-          assigned_at: null
-        - id: QA-W2
-          status: available
-          current_ticket: null
-          assigned_at: null
-    - role: Security
-      capacity: 1
-    - role: DevOps
-      capacity: 1
-    - role: Documentation
-      capacity: 1
+      minSize: 2
+      maxSize: 15
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []  # Dynamically populated at runtime
+    - role: Frontend Engineer
+      minSize: 1
+      maxSize: 10
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []
+    - role: QA Engineer
+      minSize: 1
+      maxSize: 8
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []
+    - role: Security Engineer
+      minSize: 1
+      maxSize: 5
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []
+    - role: DevOps Engineer
+      minSize: 1
+      maxSize: 5
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []
+    - role: Documentation Specialist
+      minSize: 1
+      maxSize: 3
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []
     - role: Validator
-      capacity: 1
-    - role: CIReviewer
-      capacity: 1
+      minSize: 1
+      maxSize: 3
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []
+    - role: CI Reviewer
+      minSize: 1
+      maxSize: 3
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []
+    - role: Research Analyst
+      minSize: 1
+      maxSize: 8
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []
+    - role: Product Manager
+      minSize: 1
+      maxSize: 3
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []
+    - role: Architect
+      minSize: 1
+      maxSize: 3
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []
+    - role: UIDesigner
+      minSize: 1
+      maxSize: 3
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "READY_tickets > currentActive"
+        scaleDownTrigger: "idle_duration > 10min"
+        cooldownPeriod: "2min"
+      activeWorkers: []
 ```
 
-### 11.2 Worker Lifecycle
+### 11.2 Worker Instance Schema
 
-1. **available** — Worker is idle, can be assigned to a ticket
-2. **busy** — Worker is executing a ticket assignment
-3. **draining** — Worker is completing current work, will not accept new tickets
+Each dynamically spawned worker is tracked with this schema:
 
-### 11.3 Conflict Detection (5 Types)
+```yaml
+worker_instance:
+  id: "BackendWorker-a1b2c3"     # Dynamic, unique per spawn
+  role: Backend                   # Agent role from pool
+  agentName: "Backend"            # EXACT runSubagent name
+  ticketId: "EWPE-BE001"         # Assigned ticket (exactly ONE)
+  spawnedAt: "2026-02-28T14:30:00Z"
+  status: active                  # spawned | active | completed | failed | terminated
+  terminatedAt: null
+```
+
+Worker IDs use the format `{Role}Worker-{shortUuid}` — e.g.,
+`BackendWorker-a1b2c3`, `FrontendWorker-d4e5f6`, `QAWorker-g7h8i9`.
+IDs are generated at spawn time and are globally unique.
+
+### 11.3 Worker Lifecycle
+
+Workers progress through 5 states:
+
+1. **spawned** — `runSubagent` called, worker instance created in pool registry
+2. **active** — Worker is executing its assigned ticket
+3. **completed** — Worker finished successfully, emitted TASK_COMPLETED
+4. **failed** — Worker reported failure, emitted TASK_FAILED
+5. **terminated** — Worker violated scope (multi-ticket) or timed out, forcibly killed
+
+#### One-Ticket-One-Worker Rule
+
+**CRITICAL:** A worker instance processes EXACTLY ONE ticket. It has no memory
+of previous tickets. It terminates after ticket completion. It NEVER picks up
+another ticket. Each `runSubagent` call creates a fresh, stateless worker
+instance dedicated to a single ticket.
+
+- One worker → one ticket → one lifecycle → one commit → termination
+- No worker reuse across tickets
+- No shared state between worker instances of the same role
+- If a ticket needs rework, a NEW worker is spawned — the original is gone
+
+### 11.4 Conflict Detection (6 Types)
 
 Before assigning a ticket, the scheduler checks for conflicts with all
 currently in-flight tickets (LOCKED through COMMIT states).
@@ -837,6 +966,7 @@ currently in-flight tickets (LOCKED through COMMIT states).
 | **DB schema** | Two tickets alter the same table/collection | Serialize — later ticket waits in READY |
 | **Infrastructure resource** | Two tickets modify the same infra resource (Docker, K8s, Terraform) | Serialize — later ticket waits in READY |
 | **Shared config** | Two tickets modify the same config file (env, settings, package.json) | Serialize — later ticket waits in READY |
+| **Mutual exclusion** | Ticket metadata contains `mutex: [group-name]` matching another in-flight ticket | Serialize — later ticket waits in READY |
 
 **Detection rules:**
 - Detection is **conservative** — path-based, not line-based
@@ -847,20 +977,69 @@ currently in-flight tickets (LOCKED through COMMIT states).
 - CHANGELOG and README are treated as shared mutable resources — only one
   ticket may write to them at a time
 
-### 11.4 Parallel Execution Flow
+### 11.5 Auto-Scaling Algorithm
+
+Pools auto-scale based on ticket backlog. Scale-up is immediate when backlog
+exceeds active workers; scale-down is governed by idle timeout.
+
+```
+function autoScale(pool):
+  ready = countReadyTickets(pool.role)
+  active = pool.currentActive
+
+  # Scale UP
+  if ready > active and active < pool.maxSize:
+    scaleUp = min(ready - active, pool.maxSize - active)
+    log("POOL_SCALED_UP", pool.role, active, active + scaleUp)
+
+  # Scale DOWN (idle workers only)
+  for worker in pool.activeWorkers:
+    if worker.status == idle and worker.idleDuration > 10min:
+      terminate(worker)
+      log("POOL_SCALED_DOWN", pool.role, active, active - 1)
+
+  # Floor enforcement
+  if pool.currentActive < pool.minSize:
+    # Reserve capacity — workers spawn on next assignment
+    pass
+```
+
+### 11.6 Parallel Dispatch Protocol
+
+ReaperOAK dispatches workers using PARALLEL `runSubagent` calls.
+When the scheduler identifies N conflict-free READY tickets, it
+launches N workers simultaneously — one `runSubagent` call per ticket.
+
+**Example:** 5 READY tickets (2 Frontend, 2 Backend, 1 DevOps)
+→ 5 parallel `runSubagent` calls:
+
+```
+runSubagent("Frontend Engineer", ticket=FE-001, worker=FrontendWorker-a1b2)
+runSubagent("Frontend Engineer", ticket=FE-002, worker=FrontendWorker-c3d4)
+runSubagent("Backend", ticket=BE-010, worker=BackendWorker-e5f6)
+runSubagent("Backend", ticket=BE-011, worker=BackendWorker-g7h8)
+runSubagent("DevOps Engineer", ticket=DO-003, worker=DevOpsWorker-i9j0)
+```
+
+All 5 execute concurrently. Each worker is independent and stateless.
+Workers of the same role share NO state between instances.
+
+### 11.7 Parallel Execution Flow
 
 ```
 Continuously:
-1. SELECT → identify N conflict-free READY tickets for N available workers
-2. LOCK → acquire lock for each ticket, assign workers from pools
-3. DELEGATE → call runSubagent for each (all independent, launched together)
-4. WAIT → react to events as workers complete at different times
-5. CHAIN → run post-execution chain per ticket as each completes
+1. AUTO-SCALE → adjust pool sizes based on READY ticket backlog
+2. SELECT → identify N conflict-free READY tickets
+3. SPAWN → create N workers with dynamic IDs ({Role}Worker-{shortUuid})
+4. LOCK → acquire lock for each ticket, assign spawned workers
+5. DISPATCH → parallel_launch(batch) — all runSubagent calls launched simultaneously
+6. WAIT → react to events as workers complete at different times
+7. CHAIN → run post-execution chain per ticket as each completes
    (shared resources like CHANGELOG serialized — only one writer at a time)
-6. DONE → release worker, trigger WORKER_FREE, schedule next READY ticket
+8. DONE → worker terminated, WORKER_TERMINATED event, schedule next READY ticket
 ```
 
-### 11.5 Stall Detection
+### 11.8 Stall Detection
 
 | Signal | Threshold | Action |
 |--------|-----------|--------|
@@ -868,12 +1047,12 @@ Continuously:
 | Dependency chain blocked | 3+ tickets in chain all blocked | Escalate to user |
 | IMPLEMENTING ↔ REWORK toggling | ≥ 3 times for same ticket | Ticket returns to READY, user notified |
 
-### 11.6 Deadlock Prevention
+### 11.9 Deadlock Prevention
 
 | Scenario | Prevention Rule |
 |----------|----------------|
 | All READY tickets conflict with in-flight | Wait for a current ticket to reach DONE |
-| Worker pool exhausted | Wait for a worker to free up (WORKER_FREE event) |
+| Worker pool exhausted (maxSize reached) | Wait for a worker to complete (WORKER_TERMINATED event) |
 | Dependency cycle detected | Reject at task creation (TODO Agent enforces DAG) |
 | All tickets blocked externally | Report to user, enter WAIT state |
 
@@ -1640,70 +1819,122 @@ When an SDR is approved:
 ### 32.1 Worked Example — Single Ticket Lifecycle
 
 Concrete example: ticket WPAE-BE001 going from READY to DONE using the
-worker pool model.
+elastic worker pool model with dynamic worker IDs.
 
 ```
+ 0. WORKER_SPAWNED │ BackendWorker-a1b2c3 spawned for WPAE-BE001
  1. READY        │ WPAE-BE001 eligible (all depends_on satisfied)
- 2. LOCKED       │ ReaperOAK assigns worker BE-W2 from Backend pool
-                 │ Lock: {ticketId: "WPAE-BE001", workerId: "BE-W2",
+ 2. LOCKED       │ ReaperOAK assigns BackendWorker-a1b2c3 from Backend pool
+                 │ Lock: {ticketId: "WPAE-BE001", workerId: "BackendWorker-a1b2c3",
                  │        poolRole: "Backend"}
- 3. IMPLEMENTING │ ReaperOAK delegates to BE-W2 with full delegation packet:
+ 3. IMPLEMENTING │ ReaperOAK delegates to BackendWorker-a1b2c3 with full delegation packet:
                  │   - Ticket ID: WPAE-BE001
-                 │   - Worker ID: BE-W2
+                 │   - Worker ID: BackendWorker-a1b2c3
                  │   - Pool Role: Backend
                  │   - Objective: Implement auth endpoint
                  │   - Upstream artifacts: api-contracts.yaml
                  │   - Chunks: .github/vibecoding/chunks/Backend.agent/
                  │   - Deliverables: server/src/auth.ts
                  │   - Scope: THIS TICKET ONLY
- 4. TASK_COMPLETED │ BE-W2 emits TASK_COMPLETED event with evidence:
+ 4. TASK_COMPLETED │ BackendWorker-a1b2c3 emits TASK_COMPLETED event with evidence:
                  │   - Artifact: server/src/auth.ts
                  │   - Tests: server/src/auth.test.ts (12 pass, 0 fail)
                  │   - Confidence: HIGH
- 5. QA_REVIEW    │ QA-W1 assigned from QA pool → test review → PASS
- 6. QA_REVIEW    │ VAL-W1 assigned from Validator pool → 10-item DoD → APPROVED
+ 5. QA_REVIEW    │ QAWorker-d4e5f6 spawned and assigned → test review → PASS
+ 6. QA_REVIEW    │ ValidatorWorker-g7h8i9 spawned and assigned → 10-item DoD → APPROVED
  7. VALIDATION   │ Validation confirmed
- 8. DOCUMENTATION│ DOC-W1 updates CHANGELOG → confirmed
- 9. CI_REVIEW    │ CI-W1 checks lint/types → PASS
+ 8. DOCUMENTATION│ DocWorker-j0k1l2 spawned → updates CHANGELOG → confirmed
+ 9. CI_REVIEW    │ CIWorker-m3n4o5 spawned → checks lint/types → PASS
 10. COMMIT       │ ReaperOAK executes:
                  │   git add server/src/auth.ts server/src/auth.test.ts
                  │   git commit -m "[WPAE-BE001] Implement auth endpoint"
-11. DONE         │ Full lifecycle complete, BE-W2 released to pool
-                 │ WORKER_FREE event → scheduler assigns next READY ticket
+11. DONE         │ Full lifecycle complete
+                 │ WORKER_TERMINATED (BackendWorker-a1b2c3, completed)
                  │ Dependent tickets re-evaluated → promoted to READY if deps met
 ```
 
-### 32.2 Worked Example — Parallel Execution
+### 32.2 Worked Example — Elastic Parallel Execution
 
-Three conflict-free tickets assigned to workers from different pools
-simultaneously. Continuous scheduling ensures no idle waits.
+Five conflict-free READY tickets trigger elastic pool spawning. ReaperOAK
+launches 5 workers in parallel — 2 Frontend, 2 Backend, 1 DevOps. All 5
+execute independently with their own lifecycle.
+
+**READY Tickets:**
+- **FE-001** (Frontend Engineer) — implement login form → `src/components/auth/LoginForm.tsx`
+- **FE-002** (Frontend Engineer) — implement dashboard sidebar → `src/components/dashboard/Sidebar.tsx`
+- **BE-010** (Backend) — implement user API endpoint → `src/services/user.service.ts`
+- **BE-011** (Backend) — implement auth middleware → `src/middleware/auth.middleware.ts`
+- **DEVOPS-003** (DevOps Engineer) — configure Docker staging env → `docker/staging/docker-compose.yml`
 
 ```
-T+00:00  READY → LOCKED: WPAE-BE005 → BE-W1 (Backend pool)
-T+00:00  READY → LOCKED: WPAE-FE003 → FE-W1 (Frontend pool)
-T+00:00  READY → LOCKED: WPAE-QA002 → QA-W1 (QA pool)
-T+00:01  TASK_STARTED (BE-W1, WPAE-BE005)
-T+00:01  TASK_STARTED (FE-W1, WPAE-FE003)
-T+00:01  TASK_STARTED (QA-W1, WPAE-QA002)
-T+25:00  TASK_COMPLETED (BE-W1, WPAE-BE005) → QA_REVIEW
-T+25:01  QA-W2 assigned to review WPAE-BE005
-T+30:00  QA PASS (WPAE-BE005) → Validator APPROVED → VALIDATION
-T+35:00  DOCUMENTATION confirmed (WPAE-BE005) → CI_REVIEW
-T+37:00  CI PASS (WPAE-BE005) → COMMIT
-T+37:01  git commit -m "[WPAE-BE005] Implement user service endpoint"
-T+37:02  WPAE-BE005 → DONE
-T+37:03  WORKER_FREE (BE-W1) → scheduler assigns next READY ticket immediately
-T+40:00  TASK_COMPLETED (FE-W1, WPAE-FE003) → QA_REVIEW
-T+45:00  TASK_COMPLETED (QA-W1, WPAE-QA002) → QA_REVIEW
-T+45:01  WORKER_FREE (QA-W1) → assigned to review WPAE-FE003
+T+00:00  POOL_SCALED_UP (Frontend Engineer, 0→2, trigger=backlog)
+T+00:00  POOL_SCALED_UP (Backend, 0→2, trigger=backlog)
+T+00:00  POOL_SCALED_UP (DevOps Engineer, 0→1, trigger=backlog)
+T+00:01  WORKER_SPAWNED (FrontendWorker-f1a2, Frontend Engineer, FE-001)
+T+00:01  WORKER_SPAWNED (FrontendWorker-f3b4, Frontend Engineer, FE-002)
+T+00:01  WORKER_SPAWNED (BackendWorker-b5c6, Backend, BE-010)
+T+00:01  WORKER_SPAWNED (BackendWorker-b7d8, Backend, BE-011)
+T+00:01  WORKER_SPAWNED (DevOpsWorker-d9e0, DevOps Engineer, DEVOPS-003)
+T+00:02  READY → LOCKED: FE-001 → FrontendWorker-f1a2
+T+00:02  READY → LOCKED: FE-002 → FrontendWorker-f3b4
+T+00:02  READY → LOCKED: BE-010 → BackendWorker-b5c6
+T+00:02  READY → LOCKED: BE-011 → BackendWorker-b7d8
+T+00:02  READY → LOCKED: DEVOPS-003 → DevOpsWorker-d9e0
+T+00:03  TASK_STARTED (BackendWorker-b5c6, BE-010)
+T+00:03  TASK_STARTED (BackendWorker-b7d8, BE-011)
+T+00:03  TASK_STARTED (FrontendWorker-f1a2, FE-001)
+T+00:03  TASK_STARTED (FrontendWorker-f3b4, FE-002)
+T+00:03  TASK_STARTED (DevOpsWorker-d9e0, DEVOPS-003)
+T+20:00  TASK_COMPLETED (BackendWorker-b7d8, BE-011) → QA_REVIEW
+T+22:00  QA PASS (BE-011) → VALIDATION
+T+23:00  Validator APPROVED (BE-011) → DOCUMENTATION
+T+24:00  Doc update confirmed (BE-011) → CI_REVIEW
+T+24:30  CI PASS (BE-011) → COMMIT
+T+24:31  git commit -m "[BE-011] Implement auth middleware"
+T+24:32  BE-011 → DONE
+T+24:33  WORKER_TERMINATED (BackendWorker-b7d8, completed)
+T+25:00  TASK_COMPLETED (FrontendWorker-f1a2, FE-001) → QA_REVIEW
+T+27:00  QA PASS (FE-001) → VALIDATION
+T+28:00  Validator APPROVED (FE-001) → DOCUMENTATION
+T+29:00  Doc update confirmed (FE-001) → CI_REVIEW
+T+29:30  CI PASS (FE-001) → COMMIT
+T+29:31  git commit -m "[FE-001] Implement login form"
+T+29:32  FE-001 → DONE
+T+29:33  WORKER_TERMINATED (FrontendWorker-f1a2, completed)
+T+30:00  TASK_COMPLETED (BackendWorker-b5c6, BE-010) → QA_REVIEW
+T+32:00  QA PASS (BE-010) → VALIDATION
+T+33:00  Validator APPROVED (BE-010) → DOCUMENTATION
+T+34:00  Doc update confirmed (BE-010) → CI_REVIEW
+T+34:30  CI PASS (BE-010) → COMMIT
+T+34:31  git commit -m "[BE-010] Implement user API endpoint"
+T+34:32  BE-010 → DONE
+T+34:33  WORKER_TERMINATED (BackendWorker-b5c6, completed)
+T+35:00  TASK_COMPLETED (DevOpsWorker-d9e0, DEVOPS-003) → QA_REVIEW
+T+37:00  QA PASS (DEVOPS-003) → VALIDATION
+T+38:00  Validator APPROVED (DEVOPS-003) → DOCUMENTATION
+T+39:00  Doc update confirmed (DEVOPS-003) → CI_REVIEW
+T+39:30  CI PASS (DEVOPS-003) → COMMIT
+T+39:31  git commit -m "[DEVOPS-003] Configure Docker staging env"
+T+39:32  DEVOPS-003 → DONE
+T+39:33  WORKER_TERMINATED (DevOpsWorker-d9e0, completed)
+T+40:00  TASK_COMPLETED (FrontendWorker-f3b4, FE-002) → QA_REVIEW
+T+42:00  QA PASS (FE-002) → VALIDATION
+T+43:00  Validator APPROVED (FE-002) → DOCUMENTATION
+T+44:00  Doc update confirmed (FE-002) → CI_REVIEW
+T+44:30  CI PASS (FE-002) → COMMIT
+T+44:31  git commit -m "[FE-002] Implement dashboard sidebar"
+T+44:32  FE-002 → DONE
+T+44:33  WORKER_TERMINATED (FrontendWorker-f3b4, completed)
+T+50:00  All pools at 0 active — system idle, waiting for next READY tickets
 ```
 
 **Key observations:**
-- **No idle waits:** BE-W1 is reassigned immediately after WPAE-BE005 reaches DONE
-- **Continuous flow:** QA-W1 finishes its implementation ticket and immediately
-  picks up a review task for another ticket
-- **No phase barriers:** Each ticket progresses independently through the
-  9-state machine at its own pace
+- **Elastic spawning:** Workers are created on demand — no pre-allocated slots
+- **True parallelism:** All 5 workers execute simultaneously with zero coordination
+- **Independent lifecycles:** Each ticket progresses through the 9-state machine at its own pace
+- **Independent commits:** Each ticket gets its own atomic commit — no batching
+- **Clean termination:** Workers are removed from the pool after completion
+- **No worker reuse:** Each worker processes exactly one ticket, then terminates
 
 ### 32.3 Worked Example — Strategic Evolution via SDR
 
@@ -1720,7 +1951,8 @@ T+0:16  Ticket WPAE-BE004 cancelled (REST endpoints no longer needed)
 T+0:17  Ticket WPAE-BE003 re-prioritized (P2 → P0 — GraphQL is critical path)
 T+0:18  TODO Agent invoked → 3 new tickets enter READY
 T+0:19  Scheduler picks up WPAE-BE003 (now highest priority)
-T+0:20  WORKER_FREE (BE-W1) → assigned to WPAE-BE003
+T+0:20  WORKER_SPAWNED (BackendWorker-e7f8g9, Backend, WPAE-BE003)
+T+0:21  READY → LOCKED: WPAE-BE003 → BackendWorker-e7f8g9
 ```
 
 **Key observation:** Execution workers (WPAE-FE001 in IMPLEMENTING) continue

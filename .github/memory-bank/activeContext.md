@@ -335,3 +335,29 @@ compaction_threshold: 50
 - Create remediation ticket for out-of-scope files referencing old model
 - Recompute chunk hashes for chunk-01.yaml and chunk-02.yaml
 - Update workflow-state.json and artifacts-manifest.json
+
+---
+
+### [2026-02-28T12:00:00Z] Elastic Multi-Worker Parallel Execution Engine v8.1.0 (Session 14 continued)
+
+- **Focus:** Elastic auto-scaling pools, dynamic worker IDs, parallel dispatch
+- **Agent:** ReaperOAK (orchestrator), Backend workers (implementers)
+- **Scope:** EWPE-BE001 through EWPE-BE003 (3 tasks, all DONE)
+- **DAG:** BE001 → (BE002 || BE003) — parallel execution after critical path
+
+### Key Changes
+- **ReaperOAK.agent.md** — Updated (1077→1453 lines, v8.0.0→v8.1.0). §7 elastic pool registry with minSize/maxSize/scalingPolicy, dynamic worker IDs `{Role}Worker-{shortUuid}`, Worker Instance Schema, 5-state Worker Lifecycle, One-Ticket-One-Worker Rule. §9 auto-scaling + parallel dispatch. §10 6th conflict type (mutual exclusion). §13 4 new scaling events. §15 worker termination on multi-ticket violation. §20-§22 elastic examples.
+- **ARCHITECTURE.md** — Updated (1728→1960 lines, v8.0.0→v8.1.0). §2 elastic pool table. §5 3-phase scheduling. §6.8 dynamic lock IDs. §8 4 new elastic events (16 total routing entries). §11 full elastic pool rewrite. §32 dynamic worker ID examples.
+- **agents.md** — Updated (233→238 lines). Worker Pool Model paragraph rewritten with elastic pools, dynamic worker IDs, parallel dispatch.
+- **_cross-cutting-protocols.md** — Updated (241→245 lines). §8.1 now 6 events including WORKER_SPAWNED, WORKER_TERMINATED, POOL_SCALED_UP, POOL_SCALED_DOWN.
+
+### Verification Results
+- 0 static worker IDs across all 4 files
+- Dynamic worker ID refs: ReaperOAK=93, ARCHITECTURE=54, agents=2, _cross-cutting=1
+- Elastic event refs: ReaperOAK=42, ARCHITECTURE=30, _cross-cutting=4
+- Both canonical files confirmed at v8.1.0
+
+### What to Do Next
+- Update chunk files (chunk-01.yaml, chunk-02.yaml) with elastic pool content
+- Update workflow-state.json and artifacts-manifest.json for EWPE tickets
+- Test elastic pool dispatch in real multi-ticket scenario

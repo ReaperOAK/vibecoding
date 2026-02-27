@@ -205,3 +205,24 @@ append_only: true
 - **10 new event types:** 4 worker pool + 6 strategic events
 - **5-type Conflict Detection:** file path, directory subtree, DB schema, infrastructure, shared config
 - **ARCHITECTURE.md at v8.0.0** (1728 lines, 32 sections)
+
+### [2026-02-28] Session 14 (continued): Elastic Multi-Worker Parallel Execution Engine v8.1.0
+
+| Task | Agent | Evidence | Status |
+|------|-------|----------|--------|
+| EWPE-BE001: ReaperOAK.agent.md elastic pool rewrite | Backend | 1453 lines, v8.1.0, 14 AC met, 0 static IDs | DONE |
+| EWPE-BE002: ARCHITECTURE.md elastic pool update | Backend | 1960 lines, v8.1.0, 10 AC met, 0 static IDs | DONE |
+| EWPE-BE003: Boot file & protocol propagation | Backend | agents.md=238, _cross-cutting=245, 7 AC met | DONE |
+| Verification sweep | ReaperOAK | 0 static IDs, versions aligned, dynamic refs confirmed | DONE |
+
+### System Now Has (Session 14 continued — v8.1.0)
+- **Elastic auto-scaling pools** with minSize/maxSize/scalingPolicy per role
+- **Dynamic worker IDs:** `{Role}Worker-{shortUuid}` — no more static BE-W1, FE-W2
+- **Parallel dispatch:** ReaperOAK launches ALL conflict-free workers simultaneously via parallel `runSubagent`
+- **6-type Conflict Detection:** file path, directory subtree, DB schema, infrastructure, shared config, + mutual exclusion
+- **4 new scaling events:** WORKER_SPAWNED, WORKER_TERMINATED, POOL_SCALED_UP, POOL_SCALED_DOWN
+- **Worker termination enforcement:** hard-kill on multi-ticket violation
+- **5-state Worker Lifecycle:** idle → assigned → executing → draining → terminated
+- **Pool sizes:** Backend (2-15), Frontend (1-10), QA (1-8), Security (1-5), DevOps (1-5), Docs/Validator/CI (1-3)
+- **ARCHITECTURE.md at v8.1.0** (1960 lines, 32 sections)
+- **ReaperOAK.agent.md at v8.1.0** (1453 lines, 22 sections)
