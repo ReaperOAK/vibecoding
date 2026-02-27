@@ -67,14 +67,14 @@ correctly. No state may be skipped; guard conditions must be satisfied.
 
 | State | What to Verify | Evidence Source |
 |-------|---------------|----------------|
-| BACKLOG | Ticket exists with valid metadata and dependencies declared | TODO task file |
-| READY | All `depends_on` tickets have status = DONE | Dependency check on TODO files |
-| LOCKED | Lock acquired by ReaperOAK, agent assigned | `workflow-state.json` lock fields |
-| IMPLEMENTING | Agent produced deliverables per acceptance criteria; no syntax errors | `git diff` output, file existence check |
-| REVIEW | This is YOUR state — you are running validation now. QA has reviewed test coverage. | Current validation session, QA report |
-| VALIDATED | All DoD items pass; Validator verdict = APPROVED | DoD report at `docs/reviews/dod/` |
-| DOCUMENTED | Documentation Specialist updated relevant docs | Doc update confirmation |
-| COMMITTED | CI Reviewer passed; `git commit` created with ticket ID | CI report, git log |
+| READY | All dependencies DONE, eligible for assignment | Dependency check on TODO files |
+| LOCKED | Lock acquired by ReaperOAK, worker assigned | `workflow-state.json` lock fields |
+| IMPLEMENTING | Worker produced deliverables per acceptance criteria; no syntax errors | `git diff` output, file existence check |
+| QA_REVIEW | This is YOUR state — you are running validation now. QA has reviewed test coverage. | Current validation session, QA report |
+| VALIDATION | All DoD items pass; Validator verdict = APPROVED | DoD report at `docs/reviews/dod/` |
+| DOCUMENTATION | Documentation Specialist updated relevant docs | Doc update confirmation |
+| CI_REVIEW | CI Reviewer passed; lint, types, complexity all pass | CI report |
+| COMMIT | `git commit` created with ticket ID | git log |
 | DONE | Full lifecycle complete; all chain steps verified | Final status in TODO file |
 
 ### Compliance Check Protocol
@@ -83,7 +83,7 @@ correctly. No state may be skipped; guard conditions must be satisfied.
 2. Verify each state transition has valid guard conditions met
 3. Confirm the mandatory post-execution chain ran (QA → Validator → Doc → CI Reviewer → Commit)
 4. For IMPLEMENTING: verify init checklist if module is new (`allPassed: true`)
-5. For REVIEW: independently re-run tests to confirm they still pass
+5. For QA_REVIEW: independently re-run tests to confirm they still pass
 6. Flag any skipped states or missing chain steps as a compliance violation
 
 ## 3. Validation Report Format

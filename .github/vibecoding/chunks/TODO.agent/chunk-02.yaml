@@ -10,29 +10,28 @@ summary: "TODO Agent — Governance Roles, Performance Safeguards, Smart Granula
 ## 1. Status Transitions (9-State Ticket Machine)
 
 ```
-BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE
-  │        │                  │               │          │            │
-  │        │                  │               │          │            └→ REWORK (CI reject)
-  │        │                  │               └→ REWORK (QA/Validator reject)
-  │        │                  └→ REWORK (agent failure)
-  │        └── READY (lock expired, 30 min timeout)
-  └── (promoted when all depends_on = DONE)
-REWORK → IMPLEMENTING (rework_count ≤ 3) | BACKLOG (rework_count > 3)
+READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → COMMIT → DONE
+  │                  │               │           │              │
+  │                  │               │           │              └→ REWORK (CI reject)
+  │                  │               └→ REWORK (QA/Validator reject)
+  │                  └→ REWORK (agent failure)
+  └── READY (lock expired, 30 min timeout)
+REWORK → IMPLEMENTING (rework_count ≤ 3) | READY (rework_count > 3)
 ```
 
 **9 States:**
 
 | State | Meaning | Owner |
 |-------|---------|-------|
-| `BACKLOG` | Ticket exists, dependencies not met | System (auto) |
-| `READY` | All dependencies DONE, eligible for selection | System (auto) |
-| `LOCKED` | Selected for cycle, lock acquired | ReaperOAK |
-| `IMPLEMENTING` | Delegated to subagent, work in progress | Implementing Agent |
-| `REVIEW` | Implementation done, QA + Validator reviewing | QA + Validator |
-| `VALIDATED` | All reviews pass, docs being updated | Documentation Specialist |
-| `DOCUMENTED` | Docs updated, CI review pending | CI Reviewer |
-| `COMMITTED` | CI passes, commit created | ReaperOAK |
-| `DONE` | Full lifecycle complete | System (final) |
+| `READY` | All dependencies DONE, eligible for assignment | System (auto via dep check) |
+| `LOCKED` | Worker assigned from pool, lock acquired | ReaperOAK |
+| `IMPLEMENTING` | Delegated to worker, work in progress | Assigned Worker |
+| `QA_REVIEW` | Implementation done, QA + Validator reviewing | QA Engineer + Validator |
+| `VALIDATION` | QA and Validator both passed | Validator (confirmation) |
+| `DOCUMENTATION` | Docs being updated by Documentation Specialist | Documentation Specialist |
+| `CI_REVIEW` | Documentation done, CI Reviewer checking lint/types/complexity | CI Reviewer |
+| `COMMIT` | CI passed, atomic commit being created | ReaperOAK |
+| `DONE` | Full lifecycle complete, worker released | System (final) |
 
 `REWORK` is a side state (failure path), not in the main progression.
 
@@ -40,31 +39,36 @@ REWORK → IMPLEMENTING (rework_count ≤ 3) | BACKLOG (rework_count > 3)
 
 | From | To | Trigger | Guard Condition |
 |------|-----|---------|----------------|
-| BACKLOG | READY | Dependency check | All `depends_on` = DONE |
-| READY | LOCKED | Cycle SELECT | No file conflicts, agent not locked |
-| LOCKED | IMPLEMENTING | `runSubagent` called | Lock active, agent assigned |
-| LOCKED | READY | Timer expires | Lock timeout (30 min) — auto-release |
-| IMPLEMENTING | REVIEW | Agent emits TASK_COMPLETED | Evidence provided |
-| IMPLEMENTING | REWORK | Agent emits TASK_FAILED | Error evidence provided |
-| REVIEW | VALIDATED | QA PASS + Validator APPROVED | QA + DoD verification pass |
-| REVIEW | REWORK | QA or Validator fail | REJECT, rework_count < 3 |
-| VALIDATED | DOCUMENTED | Doc update confirmed | Documentation Specialist confirms |
-| DOCUMENTED | COMMITTED | CI + commit pass | CI Reviewer PASS, `git commit` succeeds |
-| DOCUMENTED | REWORK | CI Reviewer rejects | rework_count < 3 |
-| COMMITTED | DONE | Final confirmation | All lifecycle steps verified |
-| REWORK | IMPLEMENTING | Re-delegation | rework_count++, < 3 |
-| REWORK | BACKLOG | Escalation | rework_count >= 3, user notified |
+| READY | LOCKED | Worker available in pool | No file conflicts with in-flight tickets, dependencies met |
+| LOCKED | IMPLEMENTING | `runSubagent` called | Lock is active, worker assignment confirmed |
+| LOCKED | READY | Lock timeout (30 min) | Timer expired — auto-release, worker returned to pool |
+| IMPLEMENTING | QA_REVIEW | Worker emits TASK_COMPLETED | Evidence provided (artifact paths, test results) |
+| IMPLEMENTING | REWORK | Worker emits TASK_FAILED | Error evidence provided |
+| QA_REVIEW | VALIDATION | QA PASS + Validator APPROVED | QA test review PASS, Validator DoD verdict = APPROVED |
+| QA_REVIEW | REWORK | QA or Validator rejects | QA FAIL or verdict = REJECTED, rework_count < 3 |
+| VALIDATION | DOCUMENTATION | Validation confirmed | Validator confirmation recorded |
+| DOCUMENTATION | CI_REVIEW | Doc update confirmed | Documentation Specialist confirms artifact updates |
+| CI_REVIEW | COMMIT | CI Reviewer PASS | Lint, types, complexity all pass |
+| CI_REVIEW | REWORK | CI Reviewer rejects | Lint/type/complexity failures, rework_count < 3 |
+| COMMIT | DONE | Atomic commit succeeds | `git commit` succeeds, all lifecycle verified |
+| REWORK | IMPLEMENTING | Re-delegation | rework_count++, rework_count ≤ 3 |
+| REWORK | READY | Escalation | rework_count > 3, user notified, ticket re-enters READY |
 
 **Immutability:** Once `DONE`, revert only via post-completion audit
 by Validator (with evidence). Tasks are archived, never deleted.
 
 **Backward Compatibility:**
-- `not_started` → `BACKLOG` (promoted to READY if all deps DONE)
+- `not_started` → `READY`
 - `in_progress` → `IMPLEMENTING`
 - `completed` → `DONE`
-- `blocked` → `BACKLOG` with `blocker_reason` field
-- `VALIDATING` → `REVIEW`
-- `DOCUMENTING` → `DOCUMENTED`
+- `blocked` → `READY` with `blocker_reason` field
+- `BACKLOG` → `READY`
+- `REVIEW` → `QA_REVIEW`
+- `VALIDATED` → `VALIDATION`
+- `VALIDATING` → `QA_REVIEW`
+- `DOCUMENTED` → `DOCUMENTATION`
+- `DOCUMENTING` → `DOCUMENTATION`
+- `COMMITTED` → `CI_REVIEW`
 
 ## 2. Mandatory Post-Execution Chain
 
@@ -84,7 +88,7 @@ finishes, this chain runs for EVERY ticket. No exceptions, no shortcuts.
 If ANY chain step rejects → ticket enters **REWORK** → assigned back
 to implementing agent with rejection report. QA (Step 2), Validator
 (Step 3), and CI (Step 5) share a single `rework_count` counter
-(max 3 combined). On exhaustion → escalate to user (ticket → BACKLOG).
+(max 3 combined). On exhaustion → escalate to user (ticket → READY).
 
 ## 3. Completion Gates
 
@@ -92,14 +96,14 @@ A ticket reaches `DONE` ONLY when ALL of these are true:
 
 | Gate | Verification | Stage |
 |------|-------------|-------|
-| **Deliverables exist** | Files listed in task spec exist on disk | REVIEW |
-| **Acceptance criteria met** | Each criterion checked and passed | REVIEW |
-| **QA review passed** | QA Engineer test completeness PASS | REVIEW |
-| **Validator approved** | Validator DoD (10 items) APPROVED | REVIEW → VALIDATED |
-| **Docs updated** | Documentation Specialist confirms | VALIDATED → DOCUMENTED |
-| **CI checks pass** | Lint, types, complexity PASS | DOCUMENTED → COMMITTED |
-| **Commit created** | `git commit` with ticket ID succeeds | COMMITTED |
-| **Full chain** | Ticket passed REVIEW, VALIDATED, DOCUMENTED, COMMITTED | DONE |
+| **Deliverables exist** | Files listed in task spec exist on disk | QA_REVIEW |
+| **Acceptance criteria met** | Each criterion checked and passed | QA_REVIEW |
+| **QA review passed** | QA Engineer test completeness PASS | QA_REVIEW |
+| **Validator approved** | Validator DoD (10 items) APPROVED | QA_REVIEW → VALIDATION |
+| **Docs updated** | Documentation Specialist confirms | VALIDATION → DOCUMENTATION |
+| **CI checks pass** | Lint, types, complexity PASS | DOCUMENTATION → CI_REVIEW |
+| **Commit created** | `git commit` with ticket ID succeeds | COMMIT |
+| **Full chain** | Ticket passed QA_REVIEW, VALIDATION, DOCUMENTATION, CI_REVIEW, COMMIT | DONE |
 
 ## 4. Governance Rules
 
@@ -118,9 +122,9 @@ One ticket in IMPLEMENTING per agent per cycle (ticket locking via ReaperOAK).
 | Signal | Detection | Action |
 |--------|-----------|--------|
 | **Task Progress Stall** | Task in IMPLEMENTING for > 2 cycles without state change | Mark STALLED, escalate |
-| **Blocked Chain** | 3+ tasks in dependency chain all in BACKLOG (blocked) | Identify root blocker, escalate to user |
+| **Blocked Chain** | 3+ tasks in dependency chain all blocked (not yet READY) | Identify root blocker, escalate to user |
 | **Zero-Progress Cycle** | Full cycle with 0 tasks reaching DONE | Halt pipeline, require user re-scoping |
-| **Thrashing** | Same task toggled between IMPLEMENTING/REWORK ≥ 3 times | Force BACKLOG, root cause analysis |
+| **Thrashing** | Same task toggled between IMPLEMENTING/REWORK ≥ 3 times | Force READY, root cause analysis |
 | **Orphan Tasks** | `depends_on` referencing non-existent IDs | todo_visual.py reports `missing_deps`, fix immediately |
 
 ### 4.3 Priority Escalation
@@ -161,7 +165,7 @@ distinct output expectations, validation rules, and forbidden actions.
 
 **Executor Controller (Execution Planning Mode):**
 - **Output:** Full Format A task specs with acceptance criteria and file paths
-- **Default status:** All generated tasks enter **BACKLOG** state
+- **Default status:** All generated tasks enter **READY** state
 - **Validation:** Each task ≤ 90 min effort, has explicit file paths, has ≥ 3 acceptance criteria
 - **Forbidden:** Generating L4 micro-tasks unless explicitly triggered
 
@@ -283,7 +287,7 @@ python3 todo_visual.py --json
 **If validation fails:**
 - Check task header format matches regex: `^(#{2,4})\s+([A-Z][A-Z0-9-]*\d{3,4}):\s*(.+)$`
 - Check bold-text metadata lines are correctly formatted
-- Check status values are one of: `BACKLOG`, `READY`, `LOCKED`, `IMPLEMENTING`, `REVIEW`, `VALIDATED`, `DOCUMENTED`, `COMMITTED`, `DONE`, `REWORK` (legacy values `not_started`, `in_progress`, `completed`, `blocked` accepted as aliases)
+- Check status values are one of: `READY`, `LOCKED`, `IMPLEMENTING`, `QA_REVIEW`, `VALIDATION`, `DOCUMENTATION`, `CI_REVIEW`, `COMMIT`, `DONE`, `REWORK` (legacy values `not_started`, `in_progress`, `completed`, `blocked`, `BACKLOG`, `REVIEW`, `VALIDATED`, `DOCUMENTED`, `COMMITTED` accepted as aliases)
 - Fix and re-validate before returning results
 
 ## 11. Extended Metadata Fields

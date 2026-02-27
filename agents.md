@@ -51,11 +51,46 @@ Each agent file specifies:
 runs implementation commands. ReaperOAK operates a ticket-driven event loop:
 SELECT one READY ticket → LOCK → DELEGATE to implementing agent → run
 mandatory post-execution chain (QA → Validator → Documentation → CI Reviewer
-→ Commit) → DONE. Each ticket traverses a 9-state machine (BACKLOG → READY →
-LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE).
+→ Commit) → DONE. Each ticket traverses a 9-state machine (READY → LOCKED →
+IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → COMMIT → DONE).
 
 When delegating to a subagent, use the delegation packet schema at
 `.github/tasks/delegation-packet-schema.json`.
+
+**Worker Pool Model.** Each agent role is backed by a pool of N workers
+(configurable capacity per role). Multiple workers of the same role can
+process different tickets concurrently — for example, `Backend-W1` and
+`Backend-W2` may implement two independent tickets at the same time. Workers
+are ephemeral instances spawned per ticket and released on completion. Worker
+identity format: `{AgentRole}-W{N}` (e.g., `Backend-W1`, `QA-W2`,
+`Frontend-W1`). Pool capacity is tuned per project; a busy pool emits
+`POOL_EXHAUSTED` and queues tickets until a worker frees up.
+
+**Two-Layer Orchestration.** The agent roster is organized into two
+concurrent layers that run simultaneously without phase barriers:
+
+- **Strategic Layer** — Research Analyst, Product Manager, Architect,
+  Security Engineer (threat modeling only), UIDesigner (conceptual design
+  only), DevOps Engineer (infrastructure planning only). This layer produces
+  roadmap artifacts: PRDs, ADRs, threat models, design specifications, and
+  Strategic Decision Records (SDRs). Its output feeds the ticket pipeline.
+- **Execution Layer** — Backend, Frontend Engineer, DevOps Engineer
+  (execution), QA Engineer, Security Engineer (execution), Documentation
+  Specialist, Validator, CI Reviewer. This layer consumes strategic
+  artifacts and processes tickets through the 9-state machine.
+
+Some agents span both layers with different capabilities per layer: Security
+Engineer operates strategically for threat modeling and executionally for
+SBOM/scans; DevOps Engineer operates strategically for capacity planning and
+executionally for CI/CD and IaC.
+
+**Strategy Evolution.** Strategic Decision Records (SDRs) enable mid-execution
+strategy changes without halting unaffected work. SDR lifecycle:
+PROPOSED → APPROVED → APPLIED → ARCHIVED. Only strategic-layer agents may
+propose SDRs. Each approved SDR increments the roadmap minor version
+(v1.0 → v1.1 → v1.2). SDRs that affect in-flight tickets trigger
+re-prioritization but do NOT halt execution unless explicitly flagged as
+blocking. Rejected SDRs are archived with a rejection reason.
 
 **TODO Agent** is invokable only by ReaperOAK. No other agent may delegate
 to it or invoke it directly. TODO Agent is a progressive refinement
@@ -73,7 +108,14 @@ MUST first invoke the TODO Agent in Strategic Mode (L0→L1) to identify
 capabilities, then progressively refine through Planning Mode (L1→L2) and
 Execution Planning Mode (L2→L3) before entering the BUILD phase. Each L3
 task is a "ticket" in the ticket-driven model, entering the 9-state machine
-at BACKLOG.
+at READY.
+
+**TODO Agent never initiates strategic decisions.** If strategic input is
+needed during decomposition (unclear scope, missing architecture decision,
+conflicting requirements), TODO emits `REQUIRES_STRATEGIC_INPUT` with the
+specific question and waits for ReaperOAK to route the request to the
+appropriate strategic-layer agent. After resolution, ReaperOAK passes the
+answer back to TODO Agent to continue decomposition.
 
 **TODO directory structure:**
 
@@ -87,10 +129,10 @@ at BACKLOG.
 authority to **reject task completion**. It verifies Definition of Done
 compliance, SDLC stage adherence, quality gates, and pattern conformance.
 The Validator cannot implement code — it only reads artifacts and writes
-validation reports. Its rejection blocks advancement past REVIEW.
+validation reports. Its rejection blocks advancement past QA_REVIEW.
 
 **Validator Agent invocation:** Validator is invoked as part of the mandatory
-post-execution chain at the REVIEW state of every ticket. No agent may
+post-execution chain at the QA_REVIEW state of every ticket. No agent may
 self-validate.
 
 ## 5. Human Approval Required
@@ -164,19 +206,19 @@ LOW (50-69%, pause for review) | INSUFFICIENT (<50%, block and escalate).
 Every ticket traverses a mandatory 9-state machine:
 
 ```
-BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE
+READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → COMMIT → DONE
 ```
 
 **Rules:**
 - No state may be skipped. Guard conditions enforce every transition.
 - At IMPLEMENTING, the assigned agent works on the ticket and emits
   `TASK_COMPLETED` or `TASK_FAILED` when done.
-- At REVIEW, the mandatory post-execution chain runs: QA Engineer reviews
+- At QA_REVIEW, the mandatory post-execution chain runs: QA Engineer reviews
   test coverage → Validator checks Definition of Done compliance → if both
-  pass, ticket advances to VALIDATED.
-- At VALIDATED, Documentation Specialist updates relevant docs.
-- At DOCUMENTED, CI Reviewer checks lint/type/complexity → ReaperOAK
-  enforces `git commit` → ticket advances to COMMITTED → DONE.
+  pass, ticket advances to VALIDATION.
+- At DOCUMENTATION, Documentation Specialist updates relevant docs.
+- At CI_REVIEW, CI Reviewer checks lint/type/complexity.
+- At COMMIT, ReaperOAK enforces `git commit` → ticket advances to DONE.
 - If any chain member rejects, the ticket enters REWORK → re-delegated to
   the implementing agent. Max 3 rework iterations before escalation.
 - Agents must emit structured events (`TASK_STARTED`, `TASK_COMPLETED`,

@@ -35,7 +35,7 @@ verification, project initialization checklist validation, running
 linters/type checkers/test suites as independent verification, pattern
 conformance checking against `systemPatterns.md`, writing validation reports
 to `docs/reviews/`, writing DoD verdicts, appending to `feedback-log.md`,
-blocking ticket advancement past REVIEW for non-compliant tasks.
+blocking ticket advancement past QA_REVIEW for non-compliant tasks.
 
 **Excluded:** Implementing application code (→ Backend/Frontend), fixing bugs
 (→ domain agents), architecture decisions (→ Architect), test strategy design
@@ -93,7 +93,7 @@ Validator returns:
 - **rejectionReasons:** list of DOD-XX failures (if rejected)
 
 ReaperOAK then routes:
-- APPROVED → task proceeds to DOCUMENT stage
+- APPROVED → task proceeds to DOCUMENTATION stage
 - REJECTED → re-delegate to original agent with findings attached
 
 ### Validator ↔ TODO Agent (Indirect)
@@ -149,7 +149,7 @@ Validator → returns verdict → ReaperOAK → routes to agent or TODO
 ## Extended Validation Checklist
 
 The Validator independently verifies these 10 CHK items on every task at the
-VALIDATE stage. CHK items are the Validator's *operational* checks — separate
+VALIDATION stage. CHK items are the Validator's *operational* checks — separate
 from the DOD items which are the *contract* between agent and system. There is
 intentional overlap (e.g., DOD-03 ≈ CHK-03) — the Validator independently runs
 the same checks rather than trusting the agent's self-report.

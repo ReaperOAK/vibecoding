@@ -120,6 +120,19 @@ ReaperOAK's event loop.
 | `REQUEST_RESEARCH` | Need research before proceeding | ticket_id, agent_name, research_question |
 | `REQUIRES_UI_DESIGN` | UI artifacts needed before Frontend work | ticket_id, agent_name, feature_name, ui_requirements |
 | `ESCALATE_TO_PM` | Scope or requirements unclear | ticket_id, agent_name, ambiguity_description |
+| `REQUIRES_STRATEGIC_INPUT` | Execution agent needs strategic decision | ticket_id, agent_name, question, suggested_reviewer |
+
+### 8.1 Worker Pool Events
+
+These events are emitted by the worker pool subsystem and consumed by
+ReaperOAK's continuous scheduler.
+
+| Event Type | When Emitted | Payload |
+|-----------|-------------|--------|
+| `WORKER_FREE` | Worker completes ticket and is released | worker_id, pool_role, timestamp, freed_capacity |
+| `WORKER_ASSIGNED` | Worker assigned to ticket | worker_id, pool_role, ticket_id, timestamp |
+| `POOL_EXHAUSTED` | All workers in a pool are busy | pool_role, queued_tickets, timestamp |
+| `POOL_SCALED` | Pool capacity changed | pool_role, old_capacity, new_capacity, reason |
 
 ### Event Payload Format
 
@@ -169,7 +182,7 @@ delivery.
 - Agent must ONLY respond to the assigned ticket ID
 - If output references unrelated tickets → ReaperOAK REJECTS
 - If implementation exceeds ticket scope (modifies files not in the ticket's
-  write_paths) → Validator REJECTS at REVIEW
+  write_paths) → Validator REJECTS at QA_REVIEW
 - If agent attempts to implement multiple tickets in one response → force
   stop and re-delegate
 
@@ -207,3 +220,22 @@ ReaperOAK enforces single-ticket focus through these checks:
 - Does output exceed expected size for a single ticket? → flag for review
 - Does agent output include self-reflection evidence? → required for
   acceptance of `TASK_COMPLETED` events
+
+## 10. Strategic Event Types
+
+These events are emitted only by **strategic-layer agents** (Research Analyst,
+Product Manager, Architect, Security Engineer in strategic mode, UIDesigner,
+DevOps Engineer in planning mode). Execution-layer agents MUST NOT emit
+these events.
+
+| Event Type | When Emitted | Payload |
+|-----------|-------------|--------|
+| `SDR_PROPOSED` | Strategic agent proposes strategy change | sdr_id, proposer, impact_assessment |
+| `SDR_APPROVED` | ReaperOAK approves SDR | sdr_id, approver, affected_tickets |
+| `SDR_APPLIED` | SDR changes applied to roadmap | sdr_id, roadmap_version_before, roadmap_version_after |
+| `STRATEGIC_REVIEW_REQUIRED` | Execution agent detects strategic issue | ticket_id, issue_description, suggested_reviewer |
+| `ARCHITECTURE_RISK_DETECTED` | Architect identifies structural risk | risk_id, severity, affected_components |
+| `SCOPE_CONFLICT_DETECTED` | PM identifies scope conflict | conflict_description, affected_tickets |
+
+> **Note:** Strategic events pause the continuous scheduling loop for the
+> affected tickets only. Unaffected tickets continue normal execution.

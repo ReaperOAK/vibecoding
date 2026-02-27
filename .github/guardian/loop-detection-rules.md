@@ -24,7 +24,7 @@ locked_by: ReaperOAK
 - ESCALATE: Notify ReaperOAK → human escalation if unresolvable
 
 ### Signal: Oscillating State
-- DETECT: Task status oscillates between two states ≥ 3 times (e.g. IN_PROGRESS → REVIEW → REJECTED → IN_PROGRESS)
+- DETECT: Task status oscillates between two states ≥ 3 times (e.g. IMPLEMENTING → QA_REVIEW → REWORK → IMPLEMENTING)
 - ACTION: Halt, force BLOCKED status
 - ESCALATE: Root cause analysis required before retry
 
@@ -49,13 +49,13 @@ locked_by: ReaperOAK
 - ESCALATE: TODO Agent must further decompose the oversized batch
 
 ### Signal: Ticket State Skip
-- DETECT: Agent attempts to advance a ticket past a state in the 9-state machine (BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE) without satisfying the guard condition for the transition (e.g., skipping REVIEW to reach VALIDATED, or bypassing the post-execution chain)
+- DETECT: Agent attempts to advance a ticket past a state in the 9-state machine (READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → COMMIT → DONE) without satisfying the guard condition for the transition (e.g., skipping QA_REVIEW to reach VALIDATION, or bypassing the post-execution chain)
 - ACTION: Block the state transition, log the skip attempt with ticket ID and attempted transition, revert ticket to its last valid state
 - ESCALATE: Notify ReaperOAK with evidence of attempted skip; ReaperOAK re-delegates with explicit state requirements and mandatory chain checks
 
 ### Signal: DoD Non-Compliance
-- DETECT: Ticket advancement past REVIEW attempted when DoD report has any item with `status: false`, or no DoD report exists at `docs/reviews/dod/{TASK_ID}-dod.yaml`, or `verdict != APPROVED`
-- ACTION: Block advancement past REVIEW, return ticket to REWORK → IMPLEMENTING, log non-compliance details (which DoD items failed)
+- DETECT: Ticket advancement past QA_REVIEW attempted when DoD report has any item with `status: false`, or no DoD report exists at `docs/reviews/dod/{TASK_ID}-dod.yaml`, or `verdict != APPROVED`
+- ACTION: Block advancement past QA_REVIEW, return ticket to REWORK → IMPLEMENTING, log non-compliance details (which DoD items failed)
 - ESCALATE: Notify ReaperOAK; if repeated (≥ 2 advancement attempts with failing DoD), flag the owning agent for re-delegation or user intervention
 
 ### Signal: Initialization Skip
@@ -70,7 +70,7 @@ locked_by: ReaperOAK
 
 ### Signal: Validator Rejection Loop
 - DETECT: Validator issues `REJECTED` verdict for the same task ≥ 3 times (rework count reaches maximum of 3)
-- ACTION: Set task status to ESCALATED, halt all further rework attempts for this task, stop the delegated agent from re-entering IMPLEMENT
+- ACTION: Set task status to ESCALATED, halt all further rework attempts for this task, stop the delegated agent from re-entering IMPLEMENTING
 - ESCALATE: Notify ReaperOAK → present full rejection history (all 3 rejection reports) to user with options: force-approve (override logged in `decisionLog.md`), cancel task, or reassign to a different agent
 
 ## Token Budget Enforcement
