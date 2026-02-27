@@ -25,8 +25,8 @@
 
 ## DoD Checklist
 
-All 10 items must pass before a task can enter DOCUMENT stage.
-Validator approval (DOD-07 verdict) is required before MARK COMPLETE.
+All 10 items must pass before a ticket can advance past REVIEW.
+Validator approval (DOD-07 verdict) is required before VALIDATED state.
 
 <!-- Machine-parseable: each checkbox line maps to a dod_checklist boolean field.
      Field mapping: DOD-01 → code_implemented, DOD-02 → tests_written, etc.
@@ -179,8 +179,8 @@ Validator approval (DOD-07 verdict) is required before MARK COMPLETE.
 
 | Rule | Effect |
 |------|--------|
-| `all_passed == false` | Task CANNOT enter DOCUMENT stage |
-| `verdict != APPROVED` | Task CANNOT enter MARK_COMPLETE stage |
+| `all_passed == false` | Ticket CANNOT advance past REVIEW |
+| `verdict != APPROVED` | Ticket CANNOT reach VALIDATED state |
 | Agent submits with `DOD-07 == false` | Auto-set — only Validator can mark true |
 | Any item `status: false` at Validator review | Validator MUST issue `REJECTED` verdict |
 | 3 consecutive rejections | Task escalated to user for intervention |

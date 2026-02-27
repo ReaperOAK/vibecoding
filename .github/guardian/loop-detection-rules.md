@@ -48,25 +48,25 @@ locked_by: ReaperOAK
 - ACTION: Reject delegation batch, log violation
 - ESCALATE: TODO Agent must further decompose the oversized batch
 
-### Signal: SDLC Stage Skip
-- DETECT: Agent attempts to advance a task past a stage in the 7-stage task loop (PLAN → INITIALIZE → IMPLEMENT → TEST → VALIDATE → DOCUMENT → MARK COMPLETE) without producing required exit-gate evidence for an intermediate stage (e.g., jumping from PLAN to IMPLEMENT without INITIALIZE, or from IMPLEMENT to VALIDATE without TEST)
-- ACTION: Block the stage transition, log the skip attempt with task ID and attempted transition, revert task to its last valid stage
-- ESCALATE: Notify ReaperOAK with evidence of attempted skip; ReaperOAK re-delegates with explicit stage instructions and mandatory gate checks
+### Signal: Ticket State Skip
+- DETECT: Agent attempts to advance a ticket past a state in the 9-state machine (BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE) without satisfying the guard condition for the transition (e.g., skipping REVIEW to reach VALIDATED, or bypassing the post-execution chain)
+- ACTION: Block the state transition, log the skip attempt with ticket ID and attempted transition, revert ticket to its last valid state
+- ESCALATE: Notify ReaperOAK with evidence of attempted skip; ReaperOAK re-delegates with explicit state requirements and mandatory chain checks
 
 ### Signal: DoD Non-Compliance
-- DETECT: MARK COMPLETE attempted for a task whose DoD report has any item with `status: false`, or no DoD report exists at `docs/reviews/dod/{TASK_ID}-dod.yaml`, or `verdict != APPROVED`
-- ACTION: Block MARK COMPLETE, return task to VALIDATE stage, log non-compliance details (which DoD items failed)
-- ESCALATE: Notify ReaperOAK; if repeated (≥ 2 MARK COMPLETE attempts with failing DoD), flag the owning agent for re-delegation or user intervention
+- DETECT: Ticket advancement past REVIEW attempted when DoD report has any item with `status: false`, or no DoD report exists at `docs/reviews/dod/{TASK_ID}-dod.yaml`, or `verdict != APPROVED`
+- ACTION: Block advancement past REVIEW, return ticket to REWORK → IMPLEMENTING, log non-compliance details (which DoD items failed)
+- ESCALATE: Notify ReaperOAK; if repeated (≥ 2 advancement attempts with failing DoD), flag the owning agent for re-delegation or user intervention
 
 ### Signal: Initialization Skip
-- DETECT: Agent enters IMPLEMENT stage (Stage 3) for a task modifying a module that has no passing initialization checklist on disk (`allPassed: true` in `docs/reviews/init/{MODULE}-init.yaml` does not exist or is `false`)
-- ACTION: Block IMPLEMENT, return task to INITIALIZE stage, log violation with module name and missing checklist items
-- ESCALATE: Notify ReaperOAK to re-delegate with explicit INITIALIZE instructions; if module scaffolding cannot be completed after 2 attempts → user notification
+- DETECT: Agent enters IMPLEMENTING state for a ticket modifying a module that has no passing initialization checklist on disk (`allPassed: true` in `docs/reviews/init/{MODULE}-init.yaml` does not exist or is `false`)
+- ACTION: Block IMPLEMENTING, return ticket to REWORK, log violation with module name and missing checklist items
+- ESCALATE: Notify ReaperOAK to re-delegate with explicit initialization instructions; if module scaffolding cannot be completed after 2 attempts → user notification
 
 ### Signal: UI/UX Gate Bypass
-- DETECT: Frontend task with `UI Touching: yes` enters IMPLEMENT (BUILD phase) without: (a) a completed UIDesigner dependency task (`status: completed`), or (b) design artifacts on disk at `docs/uiux/{UID_TASK_ID}-design-spec.md` or `docs/uiux/{UID_TASK_ID}-component-spec.yaml`
-- ACTION: Block the Frontend task from entering IMPLEMENT, set task status to BLOCKED, log bypass attempt with task ID and missing artifact paths
-- ESCALATE: Notify ReaperOAK; require UIDesigner task completion before unblocking. Override requires explicit user approval logged in `decisionLog.md`
+- DETECT: Frontend ticket with `UI Touching: yes` enters IMPLEMENTING without: (a) a completed UIDesigner dependency ticket (`status: DONE`), or (b) design artifacts on disk at `docs/uiux/<feature>/` (mockup, interaction-spec, component-hierarchy, state-variations, accessibility-checklist)
+- ACTION: Block the Frontend ticket from entering IMPLEMENTING, return to REWORK, log bypass attempt with ticket ID and missing artifact paths
+- ESCALATE: Notify ReaperOAK; require UIDesigner ticket completion before unblocking. Override requires explicit user approval logged in `decisionLog.md`
 
 ### Signal: Validator Rejection Loop
 - DETECT: Validator issues `REJECTED` verdict for the same task ≥ 3 times (rework count reaches maximum of 3)

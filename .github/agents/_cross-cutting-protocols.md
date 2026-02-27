@@ -99,3 +99,111 @@ ReaperOAK rather than guessing.
 
 For detailed protocol definitions, templates, and examples, load chunks from
 `.github/vibecoding/chunks/_cross-cutting-protocols/`.
+
+## 8. Agent Event Emission Protocol
+
+Every agent MUST emit structured events during ticket execution. ReaperOAK is
+the SOLE consumer and router of all events. Agents must NOT directly call or
+communicate with each other — ALL inter-agent communication flows through
+ReaperOAK's event loop.
+
+### Event Types
+
+| Event Type | When Emitted | Payload |
+|-----------|-------------|---------|
+| `TASK_STARTED` | Agent begins work on assigned ticket | ticket_id, agent_name, timestamp |
+| `TASK_COMPLETED` | Agent finishes with evidence | ticket_id, agent_name, timestamp, evidence (artifact paths, test results, confidence) |
+| `TASK_FAILED` | Agent cannot complete | ticket_id, agent_name, timestamp, error_details, suggested_action |
+| `NEEDS_INPUT_FROM` | Agent needs output from another agent type | ticket_id, agent_name, target_agent, context, question |
+| `BLOCKED_BY` | Agent is blocked by external dependency | ticket_id, agent_name, blocker_description, blocker_type |
+| `PROGRESS_UPDATE` | Periodic status during long tasks | ticket_id, agent_name, timestamp, percent_complete, current_step |
+| `REQUEST_RESEARCH` | Need research before proceeding | ticket_id, agent_name, research_question |
+| `REQUIRES_UI_DESIGN` | UI artifacts needed before Frontend work | ticket_id, agent_name, feature_name, ui_requirements |
+| `ESCALATE_TO_PM` | Scope or requirements unclear | ticket_id, agent_name, ambiguity_description |
+
+### Event Payload Format
+
+Emit events as structured markdown in your output:
+
+```
+**Event:** TASK_COMPLETED
+**Ticket:** TDSA-BE001
+**Agent:** Backend
+**Timestamp:** 2026-02-27T14:30:00Z
+**Details:** Implementation complete. Files created: server/auth.ts, server/auth.test.ts
+**Evidence:** All 5 acceptance criteria verified. Confidence: HIGH
+**Artifacts:** server/auth.ts, server/auth.test.ts
+```
+
+### Emission Rules
+
+1. Every agent MUST emit `TASK_STARTED` at the beginning and either
+   `TASK_COMPLETED` or `TASK_FAILED` at the end of every ticket execution.
+2. Blocking events (`NEEDS_INPUT_FROM`, `BLOCKED_BY`, `REQUEST_RESEARCH`,
+   `REQUIRES_UI_DESIGN`, `ESCALATE_TO_PM`) pause the current ticket.
+   ReaperOAK handles routing the request to the appropriate agent and
+   passing resolution artifacts back.
+3. `PROGRESS_UPDATE` should be emitted periodically during tasks with
+   effort > 30 min to provide visibility into long-running work.
+4. `TASK_COMPLETED` MUST include evidence — artifact paths, test results,
+   and confidence level. Events without evidence are rejected.
+
+### No Direct Agent Communication
+
+Agents must NOT call each other directly. ALL inter-agent communication is
+routed through ReaperOAK. This ensures:
+
+- Single point of coordination and audit trail
+- No circular dependencies between agents
+- ReaperOAK maintains full visibility of system state
+- Every interaction is logged for observability
+
+## 9. Anti-One-Shot Guardrails
+
+Hard rules preventing agents from attempting complex work in a single pass
+or exceeding ticket scope. These guardrails enforce iterative, evidence-based
+delivery.
+
+### Scope Enforcement
+
+- Agent must ONLY respond to the assigned ticket ID
+- If output references unrelated tickets → ReaperOAK REJECTS
+- If implementation exceeds ticket scope (modifies files not in the ticket's
+  write_paths) → Validator REJECTS at REVIEW
+- If agent attempts to implement multiple tickets in one response → force
+  stop and re-delegate
+
+### Mandatory Iteration Pattern (for tasks with effort > 30 min)
+
+Agents MUST demonstrate iteration rather than attempting one-shot delivery:
+
+1. **Pass 1 — Draft implementation:** Write the initial implementation
+   addressing all acceptance criteria
+2. **Pass 2 — Self-review:** Check output against acceptance criteria using
+   the Self-Reflection protocol (§2). Score all 5 dimensions.
+3. **Pass 3 — Fix gaps:** Address any gaps, low scores, or missing criteria
+   found during self-review
+4. **Pass 4 — Final check:** Confirm all criteria are met, run quality
+   scores, verify file scope compliance
+
+**Minimum:** 2 iterations for any task with effort > 30 min. The
+Self-Reflection scores (§2) serve as the evidence of iteration.
+
+### Pre-Submission Scope Checks
+
+Before submitting `TASK_COMPLETED`:
+
+1. Compare files modified against the ticket's listed write_paths
+2. If any file outside scope was modified → undo the change and report
+3. Verify that output references only the assigned ticket ID
+4. Confirm all acceptance criteria from the ticket are addressed
+
+### Anti-Batch Detection
+
+ReaperOAK enforces single-ticket focus through these checks:
+
+- Does agent output contain multiple ticket IDs? → REJECT
+- Does agent output modify files belonging to other tickets? → REJECT
+- Does output exceed expected size for a single ticket? → flag for review
+- Does agent output include self-reflection evidence? → required for
+  acceptance of `TASK_COMPLETED` events

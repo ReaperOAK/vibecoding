@@ -48,8 +48,11 @@ Each agent file specifies:
 - `evidence_required` — whether claims need tool output proof
 
 **ReaperOAK is a PURE ORCHESTRATOR.** It NEVER writes code, creates files, or
-runs implementation commands. It decomposes tasks and delegates ALL
-implementation to subagents via `runSubagent` — in PARALLEL when possible.
+runs implementation commands. ReaperOAK operates a ticket-driven event loop:
+SELECT one READY ticket → LOCK → DELEGATE to implementing agent → run
+mandatory post-execution chain (QA → Validator → Documentation → CI Reviewer
+→ Commit) → DONE. Each ticket traverses a 9-state machine (BACKLOG → READY →
+LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE).
 
 When delegating to a subagent, use the delegation packet schema at
 `.github/tasks/delegation-packet-schema.json`.
@@ -68,7 +71,9 @@ the appropriate mode based on the current decomposition layer.
 **TODO Agent invocation:** For any multi-step feature request, ReaperOAK
 MUST first invoke the TODO Agent in Strategic Mode (L0→L1) to identify
 capabilities, then progressively refine through Planning Mode (L1→L2) and
-Execution Planning Mode (L2→L3) before entering the BUILD phase.
+Execution Planning Mode (L2→L3) before entering the BUILD phase. Each L3
+task is a "ticket" in the ticket-driven model, entering the 9-state machine
+at BACKLOG.
 
 **TODO directory structure:**
 
@@ -82,10 +87,11 @@ Execution Planning Mode (L2→L3) before entering the BUILD phase.
 authority to **reject task completion**. It verifies Definition of Done
 compliance, SDLC stage adherence, quality gates, and pattern conformance.
 The Validator cannot implement code — it only reads artifacts and writes
-validation reports. Its rejection blocks MARK COMPLETE.
+validation reports. Its rejection blocks advancement past REVIEW.
 
-**Validator Agent invocation:** Validator is invoked by ReaperOAK at the
-VALIDATE and MARK COMPLETE stages of every task. No agent may self-validate.
+**Validator Agent invocation:** Validator is invoked as part of the mandatory
+post-execution chain at the REVIEW state of every ticket. No agent may
+self-validate.
 
 ## 5. Human Approval Required
 
@@ -153,27 +159,33 @@ Every claim needs evidence:
 Confidence levels: HIGH (90-100%, proceed) | MEDIUM (70-89%, flag risks) |
 LOW (50-69%, pause for review) | INSUFFICIENT (<50%, block and escalate).
 
-### Task-Level SDLC Compliance
+### Task-Level SDLC Compliance (Ticket Lifecycle)
 
-Every task follows a mandatory 7-stage inner loop within the BUILD phase:
+Every ticket traverses a mandatory 9-state machine:
 
 ```
-PLAN → INITIALIZE → IMPLEMENT → TEST → VALIDATE → DOCUMENT → MARK COMPLETE
+BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE
 ```
 
 **Rules:**
-- No stage may be skipped. Gate enforcement applies between every transition.
-- At INITIALIZE, new modules must complete the initialization checklist at
-  `.github/tasks/initialization-checklist-template.md` before proceeding.
-- At TEST, static analysis, type checking, linting, and coverage gates must pass.
-- At VALIDATE, the Validator agent independently checks Definition of Done
-  compliance using the template at `.github/tasks/definition-of-done-template.md`.
-- At MARK COMPLETE, the Validator agent re-verifies all DoD items. A task
-  cannot be marked complete until all items are checked and verified.
-- If Validator rejects, the task enters a REWORK loop back to the appropriate
-  earlier stage. Max 3 rework iterations before escalation to the user.
+- No state may be skipped. Guard conditions enforce every transition.
+- At IMPLEMENTING, the assigned agent works on the ticket and emits
+  `TASK_COMPLETED` or `TASK_FAILED` when done.
+- At REVIEW, the mandatory post-execution chain runs: QA Engineer reviews
+  test coverage → Validator checks Definition of Done compliance → if both
+  pass, ticket advances to VALIDATED.
+- At VALIDATED, Documentation Specialist updates relevant docs.
+- At DOCUMENTED, CI Reviewer checks lint/type/complexity → ReaperOAK
+  enforces `git commit` → ticket advances to COMMITTED → DONE.
+- If any chain member rejects, the ticket enters REWORK → re-delegated to
+  the implementing agent. Max 3 rework iterations before escalation.
+- Agents must emit structured events (`TASK_STARTED`, `TASK_COMPLETED`,
+  `TASK_FAILED`, `NEEDS_INPUT_FROM`, `BLOCKED_BY`) at state transitions
+  — see `_cross-cutting-protocols.md` §8.
+- Agents must follow the anti-one-shot guardrails
+  — see `_cross-cutting-protocols.md` §9.
 
 **References:**
 - Definition of Done template: `.github/tasks/definition-of-done-template.md`
 - Initialization checklist: `.github/tasks/initialization-checklist-template.md`
-- Full design: `docs/architecture/sdlc-enforcement-design.md`
+- Cross-cutting protocols: `.github/agents/_cross-cutting-protocols.md`

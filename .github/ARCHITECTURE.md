@@ -1,12 +1,12 @@
 # Vibecoding Multi-Agent System Architecture
 
-> **Version:** 6.0.0
+> **Version:** 7.0.0
 > **Owner:** ReaperOAK (CTO / Supervisor Orchestrator)
 > **Last Updated:** 2026-02-27
 >
-> **Changelog:** v6.0.0 — Progressive Refinement TODO Architecture: 5-layer
-> decomposition, 3-mode refinement engine, performance safeguards, smart
-> granularity
+> **Changelog:** v7.0.0 — Ticket-Driven Event-Based Architecture: 9-state
+> ticket machine, mandatory post-execution chain, event emission protocol,
+> anti-one-shot guardrails, commit enforcement per ticket
 
 ---
 
@@ -17,6 +17,11 @@ system with ReaperOAK as the singular CTO and orchestrator. All subagents
 operate within bounded scopes, follow Plan-Act-Reflect loops with RUG
 discipline, and route destructive operations through human approval gates.
 
+The unit of execution is: **ONE TICKET → FULL SDLC LOOP → COMMIT**.
+There is no phased pipeline. There is no batch feature completion. ReaperOAK
+reacts to events emitted by agents and routes tickets through a 9-state
+machine.
+
 ### Design Principles
 
 1. **Determinism over cleverness** — explicit state transitions, bounded loops
@@ -26,10 +31,11 @@ discipline, and route destructive operations through human approval gates.
 5. **Immutable truth sources** — `systemPatterns.md` and `decisionLog.md` are
    controlled by ReaperOAK only
 6. **Human-in-the-loop for destructive ops** — always
-7. **Confidence-gated progression** — no phase transition without assessed confidence
+7. **Confidence-gated progression** — no state transition without assessed confidence
 8. **DAG-first decomposition** — all multi-task work starts with dependency graph
 9. **Evidence over assertion** — every claim requires tool output or file reference
 10. **Governance by default** — hooks and guardrails active in every session
+11. **Single-ticket focus** — one agent, one ticket, full lifecycle, then next
 
 ---
 
@@ -57,22 +63,25 @@ ReaperOAK (Supervisor / CTO)
 
 ### Agent Authority Matrix
 
-| Agent | Domain Expertise | Can Read | Can Write | Can Execute | Cannot Do |
-|-------|-----------------|----------|-----------|-------------|-----------|
-| **ReaperOAK** | Orchestration, DAG construction, QA integration | Everything | systemPatterns, decisionLog, activeContext, progress | Delegate, validate, approve | Direct file edits in multi-agent mode |
-| **ProductManager** | EARS notation, INVEST stories, DDD context mapping | All memory bank | activeContext, progress | GitHub issues | Edit code, deploy, modify architecture |
-| **Architect** | Well-Architected Pillars, API contracts, DAG task graphs | All memory bank, codebase | activeContext, progress | Analysis tools | Edit production code, deploy |
-| **Backend** | TDD, Object Calisthenics, RFC 7807, N+1 detection | Assigned files, systemPatterns | Source code (scoped dirs) | Terminal, tests | Frontend files, infra, security config |
-| **Frontend** | WCAG 2.2 AA, Core Web Vitals, Component Calisthenics | Assigned files, systemPatterns | UI source (scoped dirs) | Terminal, browser | Backend files, infra, DB schemas |
-| **QA** | Test pyramid, mutation testing, SFDPOT/HICCUPS, Playwright | All source, test dirs | Test files only | Terminal, browser | Production code, infra, deploy |
-| **Security** | OWASP Top 10, STRIDE, SARIF, SBOM, policy-as-config | Everything (read-only audit) | riskRegister, activeContext | Scanners | Production code, deploy, merge |
-| **DevOps** | GitOps, SLO/SLI, Docker multi-stage, chaos engineering | Infra files, CI/CD configs | CI/CD, Dockerfiles, IaC | Terminal, deploy (staging) | Application code, merge to main |
-| **Documentation** | Diátaxis, Flesch-Kincaid, doc-as-code CI pipeline | All source, all docs | Documentation files only | Analysis tools | Code, infra, deploy |
-| **Research** | Bayesian confidence, evidence hierarchy, license analysis | External sources, codebase | activeContext, progress | Web fetch, search | Code, infra, deploy, merge |
-| **CIReviewer** | Cognitive complexity, fitness functions, SARIF | PR diffs, codebase | PR comments only | Analysis tools | Merge, deploy, edit source |
-| **UIDesigner** | Stitch design generation, component specs, design tokens | User request, PRD, architecture docs | Design specs (docs/design-specs/) | Stitch, Playwright (screenshot/snapshot), Memory | Implement components, modify backend, deploy |
-| **TODO** | Task decomposition, lifecycle tracking, dependency DAGs | All memory bank, codebase, existing TODO files | TODO files (TODO/**/*.md), activeContext, progress | Terminal (todo_visual.py only) | Implement code, modify agents, deploy, write outside TODO/ |
-| **Validator** | DoD compliance, SDLC gates, pattern conformance | Everything (full read-only audit) | Validation reports (`docs/reviews/`), `feedback-log.md` (append) | Linters, type checkers, test runners (read-only) | Modify code, mark tasks, deploy, merge, override rejections |
+| Agent | Domain Expertise | Can Write | Can Execute |
+|-------|-----------------|-----------|-------------|
+| **ReaperOAK** | Orchestration, ticket routing, event handling | systemPatterns, decisionLog, activeContext, progress | Delegate, validate, commit |
+| **ProductManager** | EARS notation, INVEST stories, DDD | activeContext, progress | GitHub issues |
+| **Architect** | Well-Architected Pillars, API contracts, DAGs | activeContext, progress | Analysis tools |
+| **Backend** | TDD, Object Calisthenics, RFC 7807 | Source code (scoped dirs) | Terminal, tests |
+| **Frontend** | WCAG 2.2 AA, Core Web Vitals | UI source (scoped dirs) | Terminal, browser |
+| **QA** | Test pyramid, mutation testing, Playwright | Test files only | Terminal, browser |
+| **Security** | OWASP Top 10, STRIDE, SARIF, SBOM | riskRegister, activeContext | Scanners |
+| **DevOps** | GitOps, SLO/SLI, Docker, chaos engineering | CI/CD, Dockerfiles, IaC | Terminal, deploy (staging) |
+| **Documentation** | Diátaxis, Flesch-Kincaid, doc-as-code CI | Documentation files only | Analysis tools |
+| **Research** | Bayesian confidence, evidence hierarchy | activeContext, progress | Web fetch, search |
+| **CIReviewer** | Cognitive complexity, fitness functions, SARIF | PR comments only | Analysis tools |
+| **UIDesigner** | Stitch design, component specs, design tokens | Design specs (docs/design-specs/) | Stitch, Playwright, Memory |
+| **TODO** | Task decomposition, lifecycle tracking, DAGs | TODO files (TODO/**/*.md), activeContext, progress | Terminal (todo_visual.py) |
+| **Validator** | DoD compliance, SDLC gates, pattern conformance | Validation reports, `feedback-log.md` (append) | Linters, type/test runners (read-only) |
+
+Full read/write/execute permissions and forbidden actions are specified in
+each agent's `.github/agents/*.agent.md` definition file.
 
 ### Structured Autonomy Levels
 
@@ -85,23 +94,9 @@ levels based on task criticality.
 | **L2** | Guided | Agent executes within pre-approved scope, reports after completion | Scope changes only |
 | **L3** | Autonomous | Agent executes independently within delegation packet boundaries | Destructive ops only |
 
-**Default Autonomy Assignments:**
-
-| Agent | Default Level | Rationale |
-|-------|:------------:|-----------|
-| Backend | L2 | Scoped writes, needs freedom within boundaries |
-| Frontend | L2 | Same as Backend |
-| QA | L3 | Test-only writes, low risk |
-| Security | L2 | Read-only audit but findings affect decisions |
-| DevOps | L1 | Infrastructure changes require careful oversight |
-| Documentation | L3 | Doc-only writes, low risk |
-| Research | L3 | Read-only, no write risk |
-| CIReviewer | L3 | Read-only, comment-only output |
-| ProductManager | L2 | Defines scope, needs validation |
-| Architect | L2 | Designs affect everything downstream |
-| UIDesigner | L2 | Design outputs affect downstream Frontend work |
-| TODO | L2 | Task files have downstream impact on delegation, needs oversight |
-| Validator | L2 | Rejection authority over task completion requires ReaperOAK oversight |
+**Default Autonomy Assignments:** Backend (L2), Frontend (L2), QA (L3),
+Security (L2), DevOps (L1), Documentation (L3), Research (L3), CIReviewer (L3),
+ProductManager (L2), Architect (L2), UIDesigner (L2), TODO (L2), Validator (L2).
 
 ---
 
@@ -120,25 +115,9 @@ At session start, ReaperOAK loads context using a 4-priority system:
 
 ### 3.2 Context Budget Declaration
 
-Every delegation packet includes a context budget:
-
-```yaml
-contextBudget:
-  totalTokens: 20000
-  allocation:
-    delegationPacket: 2000
-    sourceFiles: 10000
-    memoryBank: 3000
-    crossCuttingProtocols: 3000
-    reserve: 2000
-  filesLoaded:
-    - path: "src/api/auth.ts"
-      priority: P0
-      tokens: 1500
-    - path: ".github/agents/_cross-cutting-protocols.md"
-      priority: P0
-      tokens: 2500
-```
+Every delegation packet includes a context budget with `totalTokens`,
+priority-based `allocation` (delegation, source, memory bank, protocols,
+reserve), and a `filesLoaded` manifest with path, priority, and token count.
 
 ### 3.3 Context Freshness Rules
 
@@ -154,55 +133,50 @@ contextBudget:
 
 ## 4. Delegation Packet Format
 
-Every task delegated from ReaperOAK to a subagent uses this canonical format:
+Every task delegated from ReaperOAK to a subagent uses a canonical YAML
+format containing: `taskId`, `delegatedBy`, `assignedTo`, `autonomyLevel`,
+`objective`, `successCriteria[]`, `scopeBoundaries` (included/excluded),
+`forbiddenActions[]`, `requiredOutputFormat`, `evidenceExpectations[]`,
+`contextBudget`, `confidenceThreshold`, `priority`, `dependencies[]`,
+`timeoutBudget`, and `crossCuttingProtocols`.
 
-```yaml
-packet:
-  taskId: "TASK-{timestamp}-{seq}"
-  delegatedBy: "ReaperOAK"
-  assignedTo: "{subagent-name}"
-  autonomyLevel: "L1 | L2 | L3"
-  objective: "Clear, measurable description of what must be accomplished"
-  successCriteria:
-    - "Criterion 1: specific, verifiable"
-    - "Criterion 2: specific, verifiable"
-  scopeBoundaries:
-    included:
-      - "files/dirs that CAN be touched"
-    excluded:
-      - "files/dirs that MUST NOT be touched"
-  forbiddenActions:
-    - "Action that is explicitly prohibited"
-  requiredOutputFormat: "Description of expected deliverable shape"
-  evidenceExpectations:
-    - "Test results, screenshots, logs, etc."
-  contextBudget:
-    totalTokens: 20000
-    priorityFiles: ["file1.ts", "file2.ts"]
-  confidenceThreshold: 70
-  priority: "P0 | P1 | P2 | P3"
-  dependencies:
-    - "TASK-ID of prerequisite tasks"
-  timeoutBudget: "max iterations or token budget"
-  crossCuttingProtocols: ".github/agents/_cross-cutting-protocols.md"
-```
+Full schema: `.github/tasks/delegation-packet-schema.json`
 
 ---
 
-## 5. DAG-First Task Decomposition
+## 5. Ticket-Driven Orchestration Model
 
-The multi-agent SDLC proceeds through these phases:
+ReaperOAK operates as a **ticket-driven event orchestrator**. It does NOT
+run lifecycle phases or batch operations. It reacts to events emitted by
+agents and routes tickets through a 9-state machine, one at a time.
+
+### 5.1 Event Loop
 
 ```
-DECOMPOSE → SPEC → BUILD → VALIDATE → GATE → DOCUMENT → RETROSPECTIVE
+LOOP:
+  1. SELECT exactly ONE READY ticket (or multiple conflict-free for parallel)
+  2. LOCK ticket to specific agent → state: LOCKED
+  3. DELEGATE to implementing agent → state: IMPLEMENTING
+  4. WAIT for completion event or blocking event
+  5. If BLOCKING EVENT → invoke requested agent → resume when resolved
+  6. If COMPLETION EVENT → run post-execution chain (§7)
+  7. After chain passes → enforce commit (§10) → state: COMMITTED → DONE
+  8. UNLOCK → select next ticket
 ```
 
-**Phase 0 — DECOMPOSE** is handled by the TODO Agent, which decomposes
-feature-level requests into granular, dependency-ordered tasks before any
-other agent is invoked. See `docs/architecture/todo-execution-governance.md`
-for the full DECOMPOSE protocol.
+ReaperOAK must NEVER call multiple lifecycle phases at once. It reacts to
+events one at a time per ticket. Each iteration processes exactly one event
+for one ticket.
 
-### 5.1 DAG Construction
+**Hard rules:**
+- No agent may implement more than one ticket per cycle
+- No batch feature completion allowed
+- No "finish remaining TODO" — each ticket is atomic
+- Every ticket completes its full lifecycle before being marked DONE
+- ReaperOAK selects the next ticket only after the current cycle completes
+  (or when running conflict-free parallel cycles — see §11)
+
+### 5.2 DAG Construction
 
 Every multi-agent objective is decomposed into a DAG before execution:
 
@@ -221,124 +195,422 @@ graph TD
     I --> J
 ```
 
-### 5.2 Parallel Batch Execution
+DAG construction is handled by the TODO Agent during progressive refinement
+(see §28). L3 tasks enter the ticket state machine at BACKLOG and are
+promoted to READY when all `depends_on` entries are DONE.
 
-Tasks with no inter-dependencies execute in parallel batches:
+### 5.3 Discovery vs Execution Separation
 
-```
-Batch 0: [TODO Agent]                   ← decomposes feature into tasks
-Batch 1: [ProductManager, Research, UIDesigner]  ← no dependencies
-Batch 2: [Architect]                    ← depends on Batch 1
-Batch 3: [Security, Frontend]          ← can parallelize
-Batch 4: [Backend]                     ← depends on Security
-Batch 5: [QA]                          ← depends on Backend + Frontend
-Batch 6: [Documentation, CIReviewer]   ← depends on QA
-Batch 7: [DevOps]                      ← depends on Docs + Review
-```
+Discovery and execution are distinct phases that must not be mixed within
+the same cycle.
 
-See `orchestration.rules.md` §2 for full DAG protocol.
+**Discovery agents** (read-only — produce artifacts, no code):
+- Research Analyst, Product Manager, Architect, Security Engineer, UIDesigner
 
-### 5.3 Task-Level SDLC Inner Loop (v5.0.0)
+**Execution agents** (write — implement from tickets):
+- Backend, Frontend Engineer, DevOps Engineer, QA Engineer
 
-Within the BUILD phase, each individual task follows a **7-stage inner loop**
-with hard gates between every transition. This creates a two-level SDLC model:
+After discovery completes, the TODO Agent generates tickets from artifacts.
+Discovery and execution agents must NOT operate in the same cycle.
 
-**Pipeline SDLC (Project-Level)** — managed by ReaperOAK:
+### 5.4 Blocking Event Handling
 
-```
-DECOMPOSE → SPEC → BUILD → VALIDATE → GATE → DOCUMENT → RETROSPECTIVE
-```
+When ReaperOAK receives a blocking event from an implementing agent:
 
-**Task SDLC (Inner Loop within BUILD)** — per task:
+1. Pause current ticket (state remains IMPLEMENTING — agent is waiting)
+2. Invoke the requested agent with context from the blocking ticket
+3. Wait for resolution from the invoked agent
+4. Pass resolution artifacts back to the original implementing agent
+5. Resume original ticket execution
 
-```
-PLAN → INITIALIZE → IMPLEMENT → TEST → VALIDATE → DOCUMENT → MARK COMPLETE
-```
+---
 
-| Aspect | Pipeline Level | Task Level |
-|--------|---------------|------------|
-| Scope | Entire project/feature | Single TODO task |
-| Manager | ReaperOAK | Delegated agent + Validator |
-| Phases | 7 phases (DECOMPOSE–RETRO) | 7 stages (PLAN–COMPLETE) |
-| State tracked in | `workflow-state.json` | Task file + DoD report |
-| Gates | Phase transition gates | Stage transition gates (G1–G8) |
+## 6. Ticket State Machine — 9 States
+
+Every ticket traverses these states in strict order. No state may be
+skipped. Invalid transitions (e.g., BACKLOG → IMPLEMENTING) are **rejected**.
+
+### 6.1 States
+
+| State | Description | Owner |
+|-------|-------------|-------|
+| **BACKLOG** | Ticket exists, dependencies not met | System (auto) |
+| **READY** | All deps DONE, eligible for selection | System (auto via dep check) |
+| **LOCKED** | Selected for cycle, lock acquired | ReaperOAK |
+| **IMPLEMENTING** | Delegated to agent, work in progress | Implementing Agent |
+| **REVIEW** | Implementation done, QA + Validator reviewing | QA + Validator |
+| **VALIDATED** | All reviews pass, docs being updated | Documentation Specialist |
+| **DOCUMENTED** | Docs updated, CI review pending | CI Reviewer |
+| **COMMITTED** | CI passes, commit created | ReaperOAK |
+| **DONE** | Full lifecycle complete | System (final) |
+
+### 6.2 State Transition Diagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PLAN
-    PLAN --> INITIALIZE
-    INITIALIZE --> IMPLEMENT: init checklist passes
-    IMPLEMENT --> TEST: G1-G3 pass
-    TEST --> VALIDATE: G4-G5 pass
-    VALIDATE --> DOCUMENT: Validator approves + G6-G8 pass
-    DOCUMENT --> MARK_COMPLETE: Validator final DoD check
-    MARK_COMPLETE --> [*]
-    VALIDATE --> IMPLEMENT: Validator rejects (max 3)
+    [*] --> BACKLOG : Ticket created
+    BACKLOG --> READY : All dependencies DONE
+    READY --> LOCKED : Selected for cycle + lock acquired
+    LOCKED --> IMPLEMENTING : Delegated to subagent
+    LOCKED --> READY : Lock expired (30 min timeout)
+    IMPLEMENTING --> REVIEW : Agent emits TASK_COMPLETED
+    IMPLEMENTING --> REWORK : Agent emits TASK_FAILED
+    REVIEW --> VALIDATED : QA PASS + Validator APPROVED
+    REVIEW --> REWORK : QA FAIL or Validator REJECTED
+    VALIDATED --> DOCUMENTED : Docs updated by Documentation Specialist
+    DOCUMENTED --> COMMITTED : CI Reviewer PASS + commit created
+    DOCUMENTED --> REWORK : CI Reviewer REJECTED
+    COMMITTED --> DONE : Full lifecycle complete
+    REWORK --> IMPLEMENTING : Re-delegated (rework_count ≤ 3)
+    REWORK --> BACKLOG : rework_count > 3 → escalated to user
+    DONE --> [*]
 ```
 
-No stage may be skipped. If the Validator rejects at VALIDATE, the task
-re-enters IMPLEMENT for rework (maximum 3 iterations before user escalation).
+### 6.3 Transition Rules
 
-> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md`
-> §2 for stage definitions, gate details, rework protocol, and state schema.
+| From | To | Trigger | Guard Condition |
+|------|-----|---------|----------------|
+| BACKLOG | READY | Dependency check | All `depends_on` tasks have status = DONE |
+| READY | LOCKED | Cycle SELECT phase | No file conflicts, agent not locked, priority selected |
+| LOCKED | IMPLEMENTING | `runSubagent` called | Lock is active, agent assignment confirmed |
+| LOCKED | READY | Timer expires | Lock timeout reached (30 min) — auto-release |
+| IMPLEMENTING | REVIEW | Agent emits TASK_COMPLETED | Evidence provided (artifact paths, test results) |
+| IMPLEMENTING | REWORK | Agent emits TASK_FAILED | Error evidence provided |
+| REVIEW | VALIDATED | QA + Validator pass | QA test review PASS, Validator DoD verdict = APPROVED |
+| REVIEW | REWORK | QA or Validator fail | QA FAIL or verdict = REJECTED, rework_count < 3 |
+| VALIDATED | DOCUMENTED | Doc update confirmed | Documentation Specialist confirms artifact updates |
+| DOCUMENTED | COMMITTED | CI + commit pass | CI Reviewer PASS, `git commit` succeeds |
+| DOCUMENTED | REWORK | CI Reviewer rejects | Lint/type/complexity failures, rework_count < 3 |
+| COMMITTED | DONE | Final confirmation | All lifecycle steps verified |
+| REWORK | IMPLEMENTING | Re-delegation | rework_count incremented, < 3 |
+| REWORK | BACKLOG | Escalation | rework_count >= 3, user notified |
+
+### 6.4 Failure Rollback Rules
+
+| Failure Mode | State Transition | Recovery Action |
+|--------------|-----------------|----------------|
+| Agent reports failure | IMPLEMENTING → REWORK | Re-delegate with findings; rework_count++ |
+| QA/Validator rejects | REVIEW → REWORK | Re-delegate with rejection report; rework_count++ |
+| CI Reviewer rejects | DOCUMENTED → REWORK | Re-delegate with CI findings; rework_count++ |
+| Lock expires (30 min) | LOCKED → READY | Lock auto-released; eligible next cycle |
+| Cycle timeout (2h) | Active → READY | All locks released; escalate to user |
+| Rework exhausted (≥3) | REWORK → BACKLOG | User notified for override or cancellation |
+
+### 6.5 Backward Compatibility — State Mapping
+
+Existing TODO files may use old status values. Normalize on read:
+
+| Old Status | New State | Migration Rule |
+|------------|-----------|---------------|
+| `not_started` | BACKLOG | Check deps to promote to READY |
+| `in_progress` | IMPLEMENTING | Active work maps to IMPLEMENTING |
+| `completed` | DONE | Finished tasks map to DONE |
+| `blocked` | BACKLOG | BACKLOG with `blocker_reason` field set |
+| `PENDING` | BACKLOG | Old state machine equivalent |
+| `IN_PROGRESS` | IMPLEMENTING | Old state machine equivalent |
+| `REVIEW` | REVIEW | Same semantics |
+| `MERGED` | DONE | Old final state |
+| `MARK_COMPLETE` | COMMITTED → DONE | Old completion gate |
+
+New tickets MUST use the 9-state values exclusively.
+
+### 6.6 Task Metadata Extension
+
+Each ticket gains two operational metadata fields:
+
+```markdown
+**Rework Count:** 0
+**Blocker:** (none)
+```
+
+- `Rework Count` starts at 0, increments on each REWORK → IMPLEMENTING.
+  Resets to 0 on escalation (REWORK → BACKLOG).
+- `Blocker` is free-text, present only in BACKLOG when externally blocked.
+
+### 6.7 Locking Mechanism
+
+When a ticket is selected for a cycle, ReaperOAK acquires a lock:
+
+```json
+{
+  "ticketId": "TDSA-BE001",
+  "lockedBy": "Backend",
+  "lockedAt": "2026-02-27T14:30:00Z",
+  "expiresAt": "2026-02-27T15:00:00Z",
+  "cycleId": "cycle-2026-02-27T14:30-001",
+  "status": "active"
+}
+```
+
+Lock schema: `.github/locks/task-lock-schema.json`
+
+**Lock lifecycle:**
+1. Acquired at READY → LOCKED transition
+2. Held through IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED
+3. Released at COMMITTED → DONE transition
+4. Auto-released on 30-minute timeout (LOCKED → READY)
+5. Auto-released on cycle timeout (2h — all locks released, escalate to user)
 
 ---
 
-## 6. Task State Machine
+## 7. Post-Execution Chain
 
-Every task follows this deterministic state flow:
+After an implementing agent finishes, this chain runs for **EVERY** ticket.
+No exceptions. No shortcuts. No skipping.
+
+### 7.1 Chain Steps
+
+| Step | Agent | Action | Failure Path |
+|------|-------|--------|-------------|
+| 1 | QA Engineer | Test completeness review, coverage check (≥80%) | REJECT → REWORK |
+| 2 | Validator | DoD enforcement (all 10 items independently verified) | REJECT → REWORK |
+| 3 | Documentation Specialist | Artifact update (README, CHANGELOG, API docs) | BLOCK → report to ReaperOAK |
+| 4 | CI Reviewer | Simulate CI checks (lint, types, complexity) | REJECT → REWORK |
+| 5 | ReaperOAK | Commit enforcement (commit with ticket ID in message) | FAIL → retry once → escalate |
+
+If ANY agent in the chain rejects → ticket moves to REWORK → assigned back
+to the implementing agent with the rejection report as upstream artifact.
+
+### 7.2 Retry Budget
+
+The total retry budget across ALL chain steps is **3 combined**:
+- QA rejections (Step 1), Validator rejections (Step 2), and CI Reviewer
+  rejections (Step 4) share a single `rework_count` counter.
+- When `rework_count` reaches 3 → escalate to user for override or
+  cancellation.
+- Counter resets to 0 on escalation (ticket returns to BACKLOG).
+
+### 7.3 Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant Impl as Implementing Agent
+    participant Oak as ReaperOAK
+    participant QA as QA Engineer
+    participant Val as Validator
+    participant Doc as Documentation Specialist
+    participant CI as CI Reviewer
+
+    Impl->>Oak: TASK_COMPLETED event + evidence
+    Oak->>QA: Step 1: Test completeness review
+
+    alt QA REJECTS
+        QA->>Oak: REJECT + findings
+        Oak->>Impl: REWORK with QA findings (rework_count++)
+    else QA PASSES
+        QA->>Oak: PASS + test report
+        Oak->>Val: Step 2: DoD verification (10 items)
+        alt Validator REJECTS
+            Val->>Oak: REJECTED + rejection_reasons[]
+            Oak->>Impl: REWORK with Validator findings (rework_count++)
+        else Validator APPROVES
+            Val->>Oak: APPROVED + validation report
+            Oak->>Doc: Step 3: Update documentation artifacts
+            Doc->>Oak: Doc-update report
+            Oak->>CI: Step 4: CI checks (lint, types, complexity)
+            alt CI REJECTS
+                CI->>Oak: REJECT + CI findings
+                Oak->>Impl: REWORK with CI findings (rework_count++)
+            else CI PASSES
+                CI->>Oak: PASS + CI report
+                Oak->>Oak: Step 5: git commit -m "[TICKET-ID] description"
+                Note over Oak: State: COMMITTED → DONE
+            end
+        end
+    end
+```
+
+### 7.4 Enforcement Rule
+
+> **No ticket may reach DONE without ALL five chain steps completing
+> successfully.** Bypassing any step is a protocol violation. Only explicit
+> user override can skip a chain step.
+
+---
+
+## 8. Event Emission Protocol
+
+Agents emit structured events during ticket execution. ReaperOAK is the
+**sole consumer and router** of all events. Agents must NOT directly call
+or communicate with each other — ALL inter-agent communication flows through
+ReaperOAK's event loop.
+
+### 8.1 Event Types
+
+| Event Type | When Emitted | Payload |
+|-----------|-------------|---------|
+| `TASK_STARTED` | Agent begins work on assigned ticket | ticket_id, agent_name, timestamp |
+| `TASK_COMPLETED` | Agent finishes with evidence | ticket_id, agent_name, timestamp, evidence (artifact paths, test results, confidence) |
+| `TASK_FAILED` | Agent cannot complete | ticket_id, agent_name, timestamp, error_details, suggested_action |
+| `NEEDS_INPUT_FROM` | Agent needs output from another agent type | ticket_id, agent_name, target_agent, context, question |
+| `BLOCKED_BY` | Agent is blocked by external dependency | ticket_id, agent_name, blocker_description, blocker_type |
+| `PROGRESS_UPDATE` | Periodic status during long tasks | ticket_id, agent_name, timestamp, percent_complete, current_step |
+| `REQUEST_RESEARCH` | Need research before proceeding | ticket_id, agent_name, research_question |
+| `REQUIRES_UI_DESIGN` | UI artifacts needed before Frontend work | ticket_id, agent_name, feature_name, ui_requirements |
+| `ESCALATE_TO_PM` | Scope or requirements unclear | ticket_id, agent_name, ambiguity_description |
+
+### 8.2 Event Payload Format
+
+Events are emitted as structured markdown in agent output:
 
 ```
-┌─────────┐    ┌──────────────┐    ┌────────┐    ┌─────────┐
-│ PENDING │───▶│ IN_PROGRESS  │───▶│ REVIEW │───▶│ MERGED  │
-└─────────┘    └──────────────┘    └────────┘    └─────────┘
-                     │                   │
-                     ▼                   ▼
-                ┌──────────┐      ┌───────────┐
-                │ BLOCKED  │      │ REJECTED  │
-                └──────────┘      └───────────┘
-                     │                   │
-                     ▼                   ▼
-                ┌──────────┐      ┌──────────────┐
-                │ ESCALATED│      │ IN_PROGRESS  │ (retry ≤ 3)
-                └──────────┘      └──────────────┘
+**Event:** {event_type}
+**Ticket:** {ticket_id}
+**Agent:** {agent_name}
+**Timestamp:** {ISO8601}
+**Details:** {free-text description}
+**Evidence:** {test results, confidence level — required for TASK_COMPLETED}
+**Artifacts:** {list of file paths, if applicable}
 ```
 
-See `orchestration.rules.md` §1 for full state definitions and transitions.
+### 8.3 Emission Rules
+
+1. Every agent MUST emit `TASK_STARTED` at the beginning and either
+   `TASK_COMPLETED` or `TASK_FAILED` at the end of every ticket execution.
+2. Blocking events (`NEEDS_INPUT_FROM`, `BLOCKED_BY`, `REQUEST_RESEARCH`,
+   `REQUIRES_UI_DESIGN`, `ESCALATE_TO_PM`) pause the current ticket.
+   ReaperOAK handles routing the request to the appropriate agent and
+   passing resolution artifacts back.
+3. `PROGRESS_UPDATE` should be emitted periodically during tasks with
+   effort > 30 min.
+4. `TASK_COMPLETED` MUST include evidence — artifact paths, test results,
+   and confidence level. Events without evidence are rejected.
+
+### 8.4 No Direct Agent Communication
+
+Agents must NOT call each other directly. ALL inter-agent communication is
+routed through ReaperOAK. This ensures:
+- Single point of coordination and audit trail
+- No circular dependencies between agents
+- ReaperOAK maintains full visibility of system state
+- Every interaction is logged for observability
 
 ---
 
-## 7. Merge Protocol
+## 9. Anti-One-Shot Guardrails
 
-1. Subagent completes work → signals REVIEW state
-2. ReaperOAK's Reviewer lane validates:
-   - Requirements coverage check
-   - Correctness/syntax validation
-   - No forbidden file modifications
-   - Evidence expectations met
-   - Self-reflection quality score ≥ 7/10
-   - Token consumption within budget
-3. If validation passes → MERGED state
-4. If validation fails → REJECTED state with fix delta → back to IN_PROGRESS
-5. File conflict detection:
-   - Before merge, diff analysis on all modified files
-   - If parallel branches modified same file → sequential resolution
-   - Conflicting changes escalated to ReaperOAK for manual merge
+Hard rules preventing agents from attempting complex work in a single pass
+or exceeding ticket scope. These guardrails enforce iterative, evidence-based
+delivery.
+
+### 9.1 Scope Enforcement
+
+- Agent must ONLY respond to its assigned ticket ID
+- If output references unrelated tickets → ReaperOAK REJECTS
+- If implementation exceeds ticket scope (modifies files not in the ticket's
+  write_paths) → Validator REJECTS at REVIEW
+- If agent attempts to implement multiple tickets in one response → force
+  stop and re-delegate
+
+### 9.2 Mandatory Iteration Pattern
+
+For tickets with effort > 30 min, agents MUST demonstrate iteration:
+
+1. **Pass 1 — Draft implementation:** Write the initial implementation
+   addressing all acceptance criteria
+2. **Pass 2 — Self-review:** Check output against acceptance criteria using
+   the Self-Reflection protocol. Score all 5 dimensions.
+3. **Pass 3 — Fix gaps:** Address any gaps, low scores, or missing criteria
+4. **Pass 4 — Final check:** Confirm all criteria met, verify file scope
+
+**Minimum:** 2 iterations for any task with effort > 30 min.
+
+### 9.3 Pre-Submission Scope Checks
+
+Before submitting `TASK_COMPLETED`:
+1. Compare files modified against the ticket's listed write_paths
+2. If any file outside scope was modified → undo and report
+3. Verify output references only the assigned ticket ID
+4. Confirm all acceptance criteria from the ticket are addressed
+
+### 9.4 Anti-Batch Detection
+
+ReaperOAK enforces single-ticket focus through these checks:
+- Does agent output contain multiple ticket IDs? → REJECT
+- Does agent output modify files belonging to other tickets? → REJECT
+- Does output exceed expected size for a single ticket? → flag for review
+- Does agent output include self-reflection evidence? → required for acceptance
 
 ---
 
-## 8. Parallel Execution Rules
+## 10. Commit Enforcement
 
-See `orchestration.rules.md` §5 for full parallelism model.
+A ticket CANNOT reach DONE unless a commit is created.
 
-Key constraints:
-- Each parallel batch requires pre-declared file ownership
-- No two subagents may claim the same file in a parallel batch
-- Integration validation gate runs after every batch
+### 10.1 Commit Requirements
+
+- Commit message references ticket ID: `[TICKET-ID] Description`
+- All changed files included in commit
+- CHANGELOG updated with ticket summary
+- All CI checks pass before commit
+
+### 10.2 Commit Execution
+
+ReaperOAK performs the commit AFTER CI Reviewer approval (Step 4 of chain):
+
+```bash
+git add <changed-files>
+git commit -m "[TICKET-ID] <description>"
+```
+
+### 10.3 Failure Handling
+
+- Commit fails → retry once with corrected parameters
+- Second failure → escalate to user
+- No commit → no DONE state. Ticket remains in DOCUMENTED.
+- Commit message MUST follow format: `[TICKET-ID] Description`
 
 ---
 
-## 9. Conflict Resolution Policy
+## 11. Parallel Execution Model
+
+ReaperOAK may select multiple READY tickets for parallel execution when
+no conflicts exist.
+
+### 11.1 Conflict Detection
+
+For each READY ticket, extract `write_paths`. Build an overlap matrix —
+if any two tickets share write paths, they CONFLICT. Select the maximum
+independent set (largest subset where no pair conflicts). If all conflict,
+select exactly 1 ticket (serial fallback).
+
+### 11.2 Additional Constraints
+
+- No dependency chain conflicts between selected tickets
+- No shared mutable resource conflicts (CHANGELOG counts as shared)
+- Same agent cannot be assigned to multiple tickets in one cycle
+- One agent = one ticket per cycle. No exceptions.
+
+### 11.3 Parallel Spawn Strategy
+
+```
+Within a cycle:
+1. SELECT → identify N conflict-free tickets for N agents
+2. LOCK → acquire lock for each ticket
+3. DELEGATE → call runSubagent for each (all independent, launched together)
+4. WAIT → wait for all agents to return results
+5. CHAIN → run post-execution chain per ticket SEQUENTIALLY
+   (prevents race conditions on shared files like CHANGELOG)
+6. DONE → release all locks, cycle ends, dependency scan runs
+```
+
+### 11.4 Deadlock Prevention
+
+| Scenario | Prevention Rule |
+|----------|----------------|
+| All eligible tickets conflict | Run exactly 1 ticket (serial fallback) |
+| Agent doesn't respond within timeout | Lock expires after 30 min → READY |
+| Full cycle doesn't complete in 2h | Release all locks, escalate to user |
+| Dependency cycle detected | REJECT at SELECT — should not happen if TODO enforced DAG |
+| All tickets blocked externally | Report to user, enter WAIT state |
+
+After every cycle completes, ReaperOAK runs a dependency scan across all
+BACKLOG tickets. Any ticket whose `depends_on` entries are all DONE is
+automatically promoted to READY for the next cycle.
+
+---
+
+## 12. Conflict Resolution Policy
 
 1. **Intra-agent conflict:** Re-run with explicit context of the contradiction
 2. **Inter-agent conflict:** ReaperOAK resolves using `systemPatterns.md`
@@ -354,7 +626,7 @@ Key constraints:
 
 ---
 
-## 10. Human Approval Gate Triggers
+## 13. Human Approval Gate Triggers
 
 The following operations **ALWAYS** halt and require explicit human approval:
 
@@ -372,76 +644,32 @@ The following operations **ALWAYS** halt and require explicit human approval:
 | Secret/credential rotation | Security |
 | Autonomy level elevation | Governance |
 
-### 10.1 UI/UX Enforcement Gate
+### 13.1 UI/UX Enforcement Gate
 
-A mandatory check between the DECOMPOSE and SPEC phases that ensures
-UIDesigner is invoked for all UI-touching work.
-
-**Gate Protocol:**
-
-1. After DECOMPOSE, ReaperOAK reads the TODO file
-2. Identifies tasks with `**UI Touching:** yes`
-3. If ANY exist:
-   - UIDesigner MUST have assigned tasks in the TODO file
-   - Every Frontend task with `UI Touching: yes` MUST depend on a UIDesigner task
-   - If missing → re-delegate to TODO Agent to add UIDesigner tasks
-4. If NONE → proceed without UIDesigner
-5. Override requires explicit user approval (logged in decisionLog.md)
-
-**UI-Touching Detection Keywords:**
-screen, page, view, modal, dialog, panel, component, widget, form, chart,
-layout, design, style, theme, responsive, dashboard, settings page, navigation,
-user flow, onboarding, landing page.
-
-**Enforcement:** No Frontend task with `UI Touching: yes` may enter BUILD
-until its UIDesigner dependency is `completed` and design specs exist on disk.
-
-See `docs/architecture/todo-execution-governance.md` §7 for the full gate
-logic, pseudocode, and escape hatch protocol.
+A mandatory check ensuring UIDesigner is invoked for all UI-touching work.
+When a Frontend ticket has UI keywords or `UI Touching: yes`, ReaperOAK
+verifies design artifacts exist at `/docs/uiux/<feature>/` (mockup PNGs,
+`interaction-spec.md`, `component-hierarchy.md`, `state-variations.md`,
+`accessibility-checklist.md`). Missing artifacts → delegate to UIDesigner
+first. Override requires user approval (logged in decisionLog.md).
 
 ---
 
-## 11. Plan-Act-Reflect Loop (All Subagents)
+## 14. Plan-Act-Reflect Loop (All Subagents)
 
-Every subagent follows this cognitive loop with RUG discipline:
+Every subagent follows a 3-step cognitive loop with RUG discipline:
 
-```
-┌──────────────────────────────────┐
-│           PLAN (RUG)              │
-│  1. READ: Load delegation packet  │
-│  2. UNDERSTAND: State objective   │
-│     in own words, list assumptions│
-│  3. Identify required tool calls  │
-│  4. List file modifications       │
-│  5. Declare confidence level      │
-└──────────────┬───────────────────┘
-               ▼
-┌──────────────────────────────────┐
-│            ACT                    │
-│  1. Execute plan step-by-step     │
-│  2. Constrain to declared scope   │
-│  3. Make smallest valid changes   │
-│  4. Collect evidence at each step │
-└──────────────┬───────────────────┘
-               ▼
-┌──────────────────────────────────┐
-│       REFLECT (Self-Score)        │
-│  1. Review stdout/stderr          │
-│  2. Score quality (5 dimensions)  │
-│     - Correctness: ?/10           │
-│     - Completeness: ?/10          │
-│     - Convention: ?/10            │
-│     - Clarity: ?/10               │
-│     - Impact: ?/10                │
-│  3. Gate: average ≥ 7 to submit   │
-│  4. If < 7: iterate (max 3x)     │
-│  5. Update activeContext.md       │
-└──────────────────────────────────┘
-```
+1. **PLAN (RUG):** Read delegation packet → state objective and assumptions
+   → identify tool calls → list file modifications → declare confidence
+2. **ACT:** Execute plan step-by-step → constrain to declared scope → make
+   smallest valid changes → collect evidence at each step
+3. **REFLECT (Self-Score):** Review stdout/stderr → score 5 dimensions
+   (Correctness, Completeness, Convention, Clarity, Impact — each ?/10)
+   → gate: average ≥ 7 to submit → if < 7: iterate (max 3x)
 
 ---
 
-## 12. Memory Bank Integration
+## 15. Memory Bank Integration
 
 Located at `.github/memory-bank/`:
 
@@ -460,29 +688,30 @@ Located at `.github/memory-bank/`:
 - No subagent may delete or overwrite entries in these files
 - Subagents may only append timestamped entries to `activeContext.md` and `progress.md`
 
-### 12.1 Shared Context Layer
+### 15.1 Shared Context Layer
 
 Additional state files for pipeline management:
 
 | File | Owner | Write Access | Purpose |
 |------|-------|-------------|----------|
-| `workflow-state.json` | ReaperOAK | ReaperOAK ONLY | Pipeline state machine — tracks current phase, agent statuses, fix loops |
+| `workflow-state.json` | ReaperOAK | ReaperOAK ONLY | Ticket state tracking — per-ticket status, rework count, lock info |
 | `artifacts-manifest.json` | ReaperOAK | ReaperOAK ONLY | Versioned build artifact tracking with SHA-256 hashes |
 | `feedback-log.md` | Shared | All subagents (append) | Inter-agent quality signals and cross-agent feedback |
 
-These files enable session resumption and provide structured state for the iterative SDLC loop.
+These files enable session resumption and provide structured state for the
+ticket-driven event loop.
 
-> **TODO State:** As of v4.1.0, `workflow-state.json` includes a `todo_state`
-> object that tracks the active project, task file path, completion percentages,
-> per-agent delegation counts, and UI/UX gate status. This enables ReaperOAK
-> to resume task-driven delegation across sessions. See
-> `docs/architecture/todo-execution-governance.md` §10.2 for the full schema.
+> **Ticket State Tracking:** `workflow-state.json` tracks per-ticket state
+> using the 9-state machine (§6), including `status`, `rework_count`,
+> `blocker_reason`, `locked_by`, `locked_at`, `last_transition`, and
+> `cycle_id`. This enables ReaperOAK to resume ticket processing across
+> sessions.
 
 ---
 
-## 13. Governance & Observability
+## 16. Governance & Observability
 
-### 13.1 Governance Hooks
+### 16.1 Governance Hooks
 
 Active hooks in `.github/hooks/`:
 
@@ -492,53 +721,27 @@ Active hooks in `.github/hooks/`:
 | `session-logger` | sessionStart, sessionEnd, userPromptSubmitted | Session activity tracking |
 | `session-auto-commit` | sessionEnd | Auto-commit changes at session end |
 
-### 13.2 Audit Trail Format
+### 16.2 Audit Trail Format
 
-Every governance event produces a JSON log entry:
+Every governance event produces a JSON log entry with `timestamp`, `event`,
+`governance_level`, and `status`. Threat events add `threat_count`,
+`max_severity`, and a `threats[]` array with category, severity, description,
+and evidence fields.
 
-```json
-{
-  "timestamp": "2025-01-15T10:30:00Z",
-  "event": "prompt_scanned",
-  "governance_level": "standard",
-  "status": "clean"
-}
-```
-
-Threat events include detailed evidence:
-
-```json
-{
-  "timestamp": "2025-01-15T10:31:00Z",
-  "event": "threat_detected",
-  "governance_level": "standard",
-  "threat_count": 1,
-  "max_severity": 0.9,
-  "threats": [
-    {
-      "category": "prompt_injection",
-      "severity": 0.9,
-      "description": "Instruction override",
-      "evidence": "ignore previous instructions"
-    }
-  ]
-}
-```
-
-### 13.3 Observability Metrics
+### 16.3 Observability Metrics
 
 | Metric | Source | Purpose |
 |--------|--------|---------|
-| Tasks completed / session | Orchestration state machine | Throughput |
-| Average retries / task | Task retry counter | Quality signal |
+| Tickets completed / session | Ticket state machine | Throughput |
+| Average reworks / ticket | Rework counter | Quality signal |
 | Token consumption / agent | Token budget tracker | Cost control |
 | Confidence trend | Confidence gate assessments | Risk detection |
 | Threat detection rate | Governance audit logs | Security posture |
-| DAG completion % | Checkpoint protocol | Progress visibility |
+| Cycle completion % | Event loop tracking | Progress visibility |
 
 ---
 
-## 14. Security Guardrails
+## 17. Security Guardrails
 
 See `.github/security.agentic-guardrails.md` for full specification.
 
@@ -556,7 +759,7 @@ Key constraints:
 
 ---
 
-## 15. CI/CD AI Integration
+## 18. CI/CD AI Integration
 
 See `.github/workflows/ai-*.yml` for workflow definitions.
 
@@ -577,7 +780,7 @@ All workflows:
 
 ---
 
-## 16. Instruction File Authority
+## 19. Instruction File Authority
 
 The following instruction files are authoritative references for their
 domains and are loaded from `docs/instructions/`:
@@ -605,7 +808,7 @@ domains and are loaded from `docs/instructions/`:
 
 ---
 
-## 17. Claude Code Integration
+## 20. Claude Code Integration
 
 The vibecoding system supports **dual-agent operation** with both GitHub Copilot
 and Claude Code. Both agents share the same memory bank, instruction files, and
@@ -643,12 +846,12 @@ governance principles.
 
 ---
 
-## 18. Self-Improvement System
+## 21. Self-Improvement System
 
-Agents can propose improvements to the infrastructure during the RETROSPECTIVE
-phase. This is controlled evolution — not autonomous self-modification.
+Agents can propose improvements to the infrastructure. This is controlled
+evolution — not autonomous self-modification.
 
-### 18.1 Proposal Lifecycle
+### 21.1 Proposal Lifecycle
 
 ```
 Agent identifies improvement → Writes proposal → ReaperOAK validates →
@@ -658,7 +861,7 @@ User approves → Agent implements → Verify → Merge
 Proposals live in `.github/proposals/` with naming convention
 `PROP-YYYYMMDD-{agent}-{seq}.md`.
 
-### 18.2 Scope Constraints
+### 21.2 Scope Constraints
 
 **Can be proposed:** Chunk improvements, agent config tweaks, new templates,
 workflow additions, catalog updates, tool ACL requests.
@@ -666,53 +869,33 @@ workflow additions, catalog updates, tool ACL requests.
 **Cannot be proposed:** Changes to systemPatterns/decisionLog, STOP_ALL
 modifications, removal of forbidden actions, autonomy elevation.
 
-### 18.3 RETROSPECTIVE Phase
-
-Phase 6 in the iterative SDLC. After DOCUMENT:
-- Agents review their own performance and identify improvement opportunities
-- Proposals written to `.github/proposals/`
-- ReaperOAK validates and presents to user
-- Approved proposals delegated for implementation in next session
-
 ---
 
-## 19. Validator Agent (v5.0.0)
+## 22. Validator Agent
 
 The **Validator** is an independent compliance reviewer that verifies task
-outputs satisfy the Definition of Done, adhere to the SDLC inner loop stages,
-pass quality gates, and conform to patterns in `systemPatterns.md`. The
-Validator does NOT implement code — it only reads artifacts and writes
-validation reports.
+outputs satisfy the Definition of Done, pass quality gates, and conform to
+patterns in `systemPatterns.md`. The Validator does NOT implement code — it
+only reads artifacts and writes validation reports.
 
 **Definition:** `.github/agents/Validator.agent.md`
 
 | Property | Value |
 |----------|-------|
 | **Autonomy** | L2 (Guided) |
-| **Invocation** | At VALIDATE and MARK COMPLETE stages of every task |
+| **Invocation** | At REVIEW state (Step 2 of post-execution chain, §7) |
 | **Verdict** | `APPROVED` or `REJECTED` |
 | **Write scope** | `docs/reviews/validation/`, `docs/reviews/dod/`, `feedback-log.md` (append) |
 | **Execute scope** | Linters, type checkers, test runners (read-only verification) |
 | **Cannot** | Modify source code, mark tasks complete, deploy, merge, override own rejections |
 
-**Interaction flow:**
-
-```
-BUILD Agent → submits work → ReaperOAK → delegates review → Validator
-Validator → returns verdict → ReaperOAK → routes to agent (rework) or TODO (complete)
-```
-
-All communication between Validator and BUILD agents flows through ReaperOAK.
-No agent may self-validate — DOD-07 (Reviewed by Validator) can only be set
-by the Validator.
-
-> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md` §7.
+**Interaction flow:** Implementing Agent emits TASK_COMPLETED → ReaperOAK delegates to QA → QA passes → ReaperOAK delegates to Validator → Validator returns verdict → ReaperOAK routes to REWORK (rejected) or VALIDATED (approved). All communication flows through ReaperOAK. No agent may self-validate — DOD-07 can only be set by the Validator.
 
 ---
 
-## 20. Definition of Done Framework (v5.0.0)
+## 23. Definition of Done Framework
 
-Every task must satisfy **10 DoD items** before it can be marked complete.
+Every ticket must satisfy **10 DoD items** before it can advance past REVIEW.
 The checklist is machine-parseable and enforced by the Validator agent.
 
 | DoD ID | Item | Verified By |
@@ -728,24 +911,15 @@ The checklist is machine-parseable and enforced by the Validator agent.
 | DOD-09 | No Unhandled Promises — no floating promises | Agent + Validator |
 | DOD-10 | No TODO Comments — no TODO/FIXME/HACK/XXX in code | Agent + Validator |
 
-**Enforcement rules:**
-
-- `allPassed == false` → task CANNOT enter DOCUMENT stage
-- `verdict != APPROVED` → task CANNOT enter MARK COMPLETE
-- Agent submits DOD-07 as `false` — only Validator may set it to `true`
-- 3 consecutive Validator rejections → escalate to user
-
-**Template:** `.github/tasks/definition-of-done-template.md`
-
-> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md` §3.
+**Enforcement:** `allPassed == false` → ticket CANNOT leave REVIEW. `verdict != APPROVED` → ticket CANNOT reach VALIDATED. Agent submits DOD-07 as `false` — only Validator may set `true`. 3 consecutive rejections → escalate to user. **Template:** `.github/tasks/definition-of-done-template.md`
 
 ---
 
-## 21. Initialization Enforcement (v5.0.0)
+## 24. Initialization Enforcement
 
-Before any task enters the IMPLEMENT stage, the target module must pass a
+Before any ticket's implementation begins, the target module must pass a
 **9-item initialization checklist**. The check runs once per module — subsequent
-tasks reuse the cached result if `all_passed: true` exists on disk.
+tickets reuse the cached result if `all_passed: true` exists on disk.
 
 | Init ID | Item | Applies To |
 |---------|------|------------|
@@ -759,154 +933,130 @@ tasks reuse the cached result if `all_passed: true` exists on disk.
 | INIT-08 | Error Boundaries Present | Frontend |
 | INIT-09 | Sentry / Error Tracking Instrumented | Backend |
 
-**Enforcement rules:**
-
-- Any required item with `status: false` → **BLOCKS IMPLEMENT**
-- Non-applicable items auto-pass based on `module_type`
-- Initialization fails after 2 attempts → BLOCK and escalate to user
-
-**Template:** `.github/tasks/initialization-checklist-template.md`
-
-> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md` §5.
+**Enforcement:** Any required item `status: false` → **BLOCKS IMPLEMENTING**. Non-applicable items auto-pass by `module_type`. Initialization fails after 2 attempts → BLOCK and escalate. **Template:** `.github/tasks/initialization-checklist-template.md`
 
 ---
 
-## 22. Bug-Catching Strategy (v5.0.0)
+## 25. Bug-Catching Strategy
 
 Bug catching is distributed across **8 layered gates** that run at different
-stages of the task-level SDLC. Each gate has explicit pass/fail criteria and
+points in the ticket lifecycle. Each gate has explicit pass/fail criteria and
 blocking behavior.
 
 | Gate | Name | Runs At | Tool | Pass Criteria | Who Runs |
 |------|------|---------|------|---------------|----------|
-| G1 | Static Analysis | IMPLEMENT | `tsc --noEmit` | Zero compiler errors | Agent |
-| G2 | Type Safety | IMPLEMENT | TypeScript strict mode | No `any` types in new code | Agent |
-| G3 | Linting | IMPLEMENT | ESLint | Zero errors, zero warnings | Agent |
-| G4 | Unit Test Coverage | TEST | Vitest/Jest | ≥80% line coverage, all pass | Agent |
-| G5 | Integration Tests | TEST | Supertest/Playwright | Happy path + error path per endpoint | Agent |
-| G6 | Performance Checks | VALIDATE | Lighthouse/k6 | LCP <2.5s, p95 <500ms | Validator |
-| G7 | Security Checklist | VALIDATE | Manual checklist | Auth, input validation, CORS, secrets | Validator |
-| G8 | Schema Validation | VALIDATE | Zod/Joi, OpenAPI | Runtime schemas match contracts | Validator |
+| G1 | Static Analysis | IMPLEMENTING | `tsc --noEmit` | Zero compiler errors | Agent |
+| G2 | Type Safety | IMPLEMENTING | TypeScript strict mode | No `any` types in new code | Agent |
+| G3 | Linting | IMPLEMENTING | ESLint | Zero errors, zero warnings | Agent |
+| G4 | Unit Test Coverage | IMPLEMENTING | Vitest/Jest | ≥80% line coverage, all pass | Agent |
+| G5 | Integration Tests | IMPLEMENTING | Supertest/Playwright | Happy path + error path per endpoint | Agent |
+| G6 | Performance Checks | REVIEW | Lighthouse/k6 | LCP <2.5s, p95 <500ms | Validator |
+| G7 | Security Checklist | REVIEW | Manual checklist | Auth, input validation, CORS, secrets | Validator |
+| G8 | Schema Validation | REVIEW | Zod/Joi, OpenAPI | Runtime schemas match contracts | Validator |
 
 ```mermaid
 graph LR
-    subgraph IMPLEMENT
+    subgraph IMPLEMENTING
         G1[G1: Static Analysis] --> G2[G2: Type Safety] --> G3[G3: Linting]
+        G3 --> G4[G4: Unit Coverage ≥80%] --> G5[G5: Integration Tests]
     end
-    subgraph TEST
-        G4[G4: Unit Coverage ≥80%] --> G5[G5: Integration Tests]
-    end
-    subgraph VALIDATE
+    subgraph REVIEW
         G6[G6: Performance] --> G7[G7: Security] --> G8[G8: Schema]
     end
-    G3 --> G4
     G5 --> G6
 ```
 
-Gates G1–G5 are run by the delegated agent (self-check). Gates G6–G8 are run
-by the Validator (independent check). The Validator also independently re-runs
-G1–G5 to prevent false claims.
-
-> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md` §6.
+Gates G1–G5 are run by the implementing agent (self-check). Gates G6–G8 are run by the Validator (independent check). The Validator also re-runs G1–G5 to prevent false claims.
 
 ---
 
-## 23. Governance Architecture (v5.0.0)
+## 26. Governance Architecture
 
-### 23.1 Blocking Rules
+### 26.1 Blocking Rules
 
-Every transition in the task-level SDLC has an explicit blocking condition.
-These are hard stops, not advisory.
+Every state transition in the ticket lifecycle has an explicit blocking
+condition. These are hard stops, not advisory.
 
 | Transition | Blocking Condition | Enforced By |
 |-----------|-------------------|-------------|
-| PLAN → INITIALIZE | Confidence < 70%; plan not documented | Agent |
-| INITIALIZE → IMPLEMENT | Any required init checklist item fails | Agent |
-| IMPLEMENT → TEST | Compiler errors (G1), type errors (G2), lint errors (G3) | Agent |
-| TEST → VALIDATE | Test failures (G4); missing integration tests (G5) | Agent |
-| VALIDATE → DOCUMENT | Validator verdict is `REJECTED` | Validator |
-| DOCUMENT → MARK COMPLETE | Public API undocumented | Agent |
-| Frontend IMPLEMENT entry | UI/UX design artifacts missing | ReaperOAK |
+| LOCKED → IMPLEMENTING | Initialization checklist fails (§24) | Agent |
+| IMPLEMENTING → REVIEW | Compiler errors (G1), type errors (G2), lint errors (G3) | Agent |
+| IMPLEMENTING → REVIEW | Test failures (G4); missing integration tests (G5) | Agent |
+| REVIEW → VALIDATED | Validator verdict is `REJECTED` | Validator |
+| VALIDATED → DOCUMENTED | Documentation artifacts incomplete | Documentation Specialist |
+| DOCUMENTED → COMMITTED | CI Reviewer lint/type/complexity failures | CI Reviewer |
+| Frontend IMPLEMENTING entry | UI/UX design artifacts missing (§13.1) | ReaperOAK |
 
-### 23.2 Rework Loop
+### 26.2 Rework Loop
 
-When the Validator rejects at VALIDATE:
+When the Validator rejects at REVIEW:
 
 1. Validator writes rejection report with specific DOD-XX failures
 2. ReaperOAK re-delegates to the original agent with rejection findings
-3. Agent re-enters at IMPLEMENT (Stage 3) with rework counter incremented
-4. **Maximum 3 rework iterations** per task
+3. Agent re-enters at IMPLEMENTING with rework counter incremented
+4. **Maximum 3 rework iterations** per ticket (shared budget across chain)
 5. After 3 rejections → escalate to user (override, cancel, or reassign)
 
 ```mermaid
 flowchart TD
     A[Agent submits work] --> B{Validator reviews}
-    B -->|APPROVED| C[Proceed to DOCUMENT]
+    B -->|APPROVED| C[Proceed to VALIDATED]
     B -->|REJECTED| D{Rework count < 3?}
     D -->|Yes| E[Re-delegate with findings]
-    E --> F[Agent fixes at IMPLEMENT]
+    E --> F[Agent fixes at IMPLEMENTING]
     F --> A
     D -->|No| G[ESCALATE to user]
 ```
 
-### 23.3 Loop Detection Updates
+### 26.3 Loop Detection Signals
 
-Five new signals added to `.github/guardian/loop-detection-rules.md` for
-SDLC enforcement:
+Signals defined in `.github/guardian/loop-detection-rules.md`:
 
 | Signal | Detects |
 |--------|---------|
-| SDLC Stage Skip | Agent attempts to bypass a required stage |
+| Ticket State Skip | Agent attempts to bypass a required state |
 | DoD Non-Compliance | Agent submits with failing DoD items |
-| Initialization Skip | Agent enters IMPLEMENT without passing init checklist |
-| UI/UX Gate Bypass | Frontend task enters IMPLEMENT without design artifacts |
-| Validator Rejection Loop | Same task rejected 3+ times by Validator |
+| Initialization Skip | Agent enters IMPLEMENTING without passing init checklist |
+| UI/UX Gate Bypass | Frontend ticket enters IMPLEMENTING without design artifacts |
+| Rework Exhaustion | Same ticket rejected 3+ times across chain steps |
 
 Each signal has DETECT, ACTION, and ESCALATE stages defined in the
 loop detection rules file.
 
-> **Full specification:** See `docs/architecture/sdlc-enforcement-design.md`
-> §8 for the complete governance state machine and failure handling protocol.
-
 ---
 
-## 24. SDLC Enforcement File Inventory (v5.0.0)
+## 27. SDLC Enforcement File Inventory
 
-Files introduced by the SDLC Enforcement Upgrade:
+Files supporting the ticket-driven SDLC enforcement:
 
 | File | Purpose |
 |------|---------|
 | `.github/agents/Validator.agent.md` | Validator agent definition |
+| `.github/agents/ReaperOAK.agent.md` | Ticket-driven orchestrator with 9-state machine |
+| `.github/agents/_cross-cutting-protocols.md` | Event emission + anti-one-shot guardrails |
 | `.github/vibecoding/chunks/Validator.agent/chunk-01.yaml` | Validator core validation protocols |
 | `.github/vibecoding/chunks/Validator.agent/chunk-02.yaml` | Validator init/DoD/gate procedures |
 | `.github/tasks/definition-of-done-template.md` | Machine-parseable DoD checklist (10 items) |
 | `.github/tasks/initialization-checklist-template.md` | Project initialization checklist (9 items) |
-| `docs/architecture/sdlc-enforcement-design.md` | Full SDLC enforcement design specification |
-| `docs/reviews/qa-report.md` | QA review report for the upgrade |
-| `docs/reviews/security-report.md` | Security review report for the upgrade |
 
-Runtime artifacts (created per task/module during execution):
+Runtime artifacts (created per ticket/module during execution):
 
 | Path Pattern | Purpose |
 |-------------|---------|
-| `docs/reviews/dod/{TASK_ID}-dod.yaml` | Per-task DoD report |
-| `docs/reviews/validation/{TASK_ID}-validation.yaml` | Per-task Validator report |
+| `docs/reviews/dod/{TICKET_ID}-dod.yaml` | Per-ticket DoD report |
+| `docs/reviews/validation/{TICKET_ID}-validation.yaml` | Per-ticket Validator report |
 | `docs/reviews/init/{MODULE_NAME}-init.yaml` | Per-module initialization checklist |
 
 ---
 
-## 25. Progressive Refinement TODO Architecture (v6.0.0)
+## 28. Progressive Refinement TODO Architecture
 
 The TODO Agent operates as a **progressive refinement decomposition engine**
 with 3 operating modes and a 5-layer decomposition model. It replaces the
 previous flat task-list approach with a structured, layer-by-layer expansion
 protocol that prevents premature detail and enforces controlled scope growth.
 
-### 25.1 Multi-Layer Decomposition Model
-
-All work flows through five decomposition layers. Each layer refines its
-parent one step at a time — the system **MUST NEVER jump directly from
-L0 to L4**.
+### 28.1 Multi-Layer Decomposition Model
 
 | Layer | Name | Scope | Effort Range | Output File |
 |-------|------|-------|-------------|-------------|
@@ -916,124 +1066,63 @@ L0 to L4**.
 | **L3** | Actionable Task | Delegatable unit | 2–4 hours | `TODO/tasks/{slug}.md` |
 | **L4** | Micro Task (opt-in) | Junior-explicit step | 30–60 min | `TODO/micro/{slug}.md` |
 
-**Critical invariant:** Layer expansion is strictly sequential:
-L0 → L1 → L2 → L3 (→ L4 only when triggered). A child layer file cannot
-be created unless the parent layer file already exists and contains the
-parent item.
+Layer expansion is strictly sequential: L0 → L1 → L2 → L3 (→ L4 only when
+triggered). A child layer file cannot exist unless its parent layer exists.
 
-### 25.2 Three Operating Modes
+### 28.2 Three Operating Modes
 
-Each TODO Agent invocation operates in exactly **one** mode, selected by
-ReaperOAK via the delegation packet's `mode` field. Mode selection is
-**file-existence driven** — ReaperOAK checks which layer files exist to
-determine the appropriate next mode.
+Each invocation operates in exactly **one** mode (file-existence driven):
 
-| Mode | Direction | Input | Output | Role |
-|------|-----------|-------|--------|------|
-| **Strategic Mode** | L0 → L1 | Project vision or user objective | Capability list (3–7 items) with names, descriptions, and rough effort | Strategist |
-| **Planning Mode** | L1 → L2 | One capability from `vision.md` or `capabilities.md` | Execution blocks (3–5 per capability) with effort estimates and inter-block dependencies | Planner |
-| **Execution Planning Mode** | L2 → L3 | One block from `blocks/{slug}.md` | Full Format A task specs with acceptance criteria, file paths, and step-by-step instructions | Executor Controller |
+| Mode | Direction | Output | Role |
+|------|-----------|--------|------|
+| **Strategic** | L0 → L1 | Capability list (3–7 items) | Strategist |
+| **Planning** | L1 → L2 | Execution blocks (3–5 per capability) | Planner |
+| **Execution Planning** | L2 → L3 | Full ticket specs with acceptance criteria | Executor Controller |
 
-**Mode constraints:**
+### 28.3 L3 Tasks Are Tickets
 
-- **Strategic Mode** produces NO task IDs, NO acceptance criteria, NO
-  step-by-step instructions.
-- **Planning Mode** produces blocks with effort estimates and dependencies
-  but NO acceptance criteria or file-level details.
-- **Execution Planning Mode** produces full Format A specs but NO L4
-  micro-tasks (unless explicitly triggered by ReaperOAK).
+All L3 tasks produced by the TODO Agent are **tickets** in the ticket-driven
+model. They enter the 9-state machine (§6) at BACKLOG and are promoted to
+READY when all `depends_on` entries are DONE.
 
-### 25.3 File Structure
-
-All decomposition artifacts live under `TODO/`:
-
-| File | Layer | Purpose |
-|------|-------|---------|
-| `TODO/vision.md` | L0 + L1 | Vision statement + capabilities list |
-| `TODO/capabilities.md` | L1 | Capability details with status tracking |
-| `TODO/blocks/{capability-slug}.md` | L2 | Execution blocks for one capability |
-| `TODO/tasks/{block-slug}.md` | L3 | Actionable tasks for one block |
-| `TODO/micro/{task-slug}.md` | L4 | Micro-tasks (optional, trigger-based only) |
-
-Legacy project-level files (`{PROJECT}_TODO.md`, `SYSTEM_TODO.md`) remain
-supported for backward compatibility. The `todo_visual.py` globs
-(`*_TODO.md` and `TODO/**/*.md`) discover all active task files.
-
-### 25.4 Controlled Expansion Protocol
-
-Expansion is intentionally throttled to prevent scope explosion:
+### 28.4 Controlled Expansion Protocol
 
 | Rule | Limit | Enforcement |
 |------|-------|-------------|
-| Expand one at a time | ONE capability (L1→L2) or ONE block (L2→L3) per invocation | TODO Agent forbidden actions |
-| Max items per call | 15 tasks maximum per TODO Agent invocation | Hard stop + confirm with ReaperOAK |
-| Parent-first | Parent layer must exist before expanding children | File-existence check before write |
-| No layer skipping | L0→L1→L2→L3 mandatory sequence | Forbidden action #12 |
-| Overflow confirmation | If expansion would create > 15 items, pause and confirm | ReaperOAK approval gate |
+| Expand one at a time | ONE capability or ONE block per invocation | TODO Agent forbidden actions |
+| Max items per call | 15 tasks maximum per invocation | Hard stop + confirm with ReaperOAK |
+| Parent-first | Parent layer must exist before expanding children | File-existence check |
+| No layer skipping | L0→L1→L2→L3 mandatory sequence | Forbidden action |
+| Overflow confirmation | > 15 items → pause and confirm | ReaperOAK approval gate |
 
-### 25.5 Performance Safeguards
-
-Hard limits prevent token bloat and context window exhaustion:
+### 28.5 Performance Safeguards
 
 | Safeguard | Limit | Action on Violation |
 |-----------|-------|--------------------|
-| File size | No TODO file > 800 lines | Auto-split into sub-files (`-part2.md`, `-part3.md`) |
-| Output size | No single TODO Agent call output > 10KB | Truncate, continue in follow-up call |
-| Task count | Total per project tracked | Warning emitted at 100+ tasks |
-| Feature effort | > 80 hours total estimated effort | Split into milestones with distinct task files |
-| Pre-write check | Line count verified before writing | If current + new > 800, create sub-file |
+| File size | No TODO file > 800 lines | Auto-split into sub-files |
+| Output size | No single call output > 10KB | Truncate, continue in follow-up |
+| Task count | Total per project tracked | Warning at 100+ tasks |
+| Feature effort | > 80 hours total | Split into milestones |
 
-### 25.6 Smart Granularity Heuristic
+### 28.6 Smart Granularity Heuristic
 
-The default decomposition depth is **L3** (2–4 hour actionable tasks).
-L4 micro-tasks are opt-in, not automatic. They are generated **only** when
-one or more of these triggers apply:
+Default depth is **L3** (2–4 hour tasks). L4 micro-tasks are generated only
+for: (1) high complexity, (2) junior executor, (3) Validator rejection for
+insufficient clarity, or (4) high bug risk (security/financial logic).
 
-| # | Trigger | Condition |
-|---|---------|-----------|
-| 1 | **High complexity** | Multi-file changes, cross-module dependencies, new patterns |
-| 2 | **Junior executor** | Explicitly stated by user or ReaperOAK |
-| 3 | **Validator rejection** | Task rejected for insufficient clarity |
-| 4 | **High bug risk** | Security-critical, data-handling, or financial logic |
-
-If no trigger applies, L4 micro-tasks are **not** generated.
-Over-decomposition wastes tokens and obscures task structure.
-
-### 25.7 Governance Roles
-
-Each mode maps to a governance role with distinct output expectations
-and forbidden actions:
-
-| Role | Mode | Produces | Forbidden |
-|------|------|----------|-----------|
-| **Strategist** | Strategic (L0→L1) | Capability list with names, descriptions, effort ranges | Task IDs, acceptance criteria, step-by-step instructions |
-| **Planner** | Planning (L1→L2) | Execution blocks with effort, inter-block dependencies | Acceptance criteria, specific file paths in task specs |
-| **Executor Controller** | Execution Planning (L2→L3) | Full Format A specs with acceptance criteria (≥3 per task), explicit file paths | L4 micro-tasks (unless explicitly triggered) |
-
-**Validation rules:**
-
-- Strategist: 3–7 capabilities, each with name + description + effort range
-- Planner: 3–5 blocks per capability, each with name + effort + dependencies
-- Executor Controller: each task ≤ 4h effort, has explicit file paths,
-  has ≥ 3 acceptance criteria, follows Format A structure
-
-### 25.8 Integration with Existing Systems
-
-The progressive refinement model is backward-compatible with all existing
-governance mechanisms:
+### 28.7 Integration with Ticket-Driven Model
 
 | System | Integration |
 |--------|-------------|
-| **Format A tasks** | L3 and L4 tasks use Format A bold-text metadata, parseable by `todo_visual.py` |
-| **8-state execution machine** | Applies to L3 tasks (BACKLOG → READY → LOCKED → IMPLEMENTING → VALIDATING → DOCUMENTING → DONE, with REWORK) |
-| **Post-task chain** | Validator → Documentation → TODO completion flow unchanged |
-| **One-task-per-agent-per-cycle** | Enforced at L3 task delegation — no agent receives > 1 task per cycle |
-| **UI/UX Gate** | L3 tasks marked `UI Touching: yes` must have UIDesigner dependency |
-| **Two-party completion** | No agent self-marks tasks complete — ReaperOAK + TODO Agent verify |
-| **Priority escalation** | P3→P2→P1→P0 auto-escalation on blocked tasks still applies |
-| **Stall detection** | Progress stall, blocked chain, zero-progress cycle signals unchanged |
+| **9-state ticket machine** | L3 tasks enter at BACKLOG, promoted to READY when deps satisfied |
+| **Post-execution chain** | Runs for every L3 ticket (QA → Validator → Docs → CI → Commit) |
+| **One-ticket-per-agent** | Enforced at L3 delegation — no agent receives > 1 ticket per cycle |
+| **UI/UX Gate** | L3 tickets marked `UI Touching: yes` must have UIDesigner dependency |
+| **Event emission** | Implementing agents emit structured events per §8 |
+| **Anti-one-shot** | Scope enforcement and iteration requirements apply per §9 |
+| **Commit enforcement** | Each completed L3 ticket gets its own git commit per §10 |
 
-### 25.9 Source Files
+### 28.8 Source Files
 
 | File | Purpose |
 |------|---------|
@@ -1041,3 +1130,65 @@ governance mechanisms:
 | `.github/vibecoding/chunks/TODO.agent/chunk-01.yaml` | Multi-layer decomposition protocol, file structure, task format |
 | `.github/vibecoding/chunks/TODO.agent/chunk-02.yaml` | Governance roles, performance safeguards, smart granularity heuristic |
 | `.github/agents/ReaperOAK.agent.md` | Mode-aware orchestration, file-existence-driven mode selection |
+
+---
+
+## 29. Chunk Routing
+
+Every agent has domain chunks at `.github/vibecoding/chunks/{AgentDir}/`.
+When delegating, **always include the chunk path** in the delegation packet.
+Add task-specific tags from `.github/vibecoding/catalog.yml` when relevant.
+
+| Agent | Chunk Dir | Extra Tags (catalog.yml) |
+|-------|-----------|-------------------------|
+| Architect | `Architect.agent/` | `sdlc:`, `general:` |
+| Backend | `Backend.agent/` | `sdlc:`, `performance:` |
+| Frontend Engineer | `Frontend.agent/` | `accessibility:`, `performance:` |
+| QA Engineer | `QA.agent/` | `testing:` |
+| Security Engineer | `Security.agent/` | `security:` |
+| DevOps Engineer | `DevOps.agent/` | `devops:`, `ci:`, `container:` |
+| Documentation Specialist | `Documentation.agent/` | — |
+| Research Analyst | `Research.agent/` | `cto:` |
+| Product Manager | `ProductManager.agent/` | `sdlc:` |
+| CI Reviewer | `CIReviewer.agent/` | `ci:` |
+| UIDesigner | `UIDesigner.agent/` | `design:`, `accessibility:` |
+| TODO | `TODO.agent/` | `sdlc:`, `general:` |
+| Validator | `Validator.agent/` | `validation:`, `sdlc-enforcement:` |
+
+Chunk paths: `.github/vibecoding/chunks/{dir}/chunk-NN.yaml`
+
+---
+
+## 30. Example Full Ticket Execution Trace
+
+Concrete example: ticket TDSA-BE001 going from READY to DONE.
+
+```
+ 1. READY      │ TDSA-BE001 eligible (all depends_on satisfied)
+ 2. LOCKED     │ ReaperOAK acquires lock for Backend agent
+               │ Lock: {ticketId: "TDSA-BE001", lockedBy: "Backend",
+               │        cycleId: "cycle-001"}
+ 3. IMPLEMENT  │ ReaperOAK delegates to Backend with full context:
+               │   - Ticket ID: TDSA-BE001
+               │   - Objective: Implement auth endpoint
+               │   - Upstream artifacts: api-contracts.yaml
+               │   - Chunks: .github/vibecoding/chunks/Backend.agent/
+               │   - Deliverables: server/src/auth.ts
+               │   - Scope: THIS TICKET ONLY
+ 4. COMPLETED  │ Backend emits TASK_COMPLETED event with evidence:
+               │   - Artifact: server/src/auth.ts
+               │   - Tests: server/src/auth.test.ts (12 pass, 0 fail)
+               │   - Confidence: HIGH
+ 5. REVIEW     │ QA Engineer runs test review → PASS
+ 6. REVIEW     │ Validator runs 10-item DoD check → APPROVED
+ 7. VALIDATED  │ Documentation Specialist updates CHANGELOG → confirmed
+ 8. DOCUMENTED │ CI Reviewer checks lint/types → PASS
+ 9. COMMITTED  │ ReaperOAK executes:
+               │   git add server/src/auth.ts server/src/auth.test.ts
+               │   git commit -m "[TDSA-BE001] Implement auth endpoint"
+10. DONE       │ Full lifecycle complete, lock released
+               │ Dependency scan: TDSA-BE002, TDSA-BE003 promoted
+               │ BACKLOG → READY
+```
+
+This trace shows every state transition, chain step, and dependency promotion.

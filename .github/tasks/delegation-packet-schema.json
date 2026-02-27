@@ -186,8 +186,8 @@
     },
     "sdlc_stage": {
       "type": ["string", "null"],
-      "enum": ["PLAN", "INITIALIZE", "IMPLEMENT", "TEST", "VALIDATE", "DOCUMENT", "MARK_COMPLETE", null],
-      "description": "Current task-level SDLC stage. Null for pipeline-level delegations."
+      "enum": ["BACKLOG", "READY", "LOCKED", "IMPLEMENTING", "REVIEW", "VALIDATED", "DOCUMENTED", "COMMITTED", "DONE", null],
+      "description": "Current ticket state in the 9-state machine. Null if not yet assigned."
     },
     "dod_checklist": {
       "type": ["object", "null"],
@@ -204,7 +204,7 @@
         "no_todo_comments": { "type": "boolean" }
       },
       "additionalProperties": false,
-      "description": "Definition of Done checklist status. Null until MARK_COMPLETE stage."
+      "description": "Definition of Done checklist status. Null until REVIEW state."
     },
     "initialization_checklist": {
       "type": ["object", "null"],

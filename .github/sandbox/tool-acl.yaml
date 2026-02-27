@@ -264,7 +264,7 @@ agents:
         - ".github/memory-bank/feedback-log.md"
       denied:
         - "**"
-    notes: "Independent SDLC compliance reviewer; invokable only by ReaperOAK at VALIDATE and MARK COMPLETE stages. Write scope is allowlist-only — denied: '**' blocks all paths not explicitly listed in allowed."
+    notes: "Independent SDLC compliance reviewer; invokable only by ReaperOAK at REVIEW state of the 9-state ticket machine. Write scope is allowlist-only — denied: '**' blocks all paths not explicitly listed in allowed."
 
 # Apply Proposal Requirements
 apply_proposal:
