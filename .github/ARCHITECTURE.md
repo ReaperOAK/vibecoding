@@ -1,12 +1,12 @@
 # Vibecoding Multi-Agent System Architecture
 
-> **Version:** 5.0.0
+> **Version:** 6.0.0
 > **Owner:** ReaperOAK (CTO / Supervisor Orchestrator)
-> **Last Updated:** 2026-02-26
+> **Last Updated:** 2026-02-27
 >
-> **Changelog:** v5.0.0 — SDLC Enforcement Upgrade: 7-stage task-level SDLC
-> loop, Validator agent, Definition of Done framework, initialization
-> enforcement, 8-layer bug-catching strategy, governance state machine
+> **Changelog:** v6.0.0 — Progressive Refinement TODO Architecture: 5-layer
+> decomposition, 3-mode refinement engine, performance safeguards, smart
+> granularity
 
 ---
 
@@ -892,3 +892,152 @@ Runtime artifacts (created per task/module during execution):
 | `docs/reviews/dod/{TASK_ID}-dod.yaml` | Per-task DoD report |
 | `docs/reviews/validation/{TASK_ID}-validation.yaml` | Per-task Validator report |
 | `docs/reviews/init/{MODULE_NAME}-init.yaml` | Per-module initialization checklist |
+
+---
+
+## 25. Progressive Refinement TODO Architecture (v6.0.0)
+
+The TODO Agent operates as a **progressive refinement decomposition engine**
+with 3 operating modes and a 5-layer decomposition model. It replaces the
+previous flat task-list approach with a structured, layer-by-layer expansion
+protocol that prevents premature detail and enforces controlled scope growth.
+
+### 25.1 Multi-Layer Decomposition Model
+
+All work flows through five decomposition layers. Each layer refines its
+parent one step at a time — the system **MUST NEVER jump directly from
+L0 to L4**.
+
+| Layer | Name | Scope | Effort Range | Output File |
+|-------|------|-------|-------------|-------------|
+| **L0** | Vision | Project objective | N/A | `TODO/vision.md` |
+| **L1** | Capability | Major feature | 1–2 weeks | `TODO/vision.md` + `TODO/capabilities.md` |
+| **L2** | Execution Block | Coherent work chunk | 1–3 days | `TODO/blocks/{slug}.md` |
+| **L3** | Actionable Task | Delegatable unit | 2–4 hours | `TODO/tasks/{slug}.md` |
+| **L4** | Micro Task (opt-in) | Junior-explicit step | 30–60 min | `TODO/micro/{slug}.md` |
+
+**Critical invariant:** Layer expansion is strictly sequential:
+L0 → L1 → L2 → L3 (→ L4 only when triggered). A child layer file cannot
+be created unless the parent layer file already exists and contains the
+parent item.
+
+### 25.2 Three Operating Modes
+
+Each TODO Agent invocation operates in exactly **one** mode, selected by
+ReaperOAK via the delegation packet's `mode` field. Mode selection is
+**file-existence driven** — ReaperOAK checks which layer files exist to
+determine the appropriate next mode.
+
+| Mode | Direction | Input | Output | Role |
+|------|-----------|-------|--------|------|
+| **Strategic Mode** | L0 → L1 | Project vision or user objective | Capability list (3–7 items) with names, descriptions, and rough effort | Strategist |
+| **Planning Mode** | L1 → L2 | One capability from `vision.md` or `capabilities.md` | Execution blocks (3–5 per capability) with effort estimates and inter-block dependencies | Planner |
+| **Execution Planning Mode** | L2 → L3 | One block from `blocks/{slug}.md` | Full Format A task specs with acceptance criteria, file paths, and step-by-step instructions | Executor Controller |
+
+**Mode constraints:**
+
+- **Strategic Mode** produces NO task IDs, NO acceptance criteria, NO
+  step-by-step instructions.
+- **Planning Mode** produces blocks with effort estimates and dependencies
+  but NO acceptance criteria or file-level details.
+- **Execution Planning Mode** produces full Format A specs but NO L4
+  micro-tasks (unless explicitly triggered by ReaperOAK).
+
+### 25.3 File Structure
+
+All decomposition artifacts live under `TODO/`:
+
+| File | Layer | Purpose |
+|------|-------|---------|
+| `TODO/vision.md` | L0 + L1 | Vision statement + capabilities list |
+| `TODO/capabilities.md` | L1 | Capability details with status tracking |
+| `TODO/blocks/{capability-slug}.md` | L2 | Execution blocks for one capability |
+| `TODO/tasks/{block-slug}.md` | L3 | Actionable tasks for one block |
+| `TODO/micro/{task-slug}.md` | L4 | Micro-tasks (optional, trigger-based only) |
+
+Legacy project-level files (`{PROJECT}_TODO.md`, `SYSTEM_TODO.md`) remain
+supported for backward compatibility. The `todo_visual.py` globs
+(`*_TODO.md` and `TODO/**/*.md`) discover all active task files.
+
+### 25.4 Controlled Expansion Protocol
+
+Expansion is intentionally throttled to prevent scope explosion:
+
+| Rule | Limit | Enforcement |
+|------|-------|-------------|
+| Expand one at a time | ONE capability (L1→L2) or ONE block (L2→L3) per invocation | TODO Agent forbidden actions |
+| Max items per call | 15 tasks maximum per TODO Agent invocation | Hard stop + confirm with ReaperOAK |
+| Parent-first | Parent layer must exist before expanding children | File-existence check before write |
+| No layer skipping | L0→L1→L2→L3 mandatory sequence | Forbidden action #12 |
+| Overflow confirmation | If expansion would create > 15 items, pause and confirm | ReaperOAK approval gate |
+
+### 25.5 Performance Safeguards
+
+Hard limits prevent token bloat and context window exhaustion:
+
+| Safeguard | Limit | Action on Violation |
+|-----------|-------|--------------------|
+| File size | No TODO file > 800 lines | Auto-split into sub-files (`-part2.md`, `-part3.md`) |
+| Output size | No single TODO Agent call output > 10KB | Truncate, continue in follow-up call |
+| Task count | Total per project tracked | Warning emitted at 100+ tasks |
+| Feature effort | > 80 hours total estimated effort | Split into milestones with distinct task files |
+| Pre-write check | Line count verified before writing | If current + new > 800, create sub-file |
+
+### 25.6 Smart Granularity Heuristic
+
+The default decomposition depth is **L3** (2–4 hour actionable tasks).
+L4 micro-tasks are opt-in, not automatic. They are generated **only** when
+one or more of these triggers apply:
+
+| # | Trigger | Condition |
+|---|---------|-----------|
+| 1 | **High complexity** | Multi-file changes, cross-module dependencies, new patterns |
+| 2 | **Junior executor** | Explicitly stated by user or ReaperOAK |
+| 3 | **Validator rejection** | Task rejected for insufficient clarity |
+| 4 | **High bug risk** | Security-critical, data-handling, or financial logic |
+
+If no trigger applies, L4 micro-tasks are **not** generated.
+Over-decomposition wastes tokens and obscures task structure.
+
+### 25.7 Governance Roles
+
+Each mode maps to a governance role with distinct output expectations
+and forbidden actions:
+
+| Role | Mode | Produces | Forbidden |
+|------|------|----------|-----------|
+| **Strategist** | Strategic (L0→L1) | Capability list with names, descriptions, effort ranges | Task IDs, acceptance criteria, step-by-step instructions |
+| **Planner** | Planning (L1→L2) | Execution blocks with effort, inter-block dependencies | Acceptance criteria, specific file paths in task specs |
+| **Executor Controller** | Execution Planning (L2→L3) | Full Format A specs with acceptance criteria (≥3 per task), explicit file paths | L4 micro-tasks (unless explicitly triggered) |
+
+**Validation rules:**
+
+- Strategist: 3–7 capabilities, each with name + description + effort range
+- Planner: 3–5 blocks per capability, each with name + effort + dependencies
+- Executor Controller: each task ≤ 4h effort, has explicit file paths,
+  has ≥ 3 acceptance criteria, follows Format A structure
+
+### 25.8 Integration with Existing Systems
+
+The progressive refinement model is backward-compatible with all existing
+governance mechanisms:
+
+| System | Integration |
+|--------|-------------|
+| **Format A tasks** | L3 and L4 tasks use Format A bold-text metadata, parseable by `todo_visual.py` |
+| **8-state execution machine** | Applies to L3 tasks (BACKLOG → READY → LOCKED → IMPLEMENTING → VALIDATING → DOCUMENTING → DONE, with REWORK) |
+| **Post-task chain** | Validator → Documentation → TODO completion flow unchanged |
+| **One-task-per-agent-per-cycle** | Enforced at L3 task delegation — no agent receives > 1 task per cycle |
+| **UI/UX Gate** | L3 tasks marked `UI Touching: yes` must have UIDesigner dependency |
+| **Two-party completion** | No agent self-marks tasks complete — ReaperOAK + TODO Agent verify |
+| **Priority escalation** | P3→P2→P1→P0 auto-escalation on blocked tasks still applies |
+| **Stall detection** | Progress stall, blocked chain, zero-progress cycle signals unchanged |
+
+### 25.9 Source Files
+
+| File | Purpose |
+|------|---------|
+| `.github/agents/TODO.agent.md` | TODO Agent definition with 3 operating modes |
+| `.github/vibecoding/chunks/TODO.agent/chunk-01.yaml` | Multi-layer decomposition protocol, file structure, task format |
+| `.github/vibecoding/chunks/TODO.agent/chunk-02.yaml` | Governance roles, performance safeguards, smart granularity heuristic |
+| `.github/agents/ReaperOAK.agent.md` | Mode-aware orchestration, file-existence-driven mode selection |

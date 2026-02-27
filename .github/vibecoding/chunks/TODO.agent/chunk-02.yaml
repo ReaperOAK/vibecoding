@@ -1,9 +1,9 @@
 ---
 source: "./.github/agents/TODO.agent.md"
 chunk_index: 2
-token_estimate: 2050
-hash: "37928765b98757dbf56ed15097803cddb16392dfa14310ae3de200eb4f4817ea"
-summary: "TODO Agent — Governance, Lifecycle & Completion Protocol. Status transitions, two-party completion protocol, completion gates, governance rules, UI/UX flagging, input/output contract, todo_visual.py validation."
+token_estimate: 3000
+hash: "PENDING_RECOMPUTE"
+summary: "TODO Agent — Governance Roles, Performance Safeguards, Smart Granularity Heuristic, Lifecycle & Completion Protocol."
 ---
 # TODO Agent — Governance, Lifecycle & Completion Protocol
 
@@ -128,8 +128,8 @@ P0 task blocked for > 1 cycle  → STOP pipeline, notify user
 ### 4.4 Task Budget
 
 ```
-Max effort per task: 90 min (split further if exceeded)
-Per-agent per-cycle budget: max 90 min of estimated effort (1 task per cycle, max 90 min per task)
+Max effort per L3 task: 4 hours, per L4 task: 90 min (split further if exceeded)
+Per-agent per-cycle budget: max 4 hours (1 L3 task per cycle)
 Per-cycle total budget: max 40h across all agents
 Feature total budget: declared at DECOMPOSE time, tracked against actuals
 ```
@@ -137,7 +137,51 @@ Feature total budget: declared at DECOMPOSE time, tracked against actuals
 If a feature's total estimated effort exceeds **80h**, split it into multiple
 milestones with distinct task files.
 
-## 5. UI/UX Flagging Protocol
+### 4.5 Governance Roles
+
+Each TODO Agent invocation operates in exactly ONE mode. Each mode has
+distinct output expectations, validation rules, and forbidden actions.
+
+**Strategist (Strategic Mode):**
+- **Output:** Capability list only (no task IDs, no acceptance criteria)
+- **Validation:** 3–7 capabilities, each with name + description + effort range
+- **Forbidden:** Generating task IDs, acceptance criteria, or step-by-step instructions
+
+**Planner (Planning Mode):**
+- **Output:** Execution blocks with rough effort estimates and dependencies
+- **Validation:** 3–5 blocks per capability, each with name + effort + dependencies
+- **Forbidden:** Generating acceptance criteria or specific file paths in task specs
+
+**Executor Controller (Execution Planning Mode):**
+- **Output:** Full Format A task specs with acceptance criteria and file paths
+- **Validation:** Each task ≤ 90 min effort, has explicit file paths, has ≥ 3 acceptance criteria
+- **Forbidden:** Generating L4 micro-tasks unless explicitly triggered
+
+## 5. Performance Safeguards
+
+| Safeguard | Limit | Action |
+|-----------|-------|--------|
+| **File size** | No TODO file > 800 lines | Split into sub-files (`-part2.md`, `-part3.md`) |
+| **Output size** | No TODO Agent call output > 10KB | Truncate, continue in follow-up call |
+| **Task count** | Track total per project | Emit warning at 100+ tasks |
+| **Pre-write check** | Check file line count before writing | If current + new > 800, create sub-file |
+
+## 6. Smart Granularity Heuristic
+
+L4 micro-tasks are generated ONLY when one or more triggers apply.
+Default behavior: **STOP at L3. L4 is opt-in, not automatic.**
+
+| # | Trigger | Condition | Action |
+|---|---------|-----------|--------|
+| 1 | **High complexity** | Multi-file changes, cross-module deps, new patterns | Generate L4 for affected L3 tasks |
+| 2 | **Junior executor** | Explicitly stated by user or ReaperOAK | Generate L4 for all L3 tasks in scope |
+| 3 | **Validator rejection** | Task rejected for insufficient clarity | Generate L4 for rejected task only |
+| 4 | **High bug risk** | Security-critical, data-handling, financial logic | Generate L4 for high-risk L3 tasks |
+
+If NO trigger applies, do NOT generate L4. Over-decomposition wastes
+tokens and obscures task structure.
+
+## 7. UI/UX Flagging Protocol
 
 Every task MUST be marked with `**UI Touching:** yes | no`. The following
 signals trigger `yes`:
@@ -161,42 +205,46 @@ signals trigger `yes`:
 UIDesigner task in their `depends_on` chain. If missing, the UI/UX Gate
 (run by ReaperOAK between DECOMPOSE and SPEC) will block the pipeline.
 
-## 6. Input/Output Contract
+## 8. Input/Output Contract
 
 **Input (from ReaperOAK):**
 
 ```yaml
 taskId: string             # ReaperOAK's delegation packet ID
+mode: string               # "strategic" | "planning" | "execution_planning"
 objective: string          # "Decompose feature X into granular tasks"
 featureDescription: string # Full feature description from user
 upstreamArtifacts: string[] # PRD, architecture docs, existing TODO files
 projectPrefix: string     # e.g., "WL", "KB", "TODO"
-maxTasksPerAgent: int      # Default: 3
+maxTasksPerAgent: int      # Default: 3 (execution_planning mode only)
 targetAgents: string[]     # Agents that should receive tasks (optional)
 ```
 
-**Output (to ReaperOAK):**
+**Output (to ReaperOAK) — mode-specific:**
+
+| Field | Strategic | Planning | Execution Planning |
+|-------|-----------|----------|-------------------|
+| `outputFile` | `TODO/vision.md` | `TODO/blocks/{slug}.md` | `TODO/tasks/{slug}.md` |
+| `itemCount` | L1 capabilities (3–7) | L2 blocks (3–5) | L3 task count |
+| `agentDistribution` | — | — | Per-agent task list |
+| `dependencyDAG` | — | Inter-block deps | Full Mermaid DAG |
+| `criticalPath` | — | — | Ordered task IDs |
+| `uiTouchingTasks` | — | — | UI-touching task IDs |
+| `estimatedTotalEffort` | Effort ranges | Block-level effort | Summed task effort |
+| `todoVisualOutput` | — | — | `todo_visual.py --json` |
+| `formatValidation` | PASS/FAIL | PASS/FAIL | PASS/FAIL |
+
+Common output envelope (all modes):
 
 ```yaml
 taskId: string
 status: "complete" | "blocked" | "failed"
-deliverables:
-  taskFile: string          # Path to generated TODO file
-  taskCount: int            # Number of tasks created
-  agentDistribution:        # Tasks per agent
-    - agent: string
-      taskCount: int
-      taskIds: string[]
-  dependencyDAG: string     # Mermaid diagram of task dependencies
-  criticalPath: string[]    # Ordered list of critical-path task IDs
-  uiTouchingTasks: string[] # Task IDs that require UIDesigner
-  estimatedTotalEffort: string # e.g., "32h"
+deliverables: { ... }      # Mode-specific fields per table above
 evidence:
-  todoVisualOutput: string  # Output of `python3 todo_visual.py --json`
   formatValidation: "PASS" | "FAIL"
 ```
 
-## 7. Post-Completion Flow
+## 9. Post-Completion Flow
 
 After writing a TODO file, the TODO Agent must:
 
@@ -213,7 +261,7 @@ If `todo_visual.py` reports parsing errors, fix the task file before
 returning. The `--json` flag produces machine-readable output for
 validation.
 
-## 8. todo_visual.py Validation
+## 10. todo_visual.py Validation
 
 Always validate generated TODO files by running:
 
@@ -230,7 +278,7 @@ python3 todo_visual.py --json
 - Check status values are one of: `BACKLOG`, `READY`, `LOCKED`, `IMPLEMENTING`, `VALIDATING`, `DOCUMENTING`, `DONE`, `REWORK` (legacy values `not_started`, `in_progress`, `completed`, `blocked` accepted as aliases)
 - Fix and re-validate before returning results
 
-## 9. Extended Metadata Fields
+## 11. Extended Metadata Fields
 
 Beyond what todo_visual.py parses, these metadata fields are tracked in each
 task block for governance purposes:
