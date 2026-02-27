@@ -35,7 +35,7 @@ verification, project initialization checklist validation, running
 linters/type checkers/test suites as independent verification, pattern
 conformance checking against `systemPatterns.md`, writing validation reports
 to `docs/reviews/`, writing DoD verdicts, appending to `feedback-log.md`,
-blocking MARK COMPLETE for non-compliant tasks.
+blocking ticket advancement past REVIEW for non-compliant tasks.
 
 **Excluded:** Implementing application code (→ Backend/Frontend), fixing bugs
 (→ domain agents), architecture decisions (→ Architect), test strategy design

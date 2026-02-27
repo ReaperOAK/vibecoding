@@ -159,3 +159,27 @@ append_only: true
 - Governance state machine with blocking rules and rework loops
 - 5 new loop detection signals + STOP_ALL keyword standardization
 - ARCHITECTURE.md at v5.0.0
+
+### [2026-02-27] Session 13: Ticket-Driven Event-Based Engine
+
+| Task | Agent | Evidence | Status |
+|------|-------|----------|--------|
+| TDSA-BE001: ReaperOAK.agent.md Rewrite | Backend | 810 lines, 20 sections, verified | DONE |
+| TDSA-BE002: TODO.agent.md Ticket Alignment | Backend | 175 lines, Ticket Compatibility section | DONE |
+| TDSA-BE003: Cross-Cutting Event Protocols | Backend | 209 lines, §8 Event Emission + §9 Anti-One-Shot | DONE |
+| TDSA-BE004: agents.md Boot Protocol | Backend | 191 lines, 9-state refs + chain refs | DONE |
+| TDSA-BE005: chunk-01.yaml Ticket Model | Backend | 324 lines, BACKLOG default, 9-state values | DONE |
+| TDSA-BE006: chunk-02.yaml State Machine | Backend | 306 lines, 9-state replaces 8-state | DONE |
+| TDSA-DOC001: ARCHITECTURE.md v7.0.0 | Documentation | 1194 lines, v6.0.0→v7.0.0, all new sections | DONE |
+| Validator Review | Validator | 7/7 checks PASS, 95% confidence, APPROVED | DONE |
+
+### System Now Has (Session 13)
+- **Ticket-driven event-based engine** replaces phase-based batch orchestration
+- **9-state ticket machine:** BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE
+- **Mandatory per-ticket post-execution chain:** QA → Validator → Doc → CI Reviewer → Commit (3 combined rework budget)
+- **Event emission protocol:** 9 structured event types routed through ReaperOAK
+- **Anti-one-shot guardrails:** scope enforcement, 2-pass minimum, anti-batch detection
+- **Commit enforcement:** every ticket gets its own `git commit` with ticket ID + CHANGELOG
+- **Progressive refinement preserved:** L3 tasks are now "tickets" entering BACKLOG
+- **ARCHITECTURE.md at v7.0.0**
+- OLD model references remain in 8+ out-of-scope files (technical debt — future ticket)

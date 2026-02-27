@@ -2,8 +2,8 @@
 source: "./.github/agents/Validator.agent.md"
 chunk_index: 1
 token_estimate: 3200
-hash: "355535798d0a4b088a2823ac85ed954e3546a8843985afa65e6635d604398c42"
-summary: "Validator Agent — Core Validation Protocols. DoD checklist verification steps (10 items), SDLC stage compliance checks (7 stages), validation report format/schema, evidence evaluation criteria, independent verification workflow."
+hash: "PENDING_RECOMPUTE"
+summary: "Validator Agent — Core Validation Protocols. DoD checklist verification steps (10 items), 9-state ticket machine compliance checks, validation report format/schema, evidence evaluation criteria, independent verification workflow."
 ---
 # Validator Agent — Core Validation Protocols
 
@@ -58,31 +58,33 @@ ELSE:
 - **Blocking vs Advisory:** All 10 DoD items are blocking. There are
   no advisory-only DoD items.
 
-## 2. SDLC Stage Compliance Checks
+## 2. Ticket State Machine Compliance Checks
 
-The Validator verifies that each task traversed all 7 SDLC stages in order.
-No stage may be skipped by the implementing agent.
+The Validator verifies that each ticket has traversed the 9-state machine
+correctly. No state may be skipped; guard conditions must be satisfied.
 
-### Stage Verification Matrix
+### State Verification Matrix
 
-| Stage | What to Verify | Evidence Source |
+| State | What to Verify | Evidence Source |
 |-------|---------------|----------------|
-| PLAN | Agent documented approach, listed files to modify, declared confidence ≥ MEDIUM | Agent output / delegation response |
-| INITIALIZE | Init checklist passed (all applicable items `true`) OR cached `all_passed: true` exists | `docs/reviews/init/{MODULE}-init.yaml` |
-| IMPLEMENT | Files created/modified per acceptance criteria; no syntax errors | `git diff` output, file existence check |
-| TEST | Tests exist for new code; all tests pass; coverage ≥ 80% | Test runner output, coverage report |
-| VALIDATE | This is YOUR stage — you are running it now | Current validation session |
-| DOCUMENT | Documentation updated for public APIs; JSDoc/TSDoc present | File diff for docs/ and code comments |
-| MARK_COMPLETE | All prior stages passed; ReaperOAK marks via TODO agent | Task status field in TODO file |
+| BACKLOG | Ticket exists with valid metadata and dependencies declared | TODO task file |
+| READY | All `depends_on` tickets have status = DONE | Dependency check on TODO files |
+| LOCKED | Lock acquired by ReaperOAK, agent assigned | `workflow-state.json` lock fields |
+| IMPLEMENTING | Agent produced deliverables per acceptance criteria; no syntax errors | `git diff` output, file existence check |
+| REVIEW | This is YOUR state — you are running validation now. QA has reviewed test coverage. | Current validation session, QA report |
+| VALIDATED | All DoD items pass; Validator verdict = APPROVED | DoD report at `docs/reviews/dod/` |
+| DOCUMENTED | Documentation Specialist updated relevant docs | Doc update confirmation |
+| COMMITTED | CI Reviewer passed; `git commit` created with ticket ID | CI report, git log |
+| DONE | Full lifecycle complete; all chain steps verified | Final status in TODO file |
 
 ### Compliance Check Protocol
 
-1. Read the task's `stageHistory` from `workflow-state.json` (if available)
-2. Verify each stage has an entry with `result: "passed"`
-3. Confirm stage ordering is correct (no skips, no out-of-order)
-4. For INITIALIZE: verify the init checklist file exists and `allPassed: true`
-5. For TEST: independently re-run tests to confirm they still pass
-6. Flag any missing stages as a compliance violation
+1. Read the ticket's state history from `workflow-state.json` (if available)
+2. Verify each state transition has valid guard conditions met
+3. Confirm the mandatory post-execution chain ran (QA → Validator → Doc → CI Reviewer → Commit)
+4. For IMPLEMENTING: verify init checklist if module is new (`allPassed: true`)
+5. For REVIEW: independently re-run tests to confirm they still pass
+6. Flag any skipped states or missing chain steps as a compliance violation
 
 ## 3. Validation Report Format
 

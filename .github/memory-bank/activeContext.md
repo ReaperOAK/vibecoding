@@ -291,3 +291,29 @@ compaction_threshold: 50
 - `.github/copilot-instructions.md` — 14 agents, Validator added
 - `agents.md` — Validator definition + Task-Level SDLC Compliance section + STOP keyword fix
 - `TODO/SDLC_TODO.md` — 13 tasks (all complete)
+
+---
+
+### [2026-02-27T00:00:00Z] Ticket-Driven Event-Based Engine (Session 13)
+
+- **Focus:** Complete orchestration model replacement — phase-based → ticket-driven
+- **Agent:** ReaperOAK
+- **Scope:** TDSA-BE001 through TDSA-DOC001 (7 tasks, all DONE)
+
+### Key Changes
+- **ReaperOAK.agent.md** — COMPLETE REWRITE (833→810 lines). 20 sections. Ticket-driven event loop replaces phased model. 9-state machine: BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE. Mandatory per-ticket post-execution chain: QA → Validator → Doc → CI Reviewer → Commit. Event emission protocol (9 types). Anti-one-shot guardrails. Commit enforcement per ticket.
+- **TODO.agent.md** — Updated (133→175 lines). Ticket Compatibility section added. L3 tasks = tickets entering BACKLOG. 9-state backward compat mapping.
+- **_cross-cutting-protocols.md** — Updated (102→209 lines). Section 8: Event Emission Protocol (9 event types, structured payloads). Section 9: Anti-One-Shot Guardrails (scope enforcement, 2-pass minimum, anti-batch detection).
+- **agents.md** — Updated (200→191 lines). Boot protocol references ticket-driven event loop, 9-state machine, post-execution chain, event emission §8, anti-one-shot §9.
+- **chunk-01.yaml** — Updated (315→324 lines). Format A default BACKLOG, 9-state values, ticket model notes. Hash: PENDING_RECOMPUTE.
+- **chunk-02.yaml** — Updated (297→306 lines). 9-state model replaces 8-state. Post-execution chain aligned. Governance rules updated. Hash: PENDING_RECOMPUTE.
+- **ARCHITECTURE.md** — Updated v6.0.0→v7.0.0 (1044→1194 lines). Full ticket-driven architecture documented.
+
+### Validator Review
+- All 7 checks PASSED at 95% confidence (V1-V7)
+- Advisory: 8+ out-of-scope files still reference old model (Validator.agent.md, loop-detection-rules.md, delegation-packet-schema.json, etc.) — technical debt for future ticket
+
+### What to Do Next
+- Create remediation ticket for out-of-scope files referencing old model
+- Recompute chunk hashes for chunk-01.yaml and chunk-02.yaml
+- Update workflow-state.json and artifacts-manifest.json

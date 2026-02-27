@@ -3,102 +3,109 @@ source: "./.github/agents/TODO.agent.md"
 chunk_index: 2
 token_estimate: 3000
 hash: "PENDING_RECOMPUTE"
-summary: "TODO Agent — Governance Roles, Performance Safeguards, Smart Granularity Heuristic, Lifecycle & Completion Protocol."
+summary: "TODO Agent — Governance Roles, Performance Safeguards, Smart Granularity Heuristic, 9-State Ticket Machine & Completion Protocol."
 ---
 # TODO Agent — Governance, Lifecycle & Completion Protocol
 
-## 1. Status Transitions
+## 1. Status Transitions (9-State Ticket Machine)
 
 ```
-BACKLOG ──→ READY ──→ LOCKED ──→ IMPLEMENTING ──→ VALIDATING ──→ DOCUMENTING ──→ DONE
-  │          │                  │              │
-  │          │                  │              ├──→ REWORK ──→ IMPLEMENTING (rework ≤ 3)
-  │          │                  │              │
-  │          │                  ├──→ REWORK    └──→ BACKLOG (rework > 3, escalated)
-  │          │                  │
-  │          └── READY (lock expired, 30 min timeout)
-  │
+BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE
+  │        │                  │               │          │            │
+  │        │                  │               │          │            └→ REWORK (CI reject)
+  │        │                  │               └→ REWORK (QA/Validator reject)
+  │        │                  └→ REWORK (agent failure)
+  │        └── READY (lock expired, 30 min timeout)
   └── (promoted when all depends_on = DONE)
+REWORK → IMPLEMENTING (rework_count ≤ 3) | BACKLOG (rework_count > 3)
 ```
 
-**8 States:**
+**9 States:**
 
-| State | Meaning |
-|-------|--------|
-| `BACKLOG` | Task exists, dependencies not yet met (or escalated from REWORK) |
-| `READY` | All dependencies DONE, eligible for cycle selection |
-| `LOCKED` | Selected for cycle, lock acquired by ReaperOAK |
-| `IMPLEMENTING` | Delegated to subagent, work in progress |
-| `VALIDATING` | Implementation submitted, Validator reviewing |
-| `DOCUMENTING` | Validator approved, Documentation Specialist updating docs |
-| `DONE` | All post-task chain steps complete |
-| `REWORK` | Validator rejected or agent reported failure |
+| State | Meaning | Owner |
+|-------|---------|-------|
+| `BACKLOG` | Ticket exists, dependencies not met | System (auto) |
+| `READY` | All dependencies DONE, eligible for selection | System (auto) |
+| `LOCKED` | Selected for cycle, lock acquired | ReaperOAK |
+| `IMPLEMENTING` | Delegated to subagent, work in progress | Implementing Agent |
+| `REVIEW` | Implementation done, QA + Validator reviewing | QA + Validator |
+| `VALIDATED` | All reviews pass, docs being updated | Documentation Specialist |
+| `DOCUMENTED` | Docs updated, CI review pending | CI Reviewer |
+| `COMMITTED` | CI passes, commit created | ReaperOAK |
+| `DONE` | Full lifecycle complete | System (final) |
+
+`REWORK` is a side state (failure path), not in the main progression.
 
 **Transition Rules:**
 
 | From | To | Trigger | Guard Condition |
 |------|-----|---------|----------------|
-| BACKLOG | READY | Dependency check | All `depends_on` tasks have status = DONE |
-| READY | LOCKED | Cycle SELECT phase | No file conflicts, agent not locked, priority selected |
-| LOCKED | IMPLEMENTING | `runSubagent` called | Lock is active, agent assignment confirmed |
-| LOCKED | READY | Timer expires | Lock timeout reached (30 min) — auto-release |
-| IMPLEMENTING | VALIDATING | Agent returns evidence | Post-task chain Step 1-2 pass (evidence reviewed) |
-| IMPLEMENTING | REWORK | Agent reports failure | Error evidence provided |
-| VALIDATING | DOCUMENTING | Validator verdict | verdict = APPROVED |
-| VALIDATING | REWORK | Validator verdict | verdict = REJECTED, rework_counter < 3 |
-| DOCUMENTING | DONE | Doc-update report | Documentation Specialist confirms all DOC items |
-| REWORK | IMPLEMENTING | Re-delegation | rework_counter incremented, < 3 |
-| REWORK | BACKLOG | Escalation | rework_counter >= 3, user notified |
-| DONE | REWORK | Post-completion audit or Validator force-revert | Validator | rework_count++ |
+| BACKLOG | READY | Dependency check | All `depends_on` = DONE |
+| READY | LOCKED | Cycle SELECT | No file conflicts, agent not locked |
+| LOCKED | IMPLEMENTING | `runSubagent` called | Lock active, agent assigned |
+| LOCKED | READY | Timer expires | Lock timeout (30 min) — auto-release |
+| IMPLEMENTING | REVIEW | Agent emits TASK_COMPLETED | Evidence provided |
+| IMPLEMENTING | REWORK | Agent emits TASK_FAILED | Error evidence provided |
+| REVIEW | VALIDATED | QA PASS + Validator APPROVED | QA + DoD verification pass |
+| REVIEW | REWORK | QA or Validator fail | REJECT, rework_count < 3 |
+| VALIDATED | DOCUMENTED | Doc update confirmed | Documentation Specialist confirms |
+| DOCUMENTED | COMMITTED | CI + commit pass | CI Reviewer PASS, `git commit` succeeds |
+| DOCUMENTED | REWORK | CI Reviewer rejects | rework_count < 3 |
+| COMMITTED | DONE | Final confirmation | All lifecycle steps verified |
+| REWORK | IMPLEMENTING | Re-delegation | rework_count++, < 3 |
+| REWORK | BACKLOG | Escalation | rework_count >= 3, user notified |
 
-**Immutability:** Once a task status is `DONE`, it cannot be reverted
-except via a post-completion audit by the Validator (with evidence).
-Tasks can only be archived, never deleted.
+**Immutability:** Once `DONE`, revert only via post-completion audit
+by Validator (with evidence). Tasks are archived, never deleted.
 
-**Backward Compatibility:** Legacy status values (`not_started`,
-`in_progress`, `completed`, `blocked`) are automatically mapped to new
-states per the State Mapping table in `ReaperOAK.agent.md`:
+**Backward Compatibility:**
 - `not_started` → `BACKLOG` (promoted to READY if all deps DONE)
 - `in_progress` → `IMPLEMENTING`
 - `completed` → `DONE`
 - `blocked` → `BACKLOG` with `blocker_reason` field
+- `VALIDATING` → `REVIEW`
+- `DOCUMENTING` → `DOCUMENTED`
 
-## 2. Two-Party Completion Protocol
+## 2. Mandatory Post-Execution Chain
 
-No agent can unilaterally mark its own tasks complete. The flow is:
+No agent may unilaterally mark tasks complete. After an implementing agent
+finishes, this chain runs for EVERY ticket. No exceptions, no shortcuts.
 
 ```
-1. Owning agent completes work → returns evidence to ReaperOAK
-2. ReaperOAK reviews evidence against acceptance criteria
-3. If PASS:
-   a. ReaperOAK delegates to TODO Agent: "Mark {TASK_ID} as completed.
-      Evidence: {evidence_summary}"
-   b. TODO Agent updates task status in the TODO file
-   c. ReaperOAK checks: are downstream tasks now unblocked?
-   d. If yes: select next batch → delegate
-4. If FAIL:
-   a. ReaperOAK re-delegates to same agent with findings (fix loop)
-   b. Max 3 retries per task (from existing loop detection rules)
-   c. After 3 failures: mark task as blocked, escalate to user
+1. Implementing agent → emits TASK_COMPLETED event with evidence
+2. QA Engineer → test completeness review (coverage ≥80%) → PASS/REJECT
+3. Validator → DoD enforcement (10 items verified) → APPROVED/REJECTED
+4. Documentation Specialist → artifact updates → confirms
+5. CI Reviewer → CI checks (lint, types, complexity) → PASS/REJECT
+6. ReaperOAK → commit enforcement → `git commit -m "[TICKET-ID] desc"`
+7. TODO Agent → marks ticket DONE after all chain steps pass
 ```
+
+If ANY chain step rejects → ticket enters **REWORK** → assigned back
+to implementing agent with rejection report. QA (Step 2), Validator
+(Step 3), and CI (Step 5) share a single `rework_count` counter
+(max 3 combined). On exhaustion → escalate to user (ticket → BACKLOG).
 
 ## 3. Completion Gates
 
-A task is marked `completed` ONLY when ALL of these are true:
+A ticket reaches `DONE` ONLY when ALL of these are true:
 
-| Gate | Verification | Source |
-|------|-------------|--------|
-| **Deliverables exist** | Files listed in task's "What to do" exist on disk | `read/readFile` |
-| **Acceptance criteria met** | Each criterion checked and passed | Agent evidence |
-| **Quality score ≥ 7/10** | Agent's self-reflection score | Agent output |
-| **No regressions** | Existing tests still pass (if applicable) | Test output |
-| **Format valid** | Output follows project conventions | CIReviewer or lint |
+| Gate | Verification | Stage |
+|------|-------------|-------|
+| **Deliverables exist** | Files listed in task spec exist on disk | REVIEW |
+| **Acceptance criteria met** | Each criterion checked and passed | REVIEW |
+| **QA review passed** | QA Engineer test completeness PASS | REVIEW |
+| **Validator approved** | Validator DoD (10 items) APPROVED | REVIEW → VALIDATED |
+| **Docs updated** | Documentation Specialist confirms | VALIDATED → DOCUMENTED |
+| **CI checks pass** | Lint, types, complexity PASS | DOCUMENTED → COMMITTED |
+| **Commit created** | `git commit` with ticket ID succeeds | COMMITTED |
+| **Full chain** | Ticket passed REVIEW, VALIDATED, DOCUMENTED, COMMITTED | DONE |
 
 ## 4. Governance Rules
 
 ### 4.1 Max-Task-Per-Cycle
 
-No subagent receives more than **1 task** per delegation cycle, enforced via task lock.
+One ticket in IMPLEMENTING per agent per cycle (ticket locking via ReaperOAK).
 
 | Check Point | Enforcer | Action on Violation |
 |-------------|----------|-------------------|
@@ -110,10 +117,10 @@ No subagent receives more than **1 task** per delegation cycle, enforced via tas
 
 | Signal | Detection | Action |
 |--------|-----------|--------|
-| **Task Progress Stall** | Task `in_progress` for > 2 cycles without status change | Mark STALLED, escalate |
-| **Blocked Chain** | 3+ tasks in a dependency chain all `blocked` | Identify root blocker, escalate to user |
-| **Zero-Progress Cycle** | Full cycle with 0 tasks moving to `completed` | Halt pipeline, require user re-scoping |
-| **Thrashing** | Same task toggled between `in_progress`/`blocked` ≥ 3 times | Force `blocked`, root cause analysis |
+| **Task Progress Stall** | Task in IMPLEMENTING for > 2 cycles without state change | Mark STALLED, escalate |
+| **Blocked Chain** | 3+ tasks in dependency chain all in BACKLOG (blocked) | Identify root blocker, escalate to user |
+| **Zero-Progress Cycle** | Full cycle with 0 tasks reaching DONE | Halt pipeline, require user re-scoping |
+| **Thrashing** | Same task toggled between IMPLEMENTING/REWORK ≥ 3 times | Force BACKLOG, root cause analysis |
 | **Orphan Tasks** | `depends_on` referencing non-existent IDs | todo_visual.py reports `missing_deps`, fix immediately |
 
 ### 4.3 Priority Escalation
@@ -154,6 +161,7 @@ distinct output expectations, validation rules, and forbidden actions.
 
 **Executor Controller (Execution Planning Mode):**
 - **Output:** Full Format A task specs with acceptance criteria and file paths
+- **Default status:** All generated tasks enter **BACKLOG** state
 - **Validation:** Each task ≤ 90 min effort, has explicit file paths, has ≥ 3 acceptance criteria
 - **Forbidden:** Generating L4 micro-tasks unless explicitly triggered
 
@@ -275,7 +283,7 @@ python3 todo_visual.py --json
 **If validation fails:**
 - Check task header format matches regex: `^(#{2,4})\s+([A-Z][A-Z0-9-]*\d{3,4}):\s*(.+)$`
 - Check bold-text metadata lines are correctly formatted
-- Check status values are one of: `BACKLOG`, `READY`, `LOCKED`, `IMPLEMENTING`, `VALIDATING`, `DOCUMENTING`, `DONE`, `REWORK` (legacy values `not_started`, `in_progress`, `completed`, `blocked` accepted as aliases)
+- Check status values are one of: `BACKLOG`, `READY`, `LOCKED`, `IMPLEMENTING`, `REVIEW`, `VALIDATED`, `DOCUMENTED`, `COMMITTED`, `DONE`, `REWORK` (legacy values `not_started`, `in_progress`, `completed`, `blocked` accepted as aliases)
 - Fix and re-validate before returning results
 
 ## 11. Extended Metadata Fields
@@ -288,6 +296,8 @@ task block for governance purposes:
 **Delegation Packet:** PKT-20260226-143000-A1B2C3
 **Completion Evidence:** path/to/evidence or "pending"
 **UI Touching:** yes | no
+**Rework Count:** 0
+**Blocker:** (none)
 **Created:** 2026-02-26T14:30:00Z
 **Updated:** 2026-02-26T15:45:00Z
 ```
