@@ -9,12 +9,47 @@
   "phase_iteration": 0,
   "overall_status": "idle",
   "phases": {
-    "SPEC": { "status": "pending", "started_at": null, "completed_at": null, "agents": {}, "artifacts_produced": [], "gate_result": null },
-    "BUILD": { "status": "pending", "started_at": null, "completed_at": null, "agents": {}, "artifacts_produced": [], "gate_result": null },
-    "VALIDATE": { "status": "pending", "started_at": null, "completed_at": null, "agents": {}, "artifacts_produced": [], "gate_result": null },
+    "SPEC": {
+      "status": "pending",
+      "started_at": null,
+      "completed_at": null,
+      "agents": {},
+      "artifacts_produced": [],
+      "gate_result": null
+    },
+    "BUILD": {
+      "status": "pending",
+      "started_at": null,
+      "completed_at": null,
+      "agents": {},
+      "artifacts_produced": [],
+      "gate_result": null
+    },
+    "VALIDATE": {
+      "status": "pending",
+      "started_at": null,
+      "completed_at": null,
+      "agents": {},
+      "artifacts_produced": [],
+      "gate_result": null
+    },
     "GATE": { "status": "pending" },
-    "DOCUMENT": { "status": "pending", "started_at": null, "completed_at": null, "agents": {}, "artifacts_produced": [], "gate_result": null },
-    "RETROSPECTIVE": { "status": "pending", "started_at": null, "completed_at": null, "agents": {}, "proposals": [], "gate_result": null }
+    "DOCUMENT": {
+      "status": "pending",
+      "started_at": null,
+      "completed_at": null,
+      "agents": {},
+      "artifacts_produced": [],
+      "gate_result": null
+    },
+    "RETROSPECTIVE": {
+      "status": "pending",
+      "started_at": null,
+      "completed_at": null,
+      "agents": {},
+      "proposals": [],
+      "gate_result": null
+    }
   },
   "fix_loops": [],
   "blockers": [],

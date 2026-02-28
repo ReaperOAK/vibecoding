@@ -54,6 +54,8 @@ CI/CD setup (→ DevOps), writing tests (→ QA), requirement elicitation (→ P
 | Context Map | Mandatory pre-design: map affected files, patterns, dependencies, test coverage |
 | Well-Architected Checklist | 6 pillars: operational excellence, security, reliability, performance, cost, sustainability |
 | ADR Template | Structured decision records with status, context, evaluation matrix, consequences |
+| API contracts | Structured swagger/OpenAPI specifications |
+| Diagrams | Structured diagrams (e.g., Mermaid, PlantUML), never ascii |
 | DAG Decomposition | Break implementation into dependency-ordered task graph |
 | Anti-Pattern Detection | Identify and prevent architecture anti-patterns before they ship |
 
