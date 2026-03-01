@@ -1,8 +1,8 @@
-<!-- GOVERNANCE_VERSION: 9.0.0 -->
+<!-- GOVERNANCE_VERSION: 9.1.0 -->
 
 # Worker Policy
 
-> **Governance Version:** 9.0.0
+> **Governance Version:** 9.1.0
 > **Source:** Extracted from ReaperOAK.agent.md §7, §15 (with unbounded scaling)
 > **Scope:** Elastic worker pool model, worker lifecycle, one-ticket-one-worker
 > rule, lock semantics, anti-one-shot guardrails, and auto-scaling algorithm.
@@ -43,6 +43,14 @@ worker_pool_registry:
     - { role: Product Manager,          currentActive: 0, activeWorkers: [] }
     - { role: Architect,                currentActive: 0, activeWorkers: [] }
     - { role: UIDesigner,               currentActive: 0, activeWorkers: [] }
+    # --- Background pool (OCF-managed, see governance/concurrency_floor.md) ---
+    - role: BackgroundWorker
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "active_workers < MIN_ACTIVE_WORKERS"
+        scaleDownTrigger: "classA_preemption OR idle_duration > 5min"
+        cooldownPeriod: "1min"
+      activeWorkers: []
     # --- Compliance pool (violation-aware scaling) ---
     - role: ComplianceWorker
       currentActive: 0
@@ -231,3 +239,8 @@ function autoScale(pool):
 - Scale-down is driven by idle timeout only (10 min default)
 - ComplianceWorker pools use `violation_backlog > currentActive` as their
   scale trigger with a tighter 5-min idle timeout
+- After Class A scaling completes, the **Operational Concurrency Floor**
+  (OCF) runs — see `governance/concurrency_floor.md` §4 for the full
+  algorithm. If `total_active_workers < MIN_ACTIVE_WORKERS (10)`, Class B
+  background workers are spawned to fill the deficit. Class A always
+  preempts Class B — see `governance/concurrency_floor.md` §5.

@@ -1,8 +1,8 @@
-<!-- GOVERNANCE_VERSION: 9.0.0 -->
+<!-- GOVERNANCE_VERSION: 9.1.0 -->
 
 # Commit Policy
 
-> **Governance Version:** 9.0.0
+> **Governance Version:** 9.1.0
 > **Source:** Extracted from ReaperOAK.agent.md §12, §22
 > **Scope:** Per-ticket atomic commit enforcement, scoped git rules, and
 > pre-commit scope validation.
@@ -137,3 +137,41 @@ to REWORK or flags for human attention.
 | Commit without ticket ID prefix | Format violation | Reject, re-format message |
 | Staging files outside ticket scope | DRIFT-002 | Reject, remove extra files |
 | Missing declared files from staging | DRIFT-002 | Reject, add missing files |
+
+---
+
+## 7. Class B (Background) Commit Policy
+
+Background workers spawned by the Operational Concurrency Floor use a
+distinct commit format. Full specification: `governance/concurrency_floor.md` §7.
+
+### BG Commit Format
+
+```bash
+git add path/to/report.md
+git commit -m "[BG-<TYPE>] description"
+```
+
+Example: `[BG-SEC-AUDIT] OWASP gap analysis for auth module`
+
+### BG Commit Rules
+
+| Rule | Enforcement |
+|------|-------------|
+| Format: `[BG-<TYPE>]` prefix | Reject commits without valid BG prefix |
+| Scoped git only (no `git add .`) | DRIFT-002 applies to Class B equally |
+| Small, scoped changes | Never mass-refactor |
+| Blocked if Class A modifies same files | Class A has file priority |
+| CHANGELOG entry optional for BG | Reports/proposals don't require CHANGELOG |
+
+### BG Commit Validation
+
+```
+function validateBGCommit(bg_ticket):
+  staged = git diff --cached --name-only
+  classA_files = union(active_classA_worker.touched_files)
+  overlap = intersection(staged, classA_files)
+  if overlap is not empty:
+    return REJECT  # Class A has file priority
+  return PASS
+```

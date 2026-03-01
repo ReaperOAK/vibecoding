@@ -1,6 +1,6 @@
 # Event Protocol
 
-> **GOVERNANCE_VERSION: 9.0.0**
+> **GOVERNANCE_VERSION: 9.1.0**
 > **Authority:** `.github/instructions/core_governance.instructions.md`
 > **Source:** ReaperOAK §13 (event types + routing), §20 (PROTOCOL_VIOLATION)
 > **Scope:** All event types, routing rules, payload format, blocking protocol
@@ -63,9 +63,19 @@
 | 23 | `INSTRUCTION_MISALIGNMENT` | Governance file version ≠ system GOVERNANCE_VERSION | Boot sequence / Health Sweep | file_path, declared_version, expected_version, timestamp |
 | 24 | `GOVERNANCE_DRIFT` | Governance integrity check detects duplication, oversized files, or misalignment | Health Sweep | drift_type, affected_files, details, timestamp |
 
+### Background / OCF Events
+
+| # | Event Type | When Emitted | Emitter | Payload |
+|---|-----------|-------------|---------|--------|
+| 25 | `BG_WORKER_SPAWNED` | OCF spawns background worker to fill concurrency floor | Scheduler | worker_id, bg_type, deficit_count, timestamp |
+| 26 | `BG_WORKER_PREEMPTED` | Class A ticket preempts lowest-priority Class B worker | Scheduler | bg_worker_id, bg_type, classA_ticket_id, timestamp |
+| 27 | `BG_WORKER_COMPLETED` | Background task finished | BG Worker | bg_type, finding_summary, recommended_action, timestamp |
+| 28 | `CONCURRENCY_FLOOR_ACTIVE` | Floor deficit detected — fewer than MIN_ACTIVE_WORKERS active | Scheduler | active_count, deficit, bg_types_selected, timestamp |
+| 29 | `CONCURRENCY_FLOOR_SATISFIED` | Floor reached — MIN_ACTIVE_WORKERS active | Scheduler | classA_count, classB_count, total, timestamp |
+
 ---
 
-## 2. Event Routing Rules (20 Routes)
+## 2. Event Routing Rules (25 Routes)
 
 When ReaperOAK receives an event, it routes as follows:
 
@@ -91,6 +101,11 @@ When ReaperOAK receives an event, it routes as follows:
 | 18 | `REQUEST_RESEARCH` | Pause ticket, invoke Research Analyst, resume on findings |
 | 19 | `INSTRUCTION_MISALIGNMENT` | **Halt agent immediately**, re-sync governance version, re-inject updated governance files before resuming |
 | 20 | `GOVERNANCE_DRIFT` | **Pause new scheduling**, run auto-correct (split oversized files, deduplicate, realign versions), resume after correction |
+| 21 | `BG_WORKER_SPAWNED` | Log spawn, add to BackgroundWorker pool registry, track bg_type |
+| 22 | `BG_WORKER_PREEMPTED` | Pause BG ticket (return to BG-READY), reassign capacity to Class A, log preemption |
+| 23 | `BG_WORKER_COMPLETED` | Terminate BG worker, evaluate finding — if actionable, create Class A improvement ticket proposal |
+| 24 | `CONCURRENCY_FLOOR_ACTIVE` | Trigger background ticket generation for deficit, select bg_types via round-robin |
+| 25 | `CONCURRENCY_FLOOR_SATISFIED` | Log floor status, no action needed — informational |
 
 ---
 
@@ -184,3 +199,7 @@ Emit events as structured markdown in agent output:
    rejected (triggers DRIFT-007)
 5. `INSTRUCTION_MISALIGNMENT` is emitted at boot if version mismatch detected
 6. `GOVERNANCE_DRIFT` is emitted by the Health Sweep on integrity violations
+7. Background workers MUST emit `BG_WORKER_COMPLETED` with `finding_summary`
+   and `recommended_action` — findings without these fields are discarded
+8. `BG_WORKER_SPAWNED` and `BG_WORKER_PREEMPTED` are emitted only by the
+   Scheduler — workers must NOT emit these events
