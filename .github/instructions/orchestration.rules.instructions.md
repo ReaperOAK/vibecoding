@@ -1,3 +1,9 @@
+---
+name: Orchestration Rules
+applyTo: '**'
+description: This file defines the canonical rules for task execution, concurrency, DAG construction, confidence-gated progression, and integration validation. All agents MUST comply.
+---
+
 # Orchestration Rules
 
 > **Version:** 2.0.0

@@ -1,3 +1,9 @@
+---
+name: Agentic Security Guardrails
+applyTo: '**'
+description: Comprehensive security guardrails for the Vibecoding Multi-Agent System, including threat model, prompt injection mitigation, and secure coding practices. This file serves as the single source of truth for system security and operational rules.
+---
+
 # Agentic Security Guardrails
 
 > **Version:** 2.0.0

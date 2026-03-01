@@ -1,3 +1,9 @@
+---
+name: ARCHITECTURE
+applyTo: '**'
+description: Comprehensive architecture for the Vibecoding Multi-Agent System, including agent topology, delegation format, continuous scheduling algorithm, 9-state lifecycle, event protocol, and more. This file serves as the single source of truth for system design and operational rules.
+---
+
 # Vibecoding Multi-Agent System Architecture
 
 > **Version:** 9.1.0
