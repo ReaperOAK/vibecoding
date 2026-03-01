@@ -1,7 +1,8 @@
 ---
-user-invokable: false
+name: Cross-Cutting Protocols
+applyTo: '**'
+description: This file defines the cross-cutting protocols that ALL agents must follow, regardless of their specific domain or role. These protocols ensure consistency, reliability, and maintainability across the entire system. ReaperOAK enforces compliance with these protocols, and violations may result in rework or escalation.
 ---
-
 # Cross-Cutting Agent Protocols
 
 > **Applies to:** ALL subagents. Every agent MUST follow these protocols in

@@ -1,5 +1,7 @@
 ---
-user-invokable: false
+name: CORE_GOVERNANCE
+applyTo: '**'
+description: This file defines the core governance framework for the vibecoding multi-agent system. It establishes the canonical authority for all governance policies, enumerates core invariants and drift violation types, and outlines the change protocol for modifying governance rules. All agents must reference this document and adhere to its rules. In case of conflict between agent instructions and this document, this document takes precedence.
 ---
 
 # Core Governance — Canonical Authority
