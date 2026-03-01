@@ -361,3 +361,57 @@ compaction_threshold: 50
 - Update chunk files (chunk-01.yaml, chunk-02.yaml) with elastic pool content
 - Update workflow-state.json and artifacts-manifest.json for EWPE tickets
 - Test elastic pool dispatch in real multi-ticket scenario
+
+---
+
+## Session 15 — Operational Integrity Protocol (OIP) v1.0.0
+
+**Date:** 2026-03-01
+**Objective:** Implement self-healing governance layer for Light Supervision Mode (Model B)
+
+### Current Focus
+Implementing OIP v1.0.0 — 7-part protocol upgrade from v8.1.0 to v8.2.0:
+1. Core Invariants (9 non-negotiable rules)
+2. Automatic Drift Detection (7 violation types: DRIFT-001 to DRIFT-007)
+3. Auto-Repair Workflow (ComplianceWorker pool, targeted single-action repair)
+4. Scoped Git Enforcement (no git add . / -A / --all, explicit file staging)
+5. Parallel Backfill Stream (Stream A execution + Stream B retroactive repair)
+6. Memory Enforcement Gate (5 required fields, blocks COMMIT without entry)
+7. Continuous Health Sweep (5 checks per scheduling interval)
+8. Light Supervision Mode (auto-correct drift, human only for strategy)
+
+### Changes Made
+
+**ReaperOAK.agent.md** — v8.1.0→v8.2.0 (1454→1863 lines, +409). Added §19-§26 (OIP core). Renumbered §19-§22→§27-§30. ComplianceWorker pool in §7. PROTOCOL_VIOLATION + REPAIR_COMPLETED events in §13. Health Sweep in §9 scheduling loop.
+
+**ARCHITECTURE.md** — v8.1.0→v8.2.0 (1961→2092 lines, +131). §33 OIP overview (6 subsections). §5.1 health sweep in scheduling loop. §8.1 two new events. §8.3 two routing entries. §10.4 scoped git. §15.2 memory gate.
+
+**_cross-cutting-protocols.md** — (245→339 lines, +94). §11 OIP cross-cutting rules (7 subsections: events, scoped git, memory, evidence, single-ticket, ComplianceWorker, health sweep awareness).
+
+**agents.md** — (238→292 lines, +54). §6 OIP memory enforcement. §9 OIP reference section (scoped git, memory gate, single-ticket, evidence, ComplianceWorker, health sweep).
+
+### OIP-ARCH-001 — ReaperOAK.agent.md OIP Core
+- **Artifacts:** .github/agents/ReaperOAK.agent.md
+- **Decisions:** OIP sections §19-§26 placed before worked examples; ComplianceWorker added as new pool role
+- **Timestamp:** 2026-03-01T00:00:00Z
+
+### OIP-ARCH-002 — ARCHITECTURE.md OIP Documentation
+- **Artifacts:** .github/ARCHITECTURE.md
+- **Decisions:** New §33 for OIP overview; existing §5, §8, §10, §15 augmented with subsections
+- **Timestamp:** 2026-03-01T00:10:00Z
+
+### OIP-ARCH-003 — Cross-Cutting Protocols OIP Rules
+- **Artifacts:** .github/agents/_cross-cutting-protocols.md
+- **Decisions:** §11 covers all agent-facing OIP rules; agents need to know events, scoped git, memory
+- **Timestamp:** 2026-03-01T00:20:00Z
+
+### OIP-ARCH-004 — Boot Protocol OIP References
+- **Artifacts:** agents.md
+- **Decisions:** §9 provides concise OIP reference; §6 adds memory gate format template
+- **Timestamp:** 2026-03-01T00:30:00Z
+
+### What to Do Next
+- Update chunk files with OIP content (chunks/{Agent}.agent/ files)
+- Update README.md with OIP governance section
+- Test OIP drift detection in real ticket execution scenario
+- Consider adding OIP worked example (§31) to ReaperOAK.agent.md
