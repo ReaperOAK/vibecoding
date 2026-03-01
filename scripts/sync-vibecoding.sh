@@ -2,13 +2,14 @@
 # sync-vibecoding.sh — One-way sync from ReaperOAK/vibecoding into this project
 #
 # Syncs:
-#   .github/*  (EXCLUDING memory-bank/)
+#   .github/*  (EXCLUDING memory-bank/ and copilot-instructions.md)
 #   agents.md
 #   todo_visual.py
 #
 # Does NOT sync:
 #   README.md (repo-specific)
 #   .github/memory-bank/ (project-specific persistent state)
+#   .github/copilot-instructions.md (project-specific Copilot config)
 #
 # Usage:
 #   ./scripts/sync-vibecoding.sh          # sync from main
@@ -67,6 +68,7 @@ if [[ -z "$DRY_RUN" ]]; then
   # This ensures removed upstream files are also removed locally
   find "$PROJECT_ROOT/.github" -mindepth 1 -maxdepth 1 \
     ! -name 'memory-bank' \
+    ! -name 'copilot-instructions.md' \
     -exec rm -rf {} +
 fi
 
@@ -75,6 +77,10 @@ cd "$SRC/.github"
 for item in *; do
   if [ "$item" = "memory-bank" ]; then
     echo "    Skipping memory-bank/ (project-specific)"
+    continue
+  fi
+  if [ "$item" = "copilot-instructions.md" ]; then
+    echo "    Skipping copilot-instructions.md (project-specific)"
     continue
   fi
   if [[ -n "$DRY_RUN" ]]; then
@@ -109,8 +115,8 @@ fi
 echo ""
 echo "==> Sync complete!"
 echo "    Source: ReaperOAK/vibecoding@$BRANCH"
-echo "    Preserved: .github/memory-bank/"
-echo "    Skipped: README.md"
+echo "    Preserved: .github/memory-bank/, .github/copilot-instructions.md"
+echo "    Skipped: README.md, copilot-instructions.md"
 echo ""
 echo "    Review changes with: git diff --stat"
 echo "    Commit with: git add .github/ agents.md todo_visual.py && git commit -m 'chore: sync vibecoding infrastructure from upstream'"

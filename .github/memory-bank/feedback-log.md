@@ -38,3 +38,13 @@ append_only: true
 - **Signal:** 3 advisory findings: (1) L3 Layer Model table says "2–4 hours" but forbidden action #3 caps at 90 min — inconsistent text. (2) SDLC summary table DECOMPOSE output still shows `TODO/{PROJECT}_TODO.md` instead of progressive refinement paths. (3) Chunk hash values are PENDING_RECOMPUTE.
 - **Evidence:** docs/reviews/validation/TODO-PROGRESSIVE-REFINEMENT-validation.yaml
 - **Resolution:** pending
+
+### [2026-03-06T00:00:00Z] ReaperOAK → System
+- **Session:** shutdown-001
+- **Phase:** SHUTDOWN
+- **Subject Artifact:** workflow-state.json, progress.md, activeContext.md, decisionLog.md
+- **Feedback Type:** suggestion
+- **Severity:** medium
+- **Signal:** Waves 1-2 (18 tasks) completed without full QA→Validator→Doc→CI chain. Memory bank governance files reconciled during shutdown Steps 3-5. Recommend backfill QA coverage check on resume.
+- **Evidence:** riskRegister.md RISK-006, progress.md Wave 1/Wave 2 tables
+- **Resolution:** deferred (to resume session)
