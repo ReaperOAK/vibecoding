@@ -1,5 +1,7 @@
 ---
-name: init
+name: Legacy Repository Takeover
+agent: ReaperOAK
+model: Claude Opus 4.6 (copilot)
 description: This prompt initializes the legacy repository takeover process, guiding the system through structured reconstruction before resuming normal autonomous execution.
 ---
 We are entering LEGACY REPOSITORY TAKEOVER MODE.
