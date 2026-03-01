@@ -11,6 +11,8 @@ Usage:
     python3 todo_visual.py --html       # HTML only
     python3 todo_visual.py --list       # List discovered files
     python3 todo_visual.py --json       # Machine-readable JSON
+    python3 todo_visual.py --ready      # Actionable tasks (non-blocked, deps met)
+    python3 todo_visual.py --ready --json  # Actionable tasks as JSON
 """
 
 from __future__ import annotations
@@ -358,6 +360,89 @@ def resolve(tasks: dict[str, Task]) -> BoardStats:
                 stats.p1_pending += 1
 
     return stats
+
+
+# ═════════════════════════════════════════════════════════════
+#  Ready-Task Filter — Actionable tickets for agent assignment
+# ═════════════════════════════════════════════════════════════
+
+def get_ready_tasks(tasks: dict[str, Task]) -> list[Task]:
+    """Return tasks that are immediately actionable (non-blocked, deps met).
+
+    After resolve() has run, any task whose dependencies are unsatisfied is
+    already marked 'blocked'. So ready = status in {not_started, ready} which
+    means every dependency is completed (or the task has no deps at all).
+    Results are sorted by priority (P0 first) then by ID.
+    """
+    actionable = [
+        t for t in tasks.values()
+        if t.status in {"not_started", "ready"}
+    ]
+    _PRIO_ORDER = {"P0": 0, "P1": 1, "P2": 2, "P3": 3}
+    actionable.sort(key=lambda t: (_PRIO_ORDER.get(t.priority, 9), t.id))
+    return actionable
+
+
+def render_ready_terminal(ready: list[Task]) -> None:
+    """Compact, agent-friendly terminal listing of assignable tasks."""
+    if not ready:
+        print("No actionable tasks. All tasks are blocked, in-progress, or completed.")
+        return
+    try:
+        from rich import box
+        from rich.console import Console
+        from rich.table import Table
+
+        c = Console()
+        c.print(f"\n[bold green]🟢 READY FOR ASSIGNMENT — {len(ready)} task(s)[/]\n")
+        tbl = Table(box=box.SIMPLE, padding=(0, 1))
+        tbl.add_column("ID", style="bold cyan", no_wrap=True)
+        tbl.add_column("Priority", justify="center")
+        tbl.add_column("Title")
+        tbl.add_column("Owner")
+        tbl.add_column("Effort", justify="right")
+        tbl.add_column("File", style="dim")
+        _P_STYLE = {"P0": "[bold red]P0[/]", "P1": "[yellow]P1[/]", "P2": "[dim]P2[/]", "P3": "[dim]P3[/]"}
+        for t in ready:
+            tbl.add_row(
+                t.id,
+                _P_STYLE.get(t.priority, t.priority),
+                t.title[:50],
+                t.owner,
+                t.effort or "-",
+                t.source_file,
+            )
+        c.print(tbl)
+        c.print()
+    except ImportError:
+        # Plain fallback
+        print(f"\nREADY FOR ASSIGNMENT — {len(ready)} task(s)")
+        print("-" * 80)
+        print(f"{'ID':<16} {'Pri':<4} {'Title':<45} {'Owner':<15}")
+        print("-" * 80)
+        for t in ready:
+            print(f"{t.id:<16} {t.priority:<4} {t.title[:45]:<45} {t.owner:<15}")
+        print()
+
+
+def render_ready_json(ready: list[Task]) -> None:
+    """Machine-readable JSON list of assignable tasks."""
+    out = {
+        "ready_count": len(ready),
+        "tasks": [
+            {
+                "id": t.id,
+                "title": t.title,
+                "priority": t.priority,
+                "owner": t.owner,
+                "effort": t.effort,
+                "depends_on": t.depends_on,
+                "source_file": t.source_file,
+            }
+            for t in ready
+        ],
+    }
+    print(json.dumps(out, indent=2))
 
 
 # ═════════════════════════════════════════════════════════════
@@ -786,6 +871,15 @@ def main() -> None:
     stats = resolve(tasks)
     stats.files_scanned = len(files)
     stats.files_with_tasks = len({t.source_file for t in tasks.values()})
+
+    # ── Ready-task filter (--ready) ──
+    if "--ready" in args:
+        ready = get_ready_tasks(tasks)
+        if "--json" in args:
+            render_ready_json(ready)
+        else:
+            render_ready_terminal(ready)
+        return
 
     # ── JSON dump ──
     if "--json" in args:

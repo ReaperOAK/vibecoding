@@ -85,6 +85,13 @@ function enforceConcurrencyFloor():
 3. If fewer than `deficit` conflict-free BG tickets available, accept
    partial fill — do NOT force-spawn conflicting workers
 
+### Task Discovery
+
+Before spawning Class B workers, the scheduler queries the actionable task
+pool via `python3 todo_visual.py --ready --json`. This provides an
+authoritative, post-resolution view of all non-blocked tasks, ensuring
+background workers are only spawned for genuinely assignable work.
+
 ---
 
 ## 5. Preemption Rules

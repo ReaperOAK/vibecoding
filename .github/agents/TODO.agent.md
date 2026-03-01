@@ -87,9 +87,12 @@ Before ANY work, do these in order:
    These are your detailed protocols, ID conventions, and governance rules.
    Do not skip.
 2. Read existing `TODO/**/*.md` files to check for task ID collisions
-3. Read **upstream artifacts** — if the delegation prompt lists files from a
+3. **Query actionable tasks** — run `python3 todo_visual.py --ready --json`
+   to get the current list of non-blocked, dependency-satisfied tasks.
+   This avoids full ticket scanning and gives you the exact current state.
+4. Read **upstream artifacts** — if the delegation prompt lists files from a
    prior phase (e.g., PRD, architecture doc), read them BEFORE decomposing
-4. If modifying files: check `.github/guardian/STOP_ALL` — halt if STOP
+5. If modifying files: check `.github/guardian/STOP_ALL` — halt if STOP
 
 ## Scope
 
