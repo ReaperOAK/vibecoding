@@ -261,13 +261,24 @@ loop forever:
     for each worker where idle_time > cooldownPeriod:
       terminate(worker)
 
-  # --- ASSIGNMENT PHASE ---
+  # --- ASSIGNMENT PHASE (Class A — Primary) ---
   ready_tickets = get_tickets(state=READY, order_by=priority)
   for each ticket in ready_tickets:
     if no_conflict(ticket):
       worker = spawn_worker(ticket.required_role)
       assign(worker, ticket)
       ticket.state = LOCKED
+
+  # --- CONCURRENCY FLOOR PHASE (OCF §25) ---
+  total_active = count_all_active_workers()
+  if total_active < MIN_ACTIVE_WORKERS:            # MIN = 10
+    needed = MIN_ACTIVE_WORKERS - total_active
+    bg_tickets = generate_background_tickets(needed)  # Class B
+    for bg in bg_tickets:
+      if no_conflict_with_primary(bg):
+        worker = spawn_worker(bg.role)
+        assign(worker, bg)
+  # Preemption: if new Class A arrives, pause lowest-priority Class B
 
   # --- DISPATCH PHASE ---
   locked_tickets = get_tickets(state=LOCKED)
@@ -282,6 +293,8 @@ loop forever:
 - **Parallel:** All conflict-free READY tickets dispatch simultaneously
 - **Self-healing:** Health sweep auto-corrects drift every iteration
 - **Governance-first:** Integrity check runs BEFORE any other phase
+- **Concurrency floor:** MIN_ACTIVE_WORKERS (10) enforced via Class B backfill
+- **Preemptive:** Class A always overrides Class B workers
 
 ### Parallel Dispatch Protocol
 
@@ -720,5 +733,89 @@ Examples cover: Strategic Evolution (SDR flow), Elastic Parallel Execution
 
 ---
 
-*End of ReaperOAK v9.0.0 specification. Governance policies are externalized
+---
+
+## 25. Operational Concurrency Floor (OCF)
+
+### Constants
+
+```
+MIN_ACTIVE_WORKERS = 10
+```
+
+### Work Classes
+
+| Class | Priority | Source | Preemptible |
+|-------|----------|--------|-------------|
+| **A** — Primary | High | Ticket backlog (L3 tasks) | No |
+| **B** — Background | Low | Scheduler-generated | Yes — paused on Class A arrival |
+
+### Background Ticket Taxonomy
+
+| Type | Agent | Scope |
+|------|-------|-------|
+| `BG-SEC-AUDIT` | Security | Scan codebase for OWASP/STRIDE gaps |
+| `BG-ARCH-ALIGN` | Architect | Verify implementation matches ADRs |
+| `BG-TECH-DEBT-SCAN` | Backend/Frontend | Identify code smells, complexity hotspots |
+| `BG-QA-COVERAGE-CHECK` | QA | Find untested paths, coverage gaps |
+| `BG-DOC-COMPLETENESS` | Documentation | Audit doc freshness and missing sections |
+| `BG-MEMORY-COMPACTION` | Documentation | Compact stale memory bank entries |
+| `BG-GOVERNANCE-DRIFT-CHECK` | Validator | Cross-check governance file consistency |
+| `BG-FAILED-TICKET-ANALYSIS` | QA | Analyze REWORK/ESCALATED tickets for patterns |
+| `BG-REFACTOR-SUGGESTION` | Architect | Propose scoped refactors (read-only analysis) |
+| `BG-PERFORMANCE-ANALYSIS` | Backend/Frontend | Profile hot paths, identify bottlenecks |
+
+### Preemption Rules
+
+1. Class A tickets ALWAYS take priority over Class B
+2. When new Class A ticket arrives and all workers busy:
+   pause lowest-priority Class B worker → reassign capacity to Class A
+3. Paused Class B tickets return to BG-READY queue (resumable)
+4. Class B workers NEVER block Class A file paths
+5. Class B workers operate **read-only** unless generating scoped proposals
+6. If Class B detects a conflict with in-flight Class A → self-pause immediately
+
+### Context Injection (Class B)
+
+Background workers receive MINIMAL context:
+- `governance/lifecycle.md` + `governance/worker_policy.md`
+- Role-specific agent chunks (2 files)
+- Scoped task description (< 500 tokens)
+- Targeted file subset (only files being analyzed)
+- **NO** full repository context, **NO** extra governance files
+
+### Commit Policy (Class B)
+
+- Commits labeled `[BG-<TYPE>] description`
+- Small, scoped — never mass-refactor
+- Explicit `git add` (scoped git rules apply)
+- Class B commits blocked if Class A is modifying same files
+
+### Throttle & Safeguards
+
+| Condition | Action |
+|-----------|--------|
+| Primary backlog > 20 tickets | Suspend all Class B spawning |
+| Token usage > 80% budget | Reduce BG spawn rate by 50% |
+| Token usage > 95% budget | Suspend all Class B |
+| Class A rework rate > 30% | Suspend Class B, focus on primary quality |
+
+### Continuous Improvement Loop
+
+When Class B worker finds an actionable issue:
+1. Create structured improvement ticket (typed, scoped, estimated)
+2. Insert into roadmap as Class A ticket at appropriate priority
+3. Do NOT attempt autonomous rewrite — report only
+4. No recursive self-modification — BG workers cannot create BG tickets
+
+### Anti-Recursion Guard
+
+- Class B workers CANNOT spawn other Class B workers
+- Class B workers CANNOT modify governance, instruction, or agent files
+- Class B output is always a **report** or **improvement ticket proposal**
+- Only ReaperOAK may promote a BG finding to a Class A ticket
+
+---
+
+*End of ReaperOAK v9.1.0 specification. Governance policies are externalized
 to `.github/governance/` — this file is the orchestrator definition only.*

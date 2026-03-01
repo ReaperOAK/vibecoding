@@ -290,4 +290,31 @@ append_only: true
 - **_cross-cutting-protocols.md** (345 lines, 11 sections)
 - **10 new governance files** — _core_governance.md + 9 policy files in governance/
 - **catalog.yml** — governance: tag with 10 file paths
+
+---
+
+## Session 17 — OCF Implementation (v9.1.0)
+
+### Objective
+Implement Operational Concurrency Floor: maintain MIN_ACTIVE_WORKERS=10 at all times. Background (Class B) workers fill unused capacity with structured idle work (security audits, architecture alignment, tech debt scans, etc.).
+
+### Tickets
+
+| Ticket | Description | Status |
+|--------|-------------|--------|
+| OCF-001 | OCF in ReaperOAK.agent.md (§6 scheduling loop + §25 OCF spec) | DONE |
+| OCF-002 | OCF in ARCHITECTURE.md (§5.1 loop + §34 OCF architecture) | DONE |
+| OCF-003 | Verification sweep (no governance bloat, consistency check) | DONE |
+| OCF-004 | Memory bank entries + scoped commit | DONE |
+
+### System Now Has (Session 17 — v9.1.0)
+- **Operational Concurrency Floor** — MIN_ACTIVE_WORKERS=10, scheduler backfills with Class B
+- **Two Work Classes** — Class A (primary, non-preemptible) and Class B (background, preemptible)
+- **10 Background Ticket Types** — BG-SEC-AUDIT, BG-ARCH-ALIGN, BG-TECH-DEBT-SCAN, BG-QA-COVERAGE-CHECK, BG-DOC-COMPLETENESS, BG-MEMORY-COMPACTION, BG-GOVERNANCE-DRIFT-CHECK, BG-FAILED-TICKET-ANALYSIS, BG-REFACTOR-SUGGESTION, BG-PERFORMANCE-ANALYSIS
+- **Preemption Protocol** — Class A always overrides, paused BG returns to BG-READY queue
+- **Throttle Safeguards** — Suspend Class B on heavy load (>20 backlog, >80% tokens, >30% rework)
+- **Anti-Recursion Guard** — BG workers cannot spawn BG, cannot modify governance/agent files
+- **ReaperOAK.agent.md at v9.1.0** (821 lines, 25 sections)
+- **ARCHITECTURE.md at v9.1.0** (~2227 lines, 34 sections)
+- **Zero governance file changes** — all OCF logic at scheduler level only
 - **agents.md** (292 lines, 9 sections)

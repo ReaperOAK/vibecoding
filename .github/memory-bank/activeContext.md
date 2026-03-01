@@ -458,8 +458,28 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Timestamp:** 2026-03-01T03:00:00Z
 
 ### What to Do Next
-- Rechunk ReaperOAK.agent.md (was 3 chunks for 1864 lines, now 723 lines — may need 2)
+- Rechunk ReaperOAK.agent.md (was 3 chunks for 1864 lines, now 821 lines — may need 2)
 - Update ARCHITECTURE.md chunks if stale
 - Verify all agent chunk files still align with new governance references
 - Run full system test with real ticket execution
 - Consider adding OIP worked example (§31) to ReaperOAK.agent.md
+
+---
+
+## Session 17 — Operational Concurrency Floor (OCF) v9.1.0
+
+### OCF-001 — ReaperOAK Scheduler OCF
+- **Artifacts:** .github/agents/ReaperOAK.agent.md
+- **Decisions:** Added §25 OCF specification (background ticket taxonomy, preemption, throttle, anti-recursion). Updated §6 scheduling loop with CONCURRENCY FLOOR PHASE between AUTO-SCALE and ASSIGNMENT. MIN_ACTIVE_WORKERS=10. Two work classes: Class A (primary) and Class B (background). 10 background ticket types. Version bumped to v9.1.0.
+- **Timestamp:** 2026-03-01T04:00:00Z
+
+### OCF-002 — ARCHITECTURE.md OCF
+- **Artifacts:** .github/ARCHITECTURE.md
+- **Decisions:** Added §34 OCF architecture documentation (work classes, 10 BG types, preemption rules, context injection limits, commit policy, throttle safeguards, continuous improvement loop, anti-recursion guard, example scenario). Updated §5.1 scheduling loop pseudocode with concurrency floor phase. Added OCF properties to §5.2. Version header bumped to v9.1.0.
+- **Timestamp:** 2026-03-01T04:00:00Z
+
+### What to Do Next
+- Rechunk ReaperOAK.agent.md (now 821 lines with §25 OCF)
+- Update ARCHITECTURE.md chunks (now 2227 lines with §34 OCF)
+- Test OCF scheduling loop with mixed Class A/B ticket scenarios
+- Verify preemption behavior under load
