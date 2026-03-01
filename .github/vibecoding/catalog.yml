@@ -111,6 +111,18 @@ general:
   - ".github/vibecoding/chunks/Validator.agent/chunk-01.yaml"
   - ".github/vibecoding/chunks/Validator.agent/chunk-02.yaml"
 
+governance:
+  - ".github/agents/_core_governance.md"
+  - ".github/governance/lifecycle.md"
+  - ".github/governance/worker_policy.md"
+  - ".github/governance/commit_policy.md"
+  - ".github/governance/memory_policy.md"
+  - ".github/governance/ui_policy.md"
+  - ".github/governance/security_policy.md"
+  - ".github/governance/event_protocol.md"
+  - ".github/governance/context_injection.md"
+  - ".github/governance/performance_monitoring.md"
+
 instruction:
   - ".github/vibecoding/chunks/a11y.instructions/chunk-01.yaml"
   - ".github/vibecoding/chunks/a11y.instructions/chunk-02.yaml"

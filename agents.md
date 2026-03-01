@@ -20,7 +20,17 @@ architecture decisions or security concerns.
 Read `.github/guardian/STOP_ALL` before executing any file modifications.
 If the file contains `STOP`, stop immediately and report to the user.
 
-## 3. Context Loading (Mandatory)
+## 3. Governance & Context Loading (Mandatory)
+
+### Governance Authority
+
+Read `.github/agents/_core_governance.md` — this is the **canonical
+governance authority**. It indexes all governance policy files in
+`.github/governance/` (lifecycle, worker policy, commit policy, memory,
+UI, security, events, context injection, performance monitoring).
+No agent may override these rules.
+
+### Domain Chunks
 
 All domain guidance is pre-chunked in `.github/vibecoding/chunks/`.
 There are no `.instructions.md` files — chunks are the sole source of truth.
@@ -31,7 +41,7 @@ There are no `.instructions.md` files — chunks are the sole source of truth.
    (e.g., Backend → `Backend.agent/`, Frontend → `Frontend.agent/`)
    — typically 2 files, ~8000 tokens. These are your detailed protocols.
 2. For task-specific guidance, check `.github/vibecoding/catalog.yml`
-   for relevant semantic tags (e.g., `testing:`, `security:`, `performance:`)
+   for relevant semantic tags (e.g., `testing:`, `security:`, `governance:`)
 3. Read additional chunks listed under those tags as needed
 
 **If you skip chunk loading, you are operating without your protocols.
@@ -57,19 +67,15 @@ IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → CO
 When delegating to a subagent, use the delegation packet schema at
 `.github/tasks/delegation-packet-schema.json`.
 
-**Worker Pool Model.** Each agent role is backed by an **elastic pool** of
-workers that auto-scales between `minSize` and `maxSize` based on ticket
-backlog. Workers are spawned dynamically per ticket with unique IDs using the
-format `{Role}Worker-{shortUuid}` (e.g., `BackendWorker-a1b2c3`,
-`FrontendWorker-d4e5f6`, `QAWorker-g7h8i9`). Each worker processes EXACTLY
-ONE ticket — no worker reuse across tickets. Workers are stateless, ephemeral
-instances created via `runSubagent` and terminated after ticket completion.
-Pools grow when backlog exceeds active workers and shrink when workers idle
-for more than 10 minutes, maintaining at least `minSize` capacity at all
-times. All conflict-free READY tickets are dispatched in parallel — ReaperOAK
-calls multiple `runSubagent` simultaneously, one per ticket. If a pool reaches
-`maxSize` and more tickets remain in READY, they queue until a worker
-completes and is released.
+**Worker Pool Model.** Each agent role is backed by an **unbounded elastic
+pool** of workers. There is no maxSize cap — pools scale purely based on
+ticket backlog (bounded only by system resources). Workers are spawned
+dynamically per ticket with unique IDs using the format
+`{Role}Worker-{shortUuid}` (e.g., `BackendWorker-a1b2c3`). Each worker
+processes EXACTLY ONE ticket — no worker reuse across tickets. Workers are
+stateless, ephemeral instances created via `runSubagent` and terminated after
+ticket completion. All conflict-free READY tickets are dispatched in parallel.
+See `governance/worker_policy.md` for full pool policy.
 
 **Two-Layer Orchestration.** The agent roster is organized into two
 concurrent layers that run simultaneously without phase barriers:
@@ -254,9 +260,10 @@ READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION
 
 ## 9. Operational Integrity Protocol (OIP)
 
-> **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19-§26
+> **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19
+> **Governance Authority:** `.github/agents/_core_governance.md`
 > **Cross-Cutting Rules:** `.github/agents/_cross-cutting-protocols.md` §11
-> **Architecture Reference:** `.github/ARCHITECTURE.md` §33
+> **Governance Policies:** `.github/governance/` (9 policy files)
 
 The OIP is the self-healing governance layer for Light Supervision Mode
 (Model B). It applies to ALL agents. Key rules:
@@ -289,4 +296,4 @@ The OIP is the self-healing governance layer for Light Supervision Mode
 - 5 checks every scheduling interval
 - Auto-corrects: stalled tickets, expired locks, missing memory, incomplete chains, scope drift
 
-For the full OIP specification, read `.github/agents/ReaperOAK.agent.md` §19-§26.
+For the full OIP specification, read `.github/agents/ReaperOAK.agent.md` §19.

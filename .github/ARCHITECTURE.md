@@ -1,17 +1,24 @@
 # Vibecoding Multi-Agent System Architecture
 
-> **Version:** 8.2.0
+> **Version:** 9.0.0
 > **Owner:** ReaperOAK (CTO / Elastic Multi-Worker Parallel Orchestrator)
 > **Last Updated:** 2026-03-01
 >
-> **Changelog:** v8.2.0 — Operational Integrity Protocol (OIP): self-healing
+> **Changelog:** v9.0.0 — Structural Hardening: unbounded elastic worker
+> pools (removed all minSize/maxSize caps), governance hierarchy
+> (`.github/governance/` + `_core_governance.md`), modular context injection
+> architecture, 9 drift types (added DRIFT-008/009), instruction versioning
+> tracked in governance files only (not agent frontmatter). ReaperOAK.agent.md
+> reduced 61% (1864→723 lines). §2, §5, §11, §19, §26, §27, §33 updated.
+>
+> v8.2.0 — Operational Integrity Protocol (OIP): self-healing
 > governance layer with 9 core invariants, 7 drift violation types,
 > ComplianceWorker auto-repair, continuous health sweep, memory enforcement
 > gate, scoped git enforcement, parallel backfill stream, Light Supervision
 > Mode. §33 added; §5, §8, §10, §15 updated.
 >
 > v8.1.0 — Elastic Multi-Worker Parallel Execution Engine:
-> elastic auto-scaling pools (minSize/maxSize), dynamic worker IDs
+> elastic auto-scaling pools, dynamic worker IDs
 > ({Role}Worker-{shortUuid}), parallel batch dispatch, mutual-exclusion
 > conflict type, 4 scaling events (WORKER_SPAWNED, WORKER_TERMINATED,
 > POOL_SCALED_UP, POOL_SCALED_DOWN), worker termination on multi-ticket violation
@@ -83,21 +90,21 @@ ReaperOAK (Worker-Pool Adaptive Orchestrator / CTO)
 
 ### Layer Assignments
 
-| Agent | Strategic Layer | Execution Layer | Elastic Pool (min-max) |
+| Agent | Strategic Layer | Execution Layer | Elastic Pool |
 |-------|:-:|:-:|:--|
-| **Research** | ✓ | — | 1-8 |
-| **ProductManager** | ✓ | — | 1-3 |
-| **Architect** | ✓ | — | 1-3 |
-| **Security** | ✓ (strategic) | ✓ (execution) | 1-5 |
-| **UIDesigner** | ✓ (conceptual) | — | 1-3 |
-| **DevOps** | ✓ (infra planning) | ✓ (execution) | 1-5 |
-| **TODO** | ✓ (invoked only by ReaperOAK) | — | 1-3 |
-| **Backend** | — | ✓ | 2-15 |
-| **Frontend** | — | ✓ | 1-10 |
-| **QA** | — | ✓ | 1-8 |
-| **Documentation** | — | ✓ | 1-3 |
-| **Validator** | — | ✓ | 1-3 |
-| **CIReviewer** | — | ✓ | 1-3 |
+| **Research** | ✓ | — | Unbounded |
+| **ProductManager** | ✓ | — | Unbounded |
+| **Architect** | ✓ | — | Unbounded |
+| **Security** | ✓ (strategic) | ✓ (execution) | Unbounded |
+| **UIDesigner** | ✓ (conceptual) | — | Unbounded |
+| **DevOps** | ✓ (infra planning) | ✓ (execution) | Unbounded |
+| **TODO** | ✓ (invoked only by ReaperOAK) | — | Unbounded |
+| **Backend** | — | ✓ | Unbounded |
+| **Frontend** | — | ✓ | Unbounded |
+| **QA** | — | ✓ | Unbounded |
+| **Documentation** | — | ✓ | Unbounded |
+| **Validator** | — | ✓ | Unbounded |
+| **CIReviewer** | — | ✓ | Unbounded |
 
 Strategic and Execution layers run **concurrently**. A strategic agent may
 propose an SDR (§31) while execution workers are processing tickets. SDRs
@@ -268,8 +275,8 @@ loop forever:
   for each pool in worker_pool_registry:
     ready_count = count_tickets(state=READY, role=pool.role)
     active_count = pool.currentActive
-    if ready_count > active_count and active_count < pool.maxSize:
-      scale_target = min(ready_count, pool.maxSize)
+    if ready_count > active_count:
+      scale_target = ready_count  # Unbounded — no maxSize cap
       # Pool capacity reserved — workers spawned on assignment
 
   # --- ASSIGNMENT PHASE ---
@@ -692,7 +699,7 @@ When ReaperOAK receives an event:
 13. **WORKER_SPAWNED** → Log spawn, update pool registry
 14. **WORKER_TERMINATED** → Release resources, check if rework needed
 15. **POOL_SCALED_UP** → Log scaling event, update pool capacity
-16. **POOL_SCALED_DOWN** → Log scaling event, verify minSize maintained
+16. **POOL_SCALED_DOWN** → Log scaling event, verify idle workers terminated
 17. **PROTOCOL_VIOLATION** → Check auto_repair flag; if true, spawn ComplianceWorker; if false, flag for human
 18. **REPAIR_COMPLETED** → Unblock affected ticket, retry state transition
 
@@ -825,31 +832,31 @@ git commit -m "[TICKET-ID] description"
 ReaperOAK assigns multiple conflict-free tickets to workers from elastic
 auto-scaling pools simultaneously. Workers are ephemeral — spawned dynamically
 per-ticket with unique IDs (`{Role}Worker-{shortUuid}`) and terminated after
-completion. Pools auto-scale between `minSize` and `maxSize` based on ticket
-backlog. There are no pre-allocated worker slots — every worker is created on
-demand.
+completion. Pools are **unbounded** — they scale elastically based purely on
+ticket backlog with no artificial upper limit (bounded only by system
+resources). There are no pre-allocated worker slots — every worker is created
+on demand. See `.github/governance/worker_policy.md` for the full pool policy.
 
 ### 11.1 Elastic Pool Registry
 
-Each agent role is backed by an elastic pool that auto-scales based on ticket
-backlog. Pools grow when READY tickets exceed active workers and shrink when
-workers idle for more than 10 minutes, maintaining at least `minSize` capacity.
+Each agent role is backed by an **unbounded elastic pool** that scales based
+on ticket backlog. Pools grow when READY tickets exceed active workers and
+shrink when workers idle for more than 10 minutes. There is no maxSize cap —
+pools scale purely based on demand.
 
 ```yaml
 worker_pool_registry:
+  # UNBOUNDED pools — no maxSize cap. Scale purely on demand.
+  # Full policy: .github/governance/worker_policy.md
   pools:
     - role: Backend
-      minSize: 2
-      maxSize: 15
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
         scaleDownTrigger: "idle_duration > 10min"
         cooldownPeriod: "2min"
-      activeWorkers: []  # Dynamically populated at runtime
+      activeWorkers: []
     - role: Frontend Engineer
-      minSize: 1
-      maxSize: 10
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
@@ -857,8 +864,6 @@ worker_pool_registry:
         cooldownPeriod: "2min"
       activeWorkers: []
     - role: QA Engineer
-      minSize: 1
-      maxSize: 8
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
@@ -866,8 +871,6 @@ worker_pool_registry:
         cooldownPeriod: "2min"
       activeWorkers: []
     - role: Security Engineer
-      minSize: 1
-      maxSize: 5
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
@@ -875,8 +878,6 @@ worker_pool_registry:
         cooldownPeriod: "2min"
       activeWorkers: []
     - role: DevOps Engineer
-      minSize: 1
-      maxSize: 5
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
@@ -884,8 +885,6 @@ worker_pool_registry:
         cooldownPeriod: "2min"
       activeWorkers: []
     - role: Documentation Specialist
-      minSize: 1
-      maxSize: 3
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
@@ -893,8 +892,6 @@ worker_pool_registry:
         cooldownPeriod: "2min"
       activeWorkers: []
     - role: Validator
-      minSize: 1
-      maxSize: 3
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
@@ -902,8 +899,6 @@ worker_pool_registry:
         cooldownPeriod: "2min"
       activeWorkers: []
     - role: CI Reviewer
-      minSize: 1
-      maxSize: 3
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
@@ -911,8 +906,6 @@ worker_pool_registry:
         cooldownPeriod: "2min"
       activeWorkers: []
     - role: Research Analyst
-      minSize: 1
-      maxSize: 8
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
@@ -920,8 +913,6 @@ worker_pool_registry:
         cooldownPeriod: "2min"
       activeWorkers: []
     - role: Product Manager
-      minSize: 1
-      maxSize: 3
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
@@ -929,8 +920,6 @@ worker_pool_registry:
         cooldownPeriod: "2min"
       activeWorkers: []
     - role: Architect
-      minSize: 1
-      maxSize: 3
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
@@ -938,8 +927,6 @@ worker_pool_registry:
         cooldownPeriod: "2min"
       activeWorkers: []
     - role: UIDesigner
-      minSize: 1
-      maxSize: 3
       currentActive: 0
       scalingPolicy:
         scaleUpTrigger: "READY_tickets > currentActive"
@@ -1015,16 +1002,16 @@ currently in-flight tickets (LOCKED through COMMIT states).
 ### 11.5 Auto-Scaling Algorithm
 
 Pools auto-scale based on ticket backlog. Scale-up is immediate when backlog
-exceeds active workers; scale-down is governed by idle timeout.
+exceeds active workers (no upper cap); scale-down is governed by idle timeout.
 
 ```
 function autoScale(pool):
   ready = countReadyTickets(pool.role)
   active = pool.currentActive
 
-  # Scale UP
-  if ready > active and active < pool.maxSize:
-    scaleUp = min(ready - active, pool.maxSize - active)
+  # Scale UP (unbounded — no maxSize cap)
+  if ready > active:
+    scaleUp = ready - active
     log("POOL_SCALED_UP", pool.role, active, active + scaleUp)
 
   # Scale DOWN (idle workers only)
@@ -1032,11 +1019,6 @@ function autoScale(pool):
     if worker.status == idle and worker.idleDuration > 10min:
       terminate(worker)
       log("POOL_SCALED_DOWN", pool.role, active, active - 1)
-
-  # Floor enforcement
-  if pool.currentActive < pool.minSize:
-    # Reserve capacity — workers spawn on next assignment
-    pass
 ```
 
 ### 11.6 Parallel Dispatch Protocol
@@ -1087,7 +1069,6 @@ Continuously:
 | Scenario | Prevention Rule |
 |----------|----------------|
 | All READY tickets conflict with in-flight | Wait for a current ticket to reach DONE |
-| Worker pool exhausted (maxSize reached) | Wait for a worker to complete (WORKER_TERMINATED event) |
 | Dependency cycle detected | Reject at task creation (TODO Agent enforces DAG) |
 | All tickets blocked externally | Report to user, enter WAIT state |
 
@@ -1312,6 +1293,25 @@ All workflows:
 ---
 
 ## 19. Instruction File Authority
+
+### 19.1 Governance Hierarchy (v9.0.0)
+
+The instruction and governance system follows a strict hierarchy:
+
+```
+agents.md                          ← Boot protocol (loaded first)
+└── .github/agents/_core_governance.md ← Canonical governance authority
+    └── .github/governance/*.md        ← 9 policy files (lifecycle, worker,
+    │                                    commit, memory, UI, security,
+    │                                    events, context injection, perf)
+    └── .github/agents/*.agent.md      ← Agent-specific instructions
+        └── .github/vibecoding/chunks/ ← Domain guidance chunks
+```
+
+**GOVERNANCE_VERSION** (currently 9.0.0) is tracked in governance files
+and `_core_governance.md` ONLY — never in agent `.agent.md` frontmatter.
+
+### 19.2 Domain Instruction Files
 
 The following instruction files are authoritative references for their
 domains and are loaded from `docs/instructions/`:
@@ -1577,6 +1577,16 @@ Files supporting the ticket-driven SDLC enforcement:
 | `.github/agents/Validator.agent.md` | Validator agent definition |
 | `.github/agents/ReaperOAK.agent.md` | Worker-pool adaptive orchestrator with 9-state machine |
 | `.github/agents/_cross-cutting-protocols.md` | Event emission + anti-one-shot guardrails |
+| `.github/agents/_core_governance.md` | Canonical governance authority (indexes all policies) |
+| `.github/governance/lifecycle.md` | 9-state machine, transitions, DoD, post-chain |
+| `.github/governance/worker_policy.md` | Unbounded elastic pools, worker lifecycle |
+| `.github/governance/commit_policy.md` | Scoped git, per-ticket commits |
+| `.github/governance/memory_policy.md` | Memory gate, 5 fields, DRIFT-003 |
+| `.github/governance/ui_policy.md` | Stitch mockup gate |
+| `.github/governance/security_policy.md` | Human approval gates |
+| `.github/governance/event_protocol.md` | 24 structured event types |
+| `.github/governance/context_injection.md` | Boot sequence, chunk routing |
+| `.github/governance/performance_monitoring.md` | Token budgets, metrics |
 | `.github/vibecoding/chunks/Validator.agent/chunk-01.yaml` | Validator core validation protocols |
 | `.github/vibecoding/chunks/Validator.agent/chunk-02.yaml` | Validator init/DoD/gate procedures |
 | `.github/tasks/definition-of-done-template.md` | Machine-parseable DoD checklist (10 items) |
@@ -2017,7 +2027,9 @@ execution are truly concurrent.
 ## 33. Operational Integrity Protocol (OIP)
 
 > **OIP Version:** 1.0.0
-> **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19-§26
+> **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19
+> **Governance Authority:** `.github/agents/_core_governance.md`
+> **Governance Policies:** `.github/governance/` (9 policy files)
 
 The Operational Integrity Protocol is a self-healing governance layer
 enabling Light Supervision Mode (Model B). It continuously monitors,
@@ -2050,12 +2062,14 @@ detects, and auto-corrects procedural drift across the ticket lifecycle.
 | DRIFT-005 | CHAIN_STEP_SKIPPED | State transition that bypasses chain steps |
 | DRIFT-006 | MULTI_TICKET_VIOLATION | Worker references non-assigned ticket IDs |
 | DRIFT-007 | UNVERIFIED_EVIDENCE | TASK_COMPLETED without evidence fields |
+| DRIFT-008 | GOVERNANCE_VERSION_MISMATCH | Governance file version ≠ system GOVERNANCE_VERSION |
+| DRIFT-009 | OVERSIZED_INSTRUCTION | Governance file > 250 lines or agent file > 300 lines |
 
 Each violation emits `PROTOCOL_VIOLATION` event with severity (CRITICAL/HIGH/MEDIUM).
 
 ### 33.3 Auto-Repair Workflow
 
-ComplianceWorker pool (minSize: 1, maxSize: 3) handles automated repairs.
+ComplianceWorker pool (unbounded) handles automated repairs.
 Key principle: repairs ONLY block the affected ticket — all other execution continues.
 
 Repair flow: Violation detected → PROTOCOL_VIOLATION emitted → ComplianceWorker spawned → targeted repair → REPAIR_COMPLETED/FAILED → ticket unblocked or escalated.
