@@ -6,7 +6,7 @@ description: This file defines the core governance framework for the vibecoding 
 
 # Core Governance — Canonical Authority
 
-> **GOVERNANCE_VERSION: 9.0.0**
+> **GOVERNANCE_VERSION: 9.1.0**
 >
 > This is the **canonical governance authority** for the vibecoding multi-agent
 > system. No agent may override these rules. All agent files must reference
@@ -29,9 +29,10 @@ policy for the system.
 | `governance/memory_policy.md` | Memory gate (INV-4), 5 required fields, DRIFT-003 enforcement |
 | `governance/ui_policy.md` | Stitch mockup gate for UI-touching tickets, UIDesigner artifact checklist |
 | `governance/security_policy.md` | Human approval gates, INV-7 security review triggers, dual-layer security |
-| `governance/event_protocol.md` | 24 event types, 20 routing rules, payload format, blocking protocol |
+| `governance/event_protocol.md` | 29 event types, 25 routing rules, payload format, blocking protocol |
 | `governance/context_injection.md` | Role-based injection, deterministic boot sequence, sliding context window |
 | `governance/performance_monitoring.md` | Token budgets, auto-summarize protocol, drift correlation metrics |
+| `governance/concurrency_floor.md` | Operational Concurrency Floor (OCF), Class A/B work classes, background ticket taxonomy |
 
 ---
 
@@ -112,6 +113,9 @@ governance policy file.
 | Context injection ≤ 100K tokens per worker (SAFE_CONTEXT_THRESHOLD) | context_injection.md |
 | Governance files ≤ 250 lines, agent files ≤ 300 lines | context_injection.md |
 | GOVERNANCE_VERSION tracked only in governance files + this authority | This file (§4) |
+| MIN_ACTIVE_WORKERS=10 — concurrency floor enforced via Class B backfill | concurrency_floor.md |
+| Class A always preempts Class B — background work never blocks primary | concurrency_floor.md |
+| Class B workers read-only, anti-recursion, ≤20K tokens | concurrency_floor.md |
 
 ---
 
@@ -119,7 +123,7 @@ governance policy file.
 
 ### Version Tracking
 
-- Current: **GOVERNANCE_VERSION 9.0.0**
+- Current: **GOVERNANCE_VERSION 9.1.0**
 - All governance files declare the same version at their top
 - Version bump requires updating ALL governance files + this authority file
 
@@ -148,7 +152,8 @@ core_governance.instructions.md (THIS FILE)
     ├── governance/security_policy.md
     ├── governance/event_protocol.md
     ├── governance/context_injection.md
-    └── governance/performance_monitoring.md
+    ├── governance/performance_monitoring.md
+    └── governance/concurrency_floor.md
 ```
 
 This file is the root authority. Governance policy files provide detailed

@@ -59,6 +59,7 @@ _STATUS_CANON: dict[str, str] = {
     "in_progress": "in_progress", "in progress": "in_progress",
     "wip": "in_progress", "🔄": "in_progress",
     "blocked": "blocked", "⏸️": "blocked", "⏸": "blocked",
+    "ready": "ready", "🟢": "ready",
 }
 
 
@@ -82,6 +83,7 @@ class BoardStats:
     in_progress: int = 0
     blocked: int = 0
     not_started: int = 0
+    ready: int = 0
     p0_pending: int = 0
     p1_pending: int = 0
     missing_deps: list[tuple[str, str]] = field(default_factory=list)
@@ -345,6 +347,8 @@ def resolve(tasks: dict[str, Task]) -> BoardStats:
                 stats.blocked += 1
             case "in_progress":
                 stats.in_progress += 1
+            case "ready":
+                stats.ready += 1
             case _:
                 stats.not_started += 1
         if t.status != "completed":
@@ -389,7 +393,8 @@ def _render_rich(tasks: dict[str, Task], stats: BoardStats) -> None:
     tbl.add_column("Metric", style="bold")
     tbl.add_column("Value", justify="right")
     tbl.add_row("✅ Completed", f"[green]{stats.completed}[/]")
-    tbl.add_row("🔵 Not Started", f"[blue]{stats.not_started}[/]")
+    tbl.add_row("� Ready", f"[green]{stats.ready}[/]")
+    tbl.add_row("�🔵 Not Started", f"[blue]{stats.not_started}[/]")
     tbl.add_row("🔄 In Progress", f"[yellow]{stats.in_progress}[/]")
     tbl.add_row("🔴 Blocked", f"[red]{stats.blocked}[/]")
     tbl.add_row("🔴 P0 Pending", f"[bold red]{stats.p0_pending}[/]")
@@ -411,7 +416,7 @@ def _render_rich(tasks: dict[str, Task], stats: BoardStats) -> None:
         pt.add_column("File", style="dim")
         _SS = {
             "blocked": "[red]BLOCKED[/]", "not_started": "[yellow]TODO[/]",
-            "in_progress": "[cyan]WIP[/]",
+            "in_progress": "[cyan]WIP[/]", "ready": "[green]READY[/]",
         }
         for t in p0:
             pt.add_row(t.id, t.title[:45], _SS.get(t.status, t.status), t.owner, t.source_file)
@@ -563,6 +568,7 @@ def _build_mermaid(tasks: dict[str, Task]) -> str:
     lines.append('    classDef not_started fill:#dbeafe,stroke:#1e40af,stroke-width:2px,color:#1e3a8a')
     lines.append('    classDef in_progress fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e')
     lines.append('    classDef blocked fill:#fee2e2,stroke:#991b1b,stroke-width:2px,color:#7f1d1d')
+    lines.append('    classDef ready fill:#d1fae5,stroke:#059669,stroke-width:2px,color:#065f46')
     lines.append('    classDef missing fill:#f3f4f6,stroke:#6b7280,stroke-width:1px,stroke-dasharray:5,color:#374151')
     return "\n".join(lines)
 
@@ -570,9 +576,10 @@ def _build_mermaid(tasks: dict[str, Task]) -> str:
 def _build_rows(tasks: dict[str, Task]) -> str:
     badges = {
         "completed": '<span class="badge done">✅ Done</span>',
-        "not_started": '<span class="badge ready">📋 Todo</span>',
+        "not_started": '<span class="badge todo">📋 Todo</span>',
         "in_progress": '<span class="badge wip">🔄 WIP</span>',
         "blocked": '<span class="badge blocked">🔴 Blocked</span>',
+        "ready": '<span class="badge ready">🟢 Ready</span>',
     }
     pri_order = {"P0": 0, "P1": 1, "P2": 2, "P3": 3}
     rows: list[str] = []

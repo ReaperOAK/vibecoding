@@ -1,6 +1,6 @@
 # Performance Monitoring
 
-> **GOVERNANCE_VERSION: 9.0.0**
+> **GOVERNANCE_VERSION: 9.1.0**
 > **Authority:** `.github/instructions/core_governance.instructions.md`
 > **Scope:** Context size logging, token usage, drift correlation, auto-summarize protocol
 
@@ -188,3 +188,41 @@ Context performance metrics are logged to `.github/memory-bank/feedback-log.md`.
 - Keep per-ticket token summaries for 30 days
 - Keep aggregate metrics indefinitely
 - Keep auto-summarize logs for 30 days
+
+---
+
+## 8. Class B (Background Worker) Metrics
+
+Background workers spawned by the Operational Concurrency Floor (OCF) are
+tracked separately from Class A workers. Full OCF spec:
+`governance/concurrency_floor.md`.
+
+### Per-Scheduling-Interval BG Metrics
+
+```markdown
+### OCF Metrics — {ISO8601}
+- **Class A active:** {count}
+- **Class B active:** {count}
+- **Total active:** {count}
+- **MIN_ACTIVE_WORKERS:** 10
+- **Floor deficit:** {count}  (0 = satisfied)
+- **BG preemptions this interval:** {count}
+- **BG findings this interval:** {count}
+- **BG token budget used:** {tokens} / {MAX_BG_TOKENS}
+```
+
+### BG Token Budget
+
+| Category | Budget |
+|----------|--------|
+| Class B boot context (per worker) | ≤ 20K tokens |
+| Class B total (all BG workers) | ≤ 80K tokens per interval |
+
+### Throttle Monitoring
+
+| Condition | Metric | Action |
+|-----------|--------|--------|
+| Primary backlog > 20 | `classA_backlog_count` | Suspend all Class B |
+| Token usage > 80% | `session_token_pct` | Reduce BG spawn rate 50% |
+| Token usage > 95% | `session_token_pct` | Suspend all Class B |
+| Class A rework > 30% | `classA_rework_rate` | Suspend Class B |
