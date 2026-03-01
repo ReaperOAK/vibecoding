@@ -1,7 +1,7 @@
 # Event Protocol
 
 > **GOVERNANCE_VERSION: 9.0.0**
-> **Authority:** `.github/agents/_core_governance.md`
+> **Authority:** `.github/instructions/core_governance.instructions.md`
 > **Source:** ReaperOAK §13 (event types + routing), §20 (PROTOCOL_VIOLATION)
 > **Scope:** All event types, routing rules, payload format, blocking protocol
 

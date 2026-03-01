@@ -69,7 +69,7 @@ append_only: true
 - **Impact:** Agent executes unintended actions, leaks data, or escalates
   privileges
 - **Mitigation:** External content sanitization protocol defined in
-  `security.agentic-guardrails.md`. All external content treated as untrusted.
+  `security.agentic-guardrails.instructions.md`. All external content treated as untrusted.
   Content boundaries enforced via delimiters.
 - **Status:** Mitigated
 - **Evidence:** Guardrails document created

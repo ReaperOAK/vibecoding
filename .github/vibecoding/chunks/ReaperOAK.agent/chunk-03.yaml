@@ -107,9 +107,9 @@ The complete multi-agent system is defined across these files:
 
 | File | Purpose |
 |------|---------|
-| `.github/ARCHITECTURE.md` | System topology, authority matrix, DAG visualization |
-| `.github/orchestration.rules.md` | DAG protocol, confidence gates, RUG, token tracking |
-| `.github/security.agentic-guardrails.md` | Threat models, MCP isolation, data controls |
+| `.github/instructions/ARCHITECTURE.instructions.md` | System topology, authority matrix, DAG visualization |
+| `.github/instructions/orchestration.rules.instructions.md` | DAG protocol, confidence gates, RUG, token tracking |
+| `.github/instructions/security.agentic-guardrails.instructions.md` | Threat models, MCP isolation, data controls |
 | `.github/agents/_cross-cutting-protocols.md` | Universal quality protocols (all agents inherit) |
 | `.github/agents/*.agent.md` | 10 specialized subagent definitions |
 | `.github/hooks/governance-audit/` | STRIDE-aligned threat scanning hooks |
@@ -124,7 +124,7 @@ When operating in multi-agent mode, follow this loop:
 ```
  1. INTAKE     → Parse objective, constraints, done criteria
  2. CONTEXT    → Load P0/P1 context, declare budget
- 3. DECOMPOSE  → Build DAG with dependency graph (orchestration.rules.md §2)
+ 3. DECOMPOSE  → Build DAG with dependency graph (orchestration.rules.instructions.md §2)
  4. OWNERSHIP  → Declare file ownership per agent (no overlaps)
  5. CONFIDENCE → Assess confidence; if < 70%, gather more context
  6. DELEGATE   → Execute via Execution Cycles (see §11.2.1 below)
@@ -295,7 +295,7 @@ If the system detects an infinite loop:
 3. Reclassify the task as BLOCKED
 4. Attempt alternative approach or escalate
 
-See `orchestration.rules.md` §9 for loop detection protocol.
+See `orchestration.rules.instructions.md` §9 for loop detection protocol.
 
 ## 11.7 Token & Cost Tracking
 
@@ -309,7 +309,7 @@ ReaperOAK monitors burn rates and enforces thresholds:
 | 95% consumed | Force wrap-up and deliver partial results |
 | 100% consumed | Hard stop, return partial output to supervisor |
 
-See `orchestration.rules.md` §7 for full cost tracking protocol.
+See `orchestration.rules.instructions.md` §7 for full cost tracking protocol.
 
 # 12. Strategic Decision Framework
 

@@ -58,7 +58,7 @@ compaction_threshold: 50
 ### [2026-02-28T00:00:00Z] Worker-Pool Adaptive Engine v8.0.0
 
 - **ReaperOAK.agent.md** — COMPLETE REWRITE (811→1077 lines). 20 sections. Worker pool model, two-layer orchestration, continuous scheduling, SDR protocol, updated 9-state machine (READY→LOCKED→IMPLEMENTING→QA_REVIEW→VALIDATION→DOCUMENTATION→CI_REVIEW→COMMIT→DONE), event-driven loop, conflict detection (5 types), two worked examples.
-- **ARCHITECTURE.md** — COMPLETE REWRITE (1194→1728 lines, 32 sections). Version v8.0.0. Added §30 Two-Layer Orchestration Model, §31 Strategic Layer & SDR Protocol. All sections updated with worker pool model, continuous scheduling, SDR references.
+- **ARCHITECTURE.instructions.md** — COMPLETE REWRITE (1194→1728 lines, 32 sections). Version v8.0.0. Added §30 Two-Layer Orchestration Model, §31 Strategic Layer & SDR Protocol. All sections updated with worker pool model, continuous scheduling, SDR references.
 - **agents.md** — Updated (191→233 lines). Worker Pool Model, Two-Layer Orchestration, Strategy Evolution paragraphs added. TODO Agent SDR restriction noted.
 - **_cross-cutting-protocols.md** — Updated (209→241 lines). §8.1 Worker Pool Events (4 types), §10 Strategic Event Types (6 types) added.
 - **TODO.agent.md** — Updated (175→203 lines). Forbidden Actions 17-18 (SDR restrictions). Strategy Boundary section added.
@@ -81,7 +81,7 @@ compaction_threshold: 50
 
 ### [2026-02-21T00:00:00Z] ReaperOAK
 
-- Created `.github/ARCHITECTURE.md` — full system architecture
+- Created `.github/instructions/ARCHITECTURE.instructions.md` — full system architecture
 - Created `.github/memory-bank/` — persistent state system
 - Performed full repository intelligence sweep (170+ instructions, 150+ agents,
   55+ skills catalogued)
@@ -188,7 +188,7 @@ compaction_threshold: 50
 3. **Self-Improvement System** — Proposals directory, RETROSPECTIVE phase, auto-reject rules
 4. **ReaperOAK Upgrade** — 6-phase SDLC (added RETROSPECTIVE), state management obligations, proposal handling
 5. **Schema Extensions** — Delegation packet: phase, upstream_artifacts, mcp_grants, fix_loop_context, output_contract fields
-6. **Architecture Update** — ARCHITECTURE.md v4.0.0 with UIDesigner, shared context layer, §18 self-improvement
+6. **Architecture Update** — ARCHITECTURE.instructions.md v4.0.0 with UIDesigner, shared context layer, §18 self-improvement
 7. **Catalog + ACL** — UIDesigner entries in catalog.yml, tool-acl.yaml, design: tag
 
 ### Validation Results
@@ -212,7 +212,7 @@ compaction_threshold: 50
 - `.github/sandbox/tool-acl.yaml` — UIDesigner section
 - `.github/tasks/delegation-packet-schema.json` — UIDesigner + 5 new fields
 - `.github/memory-bank/schema.md` — 3 new file schemas + riskRegister writers fix
-- `.github/ARCHITECTURE.md` — v4.0.0, UIDesigner, shared context, self-improvement
+- `.github/instructions/ARCHITECTURE.instructions.md` — v4.0.0, UIDesigner, shared context, self-improvement
 - `.github/copilot-instructions.md` — updated repo structure
 
 ### Architecture Document
@@ -232,7 +232,7 @@ compaction_threshold: 50
 3. **UI/UX Gate** — Mandatory check between DECOMPOSE and SPEC, keyword detection, requires UIDesigner tasks for UI work
 4. **TODO-Driven Delegation** — Max 3 tasks/cycle (5 for SPEC), task-driven delegation with specific IDs
 5. **Loop Detection** — 4 new signals: TODO stall, zero-progress cycle, blocked dependency chain, max-task-per-cycle violation
-6. **Architecture Update** — ARCHITECTURE.md v4.1.0 with §10.1 UI/UX Enforcement Gate
+6. **Architecture Update** — ARCHITECTURE.instructions.md v4.1.0 with §10.1 UI/UX Enforcement Gate
 7. **Security Hardening** — runInTerminal constrained to `python todo_visual.py`, allowlist write scope, memory bank write access removed
 
 ### Validation Results
@@ -254,7 +254,7 @@ compaction_threshold: 50
 - `.github/guardian/loop-detection-rules.md` — 4 new signals
 - `.github/vibecoding/catalog.yml` — TODO chunks under agent: and general: tags
 - `.github/sandbox/tool-acl.yaml` — TODO section with allowlist, terminal constraint
-- `.github/ARCHITECTURE.md` — v4.1.0
+- `.github/instructions/ARCHITECTURE.instructions.md` — v4.1.0
 - `.github/copilot-instructions.md` — 13 agents, TODO directory
 
 ### Reports Generated (2)
@@ -300,7 +300,7 @@ compaction_threshold: 50
 - `docs/reviews/security-report.md`
 
 ### Files Modified (9)
-- `.github/ARCHITECTURE.md` — v4.1.0 → v5.0.0 (Validator, SDLC, DoD, init, gates, governance)
+- `.github/instructions/ARCHITECTURE.instructions.md` — v4.1.0 → v5.0.0 (Validator, SDLC, DoD, init, gates, governance)
 - `.github/agents/ReaperOAK.agent.md` — Task-Level SDLC Loop, Validator in tables
 - `.github/tasks/delegation-packet-schema.json` — Validator enum, sdlc_stage, dod_checklist, initialization_checklist
 - `.github/guardian/loop-detection-rules.md` — 5 new detection signals
@@ -325,7 +325,7 @@ compaction_threshold: 50
 - **agents.md** — Updated (200→191 lines). Boot protocol references ticket-driven event loop, 9-state machine, post-execution chain, event emission §8, anti-one-shot §9.
 - **chunk-01.yaml** — Updated (315→324 lines). Format A default BACKLOG, 9-state values, ticket model notes. Hash: PENDING_RECOMPUTE.
 - **chunk-02.yaml** — Updated (297→306 lines). 9-state model replaces 8-state. Post-execution chain aligned. Governance rules updated. Hash: PENDING_RECOMPUTE.
-- **ARCHITECTURE.md** — Updated v6.0.0→v7.0.0 (1044→1194 lines). Full ticket-driven architecture documented.
+- **ARCHITECTURE.instructions.md** — Updated v6.0.0→v7.0.0 (1044→1194 lines). Full ticket-driven architecture documented.
 
 ### Validator Review
 - All 7 checks PASSED at 95% confidence (V1-V7)
@@ -347,7 +347,7 @@ compaction_threshold: 50
 
 ### Key Changes
 - **ReaperOAK.agent.md** — Updated (1077→1453 lines, v8.0.0→v8.1.0). §7 elastic pool registry with minSize/maxSize/scalingPolicy, dynamic worker IDs `{Role}Worker-{shortUuid}`, Worker Instance Schema, 5-state Worker Lifecycle, One-Ticket-One-Worker Rule. §9 auto-scaling + parallel dispatch. §10 6th conflict type (mutual exclusion). §13 4 new scaling events. §15 worker termination on multi-ticket violation. §20-§22 elastic examples.
-- **ARCHITECTURE.md** — Updated (1728→1960 lines, v8.0.0→v8.1.0). §2 elastic pool table. §5 3-phase scheduling. §6.8 dynamic lock IDs. §8 4 new elastic events (16 total routing entries). §11 full elastic pool rewrite. §32 dynamic worker ID examples.
+- **ARCHITECTURE.instructions.md** — Updated (1728→1960 lines, v8.0.0→v8.1.0). §2 elastic pool table. §5 3-phase scheduling. §6.8 dynamic lock IDs. §8 4 new elastic events (16 total routing entries). §11 full elastic pool rewrite. §32 dynamic worker ID examples.
 - **agents.md** — Updated (233→238 lines). Worker Pool Model paragraph rewritten with elastic pools, dynamic worker IDs, parallel dispatch.
 - **_cross-cutting-protocols.md** — Updated (241→245 lines). §8.1 now 6 events including WORKER_SPAWNED, WORKER_TERMINATED, POOL_SCALED_UP, POOL_SCALED_DOWN.
 
@@ -384,7 +384,7 @@ Implementing OIP v1.0.0 — 7-part protocol upgrade from v8.1.0 to v8.2.0:
 
 **ReaperOAK.agent.md** — v8.1.0→v8.2.0 (1454→1863 lines, +409). Added §19-§26 (OIP core). Renumbered §19-§22→§27-§30. ComplianceWorker pool in §7. PROTOCOL_VIOLATION + REPAIR_COMPLETED events in §13. Health Sweep in §9 scheduling loop.
 
-**ARCHITECTURE.md** — v8.1.0→v8.2.0 (1961→2092 lines, +131). §33 OIP overview (6 subsections). §5.1 health sweep in scheduling loop. §8.1 two new events. §8.3 two routing entries. §10.4 scoped git. §15.2 memory gate.
+**ARCHITECTURE.instructions.md** — v8.1.0→v8.2.0 (1961→2092 lines, +131). §33 OIP overview (6 subsections). §5.1 health sweep in scheduling loop. §8.1 two new events. §8.3 two routing entries. §10.4 scoped git. §15.2 memory gate.
 
 **_cross-cutting-protocols.md** — (245→339 lines, +94). §11 OIP cross-cutting rules (7 subsections: events, scoped git, memory, evidence, single-ticket, ComplianceWorker, health sweep awareness).
 
@@ -395,8 +395,8 @@ Implementing OIP v1.0.0 — 7-part protocol upgrade from v8.1.0 to v8.2.0:
 - **Decisions:** OIP sections §19-§26 placed before worked examples; ComplianceWorker added as new pool role
 - **Timestamp:** 2026-03-01T00:00:00Z
 
-### OIP-ARCH-002 — ARCHITECTURE.md OIP Documentation
-- **Artifacts:** .github/ARCHITECTURE.md
+### OIP-ARCH-002 — ARCHITECTURE.instructions.md OIP Documentation
+- **Artifacts:** .github/instructions/ARCHITECTURE.instructions.md
 - **Decisions:** New §33 for OIP overview; existing §5, §8, §10, §15 augmented with subsections
 - **Timestamp:** 2026-03-01T00:10:00Z
 
@@ -428,7 +428,7 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Timestamp:** 2026-03-01T02:00:00Z
 
 ### SH-002 — Core Governance Authority
-- **Artifacts:** .github/agents/_core_governance.md
+- **Artifacts:** .github/instructions/core_governance.instructions.md
 - **Decisions:** Canonical authority file indexes all governance policies; version tracking in governance files only (NOT agent frontmatter)
 - **Timestamp:** 2026-03-01T02:10:00Z
 
@@ -448,8 +448,8 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Timestamp:** 2026-03-01T02:40:00Z
 
 ### SH-006 — Cross-Cutting + Architecture
-- **Artifacts:** .github/agents/_cross-cutting-protocols.md, .github/ARCHITECTURE.md
-- **Decisions:** ARCHITECTURE.md v9.0.0 with unbounded pools, governance hierarchy in §19, DRIFT-008/009 in §33. Cross-cutting §8.1+§11 updated.
+- **Artifacts:** .github/agents/_cross-cutting-protocols.md, .github/instructions/ARCHITECTURE.instructions.md
+- **Decisions:** ARCHITECTURE.instructions.md v9.0.0 with unbounded pools, governance hierarchy in §19, DRIFT-008/009 in §33. Cross-cutting §8.1+§11 updated.
 - **Timestamp:** 2026-03-01T02:50:00Z
 
 ### SH-007 — Catalog Update
@@ -459,7 +459,7 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 
 ### What to Do Next
 - Rechunk ReaperOAK.agent.md (was 3 chunks for 1864 lines, now 821 lines — may need 2)
-- Update ARCHITECTURE.md chunks if stale
+- Update ARCHITECTURE.instructions.md chunks if stale
 - Verify all agent chunk files still align with new governance references
 - Run full system test with real ticket execution
 - Consider adding OIP worked example (§31) to ReaperOAK.agent.md
@@ -473,13 +473,13 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Decisions:** Added §25 OCF specification (background ticket taxonomy, preemption, throttle, anti-recursion). Updated §6 scheduling loop with CONCURRENCY FLOOR PHASE between AUTO-SCALE and ASSIGNMENT. MIN_ACTIVE_WORKERS=10. Two work classes: Class A (primary) and Class B (background). 10 background ticket types. Version bumped to v9.1.0.
 - **Timestamp:** 2026-03-01T04:00:00Z
 
-### OCF-002 — ARCHITECTURE.md OCF
-- **Artifacts:** .github/ARCHITECTURE.md
+### OCF-002 — ARCHITECTURE.instructions.md OCF
+- **Artifacts:** .github/instructions/ARCHITECTURE.instructions.md
 - **Decisions:** Added §34 OCF architecture documentation (work classes, 10 BG types, preemption rules, context injection limits, commit policy, throttle safeguards, continuous improvement loop, anti-recursion guard, example scenario). Updated §5.1 scheduling loop pseudocode with concurrency floor phase. Added OCF properties to §5.2. Version header bumped to v9.1.0.
 - **Timestamp:** 2026-03-01T04:00:00Z
 
 ### What to Do Next
 - Rechunk ReaperOAK.agent.md (now 821 lines with §25 OCF)
-- Update ARCHITECTURE.md chunks (now 2227 lines with §34 OCF)
+- Update ARCHITECTURE.instructions.md chunks (now 2227 lines with §34 OCF)
 - Test OCF scheduling loop with mixed Class A/B ticket scenarios
 - Verify preemption behavior under load

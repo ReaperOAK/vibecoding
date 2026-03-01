@@ -1,7 +1,7 @@
 # Performance Monitoring
 
 > **GOVERNANCE_VERSION: 9.0.0**
-> **Authority:** `.github/agents/_core_governance.md`
+> **Authority:** `.github/instructions/core_governance.instructions.md`
 > **Scope:** Context size logging, token usage, drift correlation, auto-summarize protocol
 
 ---

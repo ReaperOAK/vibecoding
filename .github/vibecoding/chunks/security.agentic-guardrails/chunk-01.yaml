@@ -1,5 +1,5 @@
 ---
-source: "./.github/security.agentic-guardrails.md"
+source: "./.github/instructions/security.agentic-guardrails.instructions.md"
 chunk_index: 1
 token_estimate: 3925
 hash: "9c26e6a3ad86aedb8020f88d89ae85b6b35257c1ee8acf372278e248460323cd"
@@ -250,7 +250,7 @@ If a memory bank file is suspected of corruption:
 | Task duration | 10 minutes | 15 minutes | Halt and escalate |
 | Fetches per task | 8 | 10 | Block further fetches |
 | File edits per task | 15 | 20 | Block further edits |
-| Total session tokens | 70% budget | 100% budget | See orchestration.rules.md §7 |
+| Total session tokens | 70% budget | 100% budget | See orchestration.rules.instructions.md §7 |
 
 ### 6.2 Infinite Loop Signals
 

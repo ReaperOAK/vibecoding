@@ -65,7 +65,7 @@ ReaperOAK MUST NEVER:
 ### Governance Architecture (v9.0.0)
 
 This version externalizes governance into dedicated policy files under
-`.github/governance/` and `.github/agents/_core_governance.md`. ReaperOAK
+`.github/governance/` and `.github/instructions/core_governance.instructions.md`. ReaperOAK
 references these files rather than embedding governance inline. This enables:
 
 - Independent versioning and review of governance policies
@@ -527,7 +527,7 @@ governance files based on the worker's role:
 | UIDesigner | `chunks/UIDesigner.agent/` | `lifecycle.md`, `ui_policy.md` |
 | TODO | `chunks/TODO.agent/` | `lifecycle.md` |
 
-All workers additionally receive `_core_governance.md` for invariant awareness.
+All workers additionally receive `core_governance.instructions.md` for invariant awareness.
 
 ---
 
@@ -590,8 +590,8 @@ ticket lifecycle.
 
 | Domain | Governance File |
 |--------|----------------|
-| 9 Core Invariants (INV-1 through INV-9) | `_core_governance.md` |
-| 9 Drift Types (DRIFT-001 through DRIFT-009) | `_core_governance.md` |
+| 9 Core Invariants (INV-1 through INV-9) | `core_governance.instructions.md` |
+| 9 Drift Types (DRIFT-001 through DRIFT-009) | `core_governance.instructions.md` |
 | Scoped Git Enforcement | `governance/commit_policy.md` |
 | Memory Enforcement Gate | `governance/memory_policy.md` |
 | Event Protocol + PROTOCOL_VIOLATION schema | `governance/event_protocol.md` |
@@ -616,13 +616,13 @@ ticket lifecycle.
 
 ### GOVERNANCE_VERSION: 9.0.0
 
-All governance files, agent files, and `_core_governance.md` share a single
+All governance files, agent files, and `core_governance.instructions.md` share a single
 version number. Version alignment is enforced at every scheduling interval.
 
 ### Version Compatibility Rule
 
 The GOVERNANCE_VERSION is tracked ONLY in governance files and
-`_core_governance.md` — NOT in `.agent.md` YAML frontmatter.
+`core_governance.instructions.md` — NOT in `.agent.md` YAML frontmatter.
 Agent files must not contain governance version fields.
 Version mismatches between governance files trigger
 DRIFT-008 (GOVERNANCE_VERSION_MISMATCH).
@@ -632,7 +632,7 @@ DRIFT-008 (GOVERNANCE_VERSION_MISMATCH).
 At each scheduling interval, ReaperOAK verifies:
 
 1. All `governance/` files share the same GOVERNANCE_VERSION
-2. `_core_governance.md` declares the matching GOVERNANCE_VERSION
+2. `core_governance.instructions.md` declares the matching GOVERNANCE_VERSION
 3. No governance content is duplicated across files
 4. No instruction file exceeds size limits (MAX_GOVERNANCE=250 lines,
    MAX_AGENT=300 lines)
@@ -718,7 +718,7 @@ See `governance/performance_monitoring.md` for token budget tracking.
 | `governance/commit_policy.md` | Scoped git, per-ticket commits, DRIFT-002 | ~139 |
 | `governance/security_policy.md` | Human approval gates, INV-7 | ~112 |
 | `governance/ui_policy.md` | Stitch mockup gate for Frontend | ~99 |
-| `_core_governance.md` | Canonical authority, invariants, drift types | ~168 |
+| `core_governance.instructions.md` | Canonical authority, invariants, drift types | ~168 |
 
 ---
 

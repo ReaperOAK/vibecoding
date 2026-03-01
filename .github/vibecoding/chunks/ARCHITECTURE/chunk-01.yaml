@@ -1,5 +1,5 @@
 ---
-source: "./.github/ARCHITECTURE.md"
+source: "./.github/instructions/ARCHITECTURE.instructions.md"
 chunk_index: 1
 token_estimate: 3943
 hash: "78e99ad05ab5329cccbf4f09aa22115d1c1ff53e25c5d401c3343a900fa67004"
@@ -218,7 +218,7 @@ Batch 6: [Documentation, CIReviewer]   ← depends on QA
 Batch 7: [DevOps]                      ← depends on Docs + Review
 ```
 
-See `orchestration.rules.md` §2 for full DAG protocol.
+See `orchestration.rules.instructions.md` §2 for full DAG protocol.
 
 ---
 
@@ -242,7 +242,7 @@ Every task follows this deterministic state flow:
                 └──────────┘      └──────────────┘
 ```
 
-See `orchestration.rules.md` §1 for full state definitions and transitions.
+See `orchestration.rules.instructions.md` §1 for full state definitions and transitions.
 
 ---
 
@@ -267,7 +267,7 @@ See `orchestration.rules.md` §1 for full state definitions and transitions.
 
 ## 8. Parallel Execution Rules
 
-See `orchestration.rules.md` §5 for full parallelism model.
+See `orchestration.rules.instructions.md` §5 for full parallelism model.
 
 Key constraints:
 - Maximum 4 parallel subagents at any time

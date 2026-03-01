@@ -88,7 +88,7 @@ Every repository, regardless of size, must contain a standard set of root-level 
 * **README.md:** The entry point. It must explain *what* the project does, *why* it exists, and *how* to run it locally. A "Getting Started" section that allows a new developer to spin up the environment in under 15 minutes is the benchmark for success.22  
 * **CONTRIBUTING.md:** Guidelines for how to propose changes. This includes branch naming conventions, PR template expectations, and local testing commands. Even for closed-source internal tools, this document sets the standard for quality and establishes the rules of engagement for the team.20  
 * **CODEOWNERS:** A critical file for governance. It defines which teams are responsible for which parts of the codebase. GitHub uses this to automatically assign reviewers to Pull Requests. For example, the infrastructure/ directory should be owned by @org/devops, while src/api/ is owned by @org/backend. This ensures that changes to critical paths are always reviewed by subject matter experts.17  
-* **ARCHITECTURE.md (or docs/)**: High-level system diagrams (C4 model or simple UML) explaining data flow and dependencies. This bridges the gap between the code (micro) and the system design (macro), helping new engineers form a mental model of the system.23
+* **ARCHITECTURE.instructions.md (or docs/)**: High-level system diagrams (C4 model or simple UML) explaining data flow and dependencies. This bridges the gap between the code (micro) and the system design (macro), helping new engineers form a mental model of the system.23
 
 #### **Architectural Decision Records (ADRs)**
 

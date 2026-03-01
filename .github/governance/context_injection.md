@@ -1,7 +1,7 @@
 # Context Injection Architecture
 
 > **GOVERNANCE_VERSION: 9.0.0**
-> **Authority:** `.github/agents/_core_governance.md`
+> **Authority:** `.github/instructions/core_governance.instructions.md`
 > **Scope:** Role-based injection, deterministic boot sequence, sliding window, file size limits
 
 ---
@@ -78,7 +78,7 @@ Step 7: Begin execution
 
 At Step 4, the governance files injected into the worker context are checked
 for GOVERNANCE_VERSION consistency. If any governance file has a mismatched
-version compared to `_core_governance.md`:
+version compared to `core_governance.instructions.md`:
 - Emit `INSTRUCTION_MISALIGNMENT` event
 - Halt worker boot
 - ReaperOAK corrects the mismatched governance file, then retries spawn

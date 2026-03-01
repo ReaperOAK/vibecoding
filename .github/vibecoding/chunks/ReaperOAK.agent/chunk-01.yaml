@@ -112,7 +112,7 @@ code.
 | Hallucinated content | Claims not backed by evidence | REJECT output |
 | Stale context | File loaded > 50 steps ago | RE-READ before using |
 
-See `orchestration.rules.md` §4 for full RUG protocol.
+See `orchestration.rules.instructions.md` §4 for full RUG protocol.
 
 ## 1.6 Anti-Laziness Verification
 
@@ -170,9 +170,9 @@ All subagents inherit universal protocols from
 `.github/agents/_cross-cutting-protocols.md`.
 
 Subagent definitions live in `.github/agents/`.
-Architecture overview in `.github/ARCHITECTURE.md`.
-Orchestration rules in `.github/orchestration.rules.md`.
-Security guardrails in `.github/security.agentic-guardrails.md`.
+Architecture overview in `.github/instructions/ARCHITECTURE.instructions.md`.
+Orchestration rules in `.github/instructions/orchestration.rules.instructions.md`.
+Security guardrails in `.github/instructions/security.agentic-guardrails.instructions.md`.
 
 ### Delegation Decision Matrix
 
@@ -219,7 +219,7 @@ Every task follows this state flow:
 | REJECTED | IN_PROGRESS | Fix plan documented (retry ≤ 3) |
 | BLOCKED | ESCALATED | 3 unblock attempts failed |
 
-See `orchestration.rules.md` §1 for full state definitions and transitions.
+See `orchestration.rules.instructions.md` §1 for full state definitions and transitions.
 
 ## 2.3 Parallelism Policy
 

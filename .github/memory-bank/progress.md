@@ -28,7 +28,7 @@ append_only: true
 | Task | Agent | Evidence | Status |
 |------|-------|----------|--------|
 | Phase 1: Repo Intelligence Sweep | ReaperOAK | Capability matrix produced, conflicts identified | ✅ Complete |
-| Phase 2: Architecture Design | ReaperOAK | `.github/ARCHITECTURE.md` created | ✅ Complete |
+| Phase 2: Architecture Design | ReaperOAK | `.github/instructions/ARCHITECTURE.instructions.md` created | ✅ Complete |
 | Phase 3: Memory Bank System | ReaperOAK | 6 memory bank files created | ✅ Complete |
 
 ### [2026-02-23] Claude Code Integration
@@ -58,7 +58,7 @@ append_only: true
 | TODO.agent.md + chunks (2 files) | DONE | Backend | 2025-07-26 |
 | ReaperOAK DECOMPOSE + UI/UX Gate + TODO Delegation | DONE | Backend | 2025-07-26 |
 | Cross-cutting updates (catalog, ACL, copilot-instructions, agents.md) | DONE | Backend | 2025-07-26 |
-| ARCHITECTURE.md v4.1.0 | DONE | Documentation | 2025-07-26 |
+| ARCHITECTURE.instructions.md v4.1.0 | DONE | Documentation | 2025-07-26 |
 | QA + Security validation | DONE | QA, Security | 2025-07-26 |
 | Fix loop (5 findings resolved) | DONE | Backend | 2025-07-26 |
 
@@ -112,7 +112,7 @@ append_only: true
 | UIDesigner agent + chunks + proposals dir | DONE | Documentation, Backend | 2025-07-25 |
 | Schema extensions (delegation + memory bank) | DONE | Backend | 2025-07-25 |
 | ReaperOAK upgrade (RETROSPECTIVE, state, proposals) | DONE | Architect | 2025-07-25 |
-| ARCHITECTURE.md v4.0.0 + copilot-instructions | DONE | Documentation | 2025-07-25 |
+| ARCHITECTURE.instructions.md v4.0.0 + copilot-instructions | DONE | Documentation | 2025-07-25 |
 | QA + Security + CI validation | DONE | QA, Security, CI Reviewer | 2025-07-25 |
 | Fix loop (6 findings resolved) | DONE | Backend | 2025-07-25 |
 
@@ -129,7 +129,7 @@ append_only: true
 - UI/UX Gate: mandatory UIDesigner invocation for UI-touching work
 - TODO-driven delegation with max-task-per-cycle limits
 - Execution governance: stall detection, zero-progress detection, dependency chain analysis
-- ARCHITECTURE.md at v4.1.0
+- ARCHITECTURE.instructions.md at v4.1.0
 
 ## SDLC Enforcement Upgrade — COMPLETED
 
@@ -145,7 +145,7 @@ append_only: true
 | VALIDATE — QA review (FAIL → fix → PASS) | DONE | QA Engineer | 2026-02-26 |
 | VALIDATE — Security review (PASS_WITH_FINDINGS) | DONE | Security Engineer | 2026-02-26 |
 | FIX LOOP — 8 findings resolved (3C + 2H + 2M + 1L) | DONE | Backend | 2026-02-26 |
-| DOCUMENT — ARCHITECTURE.md v5.0.0 | DONE | Documentation | 2026-02-26 |
+| DOCUMENT — ARCHITECTURE.instructions.md v5.0.0 | DONE | Documentation | 2026-02-26 |
 
 ### System Now Has (Session 10)
 - 14 agents (13 specialized + 1 orchestrator) — Validator Agent added
@@ -158,7 +158,7 @@ append_only: true
 - 8-layer bug-catching strategy: G1-G8 across IMPLEMENT/TEST/VALIDATE
 - Governance state machine with blocking rules and rework loops
 - 5 new loop detection signals + STOP_ALL keyword standardization
-- ARCHITECTURE.md at v5.0.0
+- ARCHITECTURE.instructions.md at v5.0.0
 
 ### [2026-02-27] Session 13: Ticket-Driven Event-Based Engine
 
@@ -170,7 +170,7 @@ append_only: true
 | TDSA-BE004: agents.md Boot Protocol | Backend | 191 lines, 9-state refs + chain refs | DONE |
 | TDSA-BE005: chunk-01.yaml Ticket Model | Backend | 324 lines, BACKLOG default, 9-state values | DONE |
 | TDSA-BE006: chunk-02.yaml State Machine | Backend | 306 lines, 9-state replaces 8-state | DONE |
-| TDSA-DOC001: ARCHITECTURE.md v7.0.0 | Documentation | 1194 lines, v6.0.0→v7.0.0, all new sections | DONE |
+| TDSA-DOC001: ARCHITECTURE.instructions.md v7.0.0 | Documentation | 1194 lines, v6.0.0→v7.0.0, all new sections | DONE |
 | Validator Review | Validator | 7/7 checks PASS, 95% confidence, APPROVED | DONE |
 
 ### System Now Has (Session 13)
@@ -181,7 +181,7 @@ append_only: true
 - **Anti-one-shot guardrails:** scope enforcement, 2-pass minimum, anti-batch detection
 - **Commit enforcement:** every ticket gets its own `git commit` with ticket ID + CHANGELOG
 - **Progressive refinement preserved:** L3 tasks are now "tickets" entering BACKLOG
-- **ARCHITECTURE.md at v7.0.0**
+- **ARCHITECTURE.instructions.md at v7.0.0**
 - OLD model references remain in 8+ out-of-scope files (technical debt — future ticket)
 
 ### [2026-02-28] Session 14: Worker-Pool Adaptive Engine v8.0.0
@@ -193,7 +193,7 @@ append_only: true
 | WPAE-BE003: Chunk Content Updates | Backend | 3 chunk files, all 5 AC met | DONE |
 | WPAE-BE004: Schema & Infra Alignment | Backend | 4 infra files, all 6 AC met | DONE |
 | WPAE-BE005: Conceptual v8 Propagation | Backend | 3 files (agents.md, _cross-cutting, TODO), 10 AC met | DONE |
-| ARCHITECTURE.md v8.0.0 Rewrite | Backend | 1728 lines, 32 sections, zero banned terms | DONE |
+| ARCHITECTURE.instructions.md v8.0.0 Rewrite | Backend | 1728 lines, 32 sections, zero banned terms | DONE |
 
 ### System Now Has (Session 14)
 - **Worker-Pool Adaptive Engine v8.0.0** replaces ticket-driven engine v7.0.0
@@ -204,14 +204,14 @@ append_only: true
 - **SDR Protocol:** Strategic Decision Records with roadmap versioning
 - **10 new event types:** 4 worker pool + 6 strategic events
 - **5-type Conflict Detection:** file path, directory subtree, DB schema, infrastructure, shared config
-- **ARCHITECTURE.md at v8.0.0** (1728 lines, 32 sections)
+- **ARCHITECTURE.instructions.md at v8.0.0** (1728 lines, 32 sections)
 
 ### [2026-02-28] Session 14 (continued): Elastic Multi-Worker Parallel Execution Engine v8.1.0
 
 | Task | Agent | Evidence | Status |
 |------|-------|----------|--------|
 | EWPE-BE001: ReaperOAK.agent.md elastic pool rewrite | Backend | 1453 lines, v8.1.0, 14 AC met, 0 static IDs | DONE |
-| EWPE-BE002: ARCHITECTURE.md elastic pool update | Backend | 1960 lines, v8.1.0, 10 AC met, 0 static IDs | DONE |
+| EWPE-BE002: ARCHITECTURE.instructions.md elastic pool update | Backend | 1960 lines, v8.1.0, 10 AC met, 0 static IDs | DONE |
 | EWPE-BE003: Boot file & protocol propagation | Backend | agents.md=238, _cross-cutting=245, 7 AC met | DONE |
 | Verification sweep | ReaperOAK | 0 static IDs, versions aligned, dynamic refs confirmed | DONE |
 
@@ -224,7 +224,7 @@ append_only: true
 - **Worker termination enforcement:** hard-kill on multi-ticket violation
 - **5-state Worker Lifecycle:** idle → assigned → executing → draining → terminated
 - **Pool sizes:** Backend (2-15), Frontend (1-10), QA (1-8), Security (1-5), DevOps (1-5), Docs/Validator/CI (1-3)
-- **ARCHITECTURE.md at v8.1.0** (1960 lines, 32 sections)
+- **ARCHITECTURE.instructions.md at v8.1.0** (1960 lines, 32 sections)
 - **ReaperOAK.agent.md at v8.1.0** (1453 lines, 22 sections)
 
 ---
@@ -243,7 +243,7 @@ append_only: true
 | Memory Enforcement Gate (5 required fields, blocks COMMIT) | DONE |
 | Continuous Health Sweep (5 checks per scheduling interval) | DONE |
 | Light Supervision Mode (auto-correct drift, human for strategy only) | DONE |
-| ARCHITECTURE.md §33 + §5/§8/§10/§15 updates | DONE |
+| ARCHITECTURE.instructions.md §33 + §5/§8/§10/§15 updates | DONE |
 | _cross-cutting-protocols.md §11 (agent-facing OIP rules) | DONE |
 | agents.md §6 + §9 (boot protocol OIP references) | DONE |
 
@@ -258,7 +258,7 @@ append_only: true
 - **Parallel Backfill** — Stream A (new work) + Stream B (retroactive repair) concurrent
 - **Light Supervision Mode** — human only for SDR approval, escalation, destructive ops, strategy
 - **ReaperOAK.agent.md at v8.2.0** (1863 lines, 30 sections)
-- **ARCHITECTURE.md at v8.2.0** (2092 lines, 33 sections)
+- **ARCHITECTURE.instructions.md at v8.2.0** (2092 lines, 33 sections)
 - **_cross-cutting-protocols.md** (339 lines, 11 sections)
 
 ---
@@ -270,25 +270,25 @@ append_only: true
 | Ticket | Description | Status |
 |--------|-------------|--------|
 | SH-001 | Create 9 governance policy files in .github/governance/ | DONE |
-| SH-002 | Create _core_governance.md canonical authority | DONE |
+| SH-002 | Create core_governance.instructions.md canonical authority | DONE |
 | SH-003 | Rewrite ReaperOAK.agent.md (1864→723 lines, 61% reduction) | DONE |
 | SH-004 | Agent normalization (reverted — frontmatter off-limits) | DONE |
 | SH-005 | Update agents.md boot protocol (§3, §4, §9) | DONE |
-| SH-006 | Update _cross-cutting-protocols.md + ARCHITECTURE.md | DONE |
+| SH-006 | Update _cross-cutting-protocols.md + ARCHITECTURE.instructions.md | DONE |
 | SH-007 | Update catalog.yml with governance: tag | DONE |
 | Verification | Cross-reference audit — zero stale refs | DONE |
 | Memory+Commit | Memory bank entries + scoped commit | DONE |
 
 ### System Now Has (Session 16 — v9.0.0)
-- **Governance Hierarchy** — _core_governance.md → 9 governance/ policy files → agent files → chunks
+- **Governance Hierarchy** — core_governance.instructions.md → 9 governance/ policy files → agent files → chunks
 - **Unbounded Worker Pools** — zero maxSize/minSize anywhere, scale purely on demand
 - **9 Drift Types** (DRIFT-001 through DRIFT-009) — added GOVERNANCE_VERSION_MISMATCH + OVERSIZED_INSTRUCTION
 - **Modular Context Injection** — governance: tag in catalog.yml, boot protocol loads governance authority
 - **Version Tracking** — GOVERNANCE_VERSION 9.0.0 in governance files only (NOT in agent frontmatter)
 - **ReaperOAK.agent.md at v9.0.0** (723 lines, 24 sections)
-- **ARCHITECTURE.md at v9.0.0** (~2106 lines, 33 sections)
+- **ARCHITECTURE.instructions.md at v9.0.0** (~2106 lines, 33 sections)
 - **_cross-cutting-protocols.md** (345 lines, 11 sections)
-- **10 new governance files** — _core_governance.md + 9 policy files in governance/
+- **10 new governance files** — core_governance.instructions.md + 9 policy files in governance/
 - **catalog.yml** — governance: tag with 10 file paths
 
 ---
@@ -303,7 +303,7 @@ Implement Operational Concurrency Floor: maintain MIN_ACTIVE_WORKERS=10 at all t
 | Ticket | Description | Status |
 |--------|-------------|--------|
 | OCF-001 | OCF in ReaperOAK.agent.md (§6 scheduling loop + §25 OCF spec) | DONE |
-| OCF-002 | OCF in ARCHITECTURE.md (§5.1 loop + §34 OCF architecture) | DONE |
+| OCF-002 | OCF in ARCHITECTURE.instructions.md (§5.1 loop + §34 OCF architecture) | DONE |
 | OCF-003 | Verification sweep (no governance bloat, consistency check) | DONE |
 | OCF-004 | Memory bank entries + scoped commit | DONE |
 
@@ -315,6 +315,6 @@ Implement Operational Concurrency Floor: maintain MIN_ACTIVE_WORKERS=10 at all t
 - **Throttle Safeguards** — Suspend Class B on heavy load (>20 backlog, >80% tokens, >30% rework)
 - **Anti-Recursion Guard** — BG workers cannot spawn BG, cannot modify governance/agent files
 - **ReaperOAK.agent.md at v9.1.0** (821 lines, 25 sections)
-- **ARCHITECTURE.md at v9.1.0** (~2227 lines, 34 sections)
+- **ARCHITECTURE.instructions.md at v9.1.0** (~2227 lines, 34 sections)
 - **Zero governance file changes** — all OCF logic at scheduler level only
 - **agents.md** (292 lines, 9 sections)

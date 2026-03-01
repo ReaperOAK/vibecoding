@@ -401,9 +401,9 @@ autonomous delivery.
   proposals/               Self-improvement proposals (PROP-*.md)
   locks/                   File lock schema for concurrent access
   archives/                Historical orchestration artifacts
-  ARCHITECTURE.md          Full system topology (1960 lines, 32 sections)
-  security.agentic-guardrails.md   Threat models, MCP isolation
-  orchestration.rules.md   DAG protocol, confidence gates, token tracking
+  ARCHITECTURE.instructions.md          Full system topology (1960 lines, 32 sections)
+  security.agentic-guardrails.instructions.md   Threat models, MCP isolation
+  orchestration.rules.instructions.md   DAG protocol, confidence gates, token tracking
 
 agents.md                  Boot protocol loaded on every agent interaction
                            Safety checks, context loading, chunk routing

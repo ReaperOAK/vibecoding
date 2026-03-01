@@ -242,7 +242,7 @@ If a memory bank file is suspected of corruption:
 | Task duration | 10 minutes | 15 minutes | Halt and escalate |
 | Fetches per task | 8 | 10 | Block further fetches |
 | File edits per task | 15 | 20 | Block further edits |
-| Total session tokens | 70% budget | 100% budget | See orchestration.rules.md §7 |
+| Total session tokens | 70% budget | 100% budget | See orchestration.rules.instructions.md §7 |
 
 ### 6.2 Infinite Loop Signals
 
