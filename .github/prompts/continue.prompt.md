@@ -17,22 +17,34 @@ This is controlled continuation mode.
 
 Before spawning any workers:
 
-1. Read memory-bank/workflow-state.json
-2. Read active tickets
-3. Read dependency graph
-4. Read progress.md
-5. Read decisionLog.md
-6. Detect:
-   - In-progress tickets
-   - Blocked tickets
-   - Failed tickets
-   - Tickets missing SDLC loop
-   - Tickets missing commit
-   - Tickets missing validation
-   - Tickets missing documentation
+1. Check for `.github/memory-bank/RESUME_POINT.md`
+   - If exists → use as primary resume anchor (skip broad re-analysis)
+   - If missing → fall back to full state scan below
+2. Read `.github/memory-bank/workflow-state.json`
+3. Read `.github/memory-bank/activeContext.md`
+4. Read `.github/memory-bank/progress.md`
+5. Read `.github/memory-bank/decisionLog.md`
+6. Read `.github/memory-bank/riskRegister.md`
+7. Read `.github/memory-bank/SESSION_SUMMARY.md` (if exists)
+8. Read `.github/memory-bank/SYSTEM_SNAPSHOT.json` (if exists)
+9. Read active tickets and dependency graph
+10. Run `python3 todo_visual.py --ready --json` for current READY ticket list
+11. Detect:
+    - In-progress tickets (IMPLEMENTING, QA_REVIEW, VALIDATION, DOCUMENTATION, CI_REVIEW)
+    - Blocked tickets
+    - Failed / escalated tickets
+    - Tickets missing SDLC stages (incomplete post-execution chain)
+    - Tickets missing scoped commit
+    - Tickets missing validation (Validator never ran)
+    - Tickets missing documentation update
 
 Generate:
 CONTINUATION_STATUS_REPORT.md
+
+Archive prior session artifacts after reading:
+- Delete or rename RESUME_POINT.md (consumed)
+- Delete or rename SESSION_SUMMARY.md (consumed)
+- Delete or rename SYSTEM_SNAPSHOT.json (consumed)
 
 Do NOT code yet.
 
@@ -52,12 +64,16 @@ Spawn parallel workers to:
 
 This must run in parallel with new development.
 
-Maintain minimum 10 active workers.
-If fewer primary tickets exist, spawn background audits:
-- Security scan
-- Architecture alignment
-- Tech debt detection
-- Performance review
+Maintain minimum 10 active workers (OCF — Operational Concurrency Floor).
+If fewer primary (Class A) tickets exist, spawn Class B background audits:
+- BG-SEC-AUDIT — Security scan (OWASP/STRIDE gaps)
+- BG-ARCH-ALIGN — Architecture alignment (ADR conformance)
+- BG-TECH-DEBT-SCAN — Tech debt detection (complexity hotspots)
+- BG-PERFORMANCE-ANALYSIS — Performance review (hot paths)
+- BG-QA-COVERAGE-CHECK — Test coverage gaps
+- BG-DOC-COMPLETENESS — Documentation freshness audit
+
+Class A tickets always preempt Class B. See governance/concurrency_floor.md.
 
 ---
 
@@ -65,16 +81,16 @@ If fewer primary tickets exist, spawn background audits:
 
 From dependency graph:
 
-1. Identify READY tickets.
-2. Exclude deprecated.
-3. Exclude blocked.
-4. Exclude tickets under review.
-5. Sort by priority.
-6. Spawn one worker per ticket.
-7. Spawn multiple workers of same role if multiple tickets exist.
-8. Respect file conflict locks.
+1. Run `python3 todo_visual.py --ready` to identify READY tickets.
+2. Exclude blocked tickets.
+3. Exclude tickets under review (QA_REVIEW, VALIDATION, CI_REVIEW).
+4. Sort by priority (P0 first).
+5. Spawn one worker per ticket.
+6. Spawn multiple workers of same role if multiple tickets exist.
+7. Respect file conflict locks (no two workers on same file path).
 
 No agent may take multiple tickets simultaneously.
+One ticket → one worker → one lifecycle → one commit.
 
 ---
 
@@ -84,9 +100,9 @@ For each ticket:
 
 READY
 → LOCKED
-→ IMPLEMENTATION
-→ QA
-→ VALIDATOR
+→ IMPLEMENTING
+→ QA_REVIEW
+→ VALIDATION
 → DOCUMENTATION
 → CI_REVIEW
 → COMMIT
@@ -172,6 +188,10 @@ Development continues until:
 Then:
 
 Generate DEVELOPMENT_STATUS_SUMMARY.md
+
+When ending the session, invoke the stop protocol
+(`.github/prompts/stop.prompt.md`) to produce RESUME_POINT.md
+and preserve full state for the next continuation.
 
 ---
 
