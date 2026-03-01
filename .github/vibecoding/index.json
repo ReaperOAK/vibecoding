@@ -1,6 +1,6 @@
 [
   {
-    "path": "./.github/ARCHITECTURE.md",
+    "path": "./.github/instructions/ARCHITECTURE.instructions.md",
     "title": "Vibecoding Multi-Agent System Architecture",
     "token_estimate": 5062,
     "first_512_chars_hash": "41e95a631c1751fb45ff56a7f690521612fdd8a03dee9fe9ea504615167a3878",
@@ -252,7 +252,7 @@
     ]
   },
   {
-    "path": "./.github/instructions/SDLC/8. Technical Design Doc for Architecture.md",
+    "path": "./.github/instructions/SDLC/8. Technical Design Doc for ARCHITECTURE.instructions.md",
     "title": "**The Architect's Blueprint: A Comprehensive Guide to Crafting Production-Grade Technical Design Documents**",
     "token_estimate": 14318,
     "first_512_chars_hash": "d772ac91b7b53f2173eacc1048cb5685c7d3b34d8b27a85e0e4d67522cdb107c",
@@ -262,7 +262,7 @@
     ]
   },
   {
-    "path": "./.github/instructions/SDLC/9. API Contract Definition in Architecture.md",
+    "path": "./.github/instructions/SDLC/9. API Contract Definition in ARCHITECTURE.instructions.md",
     "title": "**A Blueprint for Collaboration: Mastering the API Contract in the Architecture & Design Phase**",
     "token_estimate": 8885,
     "first_512_chars_hash": "694b5a2494d83105259a4b6289c88ac7a205bb637b69513f3946b1c759c5cd0c",
@@ -575,7 +575,7 @@
     ]
   },
   {
-    "path": "./.github/orchestration.rules.md",
+    "path": "./.github/instructions/orchestration.rules.instructions.md",
     "title": "Orchestration Rules",
     "token_estimate": 4494,
     "first_512_chars_hash": "28e83db0bb7097ecf104187287683ee08e438e66337025c64a135ef57ab0b145",
@@ -584,7 +584,7 @@
     ]
   },
   {
-    "path": "./.github/security.agentic-guardrails.md",
+    "path": "./.github/instructions/security.agentic-guardrails.instructions.md",
     "title": "Agentic Security Guardrails",
     "token_estimate": 6211,
     "first_512_chars_hash": "8d5bec6ec6a6b0d3256011b3dac9ca35bc075ea1eb48d99b597d4a5536470139",

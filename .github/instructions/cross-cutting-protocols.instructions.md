@@ -249,7 +249,7 @@ these events.
 ## 11. Operational Integrity Protocol (OIP) — All Agents
 
 > **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19
-> **Governance Authority:** `.github/agents/_core_governance.md`
+> **Governance Authority:** `.github/instructions/core_governance.instructions.md`
 > **Governance Policies:** `.github/governance/` (9 policy files)
 > **OIP Version:** 1.0.0
 

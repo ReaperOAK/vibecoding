@@ -11,7 +11,7 @@
 >
 > v9.0.0 — Structural Hardening: unbounded elastic worker
 > pools (removed all minSize/maxSize caps), governance hierarchy
-> (`.github/governance/` + `_core_governance.md`), modular context injection
+> (`.github/governance/` + `core_governance.instructions.md`), modular context injection
 > architecture, 9 drift types (added DRIFT-008/009), instruction versioning
 > tracked in governance files only (not agent frontmatter). ReaperOAK.agent.md
 > reduced 61% (1864→723 lines). §2, §5, §11, §19, §26, §27, §33 updated.
@@ -1273,7 +1273,7 @@ and evidence fields.
 
 ## 17. Security Guardrails
 
-See `.github/security.agentic-guardrails.md` for full specification.
+See `.github/instructions/security.agentic-guardrails.instructions.md` for full specification.
 
 Key constraints:
 
@@ -1318,7 +1318,7 @@ The instruction and governance system follows a strict hierarchy:
 
 ```
 agents.md                          ← Boot protocol (loaded first)
-└── .github/agents/_core_governance.md ← Canonical governance authority
+└── .github/instructions/core_governance.instructions.md ← Canonical governance authority
     └── .github/governance/*.md        ← 9 policy files (lifecycle, worker,
     │                                    commit, memory, UI, security,
     │                                    events, context injection, perf)
@@ -1327,7 +1327,7 @@ agents.md                          ← Boot protocol (loaded first)
 ```
 
 **GOVERNANCE_VERSION** (currently 9.0.0) is tracked in governance files
-and `_core_governance.md` ONLY — never in agent `.agent.md` frontmatter.
+and `core_governance.instructions.md` ONLY — never in agent `.agent.md` frontmatter.
 
 ### 19.2 Domain Instruction Files
 
@@ -1378,8 +1378,8 @@ governance principles.
 |----------|----------|---------|
 | Memory Bank | `.github/memory-bank/` | Both Copilot and Claude Code |
 | Instruction Files | `docs/instructions/` | Both Copilot and Claude Code |
-| Architecture Docs | `.github/ARCHITECTURE.md` | Both |
-| Security Guardrails | `.github/security.agentic-guardrails.md` | Both |
+| Architecture Docs | `.github/instructions/ARCHITECTURE.instructions.md` | Both |
+| Security Guardrails | `.github/instructions/security.agentic-guardrails.instructions.md` | Both |
 | Cross-Cutting Protocols | `.github/agents/_cross-cutting-protocols.md` | Both |
 
 ### Agent-Specific Resources
@@ -1595,7 +1595,7 @@ Files supporting the ticket-driven SDLC enforcement:
 | `.github/agents/Validator.agent.md` | Validator agent definition |
 | `.github/agents/ReaperOAK.agent.md` | Worker-pool adaptive orchestrator with 9-state machine |
 | `.github/agents/_cross-cutting-protocols.md` | Event emission + anti-one-shot guardrails |
-| `.github/agents/_core_governance.md` | Canonical governance authority (indexes all policies) |
+| `.github/instructions/core_governance.instructions.md` | Canonical governance authority (indexes all policies) |
 | `.github/governance/lifecycle.md` | 9-state machine, transitions, DoD, post-chain |
 | `.github/governance/worker_policy.md` | Unbounded elastic pools, worker lifecycle |
 | `.github/governance/commit_policy.md` | Scoped git, per-ticket commits |
@@ -2046,7 +2046,7 @@ execution are truly concurrent.
 
 > **OIP Version:** 1.0.0
 > **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19
-> **Governance Authority:** `.github/agents/_core_governance.md`
+> **Governance Authority:** `.github/instructions/core_governance.instructions.md`
 > **Governance Policies:** `.github/governance/` (9 policy files)
 
 The Operational Integrity Protocol is a self-healing governance layer

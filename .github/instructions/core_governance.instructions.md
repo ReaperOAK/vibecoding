@@ -79,7 +79,7 @@ contain governance version fields.
 ### Enforcement
 
 - At each scheduling interval, ReaperOAK checks that ALL governance files
-  and `_core_governance.md` declare the same GOVERNANCE_VERSION
+  and `core_governance.instructions.md` declare the same GOVERNANCE_VERSION
 - If any governance file has a mismatched version:
   - Emit `INSTRUCTION_MISALIGNMENT` event
   - Emit DRIFT-008 (GOVERNANCE_VERSION_MISMATCH)
@@ -130,14 +130,14 @@ The Health Sweep periodically verifies governance integrity:
 3. No agent file exceeds MAX_AGENT_FILE (300 lines)
 4. No chunk file exceeds MAX_CHUNK_FILE (4000 tokens)
 5. No duplicate rule definitions across governance files
-6. `_core_governance.md` declares matching GOVERNANCE_VERSION
+6. `core_governance.instructions.md` declares matching GOVERNANCE_VERSION
 
 Violations emit `GOVERNANCE_DRIFT` event and trigger auto-correction.
 
 ### Authority Hierarchy
 
 ```
-_core_governance.md (THIS FILE)
+core_governance.instructions.md (THIS FILE)
     ├── governance/lifecycle.md
     ├── governance/commit_policy.md
     ├── governance/worker_policy.md

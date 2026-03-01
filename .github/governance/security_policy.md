@@ -1,7 +1,7 @@
 # Security Policy
 
 > **GOVERNANCE_VERSION: 9.0.0**
-> **Authority:** `.github/agents/_core_governance.md`
+> **Authority:** `.github/instructions/core_governance.instructions.md`
 > **Scope:** Human approval gates, security review triggers, dual-layer security model
 
 ---

@@ -1,5 +1,5 @@
 ---
-source: "./.github/orchestration.rules.md"
+source: "./.github/instructions/orchestration.rules.instructions.md"
 chunk_index: 2
 token_estimate: 530
 hash: "0632b0dbe499e38018429915fffc91441acb5417f71d77f636f2c4bd5e9a1e5f"

@@ -24,7 +24,7 @@ If the file contains `STOP`, stop immediately and report to the user.
 
 ### Governance Authority
 
-Read `.github/agents/_core_governance.md` — this is the **canonical
+Read `.github/instructions/core_governance.instructions.md` — this is the **canonical
 governance authority**. It indexes all governance policy files in
 `.github/governance/` (lifecycle, worker policy, commit policy, memory,
 UI, security, events, context injection, performance monitoring).
@@ -261,7 +261,7 @@ READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION
 ## 9. Operational Integrity Protocol (OIP)
 
 > **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19
-> **Governance Authority:** `.github/agents/_core_governance.md`
+> **Governance Authority:** `.github/instructions/core_governance.instructions.md`
 > **Cross-Cutting Rules:** `.github/agents/_cross-cutting-protocols.md` §11
 > **Governance Policies:** `.github/governance/` (9 policy files)
 

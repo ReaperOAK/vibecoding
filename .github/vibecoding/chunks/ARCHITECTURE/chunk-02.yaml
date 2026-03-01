@@ -1,5 +1,5 @@
 ---
-source: "./.github/ARCHITECTURE.md"
+source: "./.github/instructions/ARCHITECTURE.instructions.md"
 chunk_index: 2
 token_estimate: 1119
 hash: "488ad4c6ee20f353d9c4c7e442c2a1e055513a3a8e05b20cba10cbe6b9a708ed"
@@ -13,7 +13,7 @@ summary: "| Confidence trend | Confidence gate assessments | Risk detection | | 
 
 ## 14. Security Guardrails
 
-See `.github/security.agentic-guardrails.md` for full specification.
+See `.github/instructions/security.agentic-guardrails.instructions.md` for full specification.
 
 Key constraints:
 
@@ -99,8 +99,8 @@ governance principles.
 |----------|----------|---------|
 | Memory Bank | `.github/memory-bank/` | Both Copilot and Claude Code |
 | Instruction Files | `docs/instructions/` | Both Copilot and Claude Code |
-| Architecture Docs | `.github/ARCHITECTURE.md` | Both |
-| Security Guardrails | `.github/security.agentic-guardrails.md` | Both |
+| Architecture Docs | `.github/instructions/ARCHITECTURE.instructions.md` | Both |
+| Security Guardrails | `.github/instructions/security.agentic-guardrails.instructions.md` | Both |
 | Cross-Cutting Protocols | `.github/agents/_cross-cutting-protocols.md` | Both |
 
 ### Agent-Specific Resources

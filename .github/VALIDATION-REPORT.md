@@ -45,9 +45,9 @@
 
 | File | Purpose |
 |------|---------|
-| `.github/ARCHITECTURE.md` | System topology, authority matrix |
-| `.github/orchestration.rules.md` | Parallel execution, DAG protocol |
-| `.github/security.agentic-guardrails.md` | Security controls |
+| `.github/instructions/ARCHITECTURE.instructions.md` | System topology, authority matrix |
+| `.github/instructions/orchestration.rules.instructions.md` | Parallel execution, DAG protocol |
+| `.github/instructions/security.agentic-guardrails.instructions.md` | Security controls |
 | `.github/agents/_cross-cutting-protocols.md` | Universal quality protocols |
 | `.github/workflows/ai-code-review.yml` | PR code review CI |
 | `.github/workflows/ai-test-validator.yml` | Test coverage CI |
@@ -325,9 +325,9 @@ graph TB
 
 ```
 .github/
-├── ARCHITECTURE.md
-├── orchestration.rules.md
-├── security.agentic-guardrails.md
+├── ARCHITECTURE.instructions.md
+├── orchestration.rules.instructions.md
+├── security.agentic-guardrails.instructions.md
 ├── orchestration.mmd
 ├── VALIDATION-REPORT.md
 ├── agents/

@@ -83,9 +83,9 @@ immutable_to_subagents: true
 ├── agents/           # Subagent definitions
 ├── memory-bank/      # Persistent state files
 ├── workflows/        # CI/CD workflows
-├── ARCHITECTURE.md   # System architecture document
-├── orchestration.rules.md  # Parallel execution framework
-└── security.agentic-guardrails.md  # Security constraints
+├── ARCHITECTURE.instructions.md   # System architecture document
+├── orchestration.rules.instructions.md  # Parallel execution framework
+└── security.agentic-guardrails.instructions.md  # Security constraints
 ```
 
 ---

@@ -362,12 +362,12 @@
           "reason": "SDLC reference guide"
         },
         {
-          "from": ".github/instructions/SDLC/8. Technical Design Doc for Architecture.md",
+          "from": ".github/instructions/SDLC/8. Technical Design Doc for ARCHITECTURE.instructions.md",
           "to": ".github/archives/SDLC/",
           "reason": "SDLC reference guide"
         },
         {
-          "from": ".github/instructions/SDLC/9. API Contract Definition in Architecture.md",
+          "from": ".github/instructions/SDLC/9. API Contract Definition in ARCHITECTURE.instructions.md",
           "to": ".github/archives/SDLC/",
           "reason": "SDLC reference guide"
         },

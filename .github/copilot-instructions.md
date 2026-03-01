@@ -23,9 +23,9 @@ under a supervisor orchestrator (ReaperOAK).
 ├── observability/       # Agent trace event schema
 ├── workflows/           # CI: task runner, sandbox merge, memory verify
 ├── hooks/               # Governance audit, session logger, auto-commit
-├── ARCHITECTURE.md      # Full system topology and authority matrix
-├── orchestration.rules.md  # DAG protocol, confidence gates, token tracking
-└── security.agentic-guardrails.md  # Threat models, MCP isolation
+├── ARCHITECTURE.instructions.md      # Full system topology and authority matrix
+├── orchestration.rules.instructions.md  # DAG protocol, confidence gates, token tracking
+└── security.agentic-guardrails.instructions.md  # Threat models, MCP isolation
 TODO/                    # Task decomposition artifacts (managed by TODO Agent)
 docs/
 ├── uiux/                # UI/UX design artifacts (wireframes, mockups, specs)

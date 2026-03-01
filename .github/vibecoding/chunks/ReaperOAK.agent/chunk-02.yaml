@@ -3,9 +3,9 @@ source: "./.github/agents/ReaperOAK.agent.md"
 chunk_index: 2
 token_estimate: 3937
 hash: "27f9c5210b649edc90e1217fb9d29c90bcd999d2be1200c96ba95b7118e72f35"
-summary: "(see `orchestration.rules.md` §2).  **File Ownership Protocol for Parallel Work:**  ```yaml parallelExecution:   task..."
+summary: "(see `orchestration.rules.instructions.md` §2).  **File Ownership Protocol for Parallel Work:**  ```yaml parallelExecution:   task..."
 ---
-(see `orchestration.rules.md` §2).
+(see `orchestration.rules.instructions.md` §2).
 
 **File Ownership Protocol for Parallel Work:**
 
@@ -86,7 +86,7 @@ No phase transition occurs without an assessed confidence level:
 | **INSUFFICIENT** | <50% | HALT — escalate to human |
 
 Every plan phase must declare a confidence assessment. Every act phase must
-re-assess after execution. See `orchestration.rules.md` §3 for weighted
+re-assess after execution. See `orchestration.rules.instructions.md` §3 for weighted
 confidence factors.
 
 ## 2.6 Cross-Agent Conflict Resolution
@@ -133,7 +133,7 @@ Use progressive context control with a 4-priority system:
 | **P3** | Low | Skip / load on demand — historical logs, completed archives | 20% |
 
 Every delegation packet includes a `contextBudget` declaration specifying
-token allocation per source category (see `.github/ARCHITECTURE.md` §3).
+token allocation per source category (see `.github/instructions/ARCHITECTURE.instructions.md` §3).
 
 When available, prefer structured compaction/summarization over ad-hoc
 truncation.
@@ -224,7 +224,7 @@ For any handoff (human or agent), provide:
 - Require approval for sensitive write actions by default.
 - Log and review outbound data sent to third-party tools.
 - Validate MCP server identity before trusting responses.
-- See `security.agentic-guardrails.md` for full MCP isolation protocol.
+- See `security.agentic-guardrails.instructions.md` for full MCP isolation protocol.
 
 ## 4.3 Model Version Handling
 

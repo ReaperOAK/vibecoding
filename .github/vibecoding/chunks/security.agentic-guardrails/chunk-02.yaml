@@ -1,5 +1,5 @@
 ---
-source: "./.github/security.agentic-guardrails.md"
+source: "./.github/instructions/security.agentic-guardrails.instructions.md"
 chunk_index: 2
 token_estimate: 2285
 hash: "69fefc476c240b4fb0b4962b65eeb53e119c06a07a77301590b62ba2fa405008"
