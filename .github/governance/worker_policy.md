@@ -244,3 +244,18 @@ function autoScale(pool):
   algorithm. If `total_active_workers < MIN_ACTIVE_WORKERS (10)`, Class B
   background workers are spawned to fill the deficit. Class A always
   preempts Class B — see `governance/concurrency_floor.md` §5.
+
+### Task Discovery CLI
+
+The `todo_visual.py` script provides a `--ready` filter that returns only
+non-blocked, dependency-satisfied tasks — sorted by priority. Workers and
+the scheduler SHOULD use this to discover assignable work:
+
+```bash
+python3 todo_visual.py --ready          # Rich terminal table
+python3 todo_visual.py --ready --json   # Machine-readable JSON
+```
+
+The JSON output includes `ready_count` and a `tasks` array with each task's
+`id`, `title`, `priority`, `owner`, `effort`, `depends_on`, and
+`source_file`. This eliminates the need to scan all ticket files manually.

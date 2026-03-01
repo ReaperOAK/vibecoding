@@ -146,7 +146,25 @@ validation reports. Its rejection blocks advancement past QA_REVIEW.
 post-execution chain at the QA_REVIEW state of every ticket. No agent may
 self-validate.
 
-## 5. Human Approval Required
+## 5. Task Discovery CLI
+
+Agents can query actionable (non-blocked, all dependencies met) tasks
+without reading every ticket file:
+
+```bash
+# Rich terminal table — sorted by priority, shows ID/Priority/Title/Owner/Effort/File
+python3 todo_visual.py --ready
+
+# Machine-readable JSON — suitable for programmatic consumption
+python3 todo_visual.py --ready --json
+```
+
+The `--ready` filter runs AFTER dependency resolution and auto-blocking,
+so it returns ONLY tasks that are immediately assignable. ReaperOAK uses
+this during the ASSIGNMENT PHASE of the scheduling loop. Workers may use
+it to verify their assigned ticket is still actionable.
+
+## 6. Human Approval Required
 
 Never execute these without explicit user confirmation:
 
@@ -156,7 +174,7 @@ Never execute these without explicit user confirmation:
 - Schema migrations that alter or drop columns
 - Any operation with irreversible data loss potential
 
-## 6. Memory Updates
+## 7. Memory Updates
 
 Update memory bank files when:
 
@@ -182,7 +200,7 @@ Required format in `activeContext.md`:
 Missing entries trigger DRIFT-003 violation and ComplianceWorker auto-repair.
 Write the entry yourself to avoid violations.
 
-## 7. Loop Prevention
+## 8. Loop Prevention
 
 If you notice yourself:
 - Making the same tool call more than 3 times with identical parameters
@@ -191,7 +209,7 @@ If you notice yourself:
 
 Stop. Re-read the task objective. Try a different approach or escalate.
 
-## 8. Cross-Cutting Protocols (ALL Agents)
+## 9. Cross-Cutting Protocols (ALL Agents)
 
 ### RUG Discipline (Read → Understand → Generate)
 
@@ -258,7 +276,7 @@ READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION
 - Initialization checklist: `.github/tasks/initialization-checklist-template.md`
 - Cross-cutting protocols: `.github/agents/_cross-cutting-protocols.md`
 
-## 9. Operational Integrity Protocol (OIP)
+## 10. Operational Integrity Protocol (OIP)
 
 > **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19
 > **Governance Authority:** `.github/instructions/core_governance.instructions.md`
