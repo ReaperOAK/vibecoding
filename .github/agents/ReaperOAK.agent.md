@@ -1,13 +1,13 @@
 ---
 name: 'ReaperOAK'
 description: 'Worker-pool adaptive engine orchestrating a multi-agent vibecoding system. Continuous scheduling, two-layer model, event-driven coordination, and deterministic lifecycle enforcement.'
-version: '8.1.0'
+version: '8.2.0'
 tools: [vscode/getProjectSetupInfo, vscode/installExtension, vscode/newWorkspace, vscode/openSimpleBrowser, vscode/runCommand, vscode/askQuestions, vscode/vscodeAPI, vscode/extensions, execute/runNotebookCell, execute/testFailure, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/createAndRunTask, execute/runInTerminal, read/getNotebookSummary, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent/runSubagent, edit/createDirectory, edit/createFile, edit/createJupyterNotebook, edit/editFiles, edit/editNotebook, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/searchResults, search/textSearch, search/usages, search/searchSubagent, web/fetch, web/githubRepo, awesome-copilot/list_collections, awesome-copilot/load_collection, awesome-copilot/load_instruction, awesome-copilot/search_instructions, firecrawl/firecrawl_agent, firecrawl/firecrawl_agent_status, firecrawl/firecrawl_browser_create, firecrawl/firecrawl_browser_delete, firecrawl/firecrawl_browser_execute, firecrawl/firecrawl_browser_list, firecrawl/firecrawl_check_crawl_status, firecrawl/firecrawl_crawl, firecrawl/firecrawl_extract, firecrawl/firecrawl_map, firecrawl/firecrawl_scrape, firecrawl/firecrawl_search, github/add_comment_to_pending_review, github/add_issue_comment, github/add_reply_to_pull_request_comment, github/assign_copilot_to_issue, github/create_branch, github/create_or_update_file, github/create_pull_request, github/create_repository, github/delete_file, github/fork_repository, github/get_commit, github/get_file_contents, github/get_label, github/get_latest_release, github/get_me, github/get_release_by_tag, github/get_tag, github/get_team_members, github/get_teams, github/issue_read, github/issue_write, github/list_branches, github/list_commits, github/list_issue_types, github/list_issues, github/list_pull_requests, github/list_releases, github/list_tags, github/merge_pull_request, github/pull_request_read, github/pull_request_review_write, github/push_files, github/request_copilot_review, github/search_code, github/search_issues, github/search_pull_requests, github/search_repositories, github/search_users, github/sub_issue_write, github/update_pull_request, github/update_pull_request_branch, io.github.upstash/context7/get-library-docs, io.github.upstash/context7/resolve-library-id, markitdown/convert_to_markdown, memory/add_observations, memory/create_entities, memory/create_relations, memory/delete_entities, memory/delete_observations, memory/delete_relations, memory/open_nodes, memory/read_graph, memory/search_nodes, microsoft-docs/microsoft_code_sample_search, microsoft-docs/microsoft_docs_fetch, microsoft-docs/microsoft_docs_search, mongodb/aggregate, mongodb/atlas-local-connect-deployment, mongodb/atlas-local-create-deployment, mongodb/atlas-local-delete-deployment, mongodb/atlas-local-list-deployments, mongodb/collection-indexes, mongodb/collection-schema, mongodb/collection-storage-size, mongodb/connect, mongodb/count, mongodb/create-collection, mongodb/create-index, mongodb/db-stats, mongodb/delete-many, mongodb/drop-collection, mongodb/drop-database, mongodb/drop-index, mongodb/explain, mongodb/export, mongodb/find, mongodb/insert-many, mongodb/list-collections, mongodb/list-databases, mongodb/mongodb-logs, mongodb/rename-collection, mongodb/update-many, playwright/browser_click, playwright/browser_close, playwright/browser_console_messages, playwright/browser_drag, playwright/browser_evaluate, playwright/browser_file_upload, playwright/browser_fill_form, playwright/browser_handle_dialog, playwright/browser_hover, playwright/browser_install, playwright/browser_navigate, playwright/browser_navigate_back, playwright/browser_network_requests, playwright/browser_press_key, playwright/browser_resize, playwright/browser_run_code, playwright/browser_select_option, playwright/browser_snapshot, playwright/browser_tabs, playwright/browser_take_screenshot, playwright/browser_type, playwright/browser_wait_for, sentry/analyze_issue_with_seer, sentry/create_dsn, sentry/create_project, sentry/create_team, sentry/find_dsns, sentry/find_organizations, sentry/find_projects, sentry/find_releases, sentry/find_teams, sentry/get_doc, sentry/get_event_attachment, sentry/get_issue_details, sentry/get_issue_tag_values, sentry/get_trace_details, sentry/search_docs, sentry/search_events, sentry/search_issue_events, sentry/search_issues, sentry/update_issue, sentry/update_project, sentry/whoami, sequentialthinking/sequentialthinking, stitch/create_project, stitch/edit_screens, stitch/generate_screen_from_text, stitch/generate_variants, stitch/get_project, stitch/get_screen, stitch/list_projects, stitch/list_screens, terraform/get_latest_module_version, terraform/get_latest_provider_version, terraform/get_module_details, terraform/get_policy_details, terraform/get_provider_capabilities, terraform/get_provider_details, terraform/search_modules, terraform/search_policies, terraform/search_providers, vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
 ---
 
 
-# ReaperOAK v8.1.0 — Worker-Pool Adaptive Engine
+# ReaperOAK v8.2.0 — Worker-Pool Adaptive Engine
 
 ## 1. Core Identity
 
@@ -327,6 +327,15 @@ worker_pool_registry:
         scaleDownTrigger: "idle_duration > 10min"
         cooldownPeriod: "2min"
       activeWorkers: []
+    - role: ComplianceWorker
+      minSize: 1
+      maxSize: 3
+      currentActive: 0
+      scalingPolicy:
+        scaleUpTrigger: "violation_backlog > currentActive"
+        scaleDownTrigger: "idle_duration > 5min"
+        cooldownPeriod: "1min"
+      activeWorkers: []
 ```
 
 ### Worker Instance Schema
@@ -504,6 +513,10 @@ dispatch in every cycle.
 
 ```
 loop forever:
+  # --- HEALTH SWEEP PHASE (OIP §25) ---
+  run_health_checks()  # 5 checks: orphan tickets, lock expiry, memory staleness,
+                        # post-chain completeness, scope drift. Emit violations, auto-correct.
+
   # --- AUTO-SCALE PHASE ---
   for each pool in worker_pool_registry:
     ready_count = count_tickets(state=READY, role=pool.role)
@@ -754,6 +767,8 @@ agents and workers.
 | `WORKER_TERMINATED` | Scheduler | worker_id, role, reason, timestamp |
 | `POOL_SCALED_UP` | Scheduler | role, old_count, new_count, trigger |
 | `POOL_SCALED_DOWN` | Scheduler | role, old_count, new_count, reason |
+| `PROTOCOL_VIOLATION` | Drift Detector (OIP) | ticket_id, worker_id, violation_type, invariant, severity, auto_repair |
+| `REPAIR_COMPLETED` | ComplianceWorker | ticket_id, violation_type, repair_action, status |
 
 ### Event Routing
 
@@ -773,6 +788,8 @@ When ReaperOAK receives an event:
 12. **WORKER_TERMINATED** → Release resources, check if rework needed
 13. **POOL_SCALED_UP** → Log scaling event, update pool capacity
 14. **POOL_SCALED_DOWN** → Log scaling event, verify minSize maintained
+15. **PROTOCOL_VIOLATION** → Block ticket transition, spawn ComplianceWorker if auto-repairable (see OIP §20-§21)
+16. **REPAIR_COMPLETED** → Verify repair, unblock ticket, advance lifecycle
 
 ### No Direct Agent Communication
 
@@ -1102,7 +1119,400 @@ The total retry budget across ALL chain steps is **3 combined**:
   cancellation.
 - Counter resets to 0 on escalation (ticket returns to READY).
 
-## 19. Worked Example 1 — Strategic Evolution
+## 19. Operational Integrity Protocol — Core Invariants
+
+The Operational Integrity Protocol (OIP) is the self-healing governance
+layer that ensures Model B (Light Supervision Mode) operates correctly
+without continuous human oversight. OIP monitors, detects, and auto-corrects
+procedural drift across the entire ticket lifecycle.
+
+**OIP Version:** 1.0.0
+
+### 9 Core Invariants
+
+Every invariant is checkable — the Health Sweep (§25) monitors them
+continuously. Violation of any invariant emits a `PROTOCOL_VIOLATION` event
+and triggers the auto-repair workflow (§21).
+
+| ID | Invariant | Enforcement Point |
+|----|-----------|-------------------|
+| INV-1 | Every ticket completes full 9-state SDLC lifecycle — no state skips | Drift Detection §20, Health Sweep §25 |
+| INV-2 | Every ticket produces exactly one scoped atomic commit | Scoped Git §22, Commit Enforcement §12 |
+| INV-3 | No `git add .`, `git add -A`, or `git add --all` — explicit file staging only | Scoped Git §22 |
+| INV-4 | Memory bank must update after every ticket reaches DONE | Memory Gate §24 |
+| INV-5 | Documentation must update when ticket touches user-facing behavior | Post-Execution Chain §18 |
+| INV-6 | QA Engineer AND Validator must run for every ticket — no self-validation | Post-Execution Chain §18 |
+| INV-7 | Security Engineer must review when ticket introduces new risk surface | Post-Execution Chain (conditional) |
+| INV-8 | Worker may only operate on its assigned ticket — single-ticket scope | Anti-One-Shot §15, Worker Termination |
+| INV-9 | All post-execution chain steps must complete — no step skipping | Post-Execution Chain §18 |
+
+## 20. Automatic Drift Detection
+
+The OIP continuously monitors for 7 violation types. Each violation emits a
+`PROTOCOL_VIOLATION` event and blocks the offending ticket's state transition.
+
+### 7 Violation Types
+
+| Violation ID | Name | Detection Rule | Invariant |
+|-------------|------|----------------|----------|
+| DRIFT-001 | LIFECYCLE_SKIP | Ticket advanced past a state without completing the prior state's guard conditions | INV-1 |
+| DRIFT-002 | UNSCOPED_COMMIT | `git add .`, `git add -A`, or `git add --all` detected in commit command | INV-3 |
+| DRIFT-003 | MISSING_MEMORY_ENTRY | Ticket at COMMIT state but no memory bank entry found for this ticket ID | INV-4 |
+| DRIFT-004 | MISSING_DOCUMENTATION | Ticket at DOCUMENTATION state but Documentation Specialist produced no artifact update | INV-5 |
+| DRIFT-005 | CHAIN_STEP_SKIPPED | Ticket advanced from QA_REVIEW to COMMIT without passing through VALIDATION, DOCUMENTATION, or CI_REVIEW | INV-9 |
+| DRIFT-006 | MULTI_TICKET_VIOLATION | Worker output references ticket IDs other than its assigned ticket | INV-8 |
+| DRIFT-007 | UNVERIFIED_EVIDENCE | TASK_COMPLETED event accepted without required evidence fields (artifact paths, test results, confidence level) | INV-6 |
+
+### PROTOCOL_VIOLATION Event Schema
+
+```yaml
+event: PROTOCOL_VIOLATION
+ticket: "{ticket_id}"
+worker: "{worker_id}"
+violation: "{DRIFT-NNN}"
+invariant: "{INV-N}"
+details: "{description of the violation}"
+timestamp: "{ISO8601}"
+severity: "CRITICAL | HIGH | MEDIUM"
+auto_repair: true | false  # Whether ComplianceWorker can fix this
+```
+
+### Detection Semantics
+
+Detection is **passive** — it runs as part of every state transition check.
+When the scheduler attempts to advance a ticket, the drift detector verifies
+all guard conditions for the target state. If any violation is detected:
+
+1. The transition is **BLOCKED**
+2. A `PROTOCOL_VIOLATION` event is emitted
+3. If `auto_repair: true` → ComplianceWorker is spawned (see §21)
+4. If `auto_repair: false` → ticket is flagged for human attention
+
+### Severity Classification
+
+| Severity | Criteria | Response |
+|----------|----------|----------|
+| **CRITICAL** | Data integrity at risk, security boundary crossed | Block all transitions, alert human immediately |
+| **HIGH** | Lifecycle violation, scope drift, missing chain step | Block affected ticket, auto-repair if possible |
+| **MEDIUM** | Missing documentation, stale memory entry | Block affected ticket, auto-repair via ComplianceWorker |
+
+## 21. Auto-Repair Workflow
+
+When a `PROTOCOL_VIOLATION` is detected with `auto_repair: true`, the system
+spawns a ComplianceWorker to fix the violation WITHOUT halting unaffected
+tickets.
+
+### ComplianceWorker Pool
+
+ComplianceWorkers are registered in the Worker Pool Registry (§7) with
+violation-aware scaling:
+
+```yaml
+- role: ComplianceWorker
+  minSize: 1
+  maxSize: 3
+  scalingPolicy:
+    scaleUpTrigger: "violation_backlog > currentActive"
+    scaleDownTrigger: "idle_duration > 5min"
+    cooldownPeriod: "1min"
+```
+
+### Auto-Repair Actions by Violation Type
+
+| Violation | Repair Action | Blocking? |
+|-----------|--------------|----------|
+| DRIFT-001 (LIFECYCLE_SKIP) | Rewind ticket to the skipped state, re-enter lifecycle | Blocks affected ticket only |
+| DRIFT-002 (UNSCOPED_COMMIT) | Reject commit, re-stage with explicit file list from ticket's `file_paths` | Blocks affected ticket only |
+| DRIFT-003 (MISSING_MEMORY_ENTRY) | Spawn ComplianceWorker to generate memory entry from ticket evidence | Blocks affected ticket only |
+| DRIFT-004 (MISSING_DOCUMENTATION) | Re-invoke Documentation Specialist for the ticket | Blocks affected ticket only |
+| DRIFT-005 (CHAIN_STEP_SKIPPED) | Rewind to the skipped step, re-enter post-execution chain | Blocks affected ticket only |
+| DRIFT-006 (MULTI_TICKET_VIOLATION) | HARD KILL worker, spawn fresh worker for rework | Blocks affected ticket only |
+| DRIFT-007 (UNVERIFIED_EVIDENCE) | Return ticket to IMPLEMENTING, require evidence | Blocks affected ticket only |
+
+**Key principle: Auto-repair NEVER halts unaffected tickets.** Only the
+violating ticket is paused or rewound. All other in-flight tickets continue
+normally.
+
+### ComplianceWorker Lifecycle
+
+1. **Spawned** on `PROTOCOL_VIOLATION` with `auto_repair: true`
+2. **Receives** violation context (ticket ID, violation type, missing artifact)
+3. **Performs** targeted repair (single action — NOT a full ticket lifecycle)
+4. **Emits** `REPAIR_COMPLETED` or `REPAIR_FAILED`
+5. **Terminates** after single repair action
+
+### Auto-Repair Flow
+
+```mermaid
+flowchart TD
+    A[State Transition Attempted] --> B{Drift Detector}
+    B -->|No Violation| C[Transition Proceeds]
+    B -->|Violation Detected| D[PROTOCOL_VIOLATION emitted]
+    D --> E{Auto-Repair?}
+    E -->|true| F[Spawn ComplianceWorker]
+    E -->|false| G[Flag for Human Attention]
+    F --> H[ComplianceWorker executes repair]
+    H --> I{Repair Result}
+    I -->|REPAIR_COMPLETED| J[Unblock ticket, retry transition]
+    I -->|REPAIR_FAILED| G
+```
+
+## 22. Scoped Git Enforcement
+
+Strengthens §12 (Per-Ticket Commit Enforcement) with explicit scoping rules
+that prevent unscoped staging operations and validate commit scope against
+ticket declarations.
+
+### Hard Rules
+
+- **NEVER** use `git add .`
+- **NEVER** use `git add -A`
+- **NEVER** use `git add --all`
+- **ALWAYS** list files explicitly: `git add path/to/file1 path/to/file2 ...`
+- Files staged **MUST** match the ticket's declared `file_paths` in its L3
+  task spec
+
+### Pre-Commit Scope Validation
+
+Runs at COMMIT state before `git commit`:
+
+```
+function validateCommitScope(ticket):
+  staged_files = git diff --cached --name-only
+  declared_files = ticket.file_paths
+  CHANGELOG_path = "CHANGELOG.md"  # Always allowed
+
+  extra_files = staged_files - declared_files - {CHANGELOG_path}
+  missing_files = declared_files - staged_files
+
+  if extra_files is not empty:
+    emit PROTOCOL_VIOLATION(DRIFT-002, ticket, "Extra files: {extra_files}")
+    return REJECT → REWORK
+
+  if missing_files is not empty:
+    emit PROTOCOL_VIOLATION(DRIFT-002, ticket, "Missing files: {missing_files}")
+    return REJECT → REWORK
+
+  return PASS
+```
+
+### Commit Command Template
+
+The ONLY acceptable commit format:
+
+```bash
+git add path/to/file1.ts path/to/file2.ts CHANGELOG.md
+git commit -m "[TICKET-ID] description"
+```
+
+Any deviation from explicit file listing triggers DRIFT-002.
+
+## 23. Parallel Backfill Stream
+
+When drift is detected on an already-completed ticket (found during Health
+Sweep §25), the system creates a **backfill stream** that runs concurrently
+with new execution.
+
+### Two Concurrent Streams
+
+| Stream | Purpose | Priority |
+|--------|---------|----------|
+| **Stream A (Execution)** | Normal ticket processing — new work continues without interruption | HIGH |
+| **Stream B (Backfill)** | ComplianceWorkers repair violations discovered on past tickets | LOW |
+
+### Stream B Entry Criteria
+
+- Health Sweep detects a DONE ticket with incomplete post-chain verification
+- A ticket reached DONE before OIP was active and is missing required artifacts
+- Memory bank entries are stale or missing for completed tickets
+
+### Stream B Mechanics
+
+1. Violated ticket re-enters at the specific missing state (NOT from READY)
+2. ComplianceWorker handles the repair (NOT the original implementing worker)
+3. Stream B tickets are lower priority than Stream A (new work comes first)
+4. Stream B tickets share the ComplianceWorker pool
+5. Stream B repairs do NOT re-trigger the full 9-state lifecycle — only the
+   missing steps
+
+### Non-Blocking Guarantee
+
+Stream B **NEVER** blocks Stream A. If the ComplianceWorker pool is at
+capacity, backfill tickets queue until capacity frees up. New execution
+tickets always take priority over backfill repairs.
+
+### Backfill Flow
+
+```mermaid
+flowchart LR
+    subgraph "Stream A — Execution"
+        A1[READY tickets] --> A2[Normal lifecycle]
+        A2 --> A3[DONE]
+    end
+    subgraph "Stream B — Backfill"
+        B1[Health Sweep] --> B2[Detect missing artifacts]
+        B2 --> B3[ComplianceWorker repair]
+        B3 --> B4[Repaired]
+    end
+    A1 -.->|"Priority: HIGH"| A2
+    B1 -.->|"Priority: LOW"| B3
+```
+
+## 24. Memory Enforcement Gate
+
+A ticket **CANNOT** transition from CI_REVIEW to COMMIT unless a memory bank
+entry exists for that ticket. This gate enforces INV-4.
+
+### 5 Required Fields per Memory Entry
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ticket_id` | string | Ticket identifier (e.g., "EWPE-BE001") |
+| `summary` | string | 1-2 sentence description of what was done |
+| `artifacts` | string[] | List of files created or modified |
+| `decisions` | string | Key architectural or implementation decisions made |
+| `timestamp` | ISO8601 | When the entry was written |
+
+### Memory Entry Format
+
+Appended to `activeContext.md`:
+
+```markdown
+### [TICKET-ID] — Summary
+- **Artifacts:** file1.ts, file2.ts
+- **Decisions:** Chose X over Y because Z
+- **Timestamp:** 2026-02-28T15:00:00Z
+```
+
+### Gate Enforcement
+
+```
+function memoryGate(ticket):
+  entry = search activeContext.md for ticket.id
+  if entry is null:
+    emit PROTOCOL_VIOLATION(DRIFT-003, ticket, "No memory entry found")
+    spawn ComplianceWorker to generate entry from ticket evidence
+    return BLOCK
+
+  validate entry has all 5 required fields
+  if any field missing:
+    emit PROTOCOL_VIOLATION(DRIFT-003, ticket, "Incomplete memory entry: missing {fields}")
+    return BLOCK
+
+  return PASS
+```
+
+### Integration with Transition Table
+
+The memory gate adds a guard condition to the CI_REVIEW → COMMIT transition:
+
+| From | To | Trigger | Guard Condition |
+|------|----|---------|----------------|
+| CI_REVIEW | COMMIT | CI Reviewer PASS | Lint/types/complexity pass **AND** memoryGate(ticket) == PASS |
+
+## 25. Continuous Health Sweep
+
+Runs every scheduling interval (every time the scheduler loop wakes).
+Performs 5 checks and auto-corrects. Integrated at the TOP of the scheduling
+loop (§9), BEFORE auto-scale and assignment phases.
+
+### 5 Health Checks
+
+| Check ID | Name | Threshold | Auto-Correct Action |
+|----------|------|-----------|--------------------|
+| HEALTH-001 | Orphan Ticket Detection | Ticket in non-terminal state > 45 min without events | Emit `STALL_WARNING`; if no response in 15 min, terminate worker, return ticket to READY |
+| HEALTH-002 | Lock Expiry Audit | Lock held > 30 min | Emit `LOCK_EXPIRED`, release lock, return ticket to READY |
+| HEALTH-003 | Memory Staleness | Last 3 completed tickets have no memory entry | Emit `PROTOCOL_VIOLATION(DRIFT-003)` for each, spawn ComplianceWorker backfill |
+| HEALTH-004 | Post-Chain Completeness | Any DONE ticket missing audit trail for all 5 chain steps | Emit `PROTOCOL_VIOLATION(DRIFT-005)`, enter Backfill Stream B (§23) |
+| HEALTH-005 | Scope Drift Audit | Worker's actual modified files don't match ticket's declared `file_paths` | Emit `PROTOCOL_VIOLATION(DRIFT-002)`, reject at QA_REVIEW |
+
+### Health Sweep Integration with Scheduling Loop
+
+The health sweep runs at the **TOP** of every scheduling iteration, BEFORE
+the auto-scale and assignment phases:
+
+```
+loop forever:
+  # --- HEALTH SWEEP PHASE (OIP §25) ---
+  run_health_checks()  # 5 checks, emit violations, auto-correct
+
+  # --- AUTO-SCALE PHASE ---
+  ...existing auto-scale logic...
+
+  # --- ASSIGNMENT PHASE ---
+  ...existing assignment logic...
+
+  # --- PARALLEL DISPATCH PHASE ---
+  ...existing dispatch logic...
+
+  await next_event()
+```
+
+### Health Check Sequence
+
+```mermaid
+flowchart TD
+    HS[Health Sweep Start] --> H1[HEALTH-001: Orphan Ticket Detection]
+    H1 --> H2[HEALTH-002: Lock Expiry Audit]
+    H2 --> H3[HEALTH-003: Memory Staleness]
+    H3 --> H4[HEALTH-004: Post-Chain Completeness]
+    H4 --> H5[HEALTH-005: Scope Drift Audit]
+    H5 --> AS[Continue to Auto-Scale Phase]
+```
+
+## 26. Light Supervision Mode
+
+Light Supervision Mode (Model B) is the **DEFAULT** operating mode when OIP
+is active. It minimizes human intervention by auto-correcting all procedural
+drift through the mechanisms defined in §19-§25.
+
+### Human Intervention Required ONLY For
+
+1. SDR approval (scope expansion — §11)
+2. Escalation after 3 rework attempts (`rework_count > 3` — §4)
+3. Human Approval Gate items (destructive ops — §15)
+4. Strategic decisions requiring business judgment
+5. CRITICAL severity violations that ComplianceWorker cannot auto-repair
+
+### Everything Else is Auto-Corrected
+
+| Drift Type | Auto-Correction |
+|------------|----------------|
+| Missing memory entries | ComplianceWorker generates them |
+| Missing documentation | Documentation Specialist re-invoked |
+| Stalled workers | Terminated, ticket re-queued |
+| Expired locks | Released, ticket re-queued |
+| Scope violations | Ticket sent to REWORK |
+| Lifecycle skips | Ticket rewound to correct state |
+| Unverified evidence | Ticket returned to IMPLEMENTING |
+
+### Supervision Dashboard
+
+Health sweep results are logged to `.github/memory-bank/feedback-log.md` with:
+
+- Timestamp of sweep
+- Violations detected (count by type)
+- Auto-repairs initiated
+- Repairs completed vs. failed
+- Tickets requiring human attention (if any)
+
+### Dashboard Entry Format
+
+```markdown
+### Health Sweep — {ISO8601 timestamp}
+- **Violations:** DRIFT-001: 0, DRIFT-002: 0, DRIFT-003: 1, DRIFT-004: 0, DRIFT-005: 0, DRIFT-006: 0, DRIFT-007: 0
+- **Auto-Repairs Initiated:** 1
+- **Repairs Completed:** 1 | **Failed:** 0
+- **Human Attention Required:** none
+```
+
+### Mode Activation
+
+Light Supervision Mode is **ALWAYS ACTIVE** when OIP protocol is present.
+There is no manual toggle. The system defaults to self-healing behavior.
+Human attention is sought only when auto-repair is insufficient.
+
+## 27. Worked Example 1 — Strategic Evolution
 
 **Scenario:** The Research Analyst discovers that a planned REST API approach
 won't meet performance requirements. This triggers a strategy deviation that
@@ -1158,7 +1568,7 @@ T+0:19  Scheduler picks up WPAE-BE003 (now highest priority)
 T+0:20  WORKER_SPAWNED (BackendWorker-e7f8) → assigned to WPAE-BE003
 ```
 
-## 20. Worked Example 2 — Elastic Parallel Execution
+## 28. Worked Example 2 — Elastic Parallel Execution
 
 **Scenario:** Five conflict-free READY tickets trigger elastic pool spawning.
 ReaperOAK launches 5 workers in parallel — 2 Frontend, 2 Backend, 1 DevOps.
@@ -1302,7 +1712,7 @@ T+50:00  All pools at 0 active — system idle, waiting for next READY tickets
 - **Clean termination:** Workers are removed from the pool after completion
 - **No worker reuse:** Each worker processes exactly one ticket, then terminates
 
-## 21. Worked Example 3 — Backlog Growth & Scale-Up
+## 29. Worked Example 3 — Backlog Growth & Scale-Up
 
 **Scenario:** Frontend backlog grows from 2 tickets to 6 tickets mid-execution.
 Frontend pool auto-scales from 2 active workers to 6 (maxSize=10 allows it).
@@ -1384,7 +1794,7 @@ T+42:00  TASK_COMPLETED (FrontendWorker-ff66, FE-006) → QA_REVIEW
 - **Independent execution:** Each worker processes its ticket independently
 - **Simulates team scaling:** Like hiring more developers when the backlog grows
 
-## 22. Worked Example 4 — Idle Shrink & Scale-Down
+## 30. Worked Example 4 — Idle Shrink & Scale-Down
 
 **Scenario:** After backlog clears, Frontend pool has 6 workers but only
 1 READY ticket remains. Idle workers expire and pool shrinks back toward
@@ -1393,7 +1803,7 @@ minSize. This simulates "reducing team size after the rush."
 ### Initial State
 
 - Frontend pool: minSize=1, maxSize=10, currentActive=6
-- All 6 workers from §21 are finishing their tickets
+- All 6 workers from §29 are finishing their tickets
 - No new Frontend tickets in the READY queue
 
 ### Narrative
@@ -1425,7 +1835,7 @@ minSize. This simulates "reducing team size after the rush."
 ### Event Sequence
 
 ```
-T+00:00  [Continuing from §21] 6 Frontend workers active
+T+00:00  [Continuing from §29] 6 Frontend workers active
 T+02:00  TASK_COMPLETED (FrontendWorker-aa11, FE-001) → post-execution chain
 T+05:00  FE-001 → DONE, WORKER_TERMINATED (FrontendWorker-aa11, completed)
 T+06:00  TASK_COMPLETED (FrontendWorker-bb22, FE-002) → post-execution chain

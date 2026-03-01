@@ -161,6 +161,21 @@ Update memory bank files when:
 
 All updates are append-only. Never delete existing entries.
 
+### OIP Memory Enforcement (§24 of ReaperOAK.agent.md)
+
+Every ticket MUST have a memory bank entry before reaching COMMIT state.
+Required format in `activeContext.md`:
+
+```
+### [TICKET-ID] — Summary
+- **Artifacts:** file1.ts, file2.ts
+- **Decisions:** Chose X over Y because Z
+- **Timestamp:** 2026-02-28T15:00:00Z
+```
+
+Missing entries trigger DRIFT-003 violation and ComplianceWorker auto-repair.
+Write the entry yourself to avoid violations.
+
 ## 7. Loop Prevention
 
 If you notice yourself:
@@ -236,3 +251,42 @@ READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION
 - Definition of Done template: `.github/tasks/definition-of-done-template.md`
 - Initialization checklist: `.github/tasks/initialization-checklist-template.md`
 - Cross-cutting protocols: `.github/agents/_cross-cutting-protocols.md`
+
+## 9. Operational Integrity Protocol (OIP)
+
+> **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19-§26
+> **Cross-Cutting Rules:** `.github/agents/_cross-cutting-protocols.md` §11
+> **Architecture Reference:** `.github/ARCHITECTURE.md` §33
+
+The OIP is the self-healing governance layer for Light Supervision Mode
+(Model B). It applies to ALL agents. Key rules:
+
+### Scoped Git (INV-3)
+- NEVER use `git add .`, `git add -A`, or `git add --all`
+- ALWAYS list files explicitly in `git add`
+- Violation triggers DRIFT-002
+
+### Memory Gate (INV-4)
+- Every ticket MUST have a memory entry before COMMIT
+- 5 required fields: ticket_id, summary, artifacts, decisions, timestamp
+- Violation triggers DRIFT-003
+
+### Single-Ticket Scope (INV-8)
+- Workers operate ONLY on their assigned ticket
+- Referencing other ticket IDs → immediate termination
+- This is a HARD KILL — no warning
+
+### Evidence (INV-6)
+- TASK_COMPLETED must include: artifact paths, test results, confidence level
+- Missing evidence → DRIFT-007 → return to IMPLEMENTING
+
+### ComplianceWorker
+- Auto-spawned on PROTOCOL_VIOLATION with `auto_repair: true`
+- Performs targeted single-action repair
+- Only blocks the affected ticket — all other tickets continue
+
+### Health Sweep
+- 5 checks every scheduling interval
+- Auto-corrects: stalled tickets, expired locks, missing memory, incomplete chains, scope drift
+
+For the full OIP specification, read `.github/agents/ReaperOAK.agent.md` §19-§26.

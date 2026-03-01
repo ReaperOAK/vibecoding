@@ -226,3 +226,38 @@ append_only: true
 - **Pool sizes:** Backend (2-15), Frontend (1-10), QA (1-8), Security (1-5), DevOps (1-5), Docs/Validator/CI (1-3)
 - **ARCHITECTURE.md at v8.1.0** (1960 lines, 32 sections)
 - **ReaperOAK.agent.md at v8.1.0** (1453 lines, 22 sections)
+
+---
+
+### Session 15 — Operational Integrity Protocol (OIP) v1.0.0
+
+**System upgraded to v8.2.0** with self-healing governance layer.
+
+| Deliverable | Status |
+|-------------|--------|
+| OIP Core Invariants (9 rules, INV-1 through INV-9) | DONE |
+| Automatic Drift Detection (7 types, DRIFT-001 through DRIFT-007) | DONE |
+| Auto-Repair Workflow (ComplianceWorker pool, targeted repair) | DONE |
+| Scoped Git Enforcement (no git add ., explicit staging, scope validation) | DONE |
+| Parallel Backfill Stream (Stream A + Stream B concurrent repair) | DONE |
+| Memory Enforcement Gate (5 required fields, blocks COMMIT) | DONE |
+| Continuous Health Sweep (5 checks per scheduling interval) | DONE |
+| Light Supervision Mode (auto-correct drift, human for strategy only) | DONE |
+| ARCHITECTURE.md §33 + §5/§8/§10/§15 updates | DONE |
+| _cross-cutting-protocols.md §11 (agent-facing OIP rules) | DONE |
+| agents.md §6 + §9 (boot protocol OIP references) | DONE |
+
+### System Now Has (Session 15 — v8.2.0)
+- **OIP v1.0.0** — self-healing governance, auto-correct procedural drift
+- **9 Core Invariants** (INV-1 through INV-9) — lifecycle, scoped git, memory, docs, QA, security, scope
+- **7 Drift Violation Types** (DRIFT-001 through DRIFT-007) — passive detection at every state transition
+- **ComplianceWorker Pool** (minSize: 1, maxSize: 3) — targeted single-action repair
+- **Scoped Git** — no git add . / -A / --all, explicit file staging, pre-commit scope validation
+- **Memory Gate** — 5 required fields, blocks COMMIT without entry, auto-backfill
+- **Health Sweep** — 5 checks every scheduling interval (orphans, locks, memory, chains, scope)
+- **Parallel Backfill** — Stream A (new work) + Stream B (retroactive repair) concurrent
+- **Light Supervision Mode** — human only for SDR approval, escalation, destructive ops, strategy
+- **ReaperOAK.agent.md at v8.2.0** (1863 lines, 30 sections)
+- **ARCHITECTURE.md at v8.2.0** (2092 lines, 33 sections)
+- **_cross-cutting-protocols.md** (339 lines, 11 sections)
+- **agents.md** (292 lines, 9 sections)

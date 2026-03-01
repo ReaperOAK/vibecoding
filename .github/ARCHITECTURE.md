@@ -1,10 +1,16 @@
 # Vibecoding Multi-Agent System Architecture
 
-> **Version:** 8.1.0
+> **Version:** 8.2.0
 > **Owner:** ReaperOAK (CTO / Elastic Multi-Worker Parallel Orchestrator)
-> **Last Updated:** 2026-02-28
+> **Last Updated:** 2026-03-01
 >
-> **Changelog:** v8.1.0 — Elastic Multi-Worker Parallel Execution Engine:
+> **Changelog:** v8.2.0 — Operational Integrity Protocol (OIP): self-healing
+> governance layer with 9 core invariants, 7 drift violation types,
+> ComplianceWorker auto-repair, continuous health sweep, memory enforcement
+> gate, scoped git enforcement, parallel backfill stream, Light Supervision
+> Mode. §33 added; §5, §8, §10, §15 updated.
+>
+> v8.1.0 — Elastic Multi-Worker Parallel Execution Engine:
 > elastic auto-scaling pools (minSize/maxSize), dynamic worker IDs
 > ({Role}Worker-{shortUuid}), parallel batch dispatch, mutual-exclusion
 > conflict type, 4 scaling events (WORKER_SPAWNED, WORKER_TERMINATED,
@@ -255,6 +261,9 @@ auto-scaling, conflict-free batching, and parallel dispatch in every cycle.
 
 ```
 loop forever:
+  # --- HEALTH SWEEP PHASE (OIP §33) ---
+  run_health_checks()  # 5 invariant checks, emit violations, auto-correct
+
   # --- AUTO-SCALE PHASE ---
   for each pool in worker_pool_registry:
     ready_count = count_tickets(state=READY, role=pool.role)
@@ -647,6 +656,8 @@ ReaperOAK's event loop.
 | `WORKER_TERMINATED` | Scheduler | worker_id, role, reason, timestamp |
 | `POOL_SCALED_UP` | Scheduler | role, old_count, new_count, trigger |
 | `POOL_SCALED_DOWN` | Scheduler | role, old_count, new_count, reason |
+| `PROTOCOL_VIOLATION` | OIP Drift Detector | ticket_id, worker_id, violation_id, invariant_id, severity, auto_repair |
+| `REPAIR_COMPLETED` | ComplianceWorker | ticket_id, violation_id, repair_action, timestamp |
 
 ### 8.2 Event Payload Format
 
@@ -682,6 +693,8 @@ When ReaperOAK receives an event:
 14. **WORKER_TERMINATED** → Release resources, check if rework needed
 15. **POOL_SCALED_UP** → Log scaling event, update pool capacity
 16. **POOL_SCALED_DOWN** → Log scaling event, verify minSize maintained
+17. **PROTOCOL_VIOLATION** → Check auto_repair flag; if true, spawn ComplianceWorker; if false, flag for human
+18. **REPAIR_COMPLETED** → Unblock affected ticket, retry state transition
 
 ### 8.4 Emission Rules
 
@@ -782,6 +795,28 @@ git commit -m "[TICKET-ID] <description>"
 - Second failure → escalate to user
 - Wrong commit format → ticket returns to REWORK (rework_count++)
 - No commit → ticket cannot reach DONE
+
+### 10.4 Scoped Git Enforcement (OIP)
+
+**Hard Rules:**
+- NEVER use `git add .`
+- NEVER use `git add -A`
+- NEVER use `git add --all`
+- ALWAYS list files explicitly: `git add path/to/file1 path/to/file2 ...`
+- Files staged MUST match the ticket's declared `file_paths`
+
+**Pre-Commit Scope Validation** runs at COMMIT state before git commit:
+1. Get staged files: `git diff --cached --name-only`
+2. Compare against ticket's declared `file_paths` (CHANGELOG.md always allowed)
+3. Extra files → PROTOCOL_VIOLATION(DRIFT-002) → REWORK
+4. Missing files → PROTOCOL_VIOLATION(DRIFT-002) → REWORK
+
+**Acceptable commit format:**
+
+```bash
+git add path/to/file1.ts path/to/file2.ts CHANGELOG.md
+git commit -m "[TICKET-ID] description"
+```
 
 ---
 
@@ -1182,6 +1217,24 @@ continuous scheduling loop.
   }
 }
 ```
+
+### 15.2 Memory Enforcement Gate (OIP)
+
+A ticket CANNOT transition from CI_REVIEW to COMMIT unless a memory bank
+entry exists for the ticket ID.
+
+**5 Required Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| ticket_id | string | Ticket identifier |
+| summary | string | 1-2 sentence description of what was done |
+| artifacts | string[] | Files created or modified |
+| decisions | string | Key decisions made during implementation |
+| timestamp | ISO8601 | When the entry was written |
+
+Missing entry → PROTOCOL_VIOLATION(DRIFT-003) → ComplianceWorker generates
+from ticket evidence. Ticket is BLOCKED at COMMIT until entry is verified.
 
 ---
 
@@ -1958,3 +2011,82 @@ T+0:21  READY → LOCKED: WPAE-BE003 → BackendWorker-e7f8g9
 **Key observation:** Execution workers (WPAE-FE001 in IMPLEMENTING) continue
 working uninterrupted throughout the SDR process. Strategy evolution and
 execution are truly concurrent.
+
+---
+
+## 33. Operational Integrity Protocol (OIP)
+
+> **OIP Version:** 1.0.0
+> **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19-§26
+
+The Operational Integrity Protocol is a self-healing governance layer
+enabling Light Supervision Mode (Model B). It continuously monitors,
+detects, and auto-corrects procedural drift across the ticket lifecycle.
+
+### 33.1 Core Invariants
+
+9 non-negotiable invariants enforced by OIP:
+
+| ID | Invariant | Enforcement |
+|----|-----------|-------------|
+| INV-1 | Every ticket completes full 9-state lifecycle | Drift Detection, Health Sweep |
+| INV-2 | Every ticket produces one scoped atomic commit | Scoped Git, Commit Enforcement |
+| INV-3 | No `git add .` / `git add -A` — explicit staging only | Scoped Git |
+| INV-4 | Memory bank must update after every DONE ticket | Memory Gate |
+| INV-5 | Documentation must update for user-facing changes | Post-Execution Chain |
+| INV-6 | QA + Validator must run for every ticket | Post-Execution Chain |
+| INV-7 | Security review when new risk surface exists | Conditional review |
+| INV-8 | Worker may only operate on assigned ticket | Anti-One-Shot, Termination |
+| INV-9 | All post-execution chain steps must complete | Post-Execution Chain |
+
+### 33.2 Drift Detection (7 Violation Types)
+
+| ID | Name | Detection |
+|----|------|-----------|
+| DRIFT-001 | LIFECYCLE_SKIP | State transition without completing prior guard conditions |
+| DRIFT-002 | UNSCOPED_COMMIT | `git add .`, `git add -A`, or `git add --all` detected |
+| DRIFT-003 | MISSING_MEMORY_ENTRY | Ticket at COMMIT without memory bank entry |
+| DRIFT-004 | MISSING_DOCUMENTATION | Documentation state without artifact update |
+| DRIFT-005 | CHAIN_STEP_SKIPPED | State transition that bypasses chain steps |
+| DRIFT-006 | MULTI_TICKET_VIOLATION | Worker references non-assigned ticket IDs |
+| DRIFT-007 | UNVERIFIED_EVIDENCE | TASK_COMPLETED without evidence fields |
+
+Each violation emits `PROTOCOL_VIOLATION` event with severity (CRITICAL/HIGH/MEDIUM).
+
+### 33.3 Auto-Repair Workflow
+
+ComplianceWorker pool (minSize: 1, maxSize: 3) handles automated repairs.
+Key principle: repairs ONLY block the affected ticket — all other execution continues.
+
+Repair flow: Violation detected → PROTOCOL_VIOLATION emitted → ComplianceWorker spawned → targeted repair → REPAIR_COMPLETED/FAILED → ticket unblocked or escalated.
+
+### 33.4 Parallel Backfill Stream
+
+Two concurrent streams when retroactive repair is needed:
+- **Stream A (Execution):** Normal new ticket processing
+- **Stream B (Backfill):** ComplianceWorker repairs for past tickets
+
+Stream B is lower priority and NEVER blocks Stream A.
+
+### 33.5 Continuous Health Sweep
+
+5 checks run at the top of every scheduling interval:
+
+| Check | Threshold | Auto-Correct |
+|-------|-----------|-------------|
+| Orphan ticket detection | Non-terminal > 45 min without events | STALL_WARNING → terminate → READY |
+| Lock expiry audit | Lock held > 30 min | LOCK_EXPIRED → release → READY |
+| Memory staleness | 3+ completed tickets without memory entry | PROTOCOL_VIOLATION(DRIFT-003) → backfill |
+| Post-chain completeness | DONE ticket missing chain step audit trail | PROTOCOL_VIOLATION(DRIFT-005) → backfill |
+| Scope drift audit | Modified files ≠ declared file_paths | PROTOCOL_VIOLATION(DRIFT-002) → REWORK |
+
+### 33.6 Light Supervision Mode
+
+Default when OIP is active. Human intervention required ONLY for:
+- SDR approval (scope changes)
+- Rework escalation (> 3 attempts)
+- Destructive operations
+- Strategic business decisions
+- CRITICAL severity violations
+
+Everything else is auto-corrected by ComplianceWorker + Health Sweep.

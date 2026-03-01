@@ -243,3 +243,97 @@ these events.
 
 > **Note:** Strategic events pause the continuous scheduling loop for the
 > affected tickets only. Unaffected tickets continue normal execution.
+
+## 11. Operational Integrity Protocol (OIP) — All Agents
+
+> **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19-§26
+> **OIP Version:** 1.0.0
+
+The OIP is the self-healing governance layer for Light Supervision Mode.
+These rules apply to ALL agents — not just ReaperOAK.
+
+### 11.1 OIP Event Types
+
+All agents must recognize and respond to these OIP-specific events:
+
+| Event | Emitter | Payload | Agent Response |
+|-------|---------|---------|---------------|
+| `PROTOCOL_VIOLATION` | OIP Drift Detector | ticket_id, violation_id (DRIFT-001 to DRIFT-007), invariant_id, severity, auto_repair | If you caused the violation, expect REWORK or ComplianceWorker intervention |
+| `REPAIR_COMPLETED` | ComplianceWorker | ticket_id, violation_id, repair_action | Resume normal ticket processing after repair |
+| `REPAIR_FAILED` | ComplianceWorker | ticket_id, violation_id, failure_reason | Expect escalation to human or re-delegation |
+
+### 11.2 Scoped Git Rules (ALL Agents)
+
+When any agent creates a commit or suggests git commands:
+
+**FORBIDDEN:**
+- `git add .`
+- `git add -A`
+- `git add --all`
+- Any wildcard or glob pattern in `git add`
+
+**REQUIRED:**
+- `git add path/to/file1 path/to/file2 ...` — explicit file listing only
+- Files staged MUST match the ticket's declared `file_paths`
+- CHANGELOG.md is always an allowed addition
+
+Violation of these rules triggers DRIFT-002 (UNSCOPED_COMMIT).
+
+### 11.3 Memory Bank Entry (ALL Implementing Agents)
+
+Before a ticket can reach COMMIT, the implementing agent MUST ensure a
+memory bank entry exists in `.github/memory-bank/activeContext.md`.
+
+**Required format:**
+```
+### [TICKET-ID] — {summary}
+- **Artifacts:** {comma-separated file paths}
+- **Decisions:** {key decisions made}
+- **Timestamp:** {ISO8601}
+```
+
+If you complete a ticket and forget the memory entry, a ComplianceWorker
+will be spawned to generate it — but this counts as a DRIFT-003 violation.
+Write it yourself to avoid the violation.
+
+### 11.4 Evidence Requirements (ALL Implementing Agents)
+
+Every `TASK_COMPLETED` event MUST include:
+- **Artifact paths:** files created or modified
+- **Test results:** test output or "N/A" with justification
+- **Confidence level:** HIGH (90-100%) | MEDIUM (70-89%) | LOW (50-69%)
+
+Missing evidence triggers DRIFT-007 (UNVERIFIED_EVIDENCE) and returns the
+ticket to IMPLEMENTING.
+
+### 11.5 Single-Ticket Scope (ALL Agents)
+
+Your output MUST reference ONLY your assigned ticket ID. If your response
+contains references to other ticket IDs (pattern: `[A-Z]+-[A-Z]+\d{3}`
+excluding your assigned ticket), you will be:
+1. Immediately terminated (WORKER_TERMINATED)
+2. A fresh worker spawned for REWORK
+3. This is a HARD KILL — no warning, no retry within the same instance
+
+### 11.6 ComplianceWorker Protocol
+
+ComplianceWorkers are specialized repair agents:
+- Spawned on PROTOCOL_VIOLATION with `auto_repair: true`
+- Perform exactly ONE repair action per spawn
+- Emit REPAIR_COMPLETED or REPAIR_FAILED
+- Terminate after single action
+- Do NOT run the full 9-state lifecycle
+- Only repair the specific missing artifact or state
+
+### 11.7 Health Sweep Awareness
+
+All agents should be aware that ReaperOAK runs a continuous health sweep
+that checks for:
+1. Orphan tickets (stalled > 45 min)
+2. Expired locks (> 30 min)
+3. Missing memory entries (last 3 DONE tickets)
+4. Incomplete post-chain audit trails
+5. Scope drift (modified files ≠ declared paths)
+
+If the health sweep detects an issue with your ticket, you may be terminated
+and your ticket re-queued. This is normal OIP behavior, not an error.
