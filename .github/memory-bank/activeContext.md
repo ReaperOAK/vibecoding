@@ -414,4 +414,52 @@ Implementing OIP v1.0.0 — 7-part protocol upgrade from v8.1.0 to v8.2.0:
 - Update chunk files with OIP content (chunks/{Agent}.agent/ files)
 - Update README.md with OIP governance section
 - Test OIP drift detection in real ticket execution scenario
+
+---
+
+## Session 16 — Structural Hardening v9.0.0
+
+### Current Focus
+Completed 7-part structural hardening upgrade: unlimited elastic workers, governance hierarchy, modular context injection.
+
+### SH-001 — Governance Policy Files
+- **Artifacts:** .github/governance/lifecycle.md, worker_policy.md, commit_policy.md, memory_policy.md, ui_policy.md, security_policy.md, event_protocol.md, context_injection.md, performance_monitoring.md
+- **Decisions:** 9 policy files extracted from ReaperOAK §§, each under 250-line limit
+- **Timestamp:** 2026-03-01T02:00:00Z
+
+### SH-002 — Core Governance Authority
+- **Artifacts:** .github/agents/_core_governance.md
+- **Decisions:** Canonical authority file indexes all governance policies; version tracking in governance files only (NOT agent frontmatter)
+- **Timestamp:** 2026-03-01T02:10:00Z
+
+### SH-003 — ReaperOAK Transformation
+- **Artifacts:** .github/agents/ReaperOAK.agent.md
+- **Decisions:** Rewritten from scratch: 1864→723 lines (61% reduction), 24 sections, zero maxSize/minSize, governance references replace inline policy
+- **Timestamp:** 2026-03-01T02:20:00Z
+
+### SH-004 — Agent Normalization
+- **Artifacts:** (no file changes — reverted per user constraint)
+- **Decisions:** Agent .agent.md YAML frontmatter is OFF-LIMITS for custom fields; governance version tracked exclusively in governance files
+- **Timestamp:** 2026-03-01T02:30:00Z
+
+### SH-005 — Boot Protocol Update
+- **Artifacts:** agents.md
+- **Decisions:** Added governance authority subsection (§3), unbounded pool language (§4), updated OIP references (§9)
+- **Timestamp:** 2026-03-01T02:40:00Z
+
+### SH-006 — Cross-Cutting + Architecture
+- **Artifacts:** .github/agents/_cross-cutting-protocols.md, .github/ARCHITECTURE.md
+- **Decisions:** ARCHITECTURE.md v9.0.0 with unbounded pools, governance hierarchy in §19, DRIFT-008/009 in §33. Cross-cutting §8.1+§11 updated.
+- **Timestamp:** 2026-03-01T02:50:00Z
+
+### SH-007 — Catalog Update
+- **Artifacts:** .github/vibecoding/catalog.yml
+- **Decisions:** Added governance: tag with all 10 governance file paths
+- **Timestamp:** 2026-03-01T03:00:00Z
+
+### What to Do Next
+- Rechunk ReaperOAK.agent.md (was 3 chunks for 1864 lines, now 723 lines — may need 2)
+- Update ARCHITECTURE.md chunks if stale
+- Verify all agent chunk files still align with new governance references
+- Run full system test with real ticket execution
 - Consider adding OIP worked example (§31) to ReaperOAK.agent.md

@@ -127,7 +127,9 @@ ReaperOAK's event loop.
 These events are emitted by the elastic worker pool subsystem and consumed by
 ReaperOAK's continuous scheduler. Workers are dynamically spawned per ticket
 with unique IDs (`{Role}Worker-{shortUuid}`) and terminated after completion.
-Pools auto-scale between `minSize` and `maxSize` based on ticket backlog.
+Pools are **unbounded** — they scale elastically based on ticket backlog with
+no artificial upper limit (bounded only by system resources).
+See `governance/worker_policy.md` for the full pool policy.
 
 | Event Type | When Emitted | Payload |
 |-----------|-------------|--------|
@@ -246,7 +248,9 @@ these events.
 
 ## 11. Operational Integrity Protocol (OIP) — All Agents
 
-> **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19-§26
+> **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19
+> **Governance Authority:** `.github/agents/_core_governance.md`
+> **Governance Policies:** `.github/governance/` (9 policy files)
 > **OIP Version:** 1.0.0
 
 The OIP is the self-healing governance layer for Light Supervision Mode.
@@ -258,7 +262,9 @@ All agents must recognize and respond to these OIP-specific events:
 
 | Event | Emitter | Payload | Agent Response |
 |-------|---------|---------|---------------|
-| `PROTOCOL_VIOLATION` | OIP Drift Detector | ticket_id, violation_id (DRIFT-001 to DRIFT-007), invariant_id, severity, auto_repair | If you caused the violation, expect REWORK or ComplianceWorker intervention |
+| `PROTOCOL_VIOLATION` | OIP Drift Detector | ticket_id, violation_id (DRIFT-001 to DRIFT-009), invariant_id, severity, auto_repair | If you caused the violation, expect REWORK or ComplianceWorker intervention |
+| `INSTRUCTION_MISALIGNMENT` | Governance Integrity Check | file_path, expected_version, actual_version | Governance file version ≠ system GOVERNANCE_VERSION — report to ReaperOAK |
+| `GOVERNANCE_DRIFT` | Governance Integrity Check | drift_type, file_path, details | Duplication, oversized file, or policy misalignment detected |
 | `REPAIR_COMPLETED` | ComplianceWorker | ticket_id, violation_id, repair_action | Resume normal ticket processing after repair |
 | `REPAIR_FAILED` | ComplianceWorker | ticket_id, violation_id, failure_reason | Expect escalation to human or re-delegation |
 

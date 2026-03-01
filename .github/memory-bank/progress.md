@@ -260,4 +260,34 @@ append_only: true
 - **ReaperOAK.agent.md at v8.2.0** (1863 lines, 30 sections)
 - **ARCHITECTURE.md at v8.2.0** (2092 lines, 33 sections)
 - **_cross-cutting-protocols.md** (339 lines, 11 sections)
+
+---
+
+## Session 16 — Structural Hardening v9.0.0
+
+### Completed
+
+| Ticket | Description | Status |
+|--------|-------------|--------|
+| SH-001 | Create 9 governance policy files in .github/governance/ | DONE |
+| SH-002 | Create _core_governance.md canonical authority | DONE |
+| SH-003 | Rewrite ReaperOAK.agent.md (1864→723 lines, 61% reduction) | DONE |
+| SH-004 | Agent normalization (reverted — frontmatter off-limits) | DONE |
+| SH-005 | Update agents.md boot protocol (§3, §4, §9) | DONE |
+| SH-006 | Update _cross-cutting-protocols.md + ARCHITECTURE.md | DONE |
+| SH-007 | Update catalog.yml with governance: tag | DONE |
+| Verification | Cross-reference audit — zero stale refs | DONE |
+| Memory+Commit | Memory bank entries + scoped commit | DONE |
+
+### System Now Has (Session 16 — v9.0.0)
+- **Governance Hierarchy** — _core_governance.md → 9 governance/ policy files → agent files → chunks
+- **Unbounded Worker Pools** — zero maxSize/minSize anywhere, scale purely on demand
+- **9 Drift Types** (DRIFT-001 through DRIFT-009) — added GOVERNANCE_VERSION_MISMATCH + OVERSIZED_INSTRUCTION
+- **Modular Context Injection** — governance: tag in catalog.yml, boot protocol loads governance authority
+- **Version Tracking** — GOVERNANCE_VERSION 9.0.0 in governance files only (NOT in agent frontmatter)
+- **ReaperOAK.agent.md at v9.0.0** (723 lines, 24 sections)
+- **ARCHITECTURE.md at v9.0.0** (~2106 lines, 33 sections)
+- **_cross-cutting-protocols.md** (345 lines, 11 sections)
+- **10 new governance files** — _core_governance.md + 9 policy files in governance/
+- **catalog.yml** — governance: tag with 10 file paths
 - **agents.md** (292 lines, 9 sections)
