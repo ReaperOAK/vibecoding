@@ -1,0 +1,31 @@
+version: 2
+multi-ecosystem-groups:
+  all:
+    schedule:
+      interval: 'weekly'
+updates:
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    multi-ecosystem-group: 'all'
+  - package-ecosystem: 'devcontainers'
+    directory: '/'
+    multi-ecosystem-group: 'all'
+  # Node.js dependencies
+  - package-ecosystem: 'npm'
+    directory: '/nodejs'
+    multi-ecosystem-group: 'all'
+  - package-ecosystem: 'npm'
+    directory: '/test/harness'
+    multi-ecosystem-group: 'all'
+  # Python dependencies
+  - package-ecosystem: 'pip'
+    directory: '/python'
+    multi-ecosystem-group: 'all'
+  # Go dependencies
+  - package-ecosystem: 'gomod'
+    directory: '/go'
+    multi-ecosystem-group: 'all'
+  # .NET dependencies
+  - package-ecosystem: 'nuget'
+    directory: '/dotnet'
+    multi-ecosystem-group: 'all'

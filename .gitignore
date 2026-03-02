@@ -1,11 +1,4 @@
-# Logs from AI agent sessions
-logs/
 
-# Processing files (temporary, per-session)
-Copilot-Processing.md
-Claude-Processing.md
-
-# OS files
+# Documentation validation output
+docs/.validation/
 .DS_Store
-Thumbs.db
-__pycache__

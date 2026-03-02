@@ -1,6 +1,6 @@
 # Vibecoding
 
-**Autonomous Software Agency Engine**
+**Autonomous Software ../assets/RepoHeader_01.png
 
 An adaptive, event-driven, elastic multi-worker orchestration system that
 simulates a professional engineering organization — not a code generator.
@@ -16,16 +16,16 @@ AI tools generate code. They do not run engineering organizations.
 The gap between "AI writes a function" and "AI ships a product" is
 enormous. Real engineering requires decomposition, dependency management,
 parallel execution, governance, quality gates, commit discipline, strategic
-pivots, and continuous delivery — all coordinated across specialized roles with
-conflict-free concurrency.
-
-Vibecoding closes that gap.
+pivots, and continuous delivery — all coo../nodejsacross specialized roles with
+conflict-free concurrency.../python
+../go
+Vibecoding closes that gap.../dotnet
 
 It is a programmable engineering organization that operates as an elastic,
 event-driven agency engine. It decomposes work into tickets, assigns them to
 specialized workers from auto-scaling pools, enforces a strict 9-state SDLC
 lifecycle per ticket, runs strategic planning concurrently with execution,
-and produces clean, atomic commits — one per ticket, every time.
+and produces clean, atomic commits — one per ticket, every tim../docs/getting-started.md
 
 The result is not generated code. It is governed, reviewable, production-grade
 engineering output with full audit trails.
@@ -63,7 +63,7 @@ ReaperOAK (CTO / Elastic Multi-Worker Parallel Orchestrator)
 **ReaperOAK** is the singular orchestrator. It never writes code. It selects
 tickets, assigns workers from elastic pools, drives each ticket through its
 lifecycle, reacts to events, and enforces commits. All inter-agent
-communication routes through ReaperOAK — there is no direct agent-to-agent
+communication routes through ReaperOAK — there is no direct agent-to-agent../docs/auth/byok.md
 messaging.
 
 ### Key Properties
@@ -75,7 +75,7 @@ messaging.
   workers and shrink when workers idle.
 - **Ticket-based execution.** Every unit of work is a ticket. Every ticket
   traverses a deterministic 9-state machine. No exceptions.
-- **No global phases.** There is no "planning phase" followed by a "build
+- **No global phases.** There is no "plan../docs/auth/index.md by a "build
   phase." Strategic agents produce artifacts continuously. Execution agents
   consume them as they become available.
 - **Adaptive roadmap evolution.** Strategy can change mid-execution via
@@ -107,8 +107,8 @@ with defined minimum and maximum capacity. Pools auto-scale based on ticket
 backlog: scale up when READY tickets exceed active workers, scale down when
 workers idle beyond a configurable timeout.
 
-| Pool | Min | Max |
-|------|-----|-----|
+| Pool | Min | Max |../docs/getting-started.md
+|------|-----|-----|../docs/auth/index.md
 | Backend | 2 | 15 |
 | Frontend | 1 | 10 |
 | QA | 1 | 8 |
@@ -130,7 +130,7 @@ ARCHIVED. Each approved SDR increments the roadmap minor version. SDRs enable
 controlled pivots without halting unaffected work.
 
 ### Event Queue
-
+../CONTRIBUTING.md
 An ordered log of all system events. ReaperOAK consumes events and routes
 them to the appropriate handler. Event types include TASK_STARTED,
 TASK_COMPLETED, TASK_FAILED, WORKER_SPAWNED, WORKER_TERMINATED,
