@@ -140,7 +140,49 @@ to REWORK or flags for human attention.
 
 ---
 
-## 7. Class B (Background) Commit Policy
+## 7. Distributed Two-Commit Protocol
+
+In distributed multi-machine mode, every agent commit is split into two
+atomic pushes. See `governance/two_commit_protocol.md` for full specification.
+
+### Summary
+
+| Commit | Contents | Purpose |
+|--------|----------|---------|
+| Commit 1 (CLAIM) | Ticket JSON only | Distributed lock via push |
+| Commit 2 (WORK) | Code + summary + ticket advance | Deliver stage output |
+
+### Commit 1 Format
+```bash
+git add .github/ticket-state/<STAGE>/<ticket-id>.json .github/tickets/<ticket-id>.json
+git commit -m "[<ticket-id>] CLAIM by <agent> on <machine-id> (<operator>)"
+git push
+```
+
+### Commit 2 Format
+```bash
+git add <code-files> .github/agent-output/<Agent>/<ticket-id>.md \
+  .github/ticket-state/<NextStage>/<ticket-id>.json .github/tickets/<ticket-id>.json
+git rm .github/ticket-state/<OldStage>/<ticket-id>.json
+git rm .github/agent-output/<PrevAgent>/<ticket-id>.md
+git commit -m "[<ticket-id>] <STAGE> complete by <agent> on <machine-id>"
+git push
+```
+
+### DRIFT Codes (Distributed)
+
+| Code | Violation |
+|------|-----------|
+| DRIFT-010 | Skipped claim commit |
+| DRIFT-011 | Wrong stage claim |
+| DRIFT-012 | Multi-ticket claim |
+| DRIFT-013 | Cross-stage modify |
+| DRIFT-014 | Missing summary file |
+| DRIFT-015 | Summary in wrong dir |
+
+---
+
+## 8. Class B (Background) Commit Policy
 
 Background workers spawned by the Operational Concurrency Floor use a
 distinct commit format. Full specification: `governance/concurrency_floor.md` §7.

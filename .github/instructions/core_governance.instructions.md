@@ -33,6 +33,7 @@ All are required and authoritative:
 - `governance/context_injection.md`
 - `governance/performance_monitoring.md`
 - `governance/concurrency_floor.md`
+- `governance/two_commit_protocol.md`
 
 If any missing/empty => emit `GOVERNANCE_DRIFT`, suspend new assignments.
 
@@ -47,6 +48,8 @@ If any missing/empty => emit `GOVERNANCE_DRIFT`, suspend new assignments.
 - `INV-7` Security review required for every ticket.
 - `INV-8` Single-ticket worker scope only.
 - `INV-9` Full post-execution chain required; no step skipping.
+- `INV-10` Two-commit protocol mandatory; claim before work.
+- `INV-11` Agent summary handoff via `.github/agent-output/` only.
 
 Any INV breach => emit `PROTOCOL_VIOLATION` and trigger auto-repair workflow.
 
@@ -61,6 +64,12 @@ Any INV breach => emit `PROTOCOL_VIOLATION` and trigger auto-repair workflow.
 - `DRIFT-007` UNVERIFIED_EVIDENCE
 - `DRIFT-008` GOVERNANCE_VERSION_MISMATCH
 - `DRIFT-009` OVERSIZED_INSTRUCTION
+- `DRIFT-010` SKIPPED_CLAIM_COMMIT
+- `DRIFT-011` WRONG_STAGE_CLAIM
+- `DRIFT-012` MULTI_TICKET_CLAIM
+- `DRIFT-013` CROSS_STAGE_MODIFY
+- `DRIFT-014` MISSING_SUMMARY_FILE
+- `DRIFT-015` SUMMARY_WRONG_DIRECTORY
 
 Detected drift => emit drift event + isolate affected ticket + auto-repair attempt.
 

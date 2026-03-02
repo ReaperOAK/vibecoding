@@ -16,12 +16,14 @@ When spawning a worker, inject ONLY the following — in this order:
 |---|-------------|-------------|---------|
 | 1 | SDLC lifecycle rules | `governance/lifecycle.md` | 9-state machine, transitions, DoD |
 | 2 | Commit rules | `governance/commit_policy.md` | Per-ticket commits, scoped git |
-| 3 | Worker behavior rules | `governance/worker_policy.md` | One-ticket-one-worker, anti-one-shot |
-| 4 | Role-specific agent file | `.github/agents/{Agent}.agent.md` | Agent identity, allowed paths, tools |
-| 5 | Role-specific chunks | `.github/vibecoding/chunks/{Agent}.agent/` | Detailed protocols, templates (~2 files) |
-| 6 | Ticket context | Delegation packet | Acceptance criteria, upstream artifacts, file_paths |
-| 7 | Rework context (if rework) | Rejection report | QA/Validator/CI findings from prior attempt |
-| 8 | Minimal memory slice | `activeContext.md` (filtered) | Only entries for dependency tickets |
+| 3 | Two-commit protocol | `governance/two_commit_protocol.md` | Claim-then-work, distributed locking, summary handoff |
+| 4 | Worker behavior rules | `governance/worker_policy.md` | One-ticket-one-worker, anti-one-shot |
+| 5 | Role-specific agent file | `.github/agents/{Agent}.agent.md` | Agent identity, allowed paths, tools |
+| 6 | Role-specific chunks | `.github/vibecoding/chunks/{Agent}.agent/` | Detailed protocols, templates (~2 files) |
+| 7 | Ticket context | Delegation packet | Acceptance criteria, upstream artifacts, file_paths |
+| 8 | Upstream summary (if exists) | `.github/agent-output/{PrevAgent}/{ticket-id}.md` | Prior stage output for context continuity |
+| 9 | Rework context (if rework) | Rejection report | QA/Validator/CI findings from prior attempt |
+| 10 | Minimal memory slice | `activeContext.md` (filtered) | Only entries for dependency tickets |
 
 ### Do NOT Inject
 
@@ -43,7 +45,7 @@ context, and keeps workers focused on their single assigned ticket.
 
 ## 2. Deterministic Worker Boot Sequence
 
-Every worker follows this exact 7-step boot sequence. The order is strict
+Every worker follows this exact 9-step boot sequence. The order is strict
 and must not be reordered.
 
 ```
@@ -52,26 +54,36 @@ Step 1: Load governance/lifecycle.md
         
 Step 2: Load governance/commit_policy.md
         → Worker learns scoped git rules, commit format
+
+Step 3: Load governance/two_commit_protocol.md
+        → Worker learns claim-then-work protocol, distributed locking,
+          summary handoff chain, lease rules
         
-Step 3: Load governance/worker_policy.md
+Step 4: Load governance/worker_policy.md
         → Worker learns one-ticket-one-worker, anti-one-shot, evidence rules
         
-Step 4: Load role-specific .agent.md
+Step 5: Load role-specific .agent.md
         → e.g., .github/agents/Backend.agent.md
         → Worker learns its identity, allowed_read/write_paths, tools
         
-Step 5: Load role-specific chunks
+Step 6: Load role-specific chunks
         → .github/vibecoding/chunks/{Agent}.agent/
         → Worker gets detailed protocols, templates (~8K tokens)
         
-Step 6: Load ticket context (delegation packet)
+Step 7: Load ticket context (delegation packet)
         → Acceptance criteria, upstream artifacts, file_paths
         → Rework context if applicable (rejection report from prior attempt)
         → Minimal memory slice (only dependency ticket entries)
+
+Step 8: Load upstream summary (if exists)
+        → .github/agent-output/{PreviousAgent}/{ticket-id}.md
+        → Context from prior SDLC stage for continuity
+        → Delete after reading (ownership transfer)
         
-Step 7: Begin execution
+Step 9: Begin execution
         → One worker, one ticket, strict isolation
         → Emit TASK_STARTED event
+        → Execute Commit 1 (CLAIM) before any work
 ```
 
 ### Boot Validation
@@ -168,7 +180,7 @@ Target token allocation per worker at boot:
 
 | Category | Target Budget | Source |
 |----------|--------------|--------|
-| Governance files (lifecycle + commit + worker policies) | ~15K tokens | 3 governance files |
+| Governance files (lifecycle + commit + two-commit + worker policies) | ~18K tokens | 4 governance files |
 | Agent instructions (agent file + chunks) | ~8K tokens | .agent.md + chunks/ |
 | Ticket context (delegation packet + upstream artifacts) | ~10K tokens | Delegation packet |
 | Memory slice (relevant memory entries) | ~5K tokens | Filtered activeContext.md |

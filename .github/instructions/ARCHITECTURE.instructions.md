@@ -232,7 +232,9 @@ Drift handling:
 
 ## 14) Commit Enforcement
 
-- one atomic commit per ticket
+- two-commit protocol per ticket per stage (claim + work)
+- Commit 1 (CLAIM): ticket JSON only, distributed lock via push
+- Commit 2 (WORK): code + summary + ticket advance
 - message begins with `[TICKET-ID]`
 - explicit file staging only
 - forbidden: `git add .`, `git add -A`, `git add --all`
@@ -306,14 +308,17 @@ Before action, workers must load in order:
 1. required memory files
 2. STOP_ALL gate
 3. core governance
-4. role agent chunks
-5. task-relevant catalog chunks
+4. two-commit protocol (`governance/two_commit_protocol.md`)
+5. role agent chunks
+6. task-relevant catalog chunks
+7. upstream summary from `.github/agent-output/` (if exists)
 
 If STOP gate active: no edits, no execution actions.
 
 ## 21) Canonical References
 
 - `.github/instructions/core_governance.instructions.md`
+- `.github/instructions/distributed-execution.instructions.md`
 - `.github/governance/lifecycle.md`
 - `.github/governance/worker_policy.md`
 - `.github/governance/event_protocol.md`
@@ -323,6 +328,10 @@ If STOP gate active: no edits, no execution actions.
 - `.github/governance/security_policy.md`
 - `.github/governance/ui_policy.md`
 - `.github/governance/performance_monitoring.md`
+- `.github/governance/two_commit_protocol.md`
 - `.github/tasks/delegation-packet-schema.json`
+- `.github/tickets/ticket-schema.json`
+- `.github/tickets.py`
+- `.github/agent-runner.py`
 
 End of contract.
