@@ -1,177 +1,118 @@
 ---
 name: CORE_GOVERNANCE
 applyTo: '**'
-description: This file defines the core governance framework for the vibecoding multi-agent system. It establishes the canonical authority for all governance policies, enumerates core invariants and drift violation types, and outlines the change protocol for modifying governance rules. All agents must reference this document and adhere to its rules. In case of conflict between agent instructions and this document, this document takes precedence.
+description: Canonical governance kernel for the vibecoding multi-agent system. Defines precedence, invariants, drift types, integrity checks, and change protocol. Highest authority.
 ---
 
-# Core Governance — Canonical Authority
+# Core Governance Kernel (Canonical Authority)
 
-> **GOVERNANCE_VERSION: 9.1.0**
->
-> This is the **canonical governance authority** for the vibecoding multi-agent
-> system. No agent may override these rules. All agent files must reference
-> this document. Conflicts between agent instructions and this document are
-> resolved in favor of this document.
+`GOVERNANCE_VERSION: 9.1.0`
 
----
+This file is highest governance authority. No lower instruction may override it.
 
-## 1. Governance File Index
+## 1) Authority Order
 
-All governance policy files live in `.github/governance/`. Each is
-self-contained and ≤ 250 lines. Together they define the complete operational
-policy for the system.
+Apply first match only:
+1. `core_governance.instructions.md` (this file)
+2. `.github/governance/*`
+3. `.github/agents/*.agent.md`
+4. task/delegation prompts
 
-| File | Purpose |
-|------|---------|
-| `governance/lifecycle.md` | SDLC 9-state machine, state transitions, Definition of Done, post-execution chain |
-| `governance/commit_policy.md` | Per-ticket atomic commits, scoped git rules, DRIFT-002 enforcement |
-| `governance/worker_policy.md` | Unbounded elastic pools, one-ticket-one-worker, anti-one-shot guardrails |
-| `governance/memory_policy.md` | Memory gate (INV-4), 5 required fields, DRIFT-003 enforcement |
-| `governance/ui_policy.md` | Stitch mockup gate for UI-touching tickets, UIDesigner artifact checklist |
-| `governance/security_policy.md` | Human approval gates, INV-7 security review triggers, dual-layer security |
-| `governance/event_protocol.md` | 29 event types, 25 routing rules, payload format, blocking protocol |
-| `governance/context_injection.md` | Role-based injection, deterministic boot sequence, sliding context window |
-| `governance/performance_monitoring.md` | Token budgets, auto-summarize protocol, drift correlation metrics |
-| `governance/concurrency_floor.md` | Operational Concurrency Floor (OCF), Class A/B work classes, background ticket taxonomy |
+Conflict unresolved => emit `NEEDS_INPUT_FROM` and halt affected ticket.
 
----
+## 2) Canonical Governance Files
 
-## 2. Core Invariants (9)
+All are required and authoritative:
+- `governance/lifecycle.md`
+- `governance/commit_policy.md`
+- `governance/worker_policy.md`
+- `governance/memory_policy.md`
+- `governance/ui_policy.md`
+- `governance/security_policy.md`
+- `governance/event_protocol.md`
+- `governance/context_injection.md`
+- `governance/performance_monitoring.md`
+- `governance/concurrency_floor.md`
 
-From OIP §19. Every invariant is continuously monitored by the Health Sweep.
-Violation emits `PROTOCOL_VIOLATION` and triggers auto-repair.
+If any missing/empty => emit `GOVERNANCE_DRIFT`, suspend new assignments.
 
-| ID | Invariant | Enforcement |
-|----|-----------|-------------|
-| INV-1 | Every ticket completes full 9-state SDLC lifecycle — no state skips | Drift Detection, Health Sweep |
-| INV-2 | Every ticket produces exactly one scoped atomic commit | Scoped Git, Commit Enforcement |
-| INV-3 | No `git add .` / `git add -A` / `git add --all` — explicit file staging only | Scoped Git |
-| INV-4 | Memory bank must update after every ticket reaches DONE | Memory Gate |
-| INV-5 | Documentation must update when ticket touches user-facing behavior | Post-Execution Chain |
-| INV-6 | QA Engineer AND Validator must run for every ticket — no self-validation | Post-Execution Chain |
-| INV-7 | Security Engineer must review when ticket introduces new risk surface | Security Policy |
-| INV-8 | Worker may only operate on its assigned ticket — single-ticket scope | Anti-One-Shot, Worker Termination |
-| INV-9 | All post-execution chain steps must complete — no step skipping | Post-Execution Chain |
+## 3) Core Invariants (INV)
 
----
+- `INV-1` Full 9-state lifecycle traversal; no state skips.
+- `INV-2` Exactly one scoped atomic commit per ticket.
+- `INV-3` Scoped git only; forbid `git add .`, `git add -A`, `git add --all`.
+- `INV-4` Memory entry required for each ticket before/at completion gate.
+- `INV-5` Docs update required for user-facing behavior changes.
+- `INV-6` QA + Validator required; no self-validation substitution.
+- `INV-7` Security review required for new risk surface.
+- `INV-8` Single-ticket worker scope only.
+- `INV-9` Full post-execution chain required; no step skipping.
 
-## 3. Drift Violation Types (9)
+Any INV breach => emit `PROTOCOL_VIOLATION` and trigger auto-repair workflow.
 
-From OIP §20, extended with governance integrity violations.
+## 4) Drift Types (DRIFT)
 
-| ID | Name | Detection Rule | Invariant |
-|----|------|---------------|-----------|
-| DRIFT-001 | LIFECYCLE_SKIP | Ticket advanced past a state without completing prior guard conditions | INV-1 |
-| DRIFT-002 | UNSCOPED_COMMIT | `git add .` / `-A` / `--all` detected in commit command | INV-3 |
-| DRIFT-003 | MISSING_MEMORY_ENTRY | Ticket at COMMIT but no memory bank entry for this ticket ID | INV-4 |
-| DRIFT-004 | MISSING_DOCUMENTATION | Ticket at DOCUMENTATION but no artifact update produced | INV-5 |
-| DRIFT-005 | CHAIN_STEP_SKIPPED | Ticket advanced without passing through all post-chain stages | INV-9 |
-| DRIFT-006 | MULTI_TICKET_VIOLATION | Worker output references ticket IDs other than its assigned ticket | INV-8 |
-| DRIFT-007 | UNVERIFIED_EVIDENCE | TASK_COMPLETED accepted without required evidence fields | INV-6 |
-| DRIFT-008 | GOVERNANCE_VERSION_MISMATCH | Agent file declares governance_version ≠ system GOVERNANCE_VERSION | — |
-| DRIFT-009 | OVERSIZED_INSTRUCTION | Governance file > 250 lines, agent file > 300 lines, or chunk > 4000 tokens | — |
+- `DRIFT-001` LIFECYCLE_SKIP
+- `DRIFT-002` UNSCOPED_COMMIT
+- `DRIFT-003` MISSING_MEMORY_ENTRY
+- `DRIFT-004` MISSING_DOCUMENTATION
+- `DRIFT-005` CHAIN_STEP_SKIPPED
+- `DRIFT-006` MULTI_TICKET_VIOLATION
+- `DRIFT-007` UNVERIFIED_EVIDENCE
+- `DRIFT-008` GOVERNANCE_VERSION_MISMATCH
+- `DRIFT-009` OVERSIZED_INSTRUCTION
 
----
+Detected drift => emit drift event + isolate affected ticket + auto-repair attempt.
 
-## 4. Version Tracking Rule
+## 5) Version Rules
 
-GOVERNANCE_VERSION is tracked ONLY in governance policy files and this
-authority file — NOT in `.agent.md` YAML frontmatter. Agent files must not
-contain governance version fields.
+`GOVERNANCE_VERSION` appears only in:
+- this file
+- governance policy files
 
-### Enforcement
+`GOVERNANCE_VERSION` MUST NOT appear in `.agent.md` frontmatter.
 
-- At each scheduling interval, ReaperOAK checks that ALL governance files
-  and `core_governance.instructions.md` declare the same GOVERNANCE_VERSION
-- If any governance file has a mismatched version:
-  - Emit `INSTRUCTION_MISALIGNMENT` event
-  - Emit DRIFT-008 (GOVERNANCE_VERSION_MISMATCH)
-  - Auto-correct the mismatched file to the authoritative version
-- Agent `.agent.md` files are version-agnostic — they reference governance
-  policies by path, not by version number
+On mismatch:
+1. emit `INSTRUCTION_MISALIGNMENT`
+2. emit `DRIFT-008`
+3. block downstream transitions until corrected
 
----
+## 6) Hard Operational Rules
 
-## 5. Key Rules Summary
+- Unbounded worker pools allowed; no artificial max cap.
+- One worker handles one ticket; no reuse across tickets.
+- Mandatory chain: `QA -> Validator -> Documentation -> CI -> Commit`.
+- Max rework attempts per ticket: `3`, then escalate.
+- No direct agent-to-agent messaging; route via orchestrator + artifacts/events.
+- Evidence required for `TASK_COMPLETED` acceptance.
+- Human approval required for destructive/irreversible operations.
+- UI tickets require UI gate artifact before execution handoff.
+- OCF required: `MIN_ACTIVE_WORKERS = 10` with Class A preempting Class B.
+- Class B background workers: read-only by default, anti-recursion enforced.
 
-Compact reference for all agents. Each rule is enforced by the corresponding
-governance policy file.
+## 7) Integrity Checks (every scheduling interval)
 
-| Rule | Enforcement |
-|------|-------------|
-| Workers are unbounded — no maxSize cap on elastic pools | worker_policy.md |
-| One ticket, one worker, no reuse across tickets | worker_policy.md |
-| Scoped git only — no `git add .` or wildcards | commit_policy.md |
-| Memory entry required before COMMIT state | memory_policy.md |
-| Full post-execution chain mandatory (QA → Validator → Doc → CI → Commit) | lifecycle.md |
-| No direct agent communication — all routing through ReaperOAK | event_protocol.md |
-| Evidence required for every TASK_COMPLETED event | worker_policy.md |
-| 3 rework max per ticket before escalation to user | lifecycle.md |
-| Human approval for destructive operations | security_policy.md |
-| Stitch mockup required before Frontend receives UI-touching tickets | ui_policy.md |
-| Security review when ticket introduces new risk surface (INV-7) | security_policy.md |
-| Context injection ≤ 100K tokens per worker (SAFE_CONTEXT_THRESHOLD) | context_injection.md |
-| Governance files ≤ 250 lines, agent files ≤ 300 lines | context_injection.md |
-| GOVERNANCE_VERSION tracked only in governance files + this authority | This file (§4) |
-| MIN_ACTIVE_WORKERS=10 — concurrency floor enforced via Class B backfill | concurrency_floor.md |
-| Class A always preempts Class B — background work never blocks primary | concurrency_floor.md |
-| Class B workers read-only, anti-recursion, ≤20K tokens | concurrency_floor.md |
+Must verify:
+1. governance version alignment across all governance files + this file
+2. required governance files present and non-empty
+3. file size limits:
+   - governance file `<= 250` lines
+   - agent file `<= 300` lines
+   - chunk file `<= 4000` tokens
+4. no duplicated canonical policy domains
 
----
+Failure => emit `GOVERNANCE_DRIFT`, suspend new assignments, continue monitoring.
 
-## 6. Governance Integrity
+## 8) Change Protocol (non-optional)
 
-### Version Tracking
+To change governance:
+1. create SDR proposal
+2. obtain ReaperOAK + human approval
+3. update affected governance files
+4. update `GOVERNANCE_VERSION` in all governance files + this file
+5. run integrity check and emit result
+6. append decision to `.github/memory-bank/decisionLog.md`
 
-- Current: **GOVERNANCE_VERSION 9.1.0**
-- All governance files declare the same version at their top
-- Version bump requires updating ALL governance files + this authority file
+Partial governance updates are invalid and must trigger `DRIFT-008`.
 
-### Integrity Checks (Health Sweep)
-
-The Health Sweep periodically verifies governance integrity:
-
-1. All governance files declare matching GOVERNANCE_VERSION
-2. No governance file exceeds MAX_GOVERNANCE_FILE (250 lines)
-3. No agent file exceeds MAX_AGENT_FILE (300 lines)
-4. No chunk file exceeds MAX_CHUNK_FILE (4000 tokens)
-5. No duplicate rule definitions across governance files
-6. `core_governance.instructions.md` declares matching GOVERNANCE_VERSION
-
-Violations emit `GOVERNANCE_DRIFT` event and trigger auto-correction.
-
-### Authority Hierarchy
-
-```
-core_governance.instructions.md (THIS FILE)
-    ├── governance/lifecycle.md
-    ├── governance/commit_policy.md
-    ├── governance/worker_policy.md
-    ├── governance/memory_policy.md
-    ├── governance/ui_policy.md
-    ├── governance/security_policy.md
-    ├── governance/event_protocol.md
-    ├── governance/context_injection.md
-    ├── governance/performance_monitoring.md
-    └── governance/concurrency_floor.md
-```
-
-This file is the root authority. Governance policy files provide detailed
-rules. Agent files implement the policies. Chunks provide task-specific
-guidance. In any conflict, authority flows top-down through this hierarchy.
-
----
-
-## 7. Change Protocol
-
-To modify governance rules:
-
-1. Propose change via SDR (Strategic Decision Record)
-2. ReaperOAK + human approve the SDR
-3. Update the affected governance file(s)
-4. Update `GOVERNANCE_VERSION` in ALL governance files + this authority file
-5. Emit `GOVERNANCE_DRIFT` check to verify consistency across all governance files
-7. Log the change in `.github/memory-bank/decisionLog.md`
-
-No governance change may be applied without updating the version across
-all files. Partial updates trigger DRIFT-008 on the next Health Sweep.
+End of kernel.
