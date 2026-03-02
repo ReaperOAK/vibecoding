@@ -221,6 +221,41 @@
       },
       "additionalProperties": false,
       "description": "Project initialization checklist. Null for non-initialization tasks."
+    },
+    "ticket_id": {
+      "type": ["string", "null"],
+      "pattern": "^TICKET-\\d{4}$",
+      "description": "Ticket ID from the distributed ticket state machine. Null for non-ticket delegations."
+    },
+    "operator": {
+      "type": ["string", "null"],
+      "description": "Human operator name (e.g., 'Owais', 'Sujal') running this machine."
+    },
+    "machine_id": {
+      "type": ["string", "null"],
+      "description": "Machine hostname or identifier for distributed execution tracking."
+    },
+    "upstream_summary_path": {
+      "type": ["string", "null"],
+      "description": "Path to the upstream agent summary file in .github/agent-output/{Agent}/{ticket-id}.md"
+    },
+    "expected_summary_output": {
+      "type": ["string", "null"],
+      "description": "Expected path for this agent's summary output in .github/agent-output/{Agent}/{ticket-id}.md"
+    },
+    "lease_duration_minutes": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 120,
+      "default": 30,
+      "description": "Lease duration for the two-commit protocol claim."
+    },
+    "rework_budget": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3,
+      "default": 3,
+      "description": "Maximum rework attempts remaining for this ticket."
     }
   },
   "additionalProperties": false
