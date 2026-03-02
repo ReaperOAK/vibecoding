@@ -23,7 +23,7 @@ One commit per ticket. No exceptions.
 
 ### Commit Execution
 
-ReaperOAK performs the commit at the COMMIT state (after CI_REVIEW passes):
+Validator performs the commit at the COMMIT state (after CI_REVIEW passes):
 
 ```bash
 git add <changed-files>

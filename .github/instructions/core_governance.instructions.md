@@ -44,7 +44,7 @@ If any missing/empty => emit `GOVERNANCE_DRIFT`, suspend new assignments.
 - `INV-4` Memory entry required for each ticket before/at completion gate.
 - `INV-5` Docs update required for user-facing behavior changes.
 - `INV-6` QA + Validator required; no self-validation substitution.
-- `INV-7` Security review required for new risk surface.
+- `INV-7` Security review required for every ticket.
 - `INV-8` Single-ticket worker scope only.
 - `INV-9` Full post-execution chain required; no step skipping.
 
@@ -81,7 +81,7 @@ On mismatch:
 
 - Unbounded worker pools allowed; no artificial max cap.
 - One worker handles one ticket; no reuse across tickets.
-- Mandatory chain: `QA -> Validator -> Documentation -> CI -> Commit`.
+- Mandatory chain: `QA -> Security -> Validator -> Documentation -> CI -> Commit`.
 - Max rework attempts per ticket: `3`, then escalate.
 - No direct agent-to-agent messaging; route via orchestrator + artifacts/events.
 - Evidence required for `TASK_COMPLETED` acceptance.

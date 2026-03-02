@@ -72,10 +72,11 @@ Rules:
 
 After IMPLEMENTING success, enforce exact order:
 1. QA
-2. Validator
-3. Documentation
-4. CI Reviewer
-5. Commit
+2. Security
+3. Validator
+4. Documentation
+5. CI Reviewer
+6. Commit (Validator authority)
 
 Any rejection returns ticket to `REWORK`.
 

@@ -69,10 +69,9 @@ A ticket introduces a new risk surface if it:
 
 ### Review Protocol
 
-1. At QA_REVIEW, Validator checks if the ticket matches any risk surface trigger
-2. If matched, Security Engineer is added to the post-execution chain
-3. Security Engineer reviews BEFORE ticket advances past VALIDATION
-4. Security PASS → ticket continues; Security REJECT → REWORK
+1. At QA_REVIEW, Security Engineer is always included in the post-execution chain
+2. Security Engineer reviews BEFORE ticket advances past VALIDATION
+3. Security PASS → ticket continues; Security REJECT → REWORK
 
 ---
 
@@ -92,7 +91,7 @@ orchestration layer:
 
 - **Activities:** SBOM generation, dependency vulnerability scanning, code review
 - **Outputs:** SBOM reports, vulnerability findings, scan results
-- **Invocation:** As part of post-execution chain when INV-7 triggers
+- **Invocation:** As part of post-execution chain for every ticket
 - **Scope:** Ticket-specific security verification
 
 ---
