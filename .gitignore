@@ -9,3 +9,22 @@ Claude-Processing.md
 .DS_Store
 Thumbs.db
 __pycache__
+A2A-main
+agent-framework-main
+AgenticQA-main
+anp-master
+autogen-main
+chroma-main
+copilot-sdk-main
+crewAI-main
+langgraph-main
+milvus-master
+modelcontextprotocol-main
+opa-main
+openclaw-main
+opentelemetry-collector-main
+redis-unstable
+runner-main
+semantic-kernel-main
+Building a Multi-Agent Vibecoding System.md
+CHAOS-DIAGNOSIS-REPORT.md

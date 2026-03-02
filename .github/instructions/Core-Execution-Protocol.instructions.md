@@ -1,69 +1,65 @@
 ---
 name: Core Execution Protocol
 applyTo: '**'
-description: This file defines the Core Execution Protocol (CEP) for the vibecoding multi-agent system. It establishes the canonical execution pattern that all agents must follow when processing tickets. The CEP ensures a strict SDLC order, enforces single-ticket-single-worker rules, and mandates parallel processing of tickets by role. ReaperOAK orchestrates the execution flow but does not implement any stage logic or modify files directly. All agents must adhere to this protocol without deviation.
+description: Canonical execution kernel for ticket processing. Defines strict role boundaries, SDLC stage order, worker constraints, parallel dispatch, commit rules, and failure recovery. Non-compliance is invalid.
 ---
 
 # CANONICAL EXECUTION PROTOCOL (CEP)
 
-This file defines the ONLY valid execution pattern.
+ONLY valid execution pattern.
 
-All agents must follow this protocol.
+## 1) Role Boundary (hard)
 
----
+ReaperOAK MUST:
+1. discover READY tickets
+2. resolve conflicts
+3. dispatch workers in parallel where safe
+4. enforce stage order and retries
+5. track ticket completion
 
-## 1. ReaperOAK Role
+ReaperOAK MUST NOT:
+- implement ticket work
+- modify implementation artifacts
+- run multiple SDLC stages as a worker
 
-ReaperOAK does NOT implement.
-ReaperOAK does NOT modify files.
-ReaperOAK does NOT commit.
+## 2) Worker Contract (hard)
 
-ReaperOAK ONLY:
+Each worker invocation MUST satisfy all:
+- one worker = one ticket
+- one invocation = one SDLC stage
+- no multi-ticket references
+- no stage fusion
+- stateless execution
 
-1. Scans READY tickets.
-2. Groups tickets by role.
-3. Spawns parallel subagent workers.
-4. Enforces no file conflicts.
-5. Ensures full SDLC chain per ticket.
-6. Repeats until no READY tickets remain.
+Violation => reject output + terminate worker + re-dispatch.
 
----
+## 3) Required Stage Order (per ticket)
 
-## 2. Worker Model
+Exact sequence:
+1. Implementation
+2. QA
+3. Security
+4. CI
+5. Documentation
+6. Validator
+7. Commit
 
-Each worker:
+Rules:
+- no skip
+- no reorder
+- no merge
+- no batch-complete shortcut
 
-- Handles ONE ticket only.
-- Runs ONE stage only.
-- Never handles multiple tickets.
-- Never performs multiple SDLC stages in one invocation.
+Commit authority:
+- only Validator stage may perform commit action
 
-Workers are stateless.
+## 4) Parallel Dispatch Rule
 
----
+For any role/stage with `N` READY tickets and no conflicts:
+- spawn `N` workers in parallel
 
-## 3. Mandatory SDLC Order (Per Ticket)
-
-Stage 1: Implementation Agent  
-Stage 2: QA Agent  
-Stage 3: Security Agent  
-Stage 4: CI Agent  
-Stage 5: Documentation Agent  
-Stage 6: Validator Agent  
-
-Only Validator may commit.
-
-No stage skipping.
-No stage merging.
-No stage batching.
-
----
-
-## 4. Parallelism Rule
-
-For N READY tickets of same role:
-
-Spawn N workers in parallel.
+After a stage closes for a ticket set:
+- dispatch next stage workers for that same ticket set
 
 Example:
 5 backend tickets → spawn 5 Backend workers.
@@ -78,85 +74,72 @@ Spawn 5 Validator workers.
 Parallelism is ticket-level.
 Never phase-level blocking.
 
----
+Parallelism scope:
+- allowed: ticket-level parallelism
+- forbidden: bypassing a stage barrier for any ticket
 
-## 5. UI Special Case
+## 5) Frontend Gate (UI special case)
 
-If ticket type == FRONTEND:
+IF ticket type is frontend:
+1. run `UIDesigner` first
+2. require artifacts: mockups + assets + stored artifact paths
+3. only then allow Frontend implementation stage
 
-Before Frontend stage:
-Run UIDesigner stage.
+Missing UI artifacts => block ticket.
 
-UIDesigner must:
-- Generate mockups
-- Download assets
-- Store artifacts
+## 6) Commit Enforcement
 
-Then proceed to Frontend.
+Commit MUST include:
+- ticket id
+- explicit staged file list
+- policy-compliant commit message
 
----
+Forbidden:
+- `git add .`
+- wildcard staging
+- partial/ambiguous staging
 
-## 6. Commit Rules
+Invalid commit attempt => reject + return ticket to rework path.
 
-Only Validator commits.
-Commit must:
-- Reference ticket ID
-- Include file list
-- Follow commit policy
-- Stage only declared files
-
-No `git add .`
-No partial commits.
-
----
-
-## 7. Error Handling
+## 7) Failure Handling
 
 If any stage fails:
+1. record failure evidence
+2. move ticket to READY/REWORK queue
+3. dispatch corrective worker for failed stage
 
-Return ticket to READY.
-Log failure.
-Spawn corrective worker.
+Never advance ticket to downstream stage after failure.
 
-Never skip forward.
+## 8) Background Capacity Rule
 
----
+If active workers < minimum concurrency floor:
+- spawn background workers for non-blocking audits
 
-## 8. Background Workers
+Allowed background classes:
+- security sweep
+- architecture alignment
+- tech debt scan
+- documentation sync
 
-If active workers < minimum threshold:
+Background constraints:
+- no modification of unrelated files
+- no blocking of primary ticket flow
 
-Spawn background audits:
-- Security sweep
-- Architecture alignment
-- Tech debt scan
-- Documentation sync
+## 9) Governance Resolution Rule
 
-Background workers must not modify unrelated files.
+Workers MUST consume referenced governance and role instructions directly.
 
----
+ReaperOAK MUST delegate with required policy references; it MUST NOT duplicate policy text ad hoc.
 
-## 9. Governance Lookup
+## 10) Global Invariant
 
-Subagents know where to find:
-- Best practices
-- Security policies
-- Architecture rules
-- CI patterns
+Ticket terminal success condition:
+- `DONE` state reached
+- commit completed
 
-ReaperOAK does NOT repeat them.
+System termination condition (all true):
+1. no READY tickets
+2. no active workers
+3. no incomplete SDLC chains
 
----
-
-## 10. System Invariant
-
-Every ticket must end in:
-
-DONE + COMMIT
-
-No ticket may remain partially processed.
-
-System halts only when:
-- No READY tickets
-- No active workers
-- All SDLC chains complete
+Any partial chain => system remains active.

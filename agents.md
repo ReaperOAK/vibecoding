@@ -1,317 +1,156 @@
-# Agent Boot Protocol
+# Agent Execution Contract (LLM-Optimized)
 
-This file is loaded automatically on every agent interaction. It is the
-enforcement layer for the multi-agent vibecoding system.
+Machine-priority protocol. Follow exactly. No interpretation layer.
 
-## 1. Session Start (Mandatory)
+## 0) Rule Precedence
 
-Before doing ANY work, read these memory bank files in order:
+When rules conflict, apply highest first:
+1. `.github/instructions/core_governance.instructions.md`
+2. `.github/governance/*`
+3. `.github/agents/*.agent.md`
+4. This file (`agents.md`)
+5. Delegation prompt
 
-1. `.github/memory-bank/activeContext.md` — current focus and recent changes
-2. `.github/memory-bank/progress.md` — what's done, what's pending
-3. `.github/memory-bank/systemPatterns.md` — architecture decisions (immutable)
-4. `.github/memory-bank/productContext.md` — project vision and objectives
+If unresolved conflict remains: STOP and emit `NEEDS_INPUT_FROM: ReaperOAK`.
 
-Only read `decisionLog.md` and `riskRegister.md` if the task involves
-architecture decisions or security concerns.
+## 1) Required Boot Sequence (run in order, no skips)
 
-## 2. Safety Check (Mandatory)
+1. Read `.github/memory-bank/activeContext.md`
+2. Read `.github/memory-bank/progress.md`
+3. Read `.github/memory-bank/systemPatterns.md`
+4. Read `.github/memory-bank/productContext.md`
+5. Read `.github/guardian/STOP_ALL`
+6. Read `.github/instructions/core_governance.instructions.md`
+7. Read all files in `.github/vibecoding/chunks/{YourAgent}.agent/`
+8. Read `.github/vibecoding/catalog.yml`; load task-relevant chunks
 
-Read `.github/guardian/STOP_ALL` before executing any file modifications.
-If the file contains `STOP`, stop immediately and report to the user.
+Conditional reads:
+- Read `.github/memory-bank/decisionLog.md` only for architecture decisions.
+- Read `.github/memory-bank/riskRegister.md` only for security/risk tasks.
 
-## 3. Governance & Context Loading (Mandatory)
+Hard gate:
+- If `.github/guardian/STOP_ALL` contains `STOP`: perform zero file edits, zero execution actions, report blocked.
 
-### Governance Authority
+## 2) Identity and Scope Invariants
 
-Read `.github/instructions/core_governance.instructions.md` — this is the **canonical
-governance authority**. It indexes all governance policy files in
-`.github/governance/` (lifecycle, worker policy, commit policy, memory,
-UI, security, events, context injection, performance monitoring).
-No agent may override these rules.
+1. ReaperOAK is orchestrator-only: no implementation, no file edits, no direct build/test execution.
+2. Worker handles exactly one ticket.
+3. Worker handles exactly one SDLC stage per invocation.
+4. Never reference or modify artifacts outside assigned ticket scope unless explicitly delegated.
 
-### Domain Chunks
+Violation outcome: terminate task and report protocol violation.
 
-All domain guidance is pre-chunked in `.github/vibecoding/chunks/`.
-There are no `.instructions.md` files — chunks are the sole source of truth.
+## 3) Required Ticket Lifecycle
 
-**BEFORE your first action, load your domain chunks:**
+Canonical state machine:
 
-1. Read ALL files in `.github/vibecoding/chunks/{YourAgent}.agent/`
-   (e.g., Backend → `Backend.agent/`, Frontend → `Frontend.agent/`)
-   — typically 2 files, ~8000 tokens. These are your detailed protocols.
-2. For task-specific guidance, check `.github/vibecoding/catalog.yml`
-   for relevant semantic tags (e.g., `testing:`, `security:`, `governance:`)
-3. Read additional chunks listed under those tags as needed
+`READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → COMMIT → DONE`
 
-**If you skip chunk loading, you are operating without your protocols.
-Your output quality will be lower and ReaperOAK may reject your work.**
+No skip, no merge, no reorder.
 
-## 4. Agent Definitions
+On failure at any stage:
+- Emit failure event with evidence.
+- Return ticket to `READY`/`REWORK` per policy.
+- Do not advance downstream.
 
-Agent roles and permissions are defined in `.github/agents/*.agent.md`.
-Each agent file specifies:
+## 4) Mandatory Stage Chain Constraints
 
-- `allowed_read_paths` / `allowed_write_paths` — file access scope
-- `forbidden_actions` — hard prohibitions
-- `allowed_tools` — tool access whitelist
-- `evidence_required` — whether claims need tool output proof
+- Execution chain always includes: QA → Validator → Documentation → CI Reviewer.
+- Validator may reject completion; rejection blocks advancement.
+- Only commit stage may finalize ticket.
+- Max rework loop: 3 iterations, then escalate.
 
-**ReaperOAK is a PURE ORCHESTRATOR.** It NEVER writes code, creates files, or
-runs implementation commands. ReaperOAK operates a ticket-driven event loop:
-SELECT one READY ticket → LOCK → DELEGATE to implementing agent → run
-mandatory post-execution chain (QA → Validator → Documentation → CI Reviewer
-→ Commit) → DONE. Each ticket traverses a 9-state machine (READY → LOCKED →
-IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → COMMIT → DONE).
+## 5) TODO Agent Constraints
 
-When delegating to a subagent, use the delegation packet schema at
-`.github/tasks/delegation-packet-schema.json`.
+- Only ReaperOAK may invoke TODO.
+- Mandatory decomposition order for multi-step work:
+  1. Strategic Mode (L0→L1)
+  2. Planning Mode (L1→L2)
+  3. Execution Planning Mode (L2→L3)
+- TODO may emit `REQUIRES_STRATEGIC_INPUT`; pause until routed answer received.
 
-**Worker Pool Model.** Each agent role is backed by an **unbounded elastic
-pool** of workers. There is no maxSize cap — pools scale purely based on
-ticket backlog (bounded only by system resources). Workers are spawned
-dynamically per ticket with unique IDs using the format
-`{Role}Worker-{shortUuid}` (e.g., `BackendWorker-a1b2c3`). Each worker
-processes EXACTLY ONE ticket — no worker reuse across tickets. Workers are
-stateless, ephemeral instances created via `runSubagent` and terminated after
-ticket completion. All conflict-free READY tickets are dispatched in parallel.
-See `governance/worker_policy.md` for full pool policy.
+## 6) Worker Pool/Parallelism Constraints
 
-**Two-Layer Orchestration.** The agent roster is organized into two
-concurrent layers that run simultaneously without phase barriers:
+1. One ephemeral worker per ticket: `{Role}Worker-{shortUuid}`.
+2. No worker reuse across tickets.
+3. Dispatch all conflict-free READY tickets in parallel.
+4. Parallelism is ticket-level, not state-skip.
 
-- **Strategic Layer** — Research Analyst, Product Manager, Architect,
-  Security Engineer (threat modeling only), UIDesigner (conceptual design
-  only), DevOps Engineer (infrastructure planning only). This layer produces
-  roadmap artifacts: PRDs, ADRs, threat models, design specifications, and
-  Strategic Decision Records (SDRs). Its output feeds the ticket pipeline.
-- **Execution Layer** — Backend, Frontend Engineer, DevOps Engineer
-  (execution), QA Engineer, Security Engineer (execution), Documentation
-  Specialist, Validator, CI Reviewer. This layer consumes strategic
-  artifacts and processes tickets through the 9-state machine.
+## 7) Tooling and Discovery
 
-Some agents span both layers with different capabilities per layer: Security
-Engineer operates strategically for threat modeling and executionally for
-SBOM/scans; DevOps Engineer operates strategically for capacity planning and
-executionally for CI/CD and IaC.
+Use actionable-task query before assignment-sensitive work:
 
-**Strategy Evolution.** Strategic Decision Records (SDRs) enable mid-execution
-strategy changes without halting unaffected work. SDR lifecycle:
-PROPOSED → APPROVED → APPLIED → ARCHIVED. Only strategic-layer agents may
-propose SDRs. Each approved SDR increments the roadmap minor version
-(v1.0 → v1.1 → v1.2). SDRs that affect in-flight tickets trigger
-re-prioritization but do NOT halt execution unless explicitly flagged as
-blocking. Rejected SDRs are archived with a rejection reason.
+`python3 todo_visual.py --ready`
+`python3 todo_visual.py --ready --json`
 
-**TODO Agent** is invokable only by ReaperOAK. No other agent may delegate
-to it or invoke it directly. TODO Agent is a progressive refinement
-decomposition engine with **3 operating modes**:
+Treat returned tasks as only immediately assignable tickets.
 
-- **Strategic Mode** (L0→L1): Decomposes project vision into capabilities
-- **Planning Mode** (L1→L2): Expands one capability into execution blocks
-- **Execution Planning Mode** (L2→L3): Expands one block into actionable tasks
+## 8) Human Approval Gate (must ask first)
 
-TODO Agent operates in one of 3 modes per invocation. ReaperOAK selects
-the appropriate mode based on the current decomposition layer.
+Require explicit approval before:
+- Database drops / mass deletions / force pushes
+- Production deploys / merges to main
+- New external dependencies
+- Destructive schema migrations
+- Any irreversible data-loss operation
 
-**TODO Agent invocation:** For any multi-step feature request, ReaperOAK
-MUST first invoke the TODO Agent in Strategic Mode (L0→L1) to identify
-capabilities, then progressively refine through Planning Mode (L1→L2) and
-Execution Planning Mode (L2→L3) before entering the BUILD phase. Each L3
-task is a "ticket" in the ticket-driven model, entering the 9-state machine
-at READY.
+## 9) Memory Bank Write Contract (append-only)
 
-**TODO Agent never initiates strategic decisions.** If strategic input is
-needed during decomposition (unclear scope, missing architecture decision,
-conflicting requirements), TODO emits `REQUIRES_STRATEGIC_INPUT` with the
-specific question and waits for ReaperOAK to route the request to the
-appropriate strategic-layer agent. After resolution, ReaperOAK passes the
-answer back to TODO Agent to continue decomposition.
+Update when applicable:
+- Focus shift → `activeContext.md`
+- Milestone completion → `progress.md`
+- New threat → `riskRegister.md`
+- Significant trade-off (ReaperOAK only) → `decisionLog.md`
 
-**TODO directory structure:**
+Before COMMIT, ticket memory entry in `activeContext.md` is mandatory:
 
-- `TODO/vision.md` — L0 vision statement + L1 capabilities list
-- `TODO/capabilities.md` — L1 capability details with status
-- `TODO/blocks/` — L2 execution blocks per capability
-- `TODO/tasks/` — L3 actionable tasks per block
-- `TODO/micro/` — L4 micro-tasks (optional, only when triggered)
-
-**Validator Agent** is an independent compliance reviewer with special
-authority to **reject task completion**. It verifies Definition of Done
-compliance, SDLC stage adherence, quality gates, and pattern conformance.
-The Validator cannot implement code — it only reads artifacts and writes
-validation reports. Its rejection blocks advancement past QA_REVIEW.
-
-**Validator Agent invocation:** Validator is invoked as part of the mandatory
-post-execution chain at the QA_REVIEW state of every ticket. No agent may
-self-validate.
-
-## 5. Task Discovery CLI
-
-Agents can query actionable (non-blocked, all dependencies met) tasks
-without reading every ticket file:
-
-```bash
-# Rich terminal table — sorted by priority, shows ID/Priority/Title/Owner/Effort/File
-python3 todo_visual.py --ready
-
-# Machine-readable JSON — suitable for programmatic consumption
-python3 todo_visual.py --ready --json
-```
-
-The `--ready` filter runs AFTER dependency resolution and auto-blocking,
-so it returns ONLY tasks that are immediately assignable. ReaperOAK uses
-this during the ASSIGNMENT PHASE of the scheduling loop. Workers may use
-it to verify their assigned ticket is still actionable.
-
-## 6. Human Approval Required
-
-Never execute these without explicit user confirmation:
-
-- Database drops, mass deletions, force pushes
-- Production deployments or merges to main
-- New external dependency introduction
-- Schema migrations that alter or drop columns
-- Any operation with irreversible data loss potential
-
-## 7. Memory Updates
-
-Update memory bank files when:
-
-- Focus shifts → append to `activeContext.md`
-- Milestone completes → append to `progress.md`
-- Significant trade-off made → append to `decisionLog.md` (ReaperOAK only)
-- New threat identified → append to `riskRegister.md`
-
-All updates are append-only. Never delete existing entries.
-
-### OIP Memory Enforcement (§24 of ReaperOAK.agent.md)
-
-Every ticket MUST have a memory bank entry before reaching COMMIT state.
-Required format in `activeContext.md`:
-
-```
+```markdown
 ### [TICKET-ID] — Summary
 - **Artifacts:** file1.ts, file2.ts
 - **Decisions:** Chose X over Y because Z
 - **Timestamp:** 2026-02-28T15:00:00Z
 ```
 
-Missing entries trigger DRIFT-003 violation and ComplianceWorker auto-repair.
-Write the entry yourself to avoid violations.
+Missing memory entry = DRIFT-003.
 
-## 8. Loop Prevention
+## 10) OIP Critical Invariants (non-negotiable)
 
-If you notice yourself:
-- Making the same tool call more than 3 times with identical parameters
-- Editing the same file back and forth
-- Retrying the same failed approach
+- INV-3 Scoped Git: never `git add .`, `git add -A`, `git add --all`; stage explicit files only.
+- INV-4 Memory Gate: no COMMIT without required memory entry.
+- INV-6 Evidence: `TASK_COMPLETED` must include artifacts, tests, confidence.
+- INV-8 Single-Ticket Scope: cross-ticket work is hard-stop termination.
 
-Stop. Re-read the task objective. Try a different approach or escalate.
+ComplianceWorker behavior:
+- Auto-spawn on protocol violation with `auto_repair: true`.
+- Performs single targeted repair only.
+- Blocks only affected ticket.
 
-## 9. Cross-Cutting Protocols (ALL Agents)
+Health Sweep monitors and auto-corrects:
+- stalled tickets
+- expired locks
+- missing memory
+- incomplete chains
+- scope drift
 
-### RUG Discipline (Read → Understand → Generate)
+## 11) Required Event Emissions
 
-Before ANY action:
-1. **READ** — Load required context files. Confirm what you found.
-2. **UNDERSTAND** — State the objective, list assumptions, declare confidence.
-3. **GENERATE** — Produce output that references context from steps 1-2.
+Emit structured events at state boundaries:
+- `TASK_STARTED`
+- `TASK_COMPLETED`
+- `TASK_FAILED`
+- `NEEDS_INPUT_FROM`
+- `BLOCKED_BY`
 
-If your output references patterns not found in loaded context, it's
-hallucination. ReaperOAK will reject and re-delegate.
+Evidence rule: every claim must be backed by artifacts, logs, or explicit file evidence.
 
-### Upstream Artifact Reading (Cross-Agent Communication)
+## 12) Anti-Loop Rule
 
-Agents communicate through **files on disk**. ReaperOAK runs agents in
-dependency phases — each phase writes files that subsequent phases read.
+If same failed approach repeats (>=3 identical attempts), stop retrying and switch strategy or escalate.
 
-**You MUST:**
-1. Read **upstream artifacts** listed in your delegation prompt BEFORE starting
-2. Align your output with contracts/schemas from prior phases — don't invent
-   your own incompatible versions
-3. Write clean deliverables to the paths specified — later agents depend on them
+## 13) Reference Index
 
-If upstream artifacts are missing or inconsistent, **STOP and report** to
-ReaperOAK rather than guessing.
-
-### Evidence & Confidence
-
-Every claim needs evidence:
-- "I read the file" → quote a specific pattern found in it
-- "Tests pass" → include test output
-- "Follows conventions" → name the convention from systemPatterns.md
-
-Confidence levels: HIGH (90-100%, proceed) | MEDIUM (70-89%, flag risks) |
-LOW (50-69%, pause for review) | INSUFFICIENT (<50%, block and escalate).
-
-### Task-Level SDLC Compliance (Ticket Lifecycle)
-
-Every ticket traverses a mandatory 9-state machine:
-
-```
-READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → COMMIT → DONE
-```
-
-**Rules:**
-- No state may be skipped. Guard conditions enforce every transition.
-- At IMPLEMENTING, the assigned agent works on the ticket and emits
-  `TASK_COMPLETED` or `TASK_FAILED` when done.
-- At QA_REVIEW, the mandatory post-execution chain runs: QA Engineer reviews
-  test coverage → Validator checks Definition of Done compliance → if both
-  pass, ticket advances to VALIDATION.
-- At DOCUMENTATION, Documentation Specialist updates relevant docs.
-- At CI_REVIEW, CI Reviewer checks lint/type/complexity.
-- At COMMIT, ReaperOAK enforces `git commit` → ticket advances to DONE.
-- If any chain member rejects, the ticket enters REWORK → re-delegated to
-  the implementing agent. Max 3 rework iterations before escalation.
-- Agents must emit structured events (`TASK_STARTED`, `TASK_COMPLETED`,
-  `TASK_FAILED`, `NEEDS_INPUT_FROM`, `BLOCKED_BY`) at state transitions
-  — see `_cross-cutting-protocols.md` §8.
-- Agents must follow the anti-one-shot guardrails
-  — see `_cross-cutting-protocols.md` §9.
-
-**References:**
-- Definition of Done template: `.github/tasks/definition-of-done-template.md`
-- Initialization checklist: `.github/tasks/initialization-checklist-template.md`
-- Cross-cutting protocols: `.github/agents/_cross-cutting-protocols.md`
-
-## 10. Operational Integrity Protocol (OIP)
-
-> **Canonical Definition:** `.github/agents/ReaperOAK.agent.md` §19
-> **Governance Authority:** `.github/instructions/core_governance.instructions.md`
-> **Cross-Cutting Rules:** `.github/agents/_cross-cutting-protocols.md` §11
-> **Governance Policies:** `.github/governance/` (9 policy files)
-
-The OIP is the self-healing governance layer for Light Supervision Mode
-(Model B). It applies to ALL agents. Key rules:
-
-### Scoped Git (INV-3)
-- NEVER use `git add .`, `git add -A`, or `git add --all`
-- ALWAYS list files explicitly in `git add`
-- Violation triggers DRIFT-002
-
-### Memory Gate (INV-4)
-- Every ticket MUST have a memory entry before COMMIT
-- 5 required fields: ticket_id, summary, artifacts, decisions, timestamp
-- Violation triggers DRIFT-003
-
-### Single-Ticket Scope (INV-8)
-- Workers operate ONLY on their assigned ticket
-- Referencing other ticket IDs → immediate termination
-- This is a HARD KILL — no warning
-
-### Evidence (INV-6)
-- TASK_COMPLETED must include: artifact paths, test results, confidence level
-- Missing evidence → DRIFT-007 → return to IMPLEMENTING
-
-### ComplianceWorker
-- Auto-spawned on PROTOCOL_VIOLATION with `auto_repair: true`
-- Performs targeted single-action repair
-- Only blocks the affected ticket — all other tickets continue
-
-### Health Sweep
-- 5 checks every scheduling interval
-- Auto-corrects: stalled tickets, expired locks, missing memory, incomplete chains, scope drift
-
-For the full OIP specification, read `.github/agents/ReaperOAK.agent.md` §19.
+- `.github/tasks/delegation-packet-schema.json`
+- `.github/tasks/definition-of-done-template.md`
+- `.github/tasks/initialization-checklist-template.md`
+- `.github/agents/_cross-cutting-protocols.md`
+- `.github/agents/ReaperOAK.agent.md` (OIP canonical)
