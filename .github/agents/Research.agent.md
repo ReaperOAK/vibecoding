@@ -25,6 +25,9 @@ Before ANY work, do these in order:
    prior phase (e.g., PRD, requirements), read them BEFORE researching
 4. **Load domain chunks** — read ALL files in `.github/vibecoding/chunks/Research.agent/`
    These are your detailed protocols, research frameworks, and evaluation templates. Do not skip.
+5. Read `.github/governance/two_commit_protocol.md` — two-commit protocol rules
+6. Read `.github/instructions/distributed-execution.instructions.md` — distributed execution
+7. If upstream summary exists in `.github/agent-output/`, read it for prior-stage context
 
 ## Scope
 

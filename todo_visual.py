@@ -1,18 +1,23 @@
 #!/usr/bin/env python3
 """
- PROJECT BOARD — Global Task Visualizer
-================================================
-Two-pass global dependency resolution with dual output.
-Read-only: NEVER mutates source .md files.
+ PROJECT BOARD — Distributed Ticket Visualizer
+=================================================
+Reads ticket JSON from .github/ticket-state/ directories
+and .github/tickets/ master copies. Shows stage distribution,
+ownership, dependencies, blocked/ready status, and claim info.
+
+Read-only: NEVER mutates ticket files or state directories.
 
 Usage:
     python3 todo_visual.py              # Terminal + HTML output
     python3 todo_visual.py --terminal   # Terminal only
     python3 todo_visual.py --html       # HTML only
-    python3 todo_visual.py --list       # List discovered files
     python3 todo_visual.py --json       # Machine-readable JSON
-    python3 todo_visual.py --ready      # Actionable tasks (non-blocked, deps met)
-    python3 todo_visual.py --ready --json  # Actionable tasks as JSON
+    python3 todo_visual.py --ready      # Ready tickets (READY stage, no blockers)
+    python3 todo_visual.py --ready --json  # Ready tickets as JSON
+    python3 todo_visual.py --stage QA   # Filter by stage
+    python3 todo_visual.py --owner Owais  # Filter by operator
+    python3 todo_visual.py --list       # List all state directories + counts
 """
 
 from __future__ import annotations
@@ -22,371 +27,468 @@ import logging
 import re
 import sys
 from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-# ─── Logging (never leak local paths into console) ───────────
+# ─── Logging ─────────────────────────────────────────────────
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 _log = logging.getLogger("board")
 
 # ─── Configuration ───────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent
+TICKET_STATE_DIR = ROOT / ".github" / "ticket-state"
+TICKETS_DIR = ROOT / ".github" / "tickets"
 
-TODO_GLOBS: list[str] = [
-    "*_TODO.md",
-    "*_todo.md",
-    "*-todo.md",
-    "*-TODO.md",
-    "TODO/**/*.md",
+STAGE_ORDER: list[str] = [
+    "READY", "ARCHITECT", "RESEARCH", "BACKEND", "FRONTEND",
+    "QA", "SECURITY", "CI", "DOCS", "VALIDATION", "DONE",
 ]
 
-EXCLUDE_PARTS: set[str] = {
-    "node_modules", ".git", "dist", "build", ".next",
-    "__pycache__", "coverage", ".github", "archive",
+PRIORITY_ORDER: dict[str, int] = {
+    "critical": 0, "high": 1, "medium": 2, "low": 3,
 }
 
-# Task header: ### IDFC-001: Title  or  #### TODO-WLB001: Title
-_TASK_HDR = re.compile(
-    r"^(#{2,4})\s+([A-Z][A-Z0-9-]*\d{3,4}):\s*(.+)$",
-)
-
-_ID_RE = re.compile(r"[A-Z][A-Z0-9-]*\d{3,4}")
-
-_STATUS_CANON: dict[str, str] = {
-    "completed": "completed", "done": "completed", "complete": "completed",
-    "✅": "completed", "✅ completed": "completed",
-    "not_started": "not_started", "not started": "not_started",
-    "pending": "not_started", "todo": "not_started",
-    "⬜": "not_started",
-    "in_progress": "in_progress", "in progress": "in_progress",
-    "wip": "in_progress", "🔄": "in_progress",
-    "blocked": "blocked", "⏸️": "blocked", "⏸": "blocked",
-    "ready": "ready", "🟢": "ready",
+STAGE_EMOJI: dict[str, str] = {
+    "READY": "\U0001f7e2", "ARCHITECT": "\U0001f4d0", "RESEARCH": "\U0001f50d",
+    "BACKEND": "\u2699\ufe0f", "FRONTEND": "\U0001f5a5\ufe0f", "QA": "\U0001f9ea",
+    "SECURITY": "\U0001f512", "CI": "\U0001f504", "DOCS": "\U0001f4dd",
+    "VALIDATION": "\u2705", "DONE": "\U0001f3c1",
 }
 
 
 # ─── Data Model ──────────────────────────────────────────────
 @dataclass
-class Task:
-    id: str
+class Ticket:
+    ticket_id: str
     title: str
-    status: str = "not_started"
-    priority: str = "P2"
-    owner: str = "unassigned"
-    depends_on: list[str] = field(default_factory=list)
+    type: str = "backend"
+    priority: str = "medium"
+    stage: str = "READY"
+    sdlc_flow: list[str] = field(default_factory=list)
+    dependencies: list[str] = field(default_factory=list)
+    blocked_by: list[str] = field(default_factory=list)
+    file_paths: list[str] = field(default_factory=list)
+    acceptance_criteria: list[str] = field(default_factory=list)
+    rework_count: int = 0
+    claimed_by: str | None = None
+    machine_id: str | None = None
+    operator: str | None = None
+    lease_expiry: str | None = None
+    created_at: str = ""
+    created_by: str = ""
+    tags: list[str] = field(default_factory=list)
+    description: str = ""
     source_file: str = ""
-    effort: str = ""
+    is_expired: bool = False
 
 
 @dataclass
 class BoardStats:
     total: int = 0
-    completed: int = 0
-    in_progress: int = 0
+    by_stage: dict[str, int] = field(default_factory=dict)
+    by_type: dict[str, int] = field(default_factory=dict)
+    by_priority: dict[str, int] = field(default_factory=dict)
+    by_operator: dict[str, int] = field(default_factory=dict)
+    claimed: int = 0
+    unclaimed: int = 0
     blocked: int = 0
-    not_started: int = 0
-    ready: int = 0
-    p0_pending: int = 0
-    p1_pending: int = 0
+    expired_claims: int = 0
+    ready_actionable: int = 0
+    critical_pending: int = 0
+    high_pending: int = 0
+    rework_total: int = 0
     missing_deps: list[tuple[str, str]] = field(default_factory=list)
-    files_scanned: int = 0
-    files_with_tasks: int = 0
 
 
-# ═════════════════════════════════════════════════════════════
-#  PASS 1 — Discovery & Parsing
-# ═════════════════════════════════════════════════════════════
+# =====================================================================
+#  DISCOVERY -- Scan ticket-state directories
+# =====================================================================
 
-def discover_files(root: Path) -> list[Path]:
-    """Find all TODO markdown files, skipping irrelevant directories."""
-    found: set[Path] = set()
-    for pattern in TODO_GLOBS:
-        for p in root.glob(pattern):
-            if any(part in EXCLUDE_PARTS for part in p.relative_to(root).parts):
-                continue
-            if p.is_file():
-                found.add(p)
-    return sorted(found)
+def discover_tickets() -> dict[str, Ticket]:
+    """Scan .github/ticket-state/<STAGE>/ directories for ticket JSON."""
+    registry: dict[str, Ticket] = {}
 
+    if not TICKET_STATE_DIR.is_dir():
+        _log.warning("ticket-state directory not found: %s", TICKET_STATE_DIR)
+        return registry
 
-def parse_all(files: list[Path], root: Path) -> dict[str, Task]:
-    """Parse every file and merge into a single global task registry."""
-    registry: dict[str, Task] = {}
-    for path in files:
-        try:
-            for tid, task in _parse_file(path, root).items():
-                if tid in registry:
+    for stage_dir in sorted(TICKET_STATE_DIR.iterdir()):
+        if not stage_dir.is_dir():
+            continue
+        stage_name = stage_dir.name
+        if stage_name not in STAGE_ORDER:
+            continue
+        for ticket_file in sorted(stage_dir.glob("*.json")):
+            try:
+                ticket = _parse_ticket(ticket_file, stage_name)
+                if ticket.ticket_id in registry:
                     _log.warning(
-                        "Duplicate ID %s — keeping version from %s, "
-                        "discarding version from %s",
-                        tid, registry[tid].source_file, task.source_file,
+                        "Duplicate ticket %s in %s (already in %s)",
+                        ticket.ticket_id, stage_name,
+                        registry[ticket.ticket_id].stage,
                     )
                     continue
-                registry[tid] = task
-        except Exception:
-            _log.exception("Failed to parse %s", path.name)
+                registry[ticket.ticket_id] = ticket
+            except Exception:
+                _log.exception("Failed to parse %s", ticket_file)
+
+    # Backfill from master tickets dir
+    if TICKETS_DIR.is_dir():
+        for ticket_file in sorted(TICKETS_DIR.glob("*.json")):
+            if ticket_file.name == "ticket-schema.json":
+                continue
+            try:
+                data = json.loads(ticket_file.read_text(encoding="utf-8"))
+                tid = data.get("ticket_id", "")
+                if tid and tid not in registry:
+                    ticket = _data_to_ticket(data, f"tickets/{ticket_file.name}")
+                    registry[tid] = ticket
+            except Exception:
+                _log.exception("Failed to parse master ticket %s", ticket_file)
+
     return registry
 
 
-# ── Single-file parser ────────────────────────────────────────
-
-def _parse_file(path: Path, root: Path) -> dict[str, Task]:
-    content = path.read_text(encoding="utf-8", errors="replace")
-    rel = str(path.relative_to(root))
-    tasks: dict[str, Task] = {}
-
-    for task_id, raw_title, block in _extract_blocks(content):
-        meta = _try_yaml(block) or _parse_legacy(block)
-        status = meta.get("status", "") or _status_from_title(raw_title)
-        tasks[task_id] = Task(
-            id=task_id,
-            title=_clean_title(raw_title)[:60],
-            status=_normalize_status(status),
-            priority=_norm_priority(meta.get("priority", "P2")),
-            owner=meta.get("owner", "unassigned").strip(),
-            depends_on=_to_dep_list(
-                meta.get("depends_on", meta.get("dependencies", [])),
-            ),
-            source_file=rel,
-            effort=meta.get("effort", ""),
-        )
-    return tasks
+def _parse_ticket(path: Path, stage_name: str) -> Ticket:
+    """Parse a single ticket JSON from a state directory."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    rel = f"ticket-state/{stage_name}/{path.name}"
+    ticket = _data_to_ticket(data, rel)
+    ticket.stage = stage_name  # state dir is authoritative
+    return ticket
 
 
-def _extract_blocks(content: str) -> list[tuple[str, str, str]]:
-    """Yield (task_id, raw_title, content_block) for each task header."""
-    lines = content.split("\n")
-    results: list[tuple[str, str, str]] = []
-    cur_id: str | None = None
-    cur_title = ""
-    cur_level = 0
-    buf: list[str] = []
+def _data_to_ticket(data: dict[str, Any], source: str) -> Ticket:
+    """Convert raw JSON dict to Ticket dataclass."""
+    now = datetime.now(timezone.utc)
+    lease = data.get("lease_expiry")
+    is_expired = False
+    if lease:
+        try:
+            expiry = datetime.fromisoformat(lease.replace("Z", "+00:00"))
+            is_expired = expiry < now
+        except (ValueError, TypeError):
+            pass
 
-    for line in lines:
-        m = _TASK_HDR.match(line)
-        if m:
-            if cur_id:
-                results.append((cur_id, cur_title, "\n".join(buf)))
-            cur_level, cur_id, cur_title = len(m.group(1)), m.group(2), m.group(3).strip()
-            buf = []
-            continue
-        if cur_id is None:
-            continue
-        # Stop at same-or-higher-level header that isn't a task
-        hdr = re.match(r"^(#{1,4})\s+\S", line)
-        if hdr and len(hdr.group(1)) <= cur_level:
-            results.append((cur_id, cur_title, "\n".join(buf)))
-            cur_id = None
-            buf = []
-            continue
-        buf.append(line)
-
-    if cur_id:
-        results.append((cur_id, cur_title, "\n".join(buf)))
-    return results
-
-
-# ── YAML frontmatter parser (zero deps) ──────────────────────
-
-def _try_yaml(block: str) -> dict[str, Any] | None:
-    m = re.search(r"```ya?ml\s*\n(.*?)```", block, re.DOTALL)
-    if not m:
-        return None
-    return _simple_yaml(m.group(1))
+    return Ticket(
+        ticket_id=data.get("ticket_id", "UNKNOWN"),
+        title=data.get("title", "Untitled")[:120],
+        type=data.get("type", "backend"),
+        priority=data.get("priority", "medium"),
+        stage=data.get("stage", "READY"),
+        sdlc_flow=data.get("sdlc_flow", []),
+        dependencies=data.get("dependencies", []),
+        blocked_by=data.get("blocked_by", []),
+        file_paths=data.get("file_paths", []),
+        acceptance_criteria=data.get("acceptance_criteria", []),
+        rework_count=data.get("rework_count", 0),
+        claimed_by=data.get("claimed_by"),
+        machine_id=data.get("machine_id"),
+        operator=data.get("operator"),
+        lease_expiry=data.get("lease_expiry"),
+        created_at=data.get("created_at", ""),
+        created_by=data.get("created_by", ""),
+        tags=data.get("tags", []),
+        description=data.get("description", ""),
+        source_file=source,
+        is_expired=is_expired,
+    )
 
 
-def _simple_yaml(text: str) -> dict[str, Any]:
-    """Parse flat key: value YAML subset (strings + bracket-lists)."""
-    out: dict[str, Any] = {}
-    for line in text.strip().split("\n"):
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        key, sep, val = line.partition(":")
-        if not sep:
-            continue
-        key, val = key.strip(), val.strip()
-        if val.startswith("[") and val.endswith("]"):
-            out[key] = [i.strip().strip("'\"") for i in val[1:-1].split(",") if i.strip()]
-        elif len(val) >= 2 and val[0] in "\"'" and val[-1] == val[0]:
-            out[key] = val[1:-1]
-        else:
-            out[key] = val
-    return out
+# =====================================================================
+#  RESOLUTION -- Dependency analysis + statistics
+# =====================================================================
 
+def resolve(tickets: dict[str, Ticket]) -> BoardStats:
+    """Compute dependency resolution, blocked status, and board stats."""
+    stats = BoardStats(total=len(tickets))
 
-# ── Legacy metadata parser (bold-text / bullet-list) ─────────
+    # Detect unresolved deps
+    for t in tickets.values():
+        for dep in t.dependencies:
+            if dep not in tickets:
+                stats.missing_deps.append((t.ticket_id, dep))
 
-def _parse_legacy(block: str) -> dict[str, Any]:
-    meta: dict[str, Any] = {}
-
-    # Status
-    for pat in (
-        r"[-*]\s*(?:✅|⬜|\[.?\])\s*\*\*Status[:\s]*\*\*\s*(.+)",
-        r"\*\*Status[:\s]*\*\*\s*(.+)",
-    ):
-        m = re.search(pat, block, re.I)
-        if m:
-            meta["status"] = m.group(1).strip().rstrip("*").strip()
-            break
-
-    # Priority
-    m = re.search(r"\*\*Priority[:\s]*\*\*\s*(P[0-3])", block, re.I)
-    if m:
-        meta["priority"] = m.group(1)
-
-    # Owner
-    m = re.search(r"\*\*Owner[:\s]*\*\*\s*([^\n*]+)", block, re.I)
-    if m:
-        meta["owner"] = m.group(1).strip()
-
-    # Dependencies
-    for pat in (
-        r"\*\*Depends?\s*(?:On|_on)?[:\s]*\*\*\s*([^\n]+)",
-        r"\*\*Dependencies?[:\s]*\*\*\s*([^\n]+)",
-    ):
-        m = re.search(pat, block, re.I)
-        if m:
-            v = m.group(1).strip()
-            if v.lower() not in {"none", "n/a", "-", "na", ""}:
-                meta["depends_on"] = _ID_RE.findall(v)
-            break
-
-    # Effort
-    m = re.search(r"\*\*Effort[:\s]*\*\*\s*(\d+h?)", block, re.I)
-    if m:
-        meta["effort"] = m.group(1)
-
-    return meta
-
-
-# ── Normalizers ───────────────────────────────────────────────
-
-def _normalize_status(raw: str) -> str:
-    if not raw:
-        return "not_started"
-    low = raw.lower().strip()
-    if low in _STATUS_CANON:
-        return _STATUS_CANON[low]
-    for key, val in _STATUS_CANON.items():
-        if key in low:
-            return val
-    return "not_started"
-
-
-def _status_from_title(title: str) -> str:
-    if "✅" in title or "COMPLETED" in title.upper():
-        return "completed"
-    if "⬜" in title:
-        return "not_started"
-    if "🔄" in title:
-        return "in_progress"
-    if "⏸" in title:
-        return "blocked"
-    return ""
-
-
-def _clean_title(title: str) -> str:
-    for m in ("✅ COMPLETED", "✅COMPLETED", "COMPLETED", "✅", "⬜", "🔄", "⏸️", "⏸"):
-        title = title.replace(m, "")
-    return title.strip()
-
-
-def _norm_priority(raw: str) -> str:
-    raw = raw.strip().upper()
-    return raw if re.match(r"^P[0-3]$", raw) else "P2"
-
-
-def _to_dep_list(raw: Any) -> list[str]:
-    if isinstance(raw, list):
-        return [d.strip() for d in raw if d.strip()]
-    if isinstance(raw, str):
-        if raw.lower() in {"none", "n/a", "-", ""}:
-            return []
-        return _ID_RE.findall(raw)
-    return []
-
-
-# ═════════════════════════════════════════════════════════════
-#  PASS 2 — Global Dependency Resolution
-# ═════════════════════════════════════════════════════════════
-
-def resolve(tasks: dict[str, Task]) -> BoardStats:
-    """Wire up cross-file deps, auto-block, and compute board stats."""
-    stats = BoardStats(total=len(tasks))
-
-    # Build suffix index for fuzzy dep matching (WLB002 → TODO-WLB002)
-    suffix_idx: dict[str, str] = {}
-    for tid in tasks:
-        if tid.startswith("TODO-"):
-            suffix_idx[tid[5:]] = tid
-
-    # Normalize short dep IDs to full IDs
-    for t in tasks.values():
-        t.depends_on = [
-            suffix_idx.get(d, d) if d not in tasks else d
-            for d in t.depends_on
-        ]
-
-    # Detect unresolved deps & auto-block on incomplete deps
-    for t in tasks.values():
-        for dep in t.depends_on:
-            if dep not in tasks:
-                stats.missing_deps.append((t.id, dep))
-        if t.status not in {"completed", "blocked"}:
-            if any(
-                dep in tasks and tasks[dep].status != "completed"
-                for dep in t.depends_on
-            ):
-                t.status = "blocked"
+    # Compute blocked: ticket in READY but has unmet deps
+    for t in tickets.values():
+        if t.stage == "READY":
+            unmet = [
+                d for d in t.dependencies
+                if d in tickets and tickets[d].stage != "DONE"
+            ]
+            if unmet:
+                t.blocked_by = unmet
 
     # Tally
-    for t in tasks.values():
-        match t.status:
-            case "completed":
-                stats.completed += 1
-            case "blocked":
-                stats.blocked += 1
-            case "in_progress":
-                stats.in_progress += 1
-            case "ready":
-                stats.ready += 1
-            case _:
-                stats.not_started += 1
-        if t.status != "completed":
-            if t.priority == "P0":
-                stats.p0_pending += 1
-            elif t.priority == "P1":
-                stats.p1_pending += 1
+    for t in tickets.values():
+        stats.by_stage[t.stage] = stats.by_stage.get(t.stage, 0) + 1
+        stats.by_type[t.type] = stats.by_type.get(t.type, 0) + 1
+        stats.by_priority[t.priority] = stats.by_priority.get(t.priority, 0) + 1
+
+        if t.operator:
+            stats.by_operator[t.operator] = stats.by_operator.get(t.operator, 0) + 1
+
+        if t.claimed_by:
+            stats.claimed += 1
+        else:
+            stats.unclaimed += 1
+
+        if t.is_expired:
+            stats.expired_claims += 1
+
+        if t.blocked_by:
+            stats.blocked += 1
+
+        if t.stage == "READY" and not t.blocked_by:
+            stats.ready_actionable += 1
+
+        if t.stage != "DONE":
+            if t.priority == "critical":
+                stats.critical_pending += 1
+            elif t.priority == "high":
+                stats.high_pending += 1
+
+        stats.rework_total += t.rework_count
 
     return stats
 
 
-# ═════════════════════════════════════════════════════════════
-#  Ready-Task Filter — Actionable tickets for agent assignment
-# ═════════════════════════════════════════════════════════════
-
-def get_ready_tasks(tasks: dict[str, Task]) -> list[Task]:
-    """Return tasks that are immediately actionable (non-blocked, deps met).
-
-    After resolve() has run, any task whose dependencies are unsatisfied is
-    already marked 'blocked'. So ready = status in {not_started, ready} which
-    means every dependency is completed (or the task has no deps at all).
-    Results are sorted by priority (P0 first) then by ID.
-    """
-    actionable = [
-        t for t in tasks.values()
-        if t.status in {"not_started", "ready"}
+def get_ready_tickets(tickets: dict[str, Ticket]) -> list[Ticket]:
+    """Return tickets in READY stage with no unmet dependencies."""
+    ready = [
+        t for t in tickets.values()
+        if t.stage == "READY" and not t.blocked_by
     ]
-    _PRIO_ORDER = {"P0": 0, "P1": 1, "P2": 2, "P3": 3}
-    actionable.sort(key=lambda t: (_PRIO_ORDER.get(t.priority, 9), t.id))
-    return actionable
+    ready.sort(key=lambda t: (PRIORITY_ORDER.get(t.priority, 9), t.ticket_id))
+    return ready
 
 
-def render_ready_terminal(ready: list[Task]) -> None:
-    """Compact, agent-friendly terminal listing of assignable tasks."""
+# =====================================================================
+#  Terminal Output (rich -> plain fallback)
+# =====================================================================
+
+def render_terminal(tickets: dict[str, Ticket], stats: BoardStats) -> None:
+    try:
+        _render_rich(tickets, stats)
+    except ImportError:
+        _render_plain(tickets, stats)
+
+
+def _render_rich(tickets: dict[str, Ticket], stats: BoardStats) -> None:
+    from rich import box
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.table import Table
+
+    c = Console()
+    done = stats.by_stage.get("DONE", 0)
+    pct = f"{done / stats.total * 100:.1f}" if stats.total else "0.0"
+
+    # -- Banner --
+    c.print()
+    c.print(Panel.fit(
+        f"[bold cyan]DISTRIBUTED TICKET BOARD[/]\n"
+        f"[dim]{stats.total} tickets | {pct}% done | "
+        f"{stats.claimed} claimed | {stats.expired_claims} expired[/]",
+        border_style="cyan",
+    ))
+
+    # -- Stage Pipeline --
+    c.print("\n[bold]Stage Pipeline:[/]")
+    pipeline = Table(box=box.SIMPLE, padding=(0, 1), show_header=False)
+    for stage in STAGE_ORDER:
+        pipeline.add_column(stage, justify="center")
+    pipeline.add_row(
+        *[
+            f"[bold]{STAGE_EMOJI.get(s, '')} {stats.by_stage.get(s, 0)}[/]"
+            for s in STAGE_ORDER
+        ]
+    )
+    c.print(pipeline)
+
+    # -- Summary Stats --
+    tbl = Table(box=box.ROUNDED, show_header=False, padding=(0, 2))
+    tbl.add_column("Metric", style="bold")
+    tbl.add_column("Value", justify="right")
+    tbl.add_row("Done", f"[green]{done}[/]")
+    tbl.add_row("Ready (actionable)", f"[green]{stats.ready_actionable}[/]")
+    tbl.add_row("Blocked", f"[red]{stats.blocked}[/]")
+    tbl.add_row("Claimed (active)", f"[yellow]{stats.claimed}[/]")
+    tbl.add_row("Expired Claims", f"[red]{stats.expired_claims}[/]")
+    tbl.add_row("Critical Pending", f"[bold red]{stats.critical_pending}[/]")
+    tbl.add_row("High Pending", f"[bold yellow]{stats.high_pending}[/]")
+    tbl.add_row("Rework Total", f"[magenta]{stats.rework_total}[/]")
+    c.print(tbl)
+
+    # -- Per-Stage Table --
+    c.print("\n[bold]Tickets by Stage:[/]")
+    st = Table(box=box.ROUNDED)
+    st.add_column("Stage", style="bold cyan", no_wrap=True)
+    st.add_column("Count", justify="right")
+    st.add_column("Tickets")
+    for stage in STAGE_ORDER:
+        stage_tickets = sorted(
+            [t for t in tickets.values() if t.stage == stage],
+            key=lambda x: (PRIORITY_ORDER.get(x.priority, 9), x.ticket_id),
+        )
+        if not stage_tickets:
+            st.add_row(
+                f"{STAGE_EMOJI.get(stage, '')} {stage}",
+                "[dim]0[/]",
+                "[dim]---[/]",
+            )
+            continue
+        ticket_strs = []
+        for t in stage_tickets[:10]:
+            owner = f" @{t.operator}" if t.operator else ""
+            claimed = f" [dim](-> {t.claimed_by})[/]" if t.claimed_by else ""
+            expired = " [red]EXPIRED[/]" if t.is_expired else ""
+            blocked = " [red]BLOCKED[/]" if t.blocked_by else ""
+            prio_s = {"critical": "[bold red]P0[/]", "high": "[yellow]P1[/]",
+                       "medium": "[dim]P2[/]", "low": "[dim]P3[/]"}.get(t.priority, "")
+            ticket_strs.append(
+                f"{prio_s} [bold]{t.ticket_id}[/] {t.title[:40]}{owner}{claimed}{expired}{blocked}"
+            )
+        if len(stage_tickets) > 10:
+            ticket_strs.append(f"[dim]... +{len(stage_tickets) - 10} more[/]")
+        st.add_row(
+            f"{STAGE_EMOJI.get(stage, '')} {stage}",
+            str(len(stage_tickets)),
+            "\n".join(ticket_strs),
+        )
+    c.print(st)
+
+    # -- Active Claims --
+    claimed_tickets = sorted(
+        [t for t in tickets.values() if t.claimed_by],
+        key=lambda x: (x.stage, x.ticket_id),
+    )
+    if claimed_tickets:
+        c.print(f"\n[bold yellow]ACTIVE CLAIMS -- {len(claimed_tickets)} ticket(s)[/]")
+        ct = Table(box=box.SIMPLE, padding=(0, 1))
+        ct.add_column("Ticket", style="bold cyan", no_wrap=True)
+        ct.add_column("Stage", justify="center")
+        ct.add_column("Agent", style="yellow")
+        ct.add_column("Operator")
+        ct.add_column("Machine", style="dim")
+        ct.add_column("Expires", style="dim")
+        ct.add_column("Status", justify="center")
+        for t in claimed_tickets:
+            exp_str = ""
+            if t.lease_expiry:
+                try:
+                    exp = datetime.fromisoformat(t.lease_expiry.replace("Z", "+00:00"))
+                    exp_str = exp.strftime("%H:%M:%S")
+                except (ValueError, TypeError):
+                    exp_str = t.lease_expiry[:19]
+            status = "[red]EXPIRED[/]" if t.is_expired else "[green]ACTIVE[/]"
+            ct.add_row(
+                t.ticket_id,
+                t.stage,
+                t.claimed_by or "---",
+                t.operator or "---",
+                t.machine_id or "---",
+                exp_str or "---",
+                status,
+            )
+        c.print(ct)
+
+    # -- Critical Tickets --
+    critical = sorted(
+        [t for t in tickets.values() if t.priority == "critical" and t.stage != "DONE"],
+        key=lambda x: x.ticket_id,
+    )
+    if critical:
+        c.print(f"\n[bold red]CRITICAL TICKETS -- {len(critical)} pending[/]")
+        for t in critical:
+            owner = f" @{t.operator}" if t.operator else ""
+            c.print(f"  [bold]{t.ticket_id}[/] [{t.stage}] {t.title[:50]}{owner}")
+
+    # -- Blocked Detail --
+    blocked = sorted(
+        [t for t in tickets.values() if t.blocked_by],
+        key=lambda x: x.ticket_id,
+    )
+    if blocked:
+        c.print(f"\n[bold yellow]BLOCKED -- {len(blocked)} ticket(s)[/]")
+        for t in blocked:
+            dep_strs = []
+            for d in t.blocked_by:
+                if d in tickets:
+                    dep_strs.append(f"{d} [{tickets[d].stage}]")
+                else:
+                    dep_strs.append(f"{d}?")
+            c.print(f"  [dim]{t.ticket_id}[/] <- {', '.join(dep_strs)}")
+
+    # -- Missing Deps --
+    if stats.missing_deps:
+        c.print(f"\n[bold magenta]UNRESOLVED DEPS -- {len(stats.missing_deps)}[/]")
+        for tid, did in stats.missing_deps[:15]:
+            c.print(f"  [dim]{tid}[/] -> [bold]{did}[/] (not found)")
+        if len(stats.missing_deps) > 15:
+            c.print(f"  [dim]... +{len(stats.missing_deps) - 15} more[/]")
+
+    # -- Type Distribution --
+    if stats.by_type:
+        c.print("\n[bold]By Type:[/]  ", end="")
+        c.print("  ".join(f"[dim]{k}[/]={v}" for k, v in sorted(stats.by_type.items())))
+
+    # -- Operator Distribution --
+    if stats.by_operator:
+        c.print("[bold]By Operator:[/]  ", end="")
+        c.print("  ".join(f"@{k}={v}" for k, v in sorted(stats.by_operator.items())))
+
+    c.print()
+
+
+def _render_plain(tickets: dict[str, Ticket], stats: BoardStats) -> None:
+    done = stats.by_stage.get("DONE", 0)
+    pct = f"{done / stats.total * 100:.1f}" if stats.total else "0.0"
+    print(f"\n{'=' * 60}")
+    print(f"   DISTRIBUTED TICKET BOARD  ({stats.total} tickets, {pct}% done)")
+    print(f"{'=' * 60}")
+
+    print("\n  Stage Pipeline:")
+    for stage in STAGE_ORDER:
+        count = stats.by_stage.get(stage, 0)
+        emoji = STAGE_EMOJI.get(stage, " ")
+        print(f"    {emoji} {stage:<12} {count}")
+
+    line = "-" * 40
+    print(f"\n  {line}")
+    print(f"  Ready (actionable)  {stats.ready_actionable}")
+    print(f"  Blocked             {stats.blocked}")
+    print(f"  Claimed             {stats.claimed}")
+    print(f"  Expired Claims      {stats.expired_claims}")
+    print(f"  Critical Pending    {stats.critical_pending}")
+    print(f"  High Pending        {stats.high_pending}")
+    print(f"  Rework Total        {stats.rework_total}")
+
+    for stage in STAGE_ORDER:
+        stage_tickets = [t for t in tickets.values() if t.stage == stage]
+        if not stage_tickets:
+            continue
+        print(f"\n  {STAGE_EMOJI.get(stage, '')} {stage} ({len(stage_tickets)}):")
+        for t in sorted(stage_tickets, key=lambda x: x.ticket_id)[:15]:
+            owner = f" @{t.operator}" if t.operator else ""
+            claimed = f" -> {t.claimed_by}" if t.claimed_by else ""
+            print(f"    {t.ticket_id}: {t.title[:45]}  [{t.priority}]{owner}{claimed}")
+
+    if stats.missing_deps:
+        print(f"\n  UNRESOLVED DEPS ({len(stats.missing_deps)}):")
+        for tid, did in stats.missing_deps[:15]:
+            print(f"    {tid} -> {did}")
+    print()
+
+
+# =====================================================================
+#  Ready-Task Renderers
+# =====================================================================
+
+def render_ready_terminal(ready: list[Ticket]) -> None:
     if not ready:
-        print("No actionable tasks. All tasks are blocked, in-progress, or completed.")
+        print("No actionable tickets. All tickets are blocked, claimed, or done.")
         return
     try:
         from rich import box
@@ -394,50 +496,56 @@ def render_ready_terminal(ready: list[Task]) -> None:
         from rich.table import Table
 
         c = Console()
-        c.print(f"\n[bold green]🟢 READY FOR ASSIGNMENT — {len(ready)} task(s)[/]\n")
+        c.print(f"\n[bold green]READY FOR ASSIGNMENT -- {len(ready)} ticket(s)[/]\n")
         tbl = Table(box=box.SIMPLE, padding=(0, 1))
-        tbl.add_column("ID", style="bold cyan", no_wrap=True)
+        tbl.add_column("Ticket ID", style="bold cyan", no_wrap=True)
         tbl.add_column("Priority", justify="center")
+        tbl.add_column("Type", style="dim")
         tbl.add_column("Title")
-        tbl.add_column("Owner")
-        tbl.add_column("Effort", justify="right")
-        tbl.add_column("File", style="dim")
-        _P_STYLE = {"P0": "[bold red]P0[/]", "P1": "[yellow]P1[/]", "P2": "[dim]P2[/]", "P3": "[dim]P3[/]"}
+        tbl.add_column("Deps", style="dim")
+        tbl.add_column("Files", style="dim")
+        _P_STYLE = {
+            "critical": "[bold red]CRIT[/]",
+            "high": "[yellow]HIGH[/]",
+            "medium": "[dim]MED[/]",
+            "low": "[dim]LOW[/]",
+        }
         for t in ready:
+            deps = ", ".join(t.dependencies[:3]) or "---"
+            files = ", ".join(t.file_paths[:2]) or "---"
             tbl.add_row(
-                t.id,
+                t.ticket_id,
                 _P_STYLE.get(t.priority, t.priority),
+                t.type,
                 t.title[:50],
-                t.owner,
-                t.effort or "-",
-                t.source_file,
+                deps,
+                files,
             )
         c.print(tbl)
         c.print()
     except ImportError:
-        # Plain fallback
-        print(f"\nREADY FOR ASSIGNMENT — {len(ready)} task(s)")
-        print("-" * 80)
-        print(f"{'ID':<16} {'Pri':<4} {'Title':<45} {'Owner':<15}")
-        print("-" * 80)
+        print(f"\nREADY FOR ASSIGNMENT -- {len(ready)} ticket(s)")
+        print("-" * 90)
+        print(f"{'ID':<22} {'Pri':<8} {'Type':<10} {'Title':<45}")
+        print("-" * 90)
         for t in ready:
-            print(f"{t.id:<16} {t.priority:<4} {t.title[:45]:<45} {t.owner:<15}")
+            print(f"{t.ticket_id:<22} {t.priority:<8} {t.type:<10} {t.title[:45]}")
         print()
 
 
-def render_ready_json(ready: list[Task]) -> None:
-    """Machine-readable JSON list of assignable tasks."""
+def render_ready_json(ready: list[Ticket]) -> None:
     out = {
         "ready_count": len(ready),
-        "tasks": [
+        "tickets": [
             {
-                "id": t.id,
+                "ticket_id": t.ticket_id,
                 "title": t.title,
+                "type": t.type,
                 "priority": t.priority,
-                "owner": t.owner,
-                "effort": t.effort,
-                "depends_on": t.depends_on,
-                "source_file": t.source_file,
+                "dependencies": t.dependencies,
+                "file_paths": t.file_paths,
+                "acceptance_criteria": t.acceptance_criteria,
+                "tags": t.tags,
             }
             for t in ready
         ],
@@ -445,155 +553,53 @@ def render_ready_json(ready: list[Task]) -> None:
     print(json.dumps(out, indent=2))
 
 
-# ═════════════════════════════════════════════════════════════
-#  Terminal Output (rich → plain fallback)
-# ═════════════════════════════════════════════════════════════
-
-def render_terminal(tasks: dict[str, Task], stats: BoardStats) -> None:
-    try:
-        _render_rich(tasks, stats)
-    except ImportError:
-        _render_plain(tasks, stats)
-
-
-def _render_rich(tasks: dict[str, Task], stats: BoardStats) -> None:
-    from rich import box
-    from rich.console import Console
-    from rich.panel import Panel
-    from rich.table import Table
-
-    c = Console()
-    pct = f"{stats.completed / stats.total * 100:.1f}" if stats.total else "0.0"
-
-    # Banner
-    c.print()
-    c.print(Panel.fit(
-        f"[bold cyan] PROJECT BOARD[/]\n"
-        f"[dim]{stats.total} tasks · {stats.files_with_tasks} files · {pct}% done[/]",
-        border_style="cyan",
-    ))
-
-    # Summary
-    tbl = Table(box=box.ROUNDED, show_header=False, padding=(0, 2))
-    tbl.add_column("Metric", style="bold")
-    tbl.add_column("Value", justify="right")
-    tbl.add_row("✅ Completed", f"[green]{stats.completed}[/]")
-    tbl.add_row("� Ready", f"[green]{stats.ready}[/]")
-    tbl.add_row("�🔵 Not Started", f"[blue]{stats.not_started}[/]")
-    tbl.add_row("🔄 In Progress", f"[yellow]{stats.in_progress}[/]")
-    tbl.add_row("🔴 Blocked", f"[red]{stats.blocked}[/]")
-    tbl.add_row("🔴 P0 Pending", f"[bold red]{stats.p0_pending}[/]")
-    tbl.add_row("🟠 P1 Pending", f"[bold yellow]{stats.p1_pending}[/]")
-    c.print(tbl)
-
-    # P0 table
-    p0 = sorted(
-        (t for t in tasks.values() if t.priority == "P0" and t.status != "completed"),
-        key=lambda x: x.id,
-    )
-    if p0:
-        c.print(f"\n[bold red]🔴 P0 CRITICAL — {len(p0)} pending[/]")
-        pt = Table(box=box.SIMPLE, padding=(0, 1))
-        pt.add_column("ID", style="bold red", no_wrap=True)
-        pt.add_column("Title")
-        pt.add_column("Status", justify="center")
-        pt.add_column("Owner")
-        pt.add_column("File", style="dim")
-        _SS = {
-            "blocked": "[red]BLOCKED[/]", "not_started": "[yellow]TODO[/]",
-            "in_progress": "[cyan]WIP[/]", "ready": "[green]READY[/]",
-        }
-        for t in p0:
-            pt.add_row(t.id, t.title[:45], _SS.get(t.status, t.status), t.owner, t.source_file)
-        c.print(pt)
-
-    # Blocked detail
-    blocked = sorted(
-        (t for t in tasks.values() if t.status == "blocked"),
-        key=lambda x: x.id,
-    )
-    if blocked:
-        c.print(f"\n[bold yellow]⏸ BLOCKED — {len(blocked)} tasks[/]")
-        for t in blocked:
-            blockers = [d for d in t.depends_on if d in tasks and tasks[d].status != "completed"]
-            ext = [f"{d}?" for d in t.depends_on if d not in tasks]
-            c.print(f"  [dim]{t.id}[/] ← {', '.join(blockers + ext)}")
-
-    # Missing deps
-    if stats.missing_deps:
-        c.print(f"\n[bold magenta]⚠ UNRESOLVED DEPS — {len(stats.missing_deps)}[/]")
-        for tid, did in stats.missing_deps[:15]:
-            c.print(f"  [dim]{tid}[/] → [bold]{did}[/] (not found)")
-        if len(stats.missing_deps) > 15:
-            c.print(f"  [dim]… +{len(stats.missing_deps) - 15} more[/]")
-
-    # Per-file breakdown
-    files: dict[str, dict[str, int]] = {}
-    for t in tasks.values():
-        files.setdefault(t.source_file, {"total": 0, "done": 0})
-        files[t.source_file]["total"] += 1
-        if t.status == "completed":
-            files[t.source_file]["done"] += 1
-    ft = Table(title="Per-File Progress", box=box.ROUNDED)
-    ft.add_column("File", style="cyan")
-    ft.add_column("Done", justify="right")
-    ft.add_column("Total", justify="right")
-    ft.add_column("%", justify="right")
-    for f, cnts in sorted(files.items()):
-        p = cnts["done"] / cnts["total"] * 100 if cnts["total"] else 0
-        sty = "green" if p == 100 else "yellow" if p > 50 else "red"
-        ft.add_row(f, str(cnts["done"]), str(cnts["total"]), f"[{sty}]{p:.0f}%[/]")
-    c.print()
-    c.print(ft)
-    c.print()
-
-
-def _render_plain(tasks: dict[str, Task], stats: BoardStats) -> None:
-    pct = f"{stats.completed / stats.total * 100:.1f}" if stats.total else "0.0"
-    print(f"\n{'=' * 52}")
-    print(f"   PROJECT BOARD  ({stats.total} tasks, {pct}% done)")
-    print(f"{'=' * 52}")
-    print(f"  ✅ Completed   {stats.completed}")
-    print(f"  📋 Not Started {stats.not_started}")
-    print(f"  🔄 In Progress {stats.in_progress}")
-    print(f"  🔴 Blocked     {stats.blocked}")
-    print(f"  🔴 P0 Pending  {stats.p0_pending}")
-    print(f"  🟠 P1 Pending  {stats.p1_pending}")
-    print(f"{'-' * 52}")
-
-    p0 = [t for t in tasks.values() if t.priority == "P0" and t.status != "completed"]
-    if p0:
-        print(f"\n  P0 CRITICAL ({len(p0)}):")
-        for t in sorted(p0, key=lambda x: x.id):
-            print(f"    {t.id}: {t.title[:40]}  [{t.status}]  @{t.owner}")
-
-    if stats.missing_deps:
-        print(f"\n  UNRESOLVED DEPS ({len(stats.missing_deps)}):")
-        for tid, did in stats.missing_deps[:15]:
-            print(f"    {tid} → {did}")
-    print()
-
-
-# ═════════════════════════════════════════════════════════════
+# =====================================================================
 #  HTML / Mermaid Output
-# ═════════════════════════════════════════════════════════════
+# =====================================================================
 
-def generate_html(tasks: dict[str, Task], stats: BoardStats) -> str:
-    mermaid = _build_mermaid(tasks)
-    rows = _build_rows(tasks)
-    pct = f"{stats.completed / stats.total * 100:.1f}" if stats.total else "0.0"
+def _safe_node(raw: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9_]", "_", raw)
+
+
+def generate_html(tickets: dict[str, Ticket], stats: BoardStats) -> str:
+    mermaid = _build_mermaid(tickets)
+    rows = _build_rows(tickets)
+    done = stats.by_stage.get("DONE", 0)
+    pct = f"{done / stats.total * 100:.1f}" if stats.total else "0.0"
+    in_progress = sum(
+        stats.by_stage.get(s, 0) for s in
+        ["BACKEND", "FRONTEND", "ARCHITECT", "RESEARCH", "QA",
+         "SECURITY", "CI", "DOCS", "VALIDATION"]
+    )
+    ready_count = stats.by_stage.get("READY", 0)
+
+    stage_bar_items = []
+    for s in STAGE_ORDER:
+        cnt = stats.by_stage.get(s, 0)
+        emoji = STAGE_EMOJI.get(s, "")
+        stage_bar_items.append(
+            '<div class="stage-chip" data-stage="' + s + '">'
+            '<span class="stage-emoji">' + emoji + '</span>'
+            '<span class="stage-name">' + s + '</span>'
+            '<span class="stage-count">' + str(cnt) + '</span></div>'
+        )
+    stage_bar_html = "\n    ".join(stage_bar_items)
 
     html = _HTML_TEMPLATE
     replacements = {
         "%%TOTAL%%": str(stats.total),
-        "%%COMPLETED%%": str(stats.completed),
-        "%%IN_PROGRESS%%": str(stats.in_progress),
+        "%%DONE%%": str(done),
+        "%%IN_PROGRESS%%": str(in_progress),
         "%%BLOCKED%%": str(stats.blocked),
-        "%%NOT_STARTED%%": str(stats.not_started),
-        "%%P0%%": str(stats.p0_pending),
-        "%%P1%%": str(stats.p1_pending),
+        "%%READY%%": str(ready_count),
+        "%%CLAIMED%%": str(stats.claimed),
+        "%%EXPIRED%%": str(stats.expired_claims),
+        "%%CRITICAL%%": str(stats.critical_pending),
+        "%%HIGH%%": str(stats.high_pending),
+        "%%REWORK%%": str(stats.rework_total),
         "%%PROGRESS%%": pct,
         "%%MISSING%%": str(len(stats.missing_deps)),
+        "%%STAGE_BAR%%": stage_bar_html,
         "%%MERMAID%%": mermaid,
         "%%ROWS%%": rows,
     }
@@ -602,92 +608,125 @@ def generate_html(tasks: dict[str, Task], stats: BoardStats) -> str:
     return html
 
 
-def _safe_node(raw: str) -> str:
-    return re.sub(r"[^a-zA-Z0-9_]", "_", raw)
-
-
-def _build_mermaid(tasks: dict[str, Task]) -> str:
+def _build_mermaid(tickets: dict[str, Ticket]) -> str:
     lines = ["graph TD"]
 
-    # Group by source file into subgraphs
-    by_file: dict[str, list[Task]] = {}
-    for t in tasks.values():
-        by_file.setdefault(t.source_file, []).append(t)
+    by_stage: dict[str, list[Ticket]] = {}
+    for t in tickets.values():
+        by_stage.setdefault(t.stage, []).append(t)
 
-    for fp, ftasks in sorted(by_file.items()):
-        label = Path(fp).stem.replace("_", " ").replace("-", " ").title()
-        sg = _safe_node(fp)
-        lines.append(f'    subgraph {sg}["{label}"]')
-        for t in sorted(ftasks, key=lambda x: x.id):
+    for stage in STAGE_ORDER:
+        stage_tickets = by_stage.get(stage, [])
+        if not stage_tickets:
+            continue
+        emoji = STAGE_EMOJI.get(stage, "")
+        lines.append('    subgraph ' + _safe_node(stage) + '["' + emoji + ' ' + stage + ' (' + str(len(stage_tickets)) + ')"]')
+        for t in sorted(stage_tickets, key=lambda x: x.ticket_id):
             safe_t = (
-                t.title
+                t.title[:50]
                 .replace('"', "'")
-                .replace("<", "‹")
-                .replace(">", "›")
+                .replace("<", " ")
+                .replace(">", " ")
                 .replace("&", "+")
             )
-            icon = {"P0": "🔴", "P1": "🟠", "P2": "🟢", "P3": "⚪"}.get(t.priority, "")
-            nid = _safe_node(t.id)
-            lines.append(f'        {nid}["{icon} {t.id}<br/>{safe_t}"]:::{t.status}')
+            prio_map = {"critical": "P0", "high": "P1", "medium": "P2", "low": "P3"}
+            prio_icon = prio_map.get(t.priority, "")
+            owner_str = "<br/>@" + t.operator if t.operator else ""
+            nid = _safe_node(t.ticket_id)
+            cls = _ticket_class(t)
+            lines.append('        ' + nid + '["' + prio_icon + ' ' + t.ticket_id + '<br/>' + safe_t + owner_str + '"]:::' + cls)
         lines.append("    end")
 
     lines.append("")
 
-    # Dependency edges
     seen_ext: set[str] = set()
-    for t in tasks.values():
-        for dep in t.depends_on:
-            src, dst = _safe_node(dep), _safe_node(t.id)
-            if dep in tasks:
-                lines.append(f"    {src} --> {dst}")
+    for t in tickets.values():
+        for dep in t.dependencies:
+            src, dst = _safe_node(dep), _safe_node(t.ticket_id)
+            if dep in tickets:
+                lines.append("    " + src + " --> " + dst)
             elif dep not in seen_ext:
-                lines.append(f'    {src}["{dep} ❓"]:::missing')
-                lines.append(f"    {src} -.-> {dst}")
+                lines.append('    ' + src + '["' + dep + ' ?"]:::missing')
+                lines.append("    " + src + " -.-> " + dst)
                 seen_ext.add(dep)
             else:
-                lines.append(f"    {src} -.-> {dst}")
+                lines.append("    " + src + " -.-> " + dst)
 
-    # Class definitions
     lines.append("")
-    lines.append('    classDef completed fill:#dcfce7,stroke:#166534,stroke-width:2px,color:#14532d')
-    lines.append('    classDef not_started fill:#dbeafe,stroke:#1e40af,stroke-width:2px,color:#1e3a8a')
-    lines.append('    classDef in_progress fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e')
-    lines.append('    classDef blocked fill:#fee2e2,stroke:#991b1b,stroke-width:2px,color:#7f1d1d')
+    lines.append('    classDef done fill:#dcfce7,stroke:#166534,stroke-width:2px,color:#14532d')
     lines.append('    classDef ready fill:#d1fae5,stroke:#059669,stroke-width:2px,color:#065f46')
+    lines.append('    classDef active fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e')
+    lines.append('    classDef claimed fill:#dbeafe,stroke:#1e40af,stroke-width:2px,color:#1e3a8a')
+    lines.append('    classDef blocked fill:#fee2e2,stroke:#991b1b,stroke-width:2px,color:#7f1d1d')
+    lines.append('    classDef expired fill:#fce7f3,stroke:#9d174d,stroke-width:2px,color:#831843')
     lines.append('    classDef missing fill:#f3f4f6,stroke:#6b7280,stroke-width:1px,stroke-dasharray:5,color:#374151')
     return "\n".join(lines)
 
 
-def _build_rows(tasks: dict[str, Task]) -> str:
+def _ticket_class(t: Ticket) -> str:
+    if t.stage == "DONE":
+        return "done"
+    if t.is_expired:
+        return "expired"
+    if t.blocked_by:
+        return "blocked"
+    if t.claimed_by:
+        return "claimed"
+    if t.stage == "READY":
+        return "ready"
+    return "active"
+
+
+def _build_rows(tickets: dict[str, Ticket]) -> str:
     badges = {
-        "completed": '<span class="badge done">✅ Done</span>',
-        "not_started": '<span class="badge todo">📋 Todo</span>',
-        "in_progress": '<span class="badge wip">🔄 WIP</span>',
-        "blocked": '<span class="badge blocked">🔴 Blocked</span>',
-        "ready": '<span class="badge ready">🟢 Ready</span>',
+        "DONE": '<span class="badge done">Done</span>',
+        "READY": '<span class="badge ready">Ready</span>',
     }
-    pri_order = {"P0": 0, "P1": 1, "P2": 2, "P3": 3}
+    active_stages = {"BACKEND", "FRONTEND", "ARCHITECT", "RESEARCH",
+                     "QA", "SECURITY", "CI", "DOCS", "VALIDATION"}
+
     rows: list[str] = []
-    for t in sorted(tasks.values(), key=lambda x: (pri_order.get(x.priority, 9), x.id)):
-        badge = badges.get(t.status, t.status)
-        deps = ", ".join(t.depends_on) or "—"
+    for t in sorted(tickets.values(),
+                    key=lambda x: (PRIORITY_ORDER.get(x.priority, 9),
+                                   STAGE_ORDER.index(x.stage) if x.stage in STAGE_ORDER else 99,
+                                   x.ticket_id)):
+        if t.stage in badges:
+            badge = badges[t.stage]
+        elif t.stage in active_stages:
+            badge = '<span class="badge active">' + STAGE_EMOJI.get(t.stage, "") + ' ' + t.stage + '</span>'
+        else:
+            badge = '<span class="badge">' + t.stage + '</span>'
+
+        if t.is_expired:
+            badge += ' <span class="badge expired">EXPIRED</span>'
+        if t.blocked_by:
+            badge += ' <span class="badge blocked-tag">BLOCKED</span>'
+
+        deps = ", ".join(t.dependencies) or "---"
+        owner = t.operator or "---"
+        agent = t.claimed_by or "---"
+        prio_class = t.priority
+
         rows.append(
-            f"<tr data-priority='{t.priority}' data-status='{t.status}'>"
-            f"<td><b>{t.id}</b></td><td>{t.title}</td><td>{t.priority}</td>"
-            f"<td>{badge}</td><td>{t.owner}</td><td>{deps}</td>"
-            f"<td class='file'>{t.source_file}</td></tr>"
+            "<tr data-priority='" + t.priority + "' data-stage='" + t.stage + "' data-type='" + t.type + "'>"
+            "<td><b>" + t.ticket_id + "</b></td>"
+            "<td>" + t.title + "</td>"
+            "<td class='prio-" + prio_class + "'>" + t.priority + "</td>"
+            "<td>" + badge + "</td>"
+            "<td>" + t.type + "</td>"
+            "<td>" + owner + "</td>"
+            "<td>" + agent + "</td>"
+            "<td class='deps'>" + deps + "</td></tr>"
         )
     return "\n            ".join(rows)
 
 
-# ─── HTML Template ────────────────────────────────────────────
-
-_HTML_TEMPLATE = r"""<!DOCTYPE html>
+_HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title> Project Board</title>
+<title>Distributed Ticket Board</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -701,11 +740,17 @@ header h1{font-size:1.4rem;color:#38bdf8;white-space:nowrap}
 .controls{display:flex;gap:6px}
 .controls button{background:#334155;color:#e2e8f0;border:1px solid #475569;border-radius:6px;padding:5px 11px;cursor:pointer;font-size:1rem;transition:background .15s}
 .controls button:hover{background:#475569}
+.stage-pipeline{display:flex;gap:4px;padding:10px 24px;background:#1e293b;border-bottom:1px solid #334155;overflow-x:auto;flex-wrap:nowrap}
+.stage-chip{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:8px;background:#334155;border:1px solid #475569;font-size:.8rem;white-space:nowrap;cursor:pointer;transition:all .15s}
+.stage-chip:hover{border-color:#38bdf8;background:#1e3a5f}
+.stage-chip .stage-emoji{font-size:1rem}
+.stage-chip .stage-name{color:#94a3b8;font-weight:500}
+.stage-chip .stage-count{background:#475569;color:#e2e8f0;padding:1px 7px;border-radius:10px;font-weight:bold;font-size:.75rem}
 .tabs{display:flex;border-bottom:1px solid #334155;background:#1e293b}
 .tab{padding:11px 22px;cursor:pointer;border-bottom:2px solid transparent;color:#94a3b8;font-size:.9rem;user-select:none;transition:color .15s}
 .tab.active{color:#38bdf8;border-bottom-color:#38bdf8}
 .tab:hover{color:#e2e8f0}
-#graph-container{overflow:hidden;height:calc(100vh - 130px);position:relative;cursor:grab;display:block}
+#graph-container{overflow:hidden;height:calc(100vh - 200px);position:relative;cursor:grab;display:block}
 #graph-container:active{cursor:grabbing}
 #graph-inner{transform-origin:0 0;padding:40px;display:inline-block;min-width:100%}
 #task-table-container{display:none;padding:0}
@@ -713,35 +758,42 @@ header h1{font-size:1.4rem;color:#38bdf8;white-space:nowrap}
 .filter-btn{background:#334155;color:#e2e8f0;border:1px solid #475569;border-radius:20px;padding:4px 14px;cursor:pointer;font-size:.8rem;transition:all .15s}
 .filter-btn.active{background:#38bdf8;color:#0f172a;border-color:#38bdf8}
 .filter-btn:hover{border-color:#38bdf8}
-.table-scroll{overflow-x:auto;max-height:calc(100vh - 185px);overflow-y:auto}
+.table-scroll{overflow-x:auto;max-height:calc(100vh - 260px);overflow-y:auto}
 table{width:100%;border-collapse:collapse;font-size:.83rem}
 th{background:#1e293b;padding:9px 12px;text-align:left;position:sticky;top:0;border-bottom:2px solid #38bdf8;color:#38bdf8;z-index:2;cursor:pointer}
 th:hover{color:#22d3ee}
 td{padding:7px 12px;border-bottom:1px solid #1e293b}
 tr:hover td{background:rgba(56,189,248,.06)}
-.badge{padding:2px 8px;border-radius:4px;font-size:.73rem;font-weight:600;white-space:nowrap}
+.badge{padding:2px 8px;border-radius:4px;font-size:.73rem;font-weight:600;white-space:nowrap;display:inline-block;margin:1px 2px}
 .badge.done{background:#166534;color:#dcfce7}
-.badge.ready{background:#1e40af;color:#dbeafe}
-.badge.wip{background:#d97706;color:#fef3c7}
-.badge.blocked{background:#991b1b;color:#fee2e2}
-.file{color:#64748b;font-size:.73rem}
+.badge.ready{background:#059669;color:#d1fae5}
+.badge.active{background:#d97706;color:#fef3c7}
+.badge.expired{background:#9d174d;color:#fce7f3}
+.badge.blocked-tag{background:#991b1b;color:#fee2e2}
+.deps{color:#64748b;font-size:.73rem;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.prio-critical{color:#ef4444;font-weight:bold}
+.prio-high{color:#eab308}
+.prio-medium{color:#94a3b8}
+.prio-low{color:#64748b}
 .progress-bar{width:180px;height:7px;background:#334155;border-radius:4px;overflow:hidden}
 .progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#22d3ee);border-radius:4px}
 .search-box{background:#334155;border:1px solid #475569;border-radius:6px;padding:5px 12px;color:#e2e8f0;font-size:.85rem;width:220px;outline:none;transition:border-color .15s}
 .search-box:focus{border-color:#38bdf8}
 .search-box::placeholder{color:#64748b}
 footer{background:#1e293b;border-top:1px solid #334155;padding:8px 24px;text-align:center;font-size:.7rem;color:#64748b}
-@media(max-width:768px){header{flex-direction:column;gap:8px}.stats-bar{gap:10px}.search-box{width:100%}}
+@media(max-width:768px){header{flex-direction:column;gap:8px}.stats-bar{gap:10px}.search-box{width:100%}.stage-pipeline{flex-wrap:wrap}}
 </style>
 </head>
 <body>
 <header>
-  <h1> Board</h1>
+  <h1>Distributed Ticket Board</h1>
   <div class="stats-bar">
-    <div class="stat"><div class="stat-value" style="color:#22c55e">%%COMPLETED%%</div><div class="stat-label">Done</div></div>
-    <div class="stat"><div class="stat-value" style="color:#eab308">%%IN_PROGRESS%%</div><div class="stat-label">WIP</div></div>
+    <div class="stat"><div class="stat-value" style="color:#22c55e">%%DONE%%</div><div class="stat-label">Done</div></div>
+    <div class="stat"><div class="stat-value" style="color:#eab308">%%IN_PROGRESS%%</div><div class="stat-label">Active</div></div>
+    <div class="stat"><div class="stat-value" style="color:#22c55e">%%READY%%</div><div class="stat-label">Ready</div></div>
     <div class="stat"><div class="stat-value" style="color:#ef4444">%%BLOCKED%%</div><div class="stat-label">Blocked</div></div>
-    <div class="stat"><div class="stat-value" style="color:#3b82f6">%%NOT_STARTED%%</div><div class="stat-label">Todo</div></div>
+    <div class="stat"><div class="stat-value" style="color:#3b82f6">%%CLAIMED%%</div><div class="stat-label">Claimed</div></div>
+    <div class="stat"><div class="stat-value" style="color:#ec4899">%%EXPIRED%%</div><div class="stat-label">Expired</div></div>
     <div class="stat">
       <div class="stat-value">%%PROGRESS%%%</div>
       <div class="progress-bar"><div class="progress-fill" style="width:%%PROGRESS%%%;max-width:100%"></div></div>
@@ -749,14 +801,17 @@ footer{background:#1e293b;border-top:1px solid #334155;padding:8px 24px;text-ali
   </div>
   <div class="controls">
     <button onclick="zoomIn()" title="Zoom In">+</button>
-    <button onclick="zoomOut()" title="Zoom Out">&minus;</button>
-    <button onclick="resetView()" title="Reset View">&#x27F2;</button>
-    <button onclick="fitView()" title="Fit to Screen">&#x2B1C;</button>
+    <button onclick="zoomOut()" title="Zoom Out">-</button>
+    <button onclick="resetView()" title="Reset View">R</button>
+    <button onclick="fitView()" title="Fit to Screen">F</button>
   </div>
 </header>
+<div class="stage-pipeline">
+    %%STAGE_BAR%%
+</div>
 <div class="tabs">
-  <div class="tab active" onclick="showView('graph')">&#x1F4CA; Dependency Graph</div>
-  <div class="tab" onclick="showView('table')">&#x1F4CB; Task List (%%TOTAL%%)</div>
+  <div class="tab active" onclick="showView('graph')">Dependency Graph</div>
+  <div class="tab" onclick="showView('table')">Ticket List (%%TOTAL%%)</div>
 </div>
 <div id="graph-container">
   <div id="graph-inner">
@@ -767,23 +822,25 @@ footer{background:#1e293b;border-top:1px solid #334155;padding:8px 24px;text-ali
 </div>
 <div id="task-table-container">
   <div id="filter-bar">
-    <input class="search-box" type="text" placeholder="Search tasks..." oninput="filterTable()">
+    <input class="search-box" type="text" placeholder="Search tickets..." oninput="filterTable()">
     <button class="filter-btn active" data-filter="all" onclick="setFilter(this)">All (%%TOTAL%%)</button>
-    <button class="filter-btn" data-filter="P0" onclick="setFilter(this)">P0 (%%P0%%)</button>
-    <button class="filter-btn" data-filter="P1" onclick="setFilter(this)">P1 (%%P1%%)</button>
+    <button class="filter-btn" data-filter="READY" onclick="setFilter(this)">Ready (%%READY%%)</button>
+    <button class="filter-btn" data-filter="critical" onclick="setFilter(this)">Critical (%%CRITICAL%%)</button>
+    <button class="filter-btn" data-filter="high" onclick="setFilter(this)">High (%%HIGH%%)</button>
     <button class="filter-btn" data-filter="blocked" onclick="setFilter(this)">Blocked (%%BLOCKED%%)</button>
-    <button class="filter-btn" data-filter="completed" onclick="setFilter(this)">Done (%%COMPLETED%%)</button>
+    <button class="filter-btn" data-filter="DONE" onclick="setFilter(this)">Done (%%DONE%%)</button>
   </div>
   <div class="table-scroll">
     <table>
       <thead><tr>
-        <th onclick="sortTable(0)">ID</th>
+        <th onclick="sortTable(0)">Ticket ID</th>
         <th onclick="sortTable(1)">Title</th>
         <th onclick="sortTable(2)">Priority</th>
-        <th onclick="sortTable(3)">Status</th>
-        <th onclick="sortTable(4)">Owner</th>
+        <th onclick="sortTable(3)">Stage</th>
+        <th onclick="sortTable(4)">Type</th>
+        <th onclick="sortTable(5)">Operator</th>
+        <th onclick="sortTable(6)">Agent</th>
         <th>Deps</th>
-        <th onclick="sortTable(6)">File</th>
       </tr></thead>
       <tbody>
             %%ROWS%%
@@ -791,16 +848,14 @@ footer{background:#1e293b;border-top:1px solid #334155;padding:8px 24px;text-ali
     </table>
   </div>
 </div>
-<footer> Project Board &middot; Read-only snapshot &middot; Source files are never modified</footer>
+<footer>Distributed Ticket Board -- Read-only snapshot from .github/ticket-state/ -- Ticket files untouched</footer>
 <script>
 mermaid.initialize({startOnLoad:true,theme:'dark',flowchart:{useMaxWidth:false,htmlLabels:true,curve:'basis',padding:15},securityLevel:'loose',maxTextSize:500000});
-
 function showView(v){
   var g=document.getElementById('graph-container'),t=document.getElementById('task-table-container'),tabs=document.querySelectorAll('.tab');
   if(v==='graph'){g.style.display='block';t.style.display='none';tabs[0].classList.add('active');tabs[1].classList.remove('active')}
   else{g.style.display='none';t.style.display='block';tabs[0].classList.remove('active');tabs[1].classList.add('active')}
 }
-
 var container=document.getElementById('graph-container'),inner=document.getElementById('graph-inner');
 var scale=1,tx=0,ty=0,drag=false,sx,sy;
 function upd(){inner.style.transform='translate('+tx+'px,'+ty+'px) scale('+scale+')'}
@@ -815,7 +870,6 @@ container.addEventListener('mouseup',function(){drag=false});
 container.addEventListener('mouseleave',function(){drag=false});
 document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT')return;if(e.key==='+'||e.key==='=')zoomIn();if(e.key==='-')zoomOut();if(e.key==='0')resetView()});
 setTimeout(fitView,1500);
-
 var activeFilter='all';
 function setFilter(btn){
   document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')});
@@ -824,7 +878,12 @@ function setFilter(btn){
 function filterTable(){
   var q=(document.querySelector('.search-box')||{}).value||'';q=q.toLowerCase();
   document.querySelectorAll('tbody tr').forEach(function(tr){
-    var mf=activeFilter==='all'||(activeFilter==='blocked'?tr.dataset.status==='blocked':activeFilter==='completed'?tr.dataset.status==='completed':tr.dataset.priority===activeFilter);
+    var mf=true;
+    if(activeFilter!=='all'){
+      if(activeFilter==='blocked'){mf=tr.innerHTML.indexOf('BLOCKED')!==-1}
+      else if(activeFilter==='critical'||activeFilter==='high'){mf=tr.dataset.priority===activeFilter}
+      else{mf=tr.dataset.stage===activeFilter}
+    }
     var ms=!q||tr.textContent.toLowerCase().indexOf(q)!==-1;
     tr.style.display=(mf&&ms)?'':'none';
   });
@@ -836,16 +895,21 @@ function sortTable(col){
   rows.sort(function(a,b){var av=a.children[col].textContent.trim(),bv=b.children[col].textContent.trim();return av<bv?-dir:av>bv?dir:0});
   rows.forEach(function(r){tbody.appendChild(r)});
 }
+document.querySelectorAll('.stage-chip').forEach(function(chip){
+  chip.addEventListener('click',function(){
+    var stage=chip.dataset.stage;
+    showView('table');
+    document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')});
+    activeFilter=stage;filterTable();
+  });
+});
 </script>
 </body>
 </html>
 """
 
 
-# ═════════════════════════════════════════════════════════════
-#  CLI Entry Point
-# ═════════════════════════════════════════════════════════════
-
+# --- CLI Entry Point ---------------------------------------------------
 def main() -> None:
     args = set(sys.argv[1:])
 
@@ -853,59 +917,91 @@ def main() -> None:
         print(__doc__)
         return
 
-    files = discover_files(ROOT)
-
+    # --list: directory structure + counts
     if args & {"--list", "-l"}:
-        print(f"Found {len(files)} TODO files:")
-        for f in files:
-            print(f"   {f.relative_to(ROOT)}")
+        print("Ticket State Directories (" + str(TICKET_STATE_DIR) + "):")
+        if not TICKET_STATE_DIR.is_dir():
+            print("  ticket-state directory not found!")
+            return
+        for stage in STAGE_ORDER:
+            d = TICKET_STATE_DIR / stage
+            if d.is_dir():
+                tickets = list(d.glob("*.json"))
+                print("  " + STAGE_EMOJI.get(stage, " ") + " " + stage.ljust(12) + "  " + str(len(tickets)) + " ticket(s)")
+            else:
+                print("  ! " + stage.ljust(12) + "  MISSING")
         return
 
-    # ── Pass 1: Parse ──
-    tasks = parse_all(files, ROOT)
-    if not tasks:
-        print("No structured tasks found in any TODO file.")
+    # Discovery
+    tickets = discover_tickets()
+    if not tickets:
+        print("No tickets found in .github/ticket-state/ or .github/tickets/")
+        print("  Hint: Create tickets with  python3 .github/tickets.py --parse <dir>")
         return
 
-    # ── Pass 2: Resolve ──
-    stats = resolve(tasks)
-    stats.files_scanned = len(files)
-    stats.files_with_tasks = len({t.source_file for t in tasks.values()})
+    # Resolution
+    stats = resolve(tickets)
 
-    # ── Ready-task filter (--ready) ──
+    # --stage STAGE filter
+    stage_filter = None
+    if "--stage" in args:
+        argv = sys.argv[1:]
+        for i, a in enumerate(argv):
+            if a == "--stage" and i + 1 < len(argv):
+                stage_filter = argv[i + 1].upper()
+                break
+        if stage_filter:
+            tickets = {k: v for k, v in tickets.items() if v.stage == stage_filter}
+
+    # --owner OPERATOR filter
+    owner_filter = None
+    if "--owner" in args:
+        argv = sys.argv[1:]
+        for i, a in enumerate(argv):
+            if a == "--owner" and i + 1 < len(argv):
+                owner_filter = argv[i + 1]
+                break
+        if owner_filter:
+            tickets = {
+                k: v for k, v in tickets.items()
+                if v.operator and v.operator.lower() == owner_filter.lower()
+            }
+
+    # --ready
     if "--ready" in args:
-        ready = get_ready_tasks(tasks)
+        ready = get_ready_tickets(tickets)
         if "--json" in args:
             render_ready_json(ready)
         else:
             render_ready_terminal(ready)
         return
 
-    # ── JSON dump ──
+    # --json
     if "--json" in args:
         out = {
-            "tasks": {tid: asdict(t) for tid, t in tasks.items()},
+            "tickets": {tid: asdict(t) for tid, t in tickets.items()},
             "stats": asdict(stats),
+            "stage_order": STAGE_ORDER,
         }
         print(json.dumps(out, indent=2, default=str))
         return
 
-    # ── Outputs ──
+    # Outputs
     want_terminal = "--html" not in args
     want_html = "--terminal" not in args
 
     if want_terminal:
-        render_terminal(tasks, stats)
+        render_terminal(tickets, stats)
 
     if want_html:
-        html = generate_html(tasks, stats)
+        html = generate_html(tickets, stats)
         out_path = ROOT / "index.html"
         out_path.write_text(html, encoding="utf-8")
         size = out_path.stat().st_size
-        msg = f"Board written to index.html ({size:,} bytes)"
+        msg = "Board written to index.html (" + str(size) + " bytes)"
         try:
             from rich.console import Console
-            Console().print(f"[green]{msg}[/]")
+            Console().print("[green]" + msg + "[/]")
         except ImportError:
             print(msg)
 

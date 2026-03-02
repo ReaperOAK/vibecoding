@@ -42,16 +42,22 @@ Violation behavior: emit `PROTOCOL_VIOLATION`, stop affected ticket.
 1. Read `.github/guardian/STOP_ALL`
 2. Read `.github/instructions/core_governance.instructions.md`
 3. Verify governance file presence/alignment
-4. Load workflow state from `.github/memory-bank/workflow-state.json`
+4. Load ticket state: `python3 .github/tickets.py --status --json`
 5. Load artifact map from `.github/memory-bank/artifacts-manifest.json`
 6. Load feedback log from `.github/memory-bank/feedback-log.md`
+7. Read `.github/governance/two_commit_protocol.md`
+8. Read `.github/instructions/distributed-execution.instructions.md`
 
 Hard gate:
 - If `STOP_ALL` contains `STOP` => no delegation, no edits, emit `BLOCKED_BY`.
 
 ## 3) Canonical Ticket Lifecycle (non-skippable)
 
+Abstract lifecycle:
 `READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → COMMIT → DONE`
+
+Distributed stage directory mapping (`.github/ticket-state/`):
+`READY → BACKEND|FRONTEND|ARCHITECT|RESEARCH → QA → SECURITY → CI → DOCS → VALIDATION → DONE`
 
 Rules:
 - no skip
@@ -59,6 +65,7 @@ Rules:
 - no reorder
 - failure routes to `REWORK`
 - `REWORK` max = 3, then `ESCALATED`
+- ticket state = directory location under `.github/ticket-state/<STAGE>/`
 
 ## 4) Required Post-Execution Chain
 
@@ -132,14 +139,29 @@ Require explicit yes/no before:
 
 No implicit approval allowed.
 
-## 10) Commit Contract
+## 10) Commit Contract (Two-Commit Protocol)
 
-- One atomic commit per ticket.
-- Commit title starts with `[TICKET-ID]`.
-- Explicit staging only.
-- Never use: `git add .`, `git add -A`, `git add --all`.
+Every agent executes exactly two git commits per ticket stage:
 
+**Commit 1 — CLAIM (distributed lock):**
+- `git pull --rebase`
+- Verify ticket in expected stage directory
+- Update claim metadata (claimed_by, machine_id, operator, lease_expiry)
+- Stage ticket JSON files only
+- `git commit -m "[TICKET-ID] CLAIM by AGENT on MACHINE (OPERATOR)"`
+- `git push` (push success = lock acquired; push failure = abort)
+
+**Commit 2 — WORK:**
+- Execute agent work
+- Write summary to `.github/agent-output/{AgentName}/{ticket-id}.md`
+- Move ticket to next stage directory
+- Stage explicit file list only
+- `git commit -m "[TICKET-ID] STAGE complete by AGENT on MACHINE"`
+- `git push`
+
+Forbidden: `git add .`, `git add -A`, `git add --all`.
 Scoped git violation => `DRIFT-002`.
+Skipped claim => `DRIFT-010`.
 
 ## 11) Memory Gate (pre-COMMIT hard gate)
 
@@ -177,6 +199,8 @@ Evidence rule:
 - INV-4: memory gate before COMMIT
 - INV-6: evidence required in `TASK_COMPLETED`
 - INV-8: single-ticket scope
+- INV-10: two-commit protocol mandatory (claim before work)
+- INV-11: agent summary handoff via `.github/agent-output/` only
 
 On invariant violation:
 1. emit `PROTOCOL_VIOLATION`
@@ -202,12 +226,17 @@ Every `runSubagent` call must include:
 - `task_summary`
 - `acceptance_criteria`
 - `upstream_artifacts`
+- `upstream_summary_path` (path to previous agent's summary in `.github/agent-output/`)
 - `expected_outputs`
+- `expected_summary_output` (path agent must write its summary to)
 - `constraints`
 - `context_chunks`
 - `governance_chunks`
 - `timeout`
 - `rework_budget`
+- `operator`
+- `machine_id`
+- `lease_duration_minutes` (default: 30)
 
 Missing required field => reject dispatch.
 
@@ -233,11 +262,15 @@ If same strategy fails >=3 times:
 ## 18) References (canonical)
 
 - `.github/instructions/core_governance.instructions.md`
+- `.github/instructions/distributed-execution.instructions.md`
 - `.github/governance/lifecycle.md`
 - `.github/governance/worker_policy.md`
 - `.github/governance/event_protocol.md`
 - `.github/governance/memory_policy.md`
 - `.github/governance/commit_policy.md`
+- `.github/governance/two_commit_protocol.md`
 - `.github/tasks/delegation-packet-schema.json`
+- `.github/tickets.py`
+- `.github/agent-runner.py`
 
 End of contract.

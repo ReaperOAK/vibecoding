@@ -25,6 +25,9 @@ Before ANY work, do these in order:
    prior phase (e.g., source code, auth impl), read them BEFORE reviewing
 4. **Load domain chunks** — read ALL files in `.github/vibecoding/chunks/Security.agent/`
    These are your detailed protocols, threat models, and OWASP patterns. Do not skip.
+5. Read `.github/governance/two_commit_protocol.md` — two-commit protocol rules
+6. Read `.github/instructions/distributed-execution.instructions.md` — distributed execution
+7. If upstream summary exists in `.github/agent-output/`, read it for prior-stage context
 
 ## Scope
 

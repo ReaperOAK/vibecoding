@@ -132,11 +132,18 @@ TODO.agent must:
 3. Mark blockers.
 4. Estimate impact.
 5. Prioritize stabilization over new features.
-6. Create structured task files.
+6. Create structured task files in `TODO/tasks/`.
+7. Parse L3 tasks into ticket JSON: `python3 .github/tickets.py --parse TODO/tasks/`
+8. Run sync to evaluate dependencies: `python3 .github/tickets.py --sync`
+9. Verify ticket state: `python3 .github/tickets.py --status`
 
 Tickets must be granular.
 One change per ticket.
 Beginner-friendly clarity.
+Each ticket must conform to `.github/tickets/ticket-schema.json`.
+
+Tickets enter the file-based state machine at `.github/ticket-state/READY/`.
+Dependency satisfaction determines READY eligibility.
 
 No implementation yet.
 
@@ -155,13 +162,20 @@ Execute in parallel:
 - Missing lint rules
 
 Each ticket must:
-- Follow full SDLC
-- Trigger QA
-- Trigger Validator
-- Trigger Documentation
-- Commit atomically
+- Follow full SDLC through file-based state machine (`.github/ticket-state/`)
+- Use two-commit protocol per stage: Commit 1 (CLAIM) + Commit 2 (WORK)
+- Traverse stage directories: READY → BACKEND/FRONTEND → QA → SECURITY → CI → DOCS → VALIDATION → DONE
+- Write agent summary to `.github/agent-output/{AgentName}/{ticket-id}.md`
+- Read upstream summary from previous stage agent before starting
+
+Sync ticket state between stages:
+```bash
+python3 .github/tickets.py --sync
+python3 .github/tickets.py --status
+```
 
 Parallel execution allowed if no file conflict.
+Claim via push-based distributed lock (push failure = another operator claimed first).
 
 Maintain minimum 10 active workers.
 Use background agents if backlog low.
@@ -177,12 +191,16 @@ Only after:
 - CI exists
 - Architecture doc exists
 - PRD reconstructed
+- `.github/ticket-state/` directories populated
+- `tickets.py --validate` passes integrity check
 
 Then continue normal autonomous execution:
-- Ticket by ticket
-- Parallelized
-- Full SDLC loop
-- Strict commit rules
+- Ticket by ticket (via `python3 .github/tickets.py --sync` + `--status`)
+- Two-commit protocol enforced: CLAIM commit (ticket JSON only) + WORK commit (code + summary + advance)
+- Parallelized across operators/machines with push-based distributed locking
+- Full SDLC loop through stage directories
+- Agent summary handoff via `.github/agent-output/{AgentName}/{ticket-id}.md`
+- Strict scoped git rules (explicit staging only, no `git add .`)
 - Memory updates
 - Observability updates
 
@@ -220,12 +238,12 @@ Resume after plan approved.
 2. Reconstructed PRD
 3. Target architecture
 4. Gap analysis
-5. Ticket tree
+5. Ticket tree (ticket JSON in `.github/tickets/`, state in `.github/ticket-state/`)
 6. Stabilization completion
 7. Updated README
 8. Clean CI pipeline
 9. Security baseline
-10. Resume normal orchestration
+10. Resume normal distributed orchestration
 
 System must transition from:
 
@@ -233,7 +251,10 @@ Unstructured vibecoded chaos
 
 to
 
-Governed, ticket-driven, production-grade engineering system.
+Governed, ticket-driven, distributed, production-grade engineering system.
+
+Use `python3 .github/tickets.py --status` to verify system health.
+Use `python3 .github/tickets.py --validate` for integrity checks.
 
 Do not skip reconstruction.
 Do not jump to coding.

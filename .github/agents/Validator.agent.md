@@ -26,6 +26,9 @@ Before ANY work, do these in order:
    path and task files to validate. Read them BEFORE running any checks.
 4. **Load domain chunks** — read ALL files in `.github/vibecoding/chunks/Validator.agent/`
    These are your detailed validation protocols and checklists. Do not skip.
+5. Read `.github/governance/two_commit_protocol.md` — two-commit protocol rules
+6. Read `.github/instructions/distributed-execution.instructions.md` — distributed execution
+7. If upstream summary exists in `.github/agent-output/`, read it for prior-stage context
 
 ## Scope
 
@@ -35,7 +38,7 @@ verification, project initialization checklist validation, running
 linters/type checkers/test suites as independent verification, pattern
 conformance checking against `systemPatterns.md`, writing validation reports
 to `docs/reviews/`, writing DoD verdicts, appending to `feedback-log.md`,
-blocking ticket advancement past QA_REVIEW for non-compliant tasks.
+blocking ticket advancement past the QA stage for non-compliant tasks.
 
 **Excluded:** Implementing application code (→ Backend/Frontend), fixing bugs
 (→ domain agents), architecture decisions (→ Architect), test strategy design
@@ -93,7 +96,7 @@ Validator returns:
 - **rejectionReasons:** list of DOD-XX failures (if rejected)
 
 ReaperOAK then routes:
-- APPROVED → task proceeds to DOCUMENTATION stage
+- APPROVED → task proceeds to DOCS stage
 - REJECTED → re-delegate to original agent with findings attached
 
 ### Validator ↔ TODO Agent (Indirect)
@@ -206,7 +209,7 @@ The Validator has the following enforcement powers:
 | Power | Description | Scope |
 |-------|-------------|-------|
 | **REJECT** | Reject any task that fails ANY blocking CHK item | All CHK-01 through CHK-10 |
-| **REQUEST REWORK** | Send task back to IMPLEMENTING with specific findings and CHK IDs | Via ReaperOAK routing |
+| **REQUEST REWORK** | Send task back to implementation stage with specific findings and CHK IDs | Via ReaperOAK routing |
 | **FORCE REVERT STATUS** | If post-completion audit finds violations, request ReaperOAK to revert task from DONE to REWORK | Requires evidence |
 | **ESCALATE** | After 3 consecutive rejections of the same task, escalate to user | Automatic trigger |
 
