@@ -5,7 +5,7 @@
 An adaptive, event-driven, elastic multi-worker orchestration system that
 simulates a professional engineering organization — not a code generator.
 
-Version 8.1.0 | Built on GitHub Copilot Agent Infrastructure
+Version 9.1.0 | Built on GitHub Copilot Agent Infrastructure
 
 ---
 
@@ -25,7 +25,7 @@ It is a programmable engineering organization that operates as an elastic,
 event-driven agency engine. It decomposes work into tickets, assigns them to
 specialized workers from auto-scaling pools, enforces a strict 9-state SDLC
 lifecycle per ticket, runs strategic planning concurrently with execution,
-and produces clean, atomic commits — one per ticket, every time.
+and enforces distributed two-commit execution (CLAIM + WORK) with scoped git.
 
 The result is not generated code. It is governed, reviewable, production-grade
 engineering output with full audit trails.
@@ -236,16 +236,14 @@ READY --> LOCKED --> IMPLEMENTING --> QA_REVIEW --> VALIDATION --> DOCUMENTATION
 | VALIDATION | Both QA and Validator passed |
 | DOCUMENTATION | Documentation Specialist updates relevant artifacts |
 | CI_REVIEW | CI Reviewer checks lint, types, complexity |
-| COMMIT | ReaperOAK enforces atomic `git commit -m "[TICKET-ID] description"` |
+| COMMIT | ReaperOAK enforces two-commit protocol with scoped staging and ticket-prefixed messages |
 | DONE | Full lifecycle complete, worker released |
 
 ### Enforcement Rules
 
 - **No skipping.** Guard conditions enforce every transition.
-- **Commit required.** No ticket reaches DONE without an atomic git commit
-  containing only that ticket's changes.
-- **Atomic changes.** Each commit corresponds to exactly one ticket. No
-  multi-ticket commits. No squashing across tickets.
+- **Two-commit required.** Each stage requires CLAIM commit then WORK commit.
+- **Scoped changes only.** Commits must stage explicit ticket files only.
 - **Ticket isolation.** A worker that modifies files outside its declared
   scope is rejected at QA_REVIEW.
 - **Shared rework counter.** QA rejections, Validator rejections, and CI
@@ -381,6 +379,9 @@ autonomous delivery.
 .github/
   agents/                  14 agent definitions (*.agent.md) with YAML frontmatter
                            Includes role, tools, permissions, forbidden actions
+  tickets/                 Ticket JSON files + schema (`ticket-schema.json`)
+  ticket-state/            File-based state machine directories (READY..DONE)
+  agent-output/            Stage handoff summaries (`{Agent}/{ticket-id}.md`)
   memory-bank/             Persistent shared state (9 files + schema)
                            activeContext, progress, decisionLog, riskRegister,
                            systemPatterns, productContext, workflow-state,
@@ -398,6 +399,8 @@ autonomous delivery.
   workflows/               CI: task runner, sandbox merge, memory verify,
                            code review, doc sync, security scan, test validation
   hooks/                   Governance audit, session logger, auto-commit
+  tickets.py               Distributed ticket state manager (`--sync --claim --advance`)
+  agent-runner.py          Two-commit stage runner (CLAIM commit + WORK commit)
   proposals/               Self-improvement proposals (PROP-*.md)
   locks/                   File lock schema for concurrent access
   archives/                Historical orchestration artifacts
@@ -449,7 +452,7 @@ T+0:03   Parallel dispatch -- 5 simultaneous worker spawns:
 
 T+20:00  BE-011 completes -> enters post-execution chain
          QA PASS -> Validator APPROVED -> Docs updated -> CI PASS
-         git commit -m "[BE-011] Implement auth middleware"
+         CLAIM + WORK commits complete
          BE-011 -> DONE. Worker terminated.
 
 T+22:00  BE-010 triggers NEEDS_INPUT_FROM (Architect).
@@ -457,22 +460,22 @@ T+22:00  BE-010 triggers NEEDS_INPUT_FROM (Architect).
          All other tickets continue unaffected.
 
 T+25:00  FE-001 completes -> full chain -> DONE
-         git commit -m "[FE-001] Implement login form"
+         CLAIM + WORK commits complete
 
 T+28:00  Architect responds. BE-010 resumes.
 
 T+33:00  BE-010 completes -> full chain -> DONE
-         git commit -m "[BE-010] Implement user API endpoint"
+         CLAIM + WORK commits complete
 
 T+35:00  DO-003 completes -> full chain -> DONE
-         git commit -m "[DO-003] Configure Docker staging env"
+         CLAIM + WORK commits complete
 
 T+40:00  FE-002 completes -> full chain -> DONE
-         git commit -m "[FE-002] Implement dashboard sidebar"
+         CLAIM + WORK commits complete
 
 T+40:01  All pools at 0 active. System idle.
 
-Commit history: 5 clean, atomic, isolated commits.
+Commit history: scoped CLAIM/WORK commit pairs with full traceability.
 ```
 
 Each ticket progressed independently. The strategic pause on BE-010 affected
@@ -605,7 +608,7 @@ cat .github/guardian/STOP_ALL
    `minSize` and `maxSize` per role based on your workload profile.
 
 3. **Git Provider.** Ensure Git is configured for the target repository.
-   ReaperOAK enforces atomic commits per ticket — write access is required.
+  ReaperOAK enforces two-commit protocol per stage with explicit scoped staging.
 
 4. **Optional Integrations.** Connect Stitch MCP for UI design, Playwright
    for E2E testing, Sentry for monitoring, MongoDB for data operations,
@@ -624,7 +627,7 @@ From there, provide a project vision or feature request. ReaperOAK will:
 2. Evaluate ticket dependencies and build the execution DAG
 3. Assign workers from elastic pools to conflict-free READY tickets
 4. Drive each ticket through the 9-state lifecycle
-5. Produce clean, atomic commits with full audit trails
+5. Produce scoped CLAIM/WORK commits with full audit trails
 
 ---
 

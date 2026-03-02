@@ -29,6 +29,9 @@ Before ANY work, do these in order:
 4. **Load domain chunks** — read ALL files in `.github/vibecoding/chunks/UIDesigner.agent/`
    These are your detailed protocols, Stitch workflow, and design token schema.
    Do not skip.
+5. Read `.github/governance/two_commit_protocol.md` — two-commit protocol rules
+6. Read `.github/instructions/distributed-execution.instructions.md` — distributed execution
+7. If upstream summary exists in `.github/agent-output/`, read it for prior-stage context
 
 ## Scope
 
@@ -95,7 +98,7 @@ exist at `docs/uiux/mockups/{feature-name}/`:
    Stitch's export API to download all screen images as PNGs
 2. **Directory Convention:** `docs/uiux/mockups/{feature-name}/` where
    `{feature-name}` is the kebab-case feature identifier from the TODO task
-3. **Blocking Gate:** UIDesigner task status may NOT advance past IMPLEMENTING
+3. **Blocking Gate:** UIDesigner task status may NOT advance past FRONTEND
    until all 5 artifact types exist on disk
 4. **Frontend Dependency:** Frontend tasks with `UI Touching: yes` are BLOCKED
    until all artifacts exist at the expected path — verified by ReaperOAK

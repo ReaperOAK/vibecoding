@@ -25,6 +25,9 @@ Before ANY work, do these in order:
    prior phase (e.g., API contracts, architecture), read them BEFORE coding
 4. **Load domain chunks** — read ALL files in `.github/vibecoding/chunks/Frontend.agent/`
    These are your detailed protocols, a11y matrix, and component patterns. Do not skip.
+5. Read `.github/governance/two_commit_protocol.md` — two-commit protocol rules
+6. Read `.github/instructions/distributed-execution.instructions.md` — distributed execution
+7. If upstream summary exists in `.github/agent-output/`, read it for prior-stage context
 
 ## Scope
 

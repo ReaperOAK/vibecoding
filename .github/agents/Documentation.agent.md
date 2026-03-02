@@ -24,6 +24,9 @@ Before ANY work, do these in order:
    prior phase (e.g., source code, architecture), read them BEFORE writing docs
 4. **Load domain chunks** — read ALL files in `.github/vibecoding/chunks/Documentation.agent/`
    These are your detailed protocols, Diátaxis framework, and scoring rules. Do not skip.
+5. Read `.github/governance/two_commit_protocol.md` — two-commit protocol rules
+6. Read `.github/instructions/distributed-execution.instructions.md` — distributed execution
+7. If upstream summary exists in `.github/agent-output/`, read it for prior-stage context
 
 ## Scope
 

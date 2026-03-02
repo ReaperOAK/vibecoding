@@ -31,22 +31,22 @@ If missing → fall through to 1b for full state scan.
 **1b.** Full state scan (only if no RESUME_POINT.md):
 
 ```
-read_file(".github/memory-bank/workflow-state.json")
 read_file(".github/memory-bank/activeContext.md")
 read_file(".github/memory-bank/progress.md")
 read_file(".github/memory-bank/decisionLog.md")
 read_file(".github/memory-bank/riskRegister.md")
+run_in_terminal("python3 .github/tickets.py --status --json")
 ```
 
 **1c.** Get current ticket landscape:
 
 ```bash
-python3 todo_visual.py --ready --json
+python3 .github/tickets.py --status --json
 ```
 
-**1d.** Detect anomalies — scan `workflow-state.json` for:
+**1d.** Detect anomalies — scan `.github/ticket-state/*` + `.github/tickets/*.json` for:
 
-- Tickets stuck in: IMPLEMENTING, QA_REVIEW, VALIDATION, DOCUMENTATION, CI_REVIEW
+- Tickets stuck in: BACKEND, FRONTEND, QA, SECURITY, CI, DOCS, VALIDATION
   (these need SDLC chain completion in Step 2)
 - Tickets in BLOCKED state (check if blocker is now resolved)
 - Tickets in REWORK with `rework_count >= 3` (need escalation)
@@ -78,14 +78,13 @@ appropriate agents to complete the chain. Use EXACT agent names below.
 
 | Current State | Agent Calls Needed |
 |---------------|-------------------|
-| IMPLEMENTING (stalled) | Roll back to READY — reassign in Step 3 |
-| QA_REVIEW (QA not run) | `runSubagent("QA Engineer", ...)` → then Validator → Doc → CI → Commit |
-| QA_REVIEW (Validator not run) | `runSubagent("Validator", ...)` → then Doc → CI → Commit |
-| VALIDATION | `runSubagent("Documentation Specialist", ...)` → then CI → Commit |
-| DOCUMENTATION | `runSubagent("CI Reviewer", ...)` → then Commit |
-| CI_REVIEW | Commit only: `git add {files} && git commit -m "[{TICKET-ID}] ..."` |
+| BACKEND / FRONTEND / ARCHITECT / RESEARCH (stalled) | Roll back to READY — reassign in Step 3 |
+| QA | `runSubagent("QA Engineer", ...)` → then Validator → Doc → CI |
+| VALIDATION | `runSubagent("Documentation Specialist", ...)` → then CI |
+| DOCS | `runSubagent("CI Reviewer", ...)` |
+| CI | Validator commit gate (explicit scoped staging only) |
 
-**Example: Ticket stuck at QA_REVIEW (Validator not yet run):**
+**Example: Ticket stuck at QA (Validator not yet run):**
 
 ```
 runSubagent("Validator", prompt="
@@ -128,8 +127,8 @@ runSubagent("Validator", prompt="Retroactive DoD check for ticket {TICKET-ID}...
 runSubagent("Documentation Specialist", prompt="Retroactive doc update for ticket {TICKET-ID}...")
 
 # Missing commit
-git add {declared_file_paths} CHANGELOG.md
-git commit -m "[{TICKET-ID}] description"
+git add {declared_file_paths}
+git commit -m "[{TICKET-ID}] WORK complete"
 ```
 
 Run all independent cleanup calls **in parallel** — tickets that don't
@@ -142,12 +141,12 @@ share file paths can be processed simultaneously.
 **3a.** Get READY tickets:
 
 ```bash
-python3 todo_visual.py --ready --json
+python3 .github/tickets.py --status --json
 ```
 
 **3b.** Filter and sort:
 
-1. Exclude BLOCKED tickets (check `blocker_reason` in workflow-state.json)
+1. Exclude BLOCKED tickets (check blocker fields in `.github/tickets/{ticket-id}.json`)
 2. Exclude tickets already in review stages (being handled by Step 2)
 3. Sort by priority: P0 first, then P1, P2, etc.
 4. Check file conflicts: no two tickets may modify the same file simultaneously
@@ -212,7 +211,7 @@ runSubagent("Frontend Engineer", prompt="
 | Task Decomposition | `"TODO"` |
 
 Launch ALL conflict-free tickets simultaneously.
-One ticket → one worker → one lifecycle → one commit.
+One ticket → one worker → one lifecycle → two commits (CLAIM then WORK).
 
 ---
 
@@ -223,6 +222,9 @@ For each dispatched ticket, enforce the full 9-state lifecycle:
 ```
 READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → COMMIT → DONE
 ```
+
+Distributed mapping reminder: stage directories map as
+`BACKEND|FRONTEND|ARCHITECT|RESEARCH -> IMPLEMENTING`, `QA -> QA_REVIEW`, `DOCS -> DOCUMENTATION`, `CI -> CI_REVIEW`.
 
 After the implementing worker emits TASK_COMPLETED, run the mandatory
 post-execution chain using these exact calls:
@@ -254,8 +256,8 @@ runSubagent("CI Reviewer", prompt="
 ")
 
 # Step 5: Commit (ReaperOAK executes directly)
-git add {declared_file_paths} CHANGELOG.md
-git commit -m "[{TICKET-ID}] description"
+git add {declared_file_paths}
+git commit -m "[{TICKET-ID}] WORK complete"
 ```
 
 **On rejection at any step:**

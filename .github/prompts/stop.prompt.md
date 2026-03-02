@@ -24,8 +24,8 @@ Immediate actions:
 
 # STEP 2 — DRAIN ACTIVE TICKETS
 
-Read `.github/memory-bank/workflow-state.json` to find all non-terminal tickets.
-Run `python3 todo_visual.py --ready --json` to see full ticket landscape.
+Read `.github/ticket-state/*` + `.github/tickets/*.json` to find all non-terminal tickets.
+Run `python3 .github/tickets.py --status --json` to see full ticket landscape.
 
 For each ticket past READY, complete its remaining SDLC chain using the
 exact `runSubagent` calls below. Do NOT skip any stage.
@@ -42,12 +42,12 @@ runSubagent("Documentation Specialist", prompt="Update docs for ticket {TICKET-I
 runSubagent("CI Reviewer", prompt="Check lint, types, complexity for ticket {TICKET-ID}...")
 ```
 
-3. Commit: `git add {declared file_paths} CHANGELOG.md && git commit -m "[{TICKET-ID}] description"`
+3. Commit: `git add {declared file_paths} && git commit -m "[{TICKET-ID}] WORK complete"`
 
-**If in QA_REVIEW:** Run from Validator onward.
+**If in QA:** Run from Validator onward.
 **If in VALIDATION:** Run from Documentation Specialist onward.
-**If in DOCUMENTATION:** Run from CI Reviewer onward.
-**If in CI_REVIEW:** Commit only.
+**If in DOCS:** Run from CI Reviewer onward.
+**If in CI:** Commit only.
 
 Each ticket must end in DONE or be explicitly set to READY/BLOCKED.
 No ticket may remain in an intermediate state.
@@ -58,9 +58,9 @@ No ticket may remain in an intermediate state.
 
 Use `read_file` to scan ticket files in `TODO/tasks/`:
 
-1. Any ticket stuck in LOCKED/IMPLEMENTING/QA_REVIEW/VALIDATION/DOCUMENTATION/CI_REVIEW
+1. Any ticket stuck in LOCKED/IMPLEMENTING/QA/VALIDATION/DOCS/CI
    that was NOT drained in Step 2 → set to READY (if safe) or BLOCKED (if invalid).
-2. Update `workflow-state.json` with final states for all tickets.
+2. Update ticket state copies under `.github/ticket-state/<STAGE>/` and master metadata under `.github/tickets/`.
 3. Verify no circular dependencies in the DAG.
 4. Verify no dangling locks remain.
 
@@ -84,7 +84,6 @@ Use `read_file` then `replace_string_in_file` or append to update each file:
 | `.github/memory-bank/progress.md` | Append: tickets completed this session, completion percentage |
 | `.github/memory-bank/decisionLog.md` | Append: session decisions and trade-offs (ReaperOAK only) |
 | `.github/memory-bank/riskRegister.md` | Append: new risks identified, resolved risks |
-| `.github/memory-bank/workflow-state.json` | Overwrite: reflect final ticket states from Step 3 |
 | `.github/memory-bank/artifacts-manifest.json` | Verify: all DONE ticket artifacts have SHA-256 hashes |
 | `.github/memory-bank/feedback-log.md` | Append: QA/Validator/CI feedback from this session |
 
@@ -184,7 +183,7 @@ git diff --name-only HEAD~5 | xargs grep -l 'TODO\|FIXME\|HACK\|XXX' 2>/dev/null
 ```
 
 Checklist:
-- [ ] No ticket skipped commit (cross-check workflow-state.json DONE tickets vs git log)
+- [ ] No ticket skipped commit (cross-check `.github/ticket-state/DONE/` tickets vs git log)
 - [ ] No ticket skipped Validator (check feedback-log.md for Validator entries per DONE ticket)
 - [ ] No ticket skipped documentation (check feedback-log.md for Doc entries per DONE ticket)
 - [ ] No unresolved PROTOCOL_VIOLATION events
@@ -204,7 +203,7 @@ If any violation found:
 
 # STEP 8 — CLEAN RESUME MARKER
 
-Run: `python3 todo_visual.py --ready --json` to get current READY tickets.
+Run: `python3 .github/tickets.py --status --json` to get current READY tickets.
 Read `.github/memory-bank/riskRegister.md` for open risks.
 
 Use `create_file` to generate:

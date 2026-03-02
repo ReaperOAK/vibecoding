@@ -21,8 +21,13 @@ If unresolved conflict remains: STOP and emit `NEEDS_INPUT_FROM: ReaperOAK`.
 4. Read `.github/memory-bank/productContext.md`
 5. Read `.github/guardian/STOP_ALL`
 6. Read `.github/instructions/core_governance.instructions.md`
-7. Read all files in `.github/vibecoding/chunks/{YourAgent}.agent/`
-8. Read `.github/vibecoding/catalog.yml`; load task-relevant chunks
+7. Read `.github/governance/two_commit_protocol.md`
+8. Read `.github/instructions/distributed-execution.instructions.md`
+9. Read all files in `.github/vibecoding/chunks/{YourAgent}.agent/`
+10. Read `.github/vibecoding/catalog.yml`; load task-relevant chunks
+
+Conditional distributed read:
+- Read upstream summary from `.github/agent-output/{PreviousAgent}/{ticket-id}.md` when present.
 
 Conditional reads:
 - Read `.github/memory-bank/decisionLog.md` only for architecture decisions.
@@ -80,8 +85,9 @@ On failure at any stage:
 
 Use actionable-task query before assignment-sensitive work:
 
-`python3 todo_visual.py --ready`
-`python3 todo_visual.py --ready --json`
+`python3 .github/tickets.py --status`
+`python3 .github/tickets.py --status --json`
+`python3 .github/tickets.py --sync`
 
 Treat returned tasks as only immediately assignable tickets.
 
@@ -119,6 +125,7 @@ Missing memory entry = DRIFT-003.
 - INV-4 Memory Gate: no COMMIT without required memory entry.
 - INV-6 Evidence: `TASK_COMPLETED` must include artifacts, tests, confidence.
 - INV-8 Single-Ticket Scope: cross-ticket work is hard-stop termination.
+- INV-10 Two-Commit: claim commit before work commit for every ticket stage.
 
 ComplianceWorker behavior:
 - Auto-spawn on protocol violation with `auto_repair: true`.
@@ -152,5 +159,9 @@ If same failed approach repeats (>=3 identical attempts), stop retrying and swit
 - `.github/tasks/delegation-packet-schema.json`
 - `.github/tasks/definition-of-done-template.md`
 - `.github/tasks/initialization-checklist-template.md`
+- `.github/governance/two_commit_protocol.md`
+- `.github/instructions/distributed-execution.instructions.md`
+- `.github/tickets.py`
+- `.github/agent-runner.py`
 - `.github/agents/_cross-cutting-protocols.md`
 - `.github/agents/ReaperOAK.agent.md` (OIP canonical)
