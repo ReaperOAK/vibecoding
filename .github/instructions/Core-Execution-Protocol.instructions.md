@@ -42,7 +42,6 @@ Exact sequence:
 4. CI
 5. Documentation
 6. Validator
-7. Commit
 
 Rules:
 - no skip
@@ -51,7 +50,10 @@ Rules:
 - no batch-complete shortcut
 
 Commit authority:
-- only Validator stage may perform commit action
+- only Validator may perform commit action
+
+Security review rule:
+- Security stage is mandatory for every ticket
 
 ## 4) Parallel Dispatch Rule
 

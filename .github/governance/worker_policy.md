@@ -141,7 +141,7 @@ at COMMIT → DONE or on timeout. Lock timeout: **30 minutes**.
 | Failure Mode | State Transition | Recovery Action |
 |--------------|-----------------|----------------|
 | Worker reports failure | IMPLEMENTING → REWORK | Spawn new worker with findings; rework_count++ |
-| QA/Validator rejects | QA_REVIEW → REWORK | Spawn new worker with rejection report; rework_count++ |
+| QA/Security/Validator rejects | QA_REVIEW → REWORK | Spawn new worker with rejection report; rework_count++ |
 | CI Reviewer rejects | CI_REVIEW → REWORK | Spawn new worker with CI findings; rework_count++ |
 | Lock expires (30 min) | LOCKED → READY | Worker terminated; ticket eligible for reassignment |
 | Rework exhausted (> 3) | REWORK → READY | User notified for override or cancellation |

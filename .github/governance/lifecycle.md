@@ -21,7 +21,7 @@ is handled implicitly by the continuous scheduler.
 | **READY** | All dependencies DONE, eligible for assignment | System (auto via dep check) |
 | **LOCKED** | Worker assigned from pool, lock acquired | ReaperOAK |
 | **IMPLEMENTING** | Delegated to worker, work in progress | Assigned Worker |
-| **QA_REVIEW** | Implementation done, QA + Validator reviewing | QA Engineer + Validator |
+| **QA_REVIEW** | Implementation done, QA + Security + Validator reviewing | QA Engineer + Security Engineer + Validator |
 | **VALIDATION** | QA and Validator both passed | Validator (confirmation) |
 | **DOCUMENTATION** | Docs being updated by Documentation Specialist | Documentation Specialist |
 | **CI_REVIEW** | Documentation done, CI Reviewer checking lint/types/complexity | CI Reviewer |
@@ -42,8 +42,8 @@ See §3 for REWORK semantics.
 | LOCKED | READY | Lock timeout (30 min) | Timer expired — auto-release, worker returned to pool |
 | IMPLEMENTING | QA_REVIEW | Worker emits TASK_COMPLETED | Evidence provided (artifact paths, test results) |
 | IMPLEMENTING | REWORK | Worker emits TASK_FAILED | Error evidence provided |
-| QA_REVIEW | VALIDATION | QA PASS + Validator APPROVED | QA test review PASS, Validator DoD verdict = APPROVED |
-| QA_REVIEW | REWORK | QA or Validator rejects | QA FAIL or verdict = REJECTED, rework_count < 3 |
+| QA_REVIEW | VALIDATION | QA PASS + Security PASS + Validator APPROVED | QA test review PASS, Security review PASS, Validator DoD verdict = APPROVED |
+| QA_REVIEW | REWORK | QA or Security or Validator rejects | QA FAIL or Security FAIL or verdict = REJECTED, rework_count < 3 |
 | VALIDATION | DOCUMENTATION | Validation confirmed | Validator confirmation recorded |
 | DOCUMENTATION | CI_REVIEW | Doc update confirmed | Documentation Specialist confirms artifact updates |
 | CI_REVIEW | COMMIT | CI Reviewer PASS | Lint, types, complexity all pass **AND** memoryGate(ticket) == PASS |
@@ -64,6 +64,7 @@ recovery path.
 
 A single `rework_count` counter tracks ALL combined rejections:
 - QA Engineer rejection at QA_REVIEW → rework_count++
+- Security Engineer rejection at QA_REVIEW → rework_count++
 - Validator rejection at QA_REVIEW → rework_count++
 - CI Reviewer rejection at CI_REVIEW → rework_count++
 
@@ -165,10 +166,11 @@ No shortcuts. No skipping.
 ```
 IMPLEMENTING → (worker emits TASK_COMPLETED)
   → QA_REVIEW: QA Engineer reviews (coverage ≥ 80%) → PASS/REJECT
+  → QA_REVIEW: Security Engineer reviews ticket-level risks → PASS/REJECT
   → VALIDATION: Validator checks DoD (10 items) → APPROVED/REJECTED
   → DOCUMENTATION: Documentation Specialist updates artifacts → confirms
   → CI_REVIEW: CI Reviewer checks lint/types/complexity → PASS/REJECT
-  → COMMIT: ReaperOAK enforces `git commit -m "[TICKET-ID] desc"` → success/fail
+  → COMMIT: Validator enforces `git commit -m "[TICKET-ID] desc"` → success/fail
   → DONE
 ```
 
@@ -179,10 +181,11 @@ If ANY step rejects → REWORK → back to IMPLEMENTING with rejection report.
 | Step | State | Agent | Action | Failure Path |
 |------|-------|-------|--------|-------------|
 | 1 | QA_REVIEW | QA Engineer | Test completeness review, coverage check (≥80%) | REJECT → REWORK |
-| 2 | QA_REVIEW | Validator | DoD enforcement (all 10 items independently verified) | REJECT → REWORK |
-| 3 | DOCUMENTATION | Documentation Specialist | Artifact update (README, CHANGELOG, API docs) | BLOCK → report to ReaperOAK |
-| 4 | CI_REVIEW | CI Reviewer | Simulate CI checks (lint, types, complexity) | REJECT → REWORK |
-| 5 | COMMIT | ReaperOAK | Commit enforcement (`git commit` with ticket ID) | FAIL → retry once → escalate |
+| 2 | QA_REVIEW | Security Engineer | Ticket-level security verification | REJECT → REWORK |
+| 3 | QA_REVIEW | Validator | DoD enforcement (all 10 items independently verified) | REJECT → REWORK |
+| 4 | DOCUMENTATION | Documentation Specialist | Artifact update (README, CHANGELOG, API docs) | BLOCK → report to ReaperOAK |
+| 5 | CI_REVIEW | CI Reviewer | Simulate CI checks (lint, types, complexity) | REJECT → REWORK |
+| 6 | COMMIT | Validator | Commit enforcement (`git commit` with ticket ID) | FAIL → retry once → escalate |
 
 ### Post-Execution Chain Sequence Diagram
 
@@ -192,6 +195,7 @@ sequenceDiagram
     participant Oak as ReaperOAK
     participant QA as QA Engineer
     participant Val as Validator
+    participant Sec as Security Engineer
     participant Doc as Documentation Specialist
     participant CI as CI Reviewer
 
@@ -203,7 +207,13 @@ sequenceDiagram
         Oak->>W: REWORK with QA findings (rework_count++)
     else QA PASSES
         QA->>Oak: PASS + test report
-        Oak->>Val: QA_REVIEW: DoD verification (10 items)
+        Oak->>Sec: QA_REVIEW: Security verification
+        alt Security REJECTS
+          Sec->>Oak: REJECT + security findings
+          Oak->>W: REWORK with Security findings (rework_count++)
+        else Security PASSES
+          Sec->>Oak: PASS + security report
+          Oak->>Val: QA_REVIEW: DoD verification (10 items)
         alt Validator REJECTS
             Val->>Oak: REJECTED + rejection_reasons[]
             Oak->>W: REWORK with Validator findings (rework_count++)
@@ -220,10 +230,11 @@ sequenceDiagram
             else CI PASSES
                 CI->>Oak: PASS + CI report
                 Note over Oak: CI_REVIEW → COMMIT
-                Oak->>Oak: COMMIT: git commit -m "[TICKET-ID] description"
+                Oak->>Val: COMMIT: Validator runs git commit -m "[TICKET-ID] description"
                 Note over Oak: COMMIT → DONE
             end
         end
+            end
     end
 ```
 
@@ -236,8 +247,8 @@ sequenceDiagram
 ### Retry Budget
 
 The total retry budget across ALL chain steps is **3 combined**:
-- QA rejections (Step 1), Validator rejections (Step 2), and CI Reviewer
-  rejections (Step 4) share a single `rework_count` counter.
+- QA rejections (Step 1), Security rejections (Step 2), Validator rejections (Step 3), and CI Reviewer
+  rejections (Step 5) share a single `rework_count` counter.
 - When `rework_count` reaches 3 → escalate to user for override or
   cancellation.
 - Counter resets to 0 on escalation (ticket returns to READY).

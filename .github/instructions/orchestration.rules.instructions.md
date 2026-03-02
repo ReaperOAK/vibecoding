@@ -13,7 +13,7 @@ Mode: Deterministic, enforcement-first
 ## 0) Rule Priority
 
 Apply first match only:
-1. `.github/core_governance.instructions.md`
+1. `.github/instructions/core_governance.instructions.md`
 2. `.github/governance/*`
 3. this file
 4. delegation packet
@@ -23,24 +23,27 @@ Conflict unresolved => emit `NEEDS_INPUT_FROM` and halt affected task.
 ## 1) Task State Machine (non-skippable)
 
 Canonical states:
-`PENDING -> IN_PROGRESS -> REVIEW -> MERGED`
+`READY -> LOCKED -> IMPLEMENTING -> QA_REVIEW -> Security -> VALIDATION -> DOCUMENTATION -> CI_REVIEW -> COMMIT -> DONE`
 
 Failure/side states:
-`BLOCKED`, `REJECTED`, `FAILED`, `ESCALATED`
+`REWORK`, `BLOCKED`, `ESCALATED`
 
 Allowed transitions only:
-- `PENDING -> IN_PROGRESS` (dependencies satisfied + agent assigned)
-- `IN_PROGRESS -> REVIEW` (deliverable + required evidence)
-- `IN_PROGRESS -> BLOCKED` (external blocker)
-- `IN_PROGRESS -> FAILED` (retry limit hit)
-- `REVIEW -> MERGED` (validation pass)
-- `REVIEW -> REJECTED` (validation fail)
-- `REJECTED -> IN_PROGRESS` (fix delta + retry <= 3)
-- `REJECTED -> FAILED` (retry > 3)
-- `BLOCKED -> PENDING` (blocker resolved)
+- `READY -> LOCKED` (claim + conflict-free + dependency satisfied)
+- `LOCKED -> IMPLEMENTING` (worker started)
+- `IMPLEMENTING -> QA_REVIEW` (implementation evidence present)
+- `QA_REVIEW -> Security` (QA pass)
+- `Security -> VALIDATION` (Security pass)
+- `VALIDATION -> DOCUMENTATION` (Validator pass)
+- `DOCUMENTATION -> CI_REVIEW` (docs updated)
+- `CI_REVIEW -> COMMIT` (CI pass + memory gate pass)
+- `COMMIT -> DONE` (scoped commit success)
+- `IMPLEMENTING|QA_REVIEW|VALIDATION|DOCUMENTATION|CI_REVIEW|COMMIT -> REWORK` (stage rejection/failure)
+- `REWORK -> IMPLEMENTING` (retry <= 3)
+- `REWORK -> ESCALATED` (retry > 3)
+- `BLOCKED -> READY` (blocker resolved)
 - `BLOCKED -> ESCALATED` (cannot unblock autonomously)
-- `FAILED -> ESCALATED` (human intervention required)
-- `ESCALATED -> PENDING` (human resolution provided)
+- `ESCALATED -> READY` (human resolution provided)
 
 Forbidden:
 - any transition not listed above
@@ -194,7 +197,7 @@ Loop signals:
 
 On loop detect:
 1. halt task
-2. mark `FAILED`
+2. mark `REWORK` (or `ESCALATED` if retries exhausted)
 3. emit diagnostics
 4. escalate or re-plan with different strategy
 
