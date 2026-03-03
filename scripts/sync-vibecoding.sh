@@ -72,6 +72,7 @@ if [[ -z "$DRY_RUN" ]]; then
     ! -name 'memory-bank' \
     ! -name 'tickets' \
     ! -name 'ticket-state' \
+    ! -name 'agent-output' \
     ! -name 'copilot-instructions.md' \
     -exec rm -rf {} +
 fi
@@ -85,6 +86,10 @@ for item in *; do
   fi
   if [ "$item" = "tickets" ]; then
     echo "    Skipping tickets/ (project-specific)"
+    continue
+  fi
+   if [ "$item" = "agent-output" ]; then
+    echo "    Skipping agent-output/ (project-specific)"
     continue
   fi
   if [ "$item" = "ticket-state" ]; then
