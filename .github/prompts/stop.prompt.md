@@ -1,6 +1,6 @@
 ---
 name: stop
-description: Structured shutdown protocol. Drains active tickets through their remaining SDLC stages using specialized agents, consolidates memory, and produces resume artifacts for continue.prompt.md.
+description: Structured shutdown protocol. Drains active tickets through remaining SDLC stages, consolidates memory, and produces resume artifacts for continue.prompt.md.
 ---
 
 We are entering SYSTEMATIC SHUTDOWN MODE.
@@ -17,37 +17,39 @@ Immediate actions:
 
 1. Do NOT call `runSubagent` for any new ticket implementation.
 2. Do NOT invoke the TODO Agent for decomposition.
-3. Do NOT accept or process new SDR proposals.
-4. Allow currently active workers to complete their current SDLC stage only.
+3. Allow currently active workers to complete their current SDLC stage only.
 
 ---
 
 # STEP 2 — DRAIN ACTIVE TICKETS
 
-Read `.github/ticket-state/*` + `.github/tickets/*.json` to find all non-terminal tickets.
 Run `python3 .github/tickets.py --status --json` to see full ticket landscape.
 
-For each ticket past READY, complete its remaining SDLC chain using the
-exact `runSubagent` calls below. Do NOT skip any stage.
+For each ticket past READY, complete its remaining SDLC chain.
+Do NOT skip any stage. Use the correct post-implementation chain order:
 
-**If in LOCKED or IMPLEMENTING:**
+**If in BACKEND/FRONTEND/ARCHITECT/RESEARCH (implementing stage):**
 
-1. Let implementing worker finish (or roll back to READY if stalled >30min)
-2. Then run the full post-execution chain:
+1. Let implementing worker finish (or roll back to READY if lease expired >30min).
+2. Then run the full post-implementation chain (strict order):
 
 ```
 runSubagent("QA Engineer", prompt="Review ticket {TICKET-ID}. Run tests, verify coverage ≥80%...")
-runSubagent("Validator", prompt="Verify DoD compliance for ticket {TICKET-ID}. Check all 10 items...")
-runSubagent("Documentation Specialist", prompt="Update docs for ticket {TICKET-ID}...")
+runSubagent("Security Engineer", prompt="Security review for ticket {TICKET-ID}. STRIDE + OWASP scan...")
 runSubagent("CI Reviewer", prompt="Check lint, types, complexity for ticket {TICKET-ID}...")
+runSubagent("Documentation Specialist", prompt="Update docs for ticket {TICKET-ID}...")
+runSubagent("Validator", prompt="Verify DoD compliance for ticket {TICKET-ID}. Check all 10 items...")
 ```
 
-3. Commit: `git add {declared file_paths} && git commit -m "[{TICKET-ID}] WORK complete"`
+**Resume from current stage:**
 
-**If in QA:** Run from Validator onward.
-**If in VALIDATION:** Run from Documentation Specialist onward.
-**If in DOCS:** Run from CI Reviewer onward.
-**If in CI:** Commit only.
+| Current Stage | Run from |
+|---------------|----------|
+| QA | Security → CI → Docs → Validator |
+| SECURITY | CI → Docs → Validator |
+| CI | Docs → Validator |
+| DOCS | Validator |
+| VALIDATION | Already at final review — complete Validator |
 
 Each ticket must end in DONE or be explicitly set to READY/BLOCKED.
 No ticket may remain in an intermediate state.
@@ -56,27 +58,24 @@ No ticket may remain in an intermediate state.
 
 # STEP 3 — RECONCILE TICKET STATES
 
-Use `read_file` to scan ticket files in `TODO/tasks/`:
-
-1. Any ticket stuck in LOCKED/IMPLEMENTING/QA/VALIDATION/DOCS/CI
-   that was NOT drained in Step 2 → set to READY (if safe) or BLOCKED (if invalid).
-2. Update ticket state copies under `.github/ticket-state/<STAGE>/` and master metadata under `.github/tickets/`.
-3. Verify no circular dependencies in the DAG.
-4. Verify no dangling locks remain.
+1. Run `python3 .github/tickets.py --sync` to release expired claims and fix state.
+2. Any ticket stuck in an intermediate stage that was NOT drained in Step 2:
+   - Set to READY (if safe to re-process) or BLOCKED (if invalid state).
+3. Update ticket state copies under `.github/ticket-state/<STAGE>/` and master metadata under `.github/tickets/`.
+4. Run `python3 .github/tickets.py --validate` to check integrity.
 
 ---
 
-# STEP 4 — LOCK & RESOURCE CLEANUP
+# STEP 4 — LEASE CLEANUP
 
-1. Delete any lock files in `.github/locks/` that reference terminated workers.
-2. Validate remaining locks against `task-lock-schema.json`.
-3. Run `git status` to confirm no unexpected staged/unstaged changes.
+1. Run `python3 .github/tickets.py --release-expired` to clear all stale claims.
+2. Run `git status` to confirm no unexpected staged/unstaged changes.
 
 ---
 
 # STEP 5 — MEMORY CONSOLIDATION
 
-Use `read_file` then `replace_string_in_file` or append to update each file:
+Update memory bank files (append-only, per ownership rules in `core.instructions.md`):
 
 | File | Action |
 |------|--------|
@@ -84,10 +83,9 @@ Use `read_file` then `replace_string_in_file` or append to update each file:
 | `.github/memory-bank/progress.md` | Append: tickets completed this session, completion percentage |
 | `.github/memory-bank/decisionLog.md` | Append: session decisions and trade-offs (ReaperOAK only) |
 | `.github/memory-bank/riskRegister.md` | Append: new risks identified, resolved risks |
-| `.github/memory-bank/artifacts-manifest.json` | Verify: all DONE ticket artifacts have SHA-256 hashes |
 | `.github/memory-bank/feedback-log.md` | Append: QA/Validator/CI feedback from this session |
 
-Then use `create_file` to generate:
+Then generate:
 
 **`.github/memory-bank/SESSION_SUMMARY.md`**
 
@@ -106,9 +104,6 @@ Then use `create_file` to generate:
 ## Tickets In Rework/Escalated
 - {TICKET-ID}: {reason}, rework_count: {n}
 
-## Strategic Decisions
-- {SDR-ID}: {title} — {status}
-
 ## Architecture Changes
 - {description}
 
@@ -122,9 +117,9 @@ Then use `create_file` to generate:
 
 ---
 
-# STEP 6 — OBSERVABILITY SNAPSHOT
+# STEP 6 — SYSTEM SNAPSHOT
 
-Use `create_file` to generate:
+Generate:
 
 **`.github/memory-bank/SYSTEM_SNAPSHOT.json`**
 
@@ -141,41 +136,22 @@ Use `create_file` to generate:
   },
   "session_metrics": {
     "tickets_completed_this_session": 0,
-    "average_sdlc_duration_minutes": 0,
-    "rework_count": 0,
-    "violations_detected": 0
-  },
-  "worker_utilization": {
-    "peak_concurrent_workers": 0,
-    "total_worker_spawns": 0,
-    "class_a_tickets_processed": 0,
-    "class_b_tickets_processed": 0
-  },
-  "governance": {
-    "governance_version": "9.1.0",
-    "ci_status": "passing|failing|unknown",
-    "unresolved_violations": []
-  },
-  "background_audit_results": {
-    "security": "not_run|clean|findings",
-    "architecture": "not_run|aligned|drift",
-    "tech_debt": "not_run|low|medium|high",
-    "coverage": "not_run|sufficient|gaps"
+    "rework_count": 0
   }
 }
 ```
 
 ---
 
-# STEP 7 — GOVERNANCE VERIFICATION
+# STEP 7 — INTEGRITY VERIFICATION
 
-Before final stop, verify ALL of these. Use `run_in_terminal` for commands:
+Before final stop, verify:
 
 ```bash
 # Check for uncommitted changes
 git status --porcelain
 
-# Check for unscoped commits (git add . violations)
+# Check recent commits for scoped staging
 git log --oneline -20
 
 # Verify no TODO/FIXME in recently changed files
@@ -186,27 +162,26 @@ Checklist:
 - [ ] No ticket skipped commit (cross-check `.github/ticket-state/DONE/` tickets vs git log)
 - [ ] No ticket skipped Validator (check feedback-log.md for Validator entries per DONE ticket)
 - [ ] No ticket skipped documentation (check feedback-log.md for Doc entries per DONE ticket)
-- [ ] No unresolved PROTOCOL_VIOLATION events
 - [ ] No `git add .` in recent commits
 - [ ] No uncommitted changes (`git status --porcelain` is empty)
-- [ ] CI passing (check last workflow run)
 
-If any violation found:
-- Spawn the appropriate agent to fix it:
-  - Missing QA → `runSubagent("QA Engineer", ...)`
-  - Missing validation → `runSubagent("Validator", ...)`
-  - Missing docs → `runSubagent("Documentation Specialist", ...)`
-  - Missing commit → execute scoped `git add` + `git commit`
-- Then re-verify.
+If any violation found, spawn the appropriate agent to fix it:
+- Missing QA → `runSubagent("QA Engineer", ...)`
+- Missing Security → `runSubagent("Security Engineer", ...)`
+- Missing CI → `runSubagent("CI Reviewer", ...)`
+- Missing docs → `runSubagent("Documentation Specialist", ...)`
+- Missing validation → `runSubagent("Validator", ...)`
+
+Then re-verify.
 
 ---
 
-# STEP 8 — CLEAN RESUME MARKER
+# STEP 8 — RESUME MARKER
 
-Run: `python3 .github/tickets.py --status --json` to get current READY tickets.
+Run: `python3 .github/tickets.py --status --json` to get current state.
 Read `.github/memory-bank/riskRegister.md` for open risks.
 
-Use `create_file` to generate:
+Generate:
 
 **`.github/memory-bank/RESUME_POINT.md`**
 
@@ -216,14 +191,8 @@ Use `create_file` to generate:
 ## Last Completed Ticket
 {TICKET-ID}
 
-## Roadmap Version
-v{X.Y}
-
 ## Branch
 {current branch from `git branch --show-current`}
-
-## GOVERNANCE_VERSION
-9.1.0
 
 ## Ticket Statistics
 - Total: {n}
@@ -235,14 +204,9 @@ v{X.Y}
 1. {TICKET-ID}: {title} (P{n}, owner: {role})
 2. {TICKET-ID}: {title} (P{n}, owner: {role})
 3. {TICKET-ID}: {title} (P{n}, owner: {role})
-4. {TICKET-ID}: {title} (P{n}, owner: {role})
-5. {TICKET-ID}: {title} (P{n}, owner: {role})
 
 ## Known Risks
 - {risk from riskRegister.md}
-
-## Active SDRs
-- {SDR-ID}: {title} — {status}
 
 ## Session Artifacts
 - `.github/memory-bank/SESSION_SUMMARY.md`
@@ -260,10 +224,10 @@ This file is consumed by `continue.prompt.md` Step 1.
 Verify final state:
 - No active workers (no pending `runSubagent` calls)
 - No partial SDLC tickets (all DONE, READY, or BLOCKED)
-- No dangling locks (`.github/locks/` clean)
+- No expired leases (run `--release-expired`)
 - Clean git state (`git status --porcelain` empty)
 - Memory bank updated (Step 5 complete)
-- Observability snapshot written (Step 6 complete)
+- System snapshot written (Step 6 complete)
 - Resume point created (Step 8 complete)
 
 Then report to user:
