@@ -529,6 +529,9 @@ def main():
     parser.add_argument("--list-ready", action="store_true", help="List all READY tickets")
     parser.add_argument("--list-claimable", action="store_true", help="List tickets claimable by agent")
     parser.add_argument("--claim-only", action="store_true", help="Only execute claim (Commit 1)")
+    parser.add_argument("--complete", metavar="TICKET_ID", help="Execute work commit (Commit 2) for a claimed ticket")
+    parser.add_argument("--modified-files", nargs="*", default=[], help="Files modified during work (for --complete)")
+    parser.add_argument("--summary-file", help="Path to summary .md file (for --complete; auto-detected if omitted)")
 
     args = parser.parse_args()
     machine_id = args.machine or get_machine_id()
@@ -548,6 +551,64 @@ def main():
         parser.print_help()
         print("\nERROR: --agent and --operator are required for claim/work operations")
         sys.exit(1)
+
+    # Handle --complete (Commit 2 — work phase)
+    if args.complete:
+        ticket_id = args.complete
+
+        # Determine modified files: from --modified-files or auto-detect from git diff
+        modified_files = list(args.modified_files)
+        if not modified_files:
+            try:
+                result = run_git("diff", "--name-only", "HEAD")
+                auto_files = [f.strip() for f in result.stdout.strip().split("\n") if f.strip()]
+                # Filter out ticket JSON and summary files — those are handled by execute_work_commit
+                modified_files = [
+                    f for f in auto_files
+                    if not f.startswith(".github/ticket-state/")
+                    and not f.startswith(".github/tickets/")
+                    and not f.startswith(".github/agent-output/")
+                ]
+                if modified_files:
+                    print(f"Auto-detected modified files: {modified_files}")
+            except subprocess.CalledProcessError:
+                pass
+
+        # Determine summary content
+        summary_content = None
+        if args.summary_file:
+            summary_path = Path(args.summary_file)
+            if summary_path.exists():
+                summary_content = summary_path.read_text(encoding="utf-8")
+            else:
+                print(f"ERROR: Summary file not found: {args.summary_file}")
+                sys.exit(1)
+        else:
+            # Auto-detect from expected location
+            expected = AGENT_OUTPUT_DIR / args.agent / f"{ticket_id}.md"
+            if expected.exists():
+                summary_content = expected.read_text(encoding="utf-8")
+                print(f"Using existing summary: {expected.relative_to(REPO_ROOT)}")
+            else:
+                # Generate a minimal summary
+                summary_content = (
+                    f"# {ticket_id} — {args.agent} Stage Summary\n\n"
+                    f"**Agent:** {args.agent}\n"
+                    f"**Machine:** {machine_id}\n"
+                    f"**Operator:** {args.operator}\n"
+                    f"**Timestamp:** {now_iso()}\n\n"
+                    f"## Artifacts\n\n"
+                    + "\n".join(f"- {f}" for f in modified_files) + "\n\n"
+                    f"## Status\n\nStage completed.\n"
+                )
+                print("Generated minimal summary (no summary file found)")
+
+        if not execute_work_commit(
+            ticket_id, args.agent, machine_id, args.operator,
+            modified_files, summary_content,
+        ):
+            sys.exit(1)
+        sys.exit(0)
 
     # Find a ticket to claim
     if args.ticket:
@@ -601,7 +662,10 @@ def main():
     if prev_summary_path:
         print(f"Prev Summary: {prev_summary_path.relative_to(REPO_ROOT)}")
     print(f"\nPerform agent work now. When done, run:")
-    print(f"  python .github/agent-runner.py --complete {ticket_id} --agent {args.agent}")
+    print(f"  python .github/agent-runner.py --complete {ticket_id} --agent {args.agent} --operator {args.operator}")
+    print(f"\n  Optional flags:")
+    print(f"    --modified-files src/file1.ts src/file2.ts   (auto-detected from git diff if omitted)")
+    print(f"    --summary-file .github/agent-output/{args.agent}/{ticket_id}.md")
     print(f"{'='*60}")
 
 
