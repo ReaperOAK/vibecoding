@@ -30,13 +30,11 @@ No other agent may execute this script.
 
 import argparse
 import json
-import os
 import re
-import shutil
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 
 # ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -768,6 +766,70 @@ def print_status() -> None:
     print()
 
 
+def print_status_json() -> None:
+    """Output machine-readable JSON status of all tickets, grouped by stage."""
+    output: dict = {
+        "stages": {},
+        "summary": {
+            "total_master": 0,
+            "total_in_state": 0,
+            "blocked": 0,
+        },
+        "active_claims": [],
+        "errors": [],
+    }
+
+    # Count by stage
+    total_in_state = 0
+    for stage in STAGES:
+        stage_dir = STATE_DIR / stage
+        stage_tickets = []
+        if stage_dir.exists():
+            for f in sorted(stage_dir.glob("*.json")):
+                try:
+                    ticket = load_ticket(f)
+                    stage_tickets.append({
+                        "ticket_id": ticket.get("ticket_id", f.stem),
+                        "title": ticket.get("title", ""),
+                        "type": ticket.get("type", ""),
+                        "priority": ticket.get("priority", "medium"),
+                        "claimed_by": ticket.get("claimed_by"),
+                        "operator": ticket.get("operator"),
+                        "machine_id": ticket.get("machine_id"),
+                        "lease_expiry": ticket.get("lease_expiry"),
+                        "rework_count": ticket.get("rework_count", 0),
+                        "dependencies": ticket.get("dependencies", []),
+                        "sdlc_flow": ticket.get("sdlc_flow", []),
+                        "file_paths": ticket.get("file_paths", []),
+                        "acceptance_criteria": ticket.get("acceptance_criteria", []),
+                    })
+                except (json.JSONDecodeError, KeyError):
+                    pass
+        total_in_state += len(stage_tickets)
+        output["stages"][stage] = stage_tickets
+
+    # Collect active claims
+    for ticket in all_tickets():
+        if ticket.get("claimed_by"):
+            output["active_claims"].append({
+                "ticket_id": ticket["ticket_id"],
+                "claimed_by": ticket["claimed_by"],
+                "operator": ticket.get("operator"),
+                "machine_id": ticket.get("machine_id"),
+                "lease_expiry": ticket.get("lease_expiry"),
+            })
+
+    total_master = len(all_ticket_ids())
+    output["summary"]["total_master"] = total_master
+    output["summary"]["total_in_state"] = total_in_state
+    output["summary"]["blocked"] = total_master - total_in_state
+
+    # Integrity errors
+    output["errors"] = validate_integrity()
+
+    print(json.dumps(output, indent=2, default=str))
+
+
 def print_dot_graph() -> None:
     """Output dependency graph in DOT format for visualization."""
     print("digraph tickets {")
@@ -879,7 +941,10 @@ Examples:
             print(f"  Moved to READY: {', '.join(result['moved_to_ready'])}")
 
     elif args.status:
-        print_status()
+        if args.json:
+            print_status_json()
+        else:
+            print_status()
 
     elif args.claim:
         ticket_id, agent, machine_id, operator = args.claim

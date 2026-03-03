@@ -2,13 +2,15 @@
 # sync-vibecoding.sh — One-way sync from ReaperOAK/vibecoding into this project
 #
 # Syncs:
-#   .github/*  (EXCLUDING memory-bank/ and copilot-instructions.md)
+#   .github/*  (EXCLUDING memory-bank/, tickets/, ticket-state/, and copilot-instructions.md)
 #   agents.md
 #   todo_visual.py
 #
 # Does NOT sync:
 #   README.md (repo-specific)
 #   .github/memory-bank/ (project-specific persistent state)
+#   .github/tickets/ (project-specific ticket definitions)
+#   .github/ticket-state/ (project-specific ticket state machine)
 #   .github/copilot-instructions.md (project-specific Copilot config)
 #
 # Usage:
@@ -61,13 +63,15 @@ for required in .github agents.md todo_visual.py; do
 done
 
 # --- Sync .github/ (excluding memory-bank/) ---
-echo "==> Syncing .github/ (excluding memory-bank/)..."
+echo "==> Syncing .github/ (excluding memory-bank/, tickets/, ticket-state/)..."
 
 if [[ -z "$DRY_RUN" ]]; then
-  # Delete everything in .github/ EXCEPT memory-bank/
+  # Delete everything in .github/ EXCEPT memory-bank/, tickets/, ticket-state/
   # This ensures removed upstream files are also removed locally
   find "$PROJECT_ROOT/.github" -mindepth 1 -maxdepth 1 \
     ! -name 'memory-bank' \
+    ! -name 'tickets' \
+    ! -name 'ticket-state' \
     ! -name 'copilot-instructions.md' \
     -exec rm -rf {} +
 fi
@@ -77,6 +81,14 @@ cd "$SRC/.github"
 for item in *; do
   if [ "$item" = "memory-bank" ]; then
     echo "    Skipping memory-bank/ (project-specific)"
+    continue
+  fi
+  if [ "$item" = "tickets" ]; then
+    echo "    Skipping tickets/ (project-specific)"
+    continue
+  fi
+  if [ "$item" = "ticket-state" ]; then
+    echo "    Skipping ticket-state/ (project-specific)"
     continue
   fi
   if [ "$item" = "copilot-instructions.md" ]; then
@@ -115,8 +127,8 @@ fi
 echo ""
 echo "==> Sync complete!"
 echo "    Source: ReaperOAK/vibecoding@$BRANCH"
-echo "    Preserved: .github/memory-bank/, .github/copilot-instructions.md"
-echo "    Skipped: README.md, copilot-instructions.md"
+echo "    Preserved: .github/memory-bank/, .github/tickets/, .github/ticket-state/, .github/copilot-instructions.md"
+echo "    Skipped: README.md, copilot-instructions.md, tickets/, ticket-state/"
 echo ""
 echo "    Review changes with: git diff --stat"
 echo "    Commit with: git add .github/ agents.md todo_visual.py && git commit -m 'chore: sync vibecoding infrastructure from upstream'"
