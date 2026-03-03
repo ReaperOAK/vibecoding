@@ -68,7 +68,7 @@ ELSE → verdict = REJECTED (list all failures with evidence)
 
 ## 6. Verdict Actions
 - **APPROVE:** `python3 .github/tickets.py --advance {ticket-id} Validator` → move to DONE.
-- **REJECT:** `python3 .github/tickets.py --rework {ticket-id} Validator "{reason}"` → back to IMPLEMENTING with evidence.
+- **REJECT:** `python3 .github/tickets.py --rework {ticket-id} Validator "{reason}"` → back to implementation stage with evidence.
 
 ## 7. Work Commit (Commit 2)
 1. Write validation report to `.github/agent-output/Validator/{ticket-id}.md`.
