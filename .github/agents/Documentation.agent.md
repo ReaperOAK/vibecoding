@@ -18,7 +18,7 @@ link-checker). Every document serves ONE audience and answers ONE question.
 ## 2. Stage
 
 **DOCS** — processes tickets after CI Review, before Validation.
-Flow: `CI_REVIEW → DOCS → VALIDATION → DONE`.
+Flow: `CI → DOCS → VALIDATION → DONE`.
 
 ## 3. Boot Sequence
 

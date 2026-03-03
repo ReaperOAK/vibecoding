@@ -23,7 +23,7 @@ Vibecoding closes that gap.
 
 It is a programmable engineering organization that operates as an elastic,
 event-driven agency engine. It decomposes work into tickets, assigns them to
-specialized workers from auto-scaling pools, enforces a strict 9-state SDLC
+specialized workers from auto-scaling pools, enforces a strict stage-based SDLC
 lifecycle per ticket, runs strategic planning concurrently with execution,
 and enforces distributed two-commit execution (CLAIM + WORK) with scoped git.
 
@@ -74,7 +74,7 @@ messaging.
   with configurable min/max capacity. Pools grow when backlog exceeds active
   workers and shrink when workers idle.
 - **Ticket-based execution.** Every unit of work is a ticket. Every ticket
-  traverses a deterministic 9-state machine. No exceptions.
+  traverses a deterministic stage-based lifecycle. No exceptions.
 - **No global phases.** There is no "planning phase" followed by a "build
   phase." Strategic agents produce artifacts continuously. Execution agents
   consume them as they become available.
@@ -139,13 +139,25 @@ CONFLICT_DETECTED, REWORK_TRIGGERED, STALL_WARNING, and others.
 
 ### Ticket State Machine
 
-Every ticket traverses 9 states in strict order. No state may be skipped.
+Every ticket traverses a defined subset of 11 stages based on its type. No
+stage may be skipped. The flow is enforced by `tickets.py`.
 
 ```
-READY -> LOCKED -> IMPLEMENTING -> QA_REVIEW -> VALIDATION -> DOCUMENTATION -> CI_REVIEW -> COMMIT -> DONE
+Available Stages: READY | ARCHITECT | RESEARCH | BACKEND | FRONTEND | QA | SECURITY | CI | DOCS | VALIDATION | DONE
 ```
 
-REWORK is a side-state (failure path) entered when QA, Validator, or CI
+| Type | Flow |
+|------|------|
+| backend | READY → BACKEND → QA → SECURITY → CI → DOCS → VALIDATION → DONE |
+| frontend | READY → FRONTEND → QA → SECURITY → CI → DOCS → VALIDATION → DONE |
+| fullstack | READY → BACKEND → FRONTEND → QA → SECURITY → CI → DOCS → VALIDATION → DONE |
+| infra | READY → BACKEND → QA → SECURITY → CI → DOCS → VALIDATION → DONE |
+| security | READY → SECURITY → QA → CI → DOCS → VALIDATION → DONE |
+| docs | READY → DOCS → VALIDATION → DONE |
+| research | READY → RESEARCH → DOCS → VALIDATION → DONE |
+| architecture | READY → ARCHITECT → DOCS → VALIDATION → DONE |
+
+REWORK is a side-state (failure path) entered when QA, Security, Validator, or CI
 Reviewer rejects output. Maximum 3 combined rework attempts before escalation
 to the operator.
 
@@ -180,7 +192,7 @@ loop that batches conflict-free tickets and dispatches them simultaneously.
 - **Auto-scaling pools.** Worker count adjusts to backlog size within
   configured bounds.
 - **Independent ticket lifecycles.** Each ticket progresses through the
-  9-state machine at its own pace. There is no synchronization barrier.
+  stage-based lifecycle at its own pace. There is no synchronization barrier.
 - **No artificial batching.** Tickets are dispatched as soon as they are
   ready and a worker is available. No waiting for "all tickets in a phase"
   to complete.
@@ -220,23 +232,26 @@ no state between instances.
 
 ## SDLC Enforcement
 
-Every ticket traverses a mandatory 9-state lifecycle. No state may be skipped.
-No shortcut exists. This is not optional governance — it is the execution model.
+Every ticket traverses a mandatory stage-based lifecycle per its type. No
+stage may be skipped. No shortcut exists. This is not optional governance —
+it is the execution model.
 
 ```
-READY --> LOCKED --> IMPLEMENTING --> QA_REVIEW --> VALIDATION --> DOCUMENTATION --> CI_REVIEW --> COMMIT --> DONE
+Available Stages: READY | ARCHITECT | RESEARCH | BACKEND | FRONTEND | QA | SECURITY | CI | DOCS | VALIDATION | DONE
 ```
 
-| State | Description |
+| Stage | Description |
 |-------|-------------|
 | READY | Dependencies met, eligible for assignment |
-| LOCKED | Worker assigned, lock acquired |
-| IMPLEMENTING | Worker executing the ticket |
-| QA_REVIEW | QA Engineer reviews test coverage (>=80%); Validator checks 10-item Definition of Done |
-| VALIDATION | Both QA and Validator passed |
-| DOCUMENTATION | Documentation Specialist updates relevant artifacts |
-| CI_REVIEW | CI Reviewer checks lint, types, complexity |
-| COMMIT | ReaperOAK enforces two-commit protocol with scoped staging and ticket-prefixed messages |
+| ARCHITECT | Architecture design, ADRs, API contracts |
+| RESEARCH | Evidence-based research, PoC, analysis |
+| BACKEND | Server-side implementation, APIs, business logic |
+| FRONTEND | UI implementation, components, layouts |
+| QA | QA Engineer reviews test coverage (>=80%), functional verification |
+| SECURITY | Security Engineer performs STRIDE + OWASP review |
+| CI | CI Reviewer checks lint, types, complexity |
+| DOCS | Documentation Specialist updates relevant artifacts |
+| VALIDATION | Validator independently verifies 10-item Definition of Done |
 | DONE | Full lifecycle complete, worker released |
 
 ### Enforcement Rules
@@ -245,7 +260,7 @@ READY --> LOCKED --> IMPLEMENTING --> QA_REVIEW --> VALIDATION --> DOCUMENTATION
 - **Two-commit required.** Each stage requires CLAIM commit then WORK commit.
 - **Scoped changes only.** Commits must stage explicit ticket files only.
 - **Ticket isolation.** A worker that modifies files outside its declared
-  scope is rejected at QA_REVIEW.
+  scope is rejected at QA.
 - **Shared rework counter.** QA rejections, Validator rejections, and CI
   rejections share one counter. Three combined failures trigger escalation.
 
@@ -456,7 +471,7 @@ T+20:00  BE-011 completes -> enters post-execution chain
          BE-011 -> DONE. Worker terminated.
 
 T+22:00  BE-010 triggers NEEDS_INPUT_FROM (Architect).
-         BE-010 pauses at IMPLEMENTING. ReaperOAK routes question.
+         BE-010 pauses at BACKEND. ReaperOAK routes question.
          All other tickets continue unaffected.
 
 T+25:00  FE-001 completes -> full chain -> DONE
@@ -626,7 +641,7 @@ From there, provide a project vision or feature request. ReaperOAK will:
 1. Invoke the TODO Agent to decompose work into tickets
 2. Evaluate ticket dependencies and build the execution DAG
 3. Assign workers from elastic pools to conflict-free READY tickets
-4. Drive each ticket through the 9-state lifecycle
+4. Drive each ticket through its stage-based lifecycle
 5. Produce scoped CLAIM/WORK commits with full audit trails
 
 ---

@@ -18,7 +18,7 @@ severity-scored verdicts. Think like an attacker, build like a defender.
 ## 2. Stage
 
 `SECURITY` — processes tickets arriving from the QA stage. On PASS, advances to CI. On FAIL, sends
-the ticket back to IMPLEMENTING via rework.
+the ticket back to its implementation stage via rework.
 
 ## 3. Boot Sequence
 
@@ -98,7 +98,7 @@ For every ticket, perform ALL of the following analyses on modified files:
 1. Write security report to `.github/agent-output/Security/{ticket-id}.md` including: STRIDE model, OWASP checklist, SARIF findings, SBOM summary, verdict.
 2. Delete previous stage summary: `.github/agent-output/QA/{ticket-id}.md`.
 3. If PASS: move ticket to `.github/ticket-state/CI/{ticket-id}.json`.
-4. If FAIL: rework via `tickets.py` (ticket stays in SECURITY or returns to IMPLEMENTING).
+4. If FAIL: rework via `tickets.py` (ticket stays in SECURITY or returns to its implementation stage).
 5. Append memory entry to `.github/memory-bank/activeContext.md`:
    ```
    ### [{ticket-id}] — Security Review

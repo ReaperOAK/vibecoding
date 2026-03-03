@@ -17,10 +17,13 @@ If unresolved conflict remains: STOP and emit NEEDS_INPUT_FROM: ReaperOAK.
 
 1. Read .github/guardian/STOP_ALL — if contains STOP: halt, zero edits
 2. Read .github/instructions/core.instructions.md
-3. Read .github/instructions/git-protocol.instructions.md
-4. Read upstream summary from .github/agent-output/{PreviousAgent}/{ticket-id}.md (if exists)
-5. Read .github/vibecoding/chunks/{YourAgent}.agent/ (all files)
-6. Read .github/vibecoding/catalog.yml; load task-relevant chunks
+3. Read .github/instructions/sdlc.instructions.md
+4. Read .github/instructions/ticket-system.instructions.md
+5. Read .github/instructions/git-protocol.instructions.md
+6. Read .github/instructions/agent-behavior.instructions.md
+7. Read upstream summary from .github/agent-output/{PreviousAgent}/{ticket-id}.md (if exists)
+8. Read .github/vibecoding/chunks/{YourAgent}.agent/ (all files)
+9. Read .github/vibecoding/catalog.yml; load task-relevant chunks
 
 ## 2) Identity Invariants
 
@@ -30,7 +33,13 @@ If unresolved conflict remains: STOP and emit NEEDS_INPUT_FROM: ReaperOAK.
 
 ## 3) Required Lifecycle
 
-READY -> LOCKED -> IMPLEMENTING -> QA_REVIEW -> VALIDATION -> DOCUMENTATION -> CI_REVIEW -> COMMIT -> DONE
+Each ticket type traverses a defined subset of 11 stages:
+
+```
+READY | ARCHITECT | RESEARCH | BACKEND | FRONTEND | QA | SECURITY | CI | DOCS | VALIDATION | DONE
+```
+
+Post-implementation chain (strict order): QA → Security → CI → Docs → Validator.
 
 No skip, no merge, no reorder. Failure at any stage -> REWORK (max 3, then ESCALATED).
 
@@ -40,9 +49,9 @@ No skip, no merge, no reorder. Failure at any stage -> REWORK (max 3, then ESCAL
 - Stage explicit files only
 - Two-commit protocol: CLAIM commit then WORK commit per stage
 
-## 5) Memory Gate (pre-COMMIT)
+## 5) Memory Gate (pre-DONE)
 
-Before COMMIT, entry must exist in .github/memory-bank/activeContext.md:
+Before DONE, entry must exist in .github/memory-bank/activeContext.md:
 
 ### [TICKET-ID] — Summary
 - **Artifacts:** file1.ts, file2.ts

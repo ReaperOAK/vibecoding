@@ -79,9 +79,13 @@ Do NOT inject code context — agents derive context from the filesystem indepen
 
 ## 6. SDLC Flow
 
+Each ticket type traverses a defined subset of 11 stages:
+
 ```
-READY → LOCKED → IMPLEMENTING → QA_REVIEW → VALIDATION → DOCUMENTATION → CI_REVIEW → COMMIT → DONE
+READY | ARCHITECT | RESEARCH | BACKEND | FRONTEND | QA | SECURITY | CI | DOCS | VALIDATION | DONE
 ```
+
+Post-implementation chain (strict order): QA → Security → CI → Docs → Validator.
 
 ReaperOAK does NOT skip stages. ReaperOAK does NOT reorder stages. ReaperOAK does NOT reason about dependencies — `tickets.py` handles all dependency resolution.
 
