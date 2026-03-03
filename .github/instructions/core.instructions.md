@@ -32,7 +32,7 @@ RULE: If file contains `STOP` => zero edits, zero execution, report blocked.
 
 REQUIRED: Before any work, read in order:
 1. `.github/guardian/STOP_ALL`
-2. `.github/instructions/` (all 5 files)
+2. `.github/instructions/` (all 6 files)
 3. `.github/vibecoding/chunks/{YourAgent}.agent/` (all files)
 4. `.github/vibecoding/catalog.yml` (load task-relevant chunks)
 5. Upstream summary from `.github/agent-output/{PreviousAgent}/{ticket-id}.md`

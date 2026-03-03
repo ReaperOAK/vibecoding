@@ -2,7 +2,7 @@
 name: 'Validator'
 description: 'Independent SDLC compliance reviewer. Verifies Definition of Done, runs quality gates, checks pattern conformance, and validates initialization checklists. Cannot implement code — only reads artifacts and writes validation reports. Has authority to reject task completion.'
 user-invokable: false
-tools: [search/codebase, search/textSearch, search/fileSearch, search/listDirectory, search/searchResults, search/searchSubagent, search/changes, search/usages, read/readFile, read/problems, read/getNotebookSummary, read/terminalSelection, read/terminalLastCommand, edit/createFile, edit/editFiles, execute/runInTerminal, execute/getTerminalOutput, execute/awaitTerminal, todo]
+tools: [search/codebase, search/textSearch, search/fileSearch, search/listDirectory, search/searchResults, search/searchSubagent, search/changes, search/usages, read/readFile, read/problems, read/getNotebookSummary, read/terminalSelection, read/terminalLastCommand, edit/createFile, edit/editFiles, execute/runInTerminal, execute/getTerminalOutput, execute/awaitTerminal, mijur.copilot-terminal-tools/listTerminals, mijur.copilot-terminal-tools/createTerminal, mijur.copilot-terminal-tools/sendCommand, mijur.copilot-terminal-tools/deleteTerminal, mijur.copilot-terminal-tools/cancelCommand, todo]
 model: Claude Opus 4.6 (copilot)
 ---
 
@@ -16,7 +16,7 @@ Independent SDLC compliance reviewer — verifies Definition of Done, runs quali
 
 ## 3. Boot Sequence (run in order, no skips)
 1. Read `.github/guardian/STOP_ALL` — if `STOP`: halt, zero edits.
-2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior).
+2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management).
 3. Read upstream summary from `.github/agent-output/Documentation/{ticket-id}.md`.
 4. Read `.github/vibecoding/chunks/Validator.agent/` (all chunk files).
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
@@ -107,5 +107,5 @@ Every validation must produce:
 - Artifact paths for all files created/modified.
 
 ## 11. References
-- `.github/instructions/*.instructions.md` (all 5 canonical files)
+- `.github/instructions/*.instructions.md` (all 6 canonical files)
 - `.github/vibecoding/chunks/Validator.agent/` (chunk-01, chunk-02, chunk-03)

@@ -9,12 +9,13 @@ ReaperOAK (stateless dispatcher).
 ```
 .github/
   agents/              # 14 agent definitions (*.agent.md)
-  instructions/        # 5 canonical instruction files (sole authority)
+  instructions/        # 6 canonical instruction files (sole authority)
     core.instructions.md            # Identity, precedence, halt gate, boot, approvals, memory, security
-    sdlc.instructions.md            # 9-state lifecycle, post-chain, rework, Definition of Done
+    sdlc.instructions.md            # Stage-based lifecycle, post-chain, rework, Definition of Done
     ticket-system.instructions.md   # State machine, directories, tickets.py, dependency resolution, parallelism
     git-protocol.instructions.md    # Two-commit protocol, scoped git, lease, summary handoff
     agent-behavior.instructions.md  # Worker model, scope, context derivation, stage ownership
+    terminal-management.instructions.md # Named terminal protocol, anti-spam, Copilot Terminal Tools
   memory-bank/         # Persistent shared state (append-only)
   tickets/             # Ticket JSON files + schema
   ticket-state/        # File-based state machine (11 stage directories)
@@ -41,7 +42,7 @@ docs/uiux/            # UI/UX design artifacts
 ## Key Conventions
 
 - All infrastructure lives inside .github/
-- 5 instruction files are the sole source of system rules
+- 6 instruction files are the sole source of system rules
 - Agent files contain only: role, stage, scope, forbidden actions, references
 - Memory bank files are append-only with ownership rules
 - Destructive operations require human approval

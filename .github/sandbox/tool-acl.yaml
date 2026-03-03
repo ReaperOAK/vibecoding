@@ -19,6 +19,8 @@ agents:
       - read/problems
       - edit/createFile (scoped: .github/**, docs/**)
       - execute/runInTerminal (read-only commands only)
+      - terminal-tools/sendCommand (terminal: git)
+      - terminal-tools/listTerminals
       - web/fetch (docs only)
     denied:
       - edit source files directly
@@ -36,6 +38,10 @@ agents:
       - edit/createFile (scoped: src/**, tests/**)
       - edit/editFile (scoped: src/**, tests/**)
       - execute/runInTerminal (test, lint, build only)
+      - terminal-tools/sendCommand (terminals: git, backend)
+      - terminal-tools/listTerminals
+      - terminal-tools/deleteTerminal
+      - terminal-tools/cancelCommand
     denied:
       - database DDL
       - deploy operations
@@ -53,6 +59,10 @@ agents:
       - edit/createFile (scoped: src/components/**, src/pages/**, src/styles/**)
       - edit/editFile (scoped: src/components/**, src/pages/**, src/styles/**)
       - execute/runInTerminal (test, lint, build only)
+      - terminal-tools/sendCommand (terminals: git, frontend)
+      - terminal-tools/listTerminals
+      - terminal-tools/deleteTerminal
+      - terminal-tools/cancelCommand
     denied:
       - backend source modifications
       - database operations
@@ -68,6 +78,10 @@ agents:
       - read/readFile
       - edit/createFile (scoped: tests/**, e2e/**)
       - execute/runInTerminal (test, playwright, lint only)
+      - terminal-tools/sendCommand (terminals: git, qa)
+      - terminal-tools/listTerminals
+      - terminal-tools/deleteTerminal
+      - terminal-tools/cancelCommand
       - read-only DB dump
     denied:
       - source code edits (non-test files)
@@ -85,6 +99,10 @@ agents:
       - read/readFile
       - edit/createFile (scoped: .github/memory-bank/riskRegister.md)
       - execute/runInTerminal (security scan tools only)
+      - terminal-tools/sendCommand (terminals: git, security)
+      - terminal-tools/listTerminals
+      - terminal-tools/deleteTerminal
+      - terminal-tools/cancelCommand
       - web/fetch (CVE databases, security advisories)
     denied:
       - source code edits
@@ -102,6 +120,10 @@ agents:
       - edit/createFile (scoped: .github/workflows/**, infra/**)
       - edit/editFile (scoped: .github/workflows/**, infra/**)
       - execute/runInTerminal (terraform plan, docker build, helm template)
+      - terminal-tools/sendCommand (terminals: git, devops)
+      - terminal-tools/listTerminals
+      - terminal-tools/deleteTerminal
+      - terminal-tools/cancelCommand
     denied:
       - terraform apply (requires human sign-off)
       - kubectl apply to production
@@ -162,6 +184,9 @@ agents:
       - read/readFile
       - read/problems
       - execute/runInTerminal (lint, test, build-check only)
+      - terminal-tools/sendCommand (terminals: git, ci-review)
+      - terminal-tools/listTerminals
+      - terminal-tools/cancelCommand
     denied:
       - any file writes
       - deploy operations
@@ -216,6 +241,8 @@ agents:
       - edit/createFile
       - edit/editFiles
       - execute/runInTerminal  # python todo_visual.py only
+      - terminal-tools/sendCommand (terminal: tickets)
+      - terminal-tools/listTerminals
       - todo
     denied_tools:
       - agent/runSubagent
@@ -250,6 +277,9 @@ agents:
       - edit/createFile
       - edit/editFiles
       - execute/runInTerminal
+      - terminal-tools/sendCommand (terminals: git, validator, tickets)
+      - terminal-tools/listTerminals
+      - terminal-tools/cancelCommand
       - todo
     denied_tools:
       - agent/runSubagent
@@ -264,7 +294,7 @@ agents:
         - ".github/memory-bank/feedback-log.md"
       denied:
         - "**"
-    notes: "Independent SDLC compliance reviewer; invokable only by ReaperOAK at QA_REVIEW state of the 9-state ticket machine. Write scope is allowlist-only — denied: '**' blocks all paths not explicitly listed in allowed."
+    notes: "Independent SDLC compliance reviewer; invokable only by ReaperOAK at VALIDATION stage. Write scope is allowlist-only — denied: '**' blocks all paths not explicitly listed in allowed."
 
 # Apply Proposal Requirements
 apply_proposal:
