@@ -27,7 +27,7 @@ You must perform structured reconstruction.
 
 Before any work, execute:
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: halt, zero edits.
-2. Read all `.github/instructions/*.instructions.md` (5 files).
+2. Read all `.github/instructions/*.instructions.md` (6 files).
 3. Run `python3 .github/tickets.py --sync`
 4. Run `python3 .github/tickets.py --status --json`
 

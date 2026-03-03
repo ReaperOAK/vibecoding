@@ -2,7 +2,7 @@
 name: 'TODO'
 description: 'Progressive refinement decomposition engine with 3 operating modes (Strategist, Planner, Executor Controller). Decomposes project visions through 5 layers (L0-L4) into granular, trackable tasks. Manages task lifecycle, enforces controlled expansion, and generates tickets.py-compatible task files.'
 user-invokable: false
-tools: [search/codebase, search/textSearch, search/fileSearch, search/listDirectory, read/readFile, read/problems, edit/createFile, edit/editFiles, execute/runInTerminal, todo]  # runInTerminal constrained: python .github/tickets.py ONLY
+tools: [search/codebase, search/textSearch, search/fileSearch, search/listDirectory, read/readFile, read/problems, edit/createFile, edit/editFiles, execute/runInTerminal, mijur.copilot-terminal-tools/listTerminals, mijur.copilot-terminal-tools/createTerminal, mijur.copilot-terminal-tools/sendCommand, mijur.copilot-terminal-tools/deleteTerminal, mijur.copilot-terminal-tools/cancelCommand, todo]  # runInTerminal constrained: python .github/tickets.py ONLY
 model: Claude Opus 4.6 (copilot)
 ---
 
@@ -22,13 +22,13 @@ TODO does NOT implement code — it decomposes only.
 ## 2. Stage
 
 N/A — TODO creates tickets, it does not process SDLC stages.
-L3 tasks become ticket JSON files that enter the 9-state machine at READY.
+L3 tasks become ticket JSON files that enter the stage-based pipeline at READY.
 
 ## 3. Boot Sequence
 
 Execute in order before any work:
 1. Read `.github/guardian/STOP_ALL` — if STOP: halt, zero edits
-2. Read `.github/instructions/*.instructions.md` (all 5 files)
+2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
 3. Read upstream summary from `.github/agent-output/TODO/{ticket-id}.md` (if exists)
 4. Read `.github/vibecoding/chunks/TODO.agent/` (all chunk files)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks

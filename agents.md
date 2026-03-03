@@ -21,9 +21,10 @@ If unresolved conflict remains: STOP and emit NEEDS_INPUT_FROM: ReaperOAK.
 4. Read .github/instructions/ticket-system.instructions.md
 5. Read .github/instructions/git-protocol.instructions.md
 6. Read .github/instructions/agent-behavior.instructions.md
-7. Read upstream summary from .github/agent-output/{PreviousAgent}/{ticket-id}.md (if exists)
-8. Read .github/vibecoding/chunks/{YourAgent}.agent/ (all files)
-9. Read .github/vibecoding/catalog.yml; load task-relevant chunks
+7. Read .github/instructions/terminal-management.instructions.md
+8. Read upstream summary from .github/agent-output/{PreviousAgent}/{ticket-id}.md (if exists)
+9. Read .github/vibecoding/chunks/{YourAgent}.agent/ (all files)
+10. Read .github/vibecoding/catalog.yml; load task-relevant chunks
 
 ## 2) Identity Invariants
 
@@ -77,5 +78,6 @@ Every TASK_COMPLETED must include: artifact paths, test results (or justified N/
 - .github/instructions/ticket-system.instructions.md
 - .github/instructions/git-protocol.instructions.md
 - .github/instructions/agent-behavior.instructions.md
+- .github/instructions/terminal-management.instructions.md
 - .github/tickets.py
 - .github/agent-runner.py
