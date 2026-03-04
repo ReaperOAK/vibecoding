@@ -2,7 +2,7 @@
 name: 'Validator'
 description: 'Independent SDLC compliance reviewer. Verifies Definition of Done, runs quality gates, checks pattern conformance, and validates initialization checklists. Cannot implement code — only reads artifacts and writes validation reports. Has authority to reject task completion.'
 user-invokable: false
-tools: [search/codebase, search/textSearch, search/fileSearch, search/listDirectory, search/searchResults, search/searchSubagent, search/changes, search/usages, read/readFile, read/problems, read/getNotebookSummary, read/terminalSelection, read/terminalLastCommand, edit/createFile, edit/editFiles, execute/runInTerminal, execute/getTerminalOutput, execute/awaitTerminal, mijur.copilot-terminal-tools/listTerminals, mijur.copilot-terminal-tools/createTerminal, mijur.copilot-terminal-tools/sendCommand, mijur.copilot-terminal-tools/deleteTerminal, mijur.copilot-terminal-tools/cancelCommand, todo]
+tools: [search/codebase, search/textSearch, search/fileSearch, search/listDirectory, search/searchResults, search/searchSubagent, search/changes, search/usages, read/readFile, read/problems, read/getNotebookSummary, read/terminalSelection, read/terminalLastCommand, edit/createFile, edit/editFiles, execute/runInTerminal, execute/getTerminalOutput, execute/awaitTerminal,  todo]
 model: Claude Opus 4.6 (copilot)
 ---
 

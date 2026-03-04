@@ -15,7 +15,6 @@ ReaperOAK (stateless dispatcher).
     ticket-system.instructions.md   # State machine, directories, tickets.py, dependency resolution, parallelism
     git-protocol.instructions.md    # Two-commit protocol, scoped git, lease, summary handoff
     agent-behavior.instructions.md  # Worker model, scope, context derivation, stage ownership
-    terminal-management.instructions.md # Named terminal protocol, anti-spam, Copilot Terminal Tools
   memory-bank/         # Persistent shared state (append-only)
   tickets/             # Ticket JSON files + schema
   ticket-state/        # File-based state machine (11 stage directories)

@@ -2,7 +2,7 @@
 name: 'TODO'
 description: 'Progressive refinement decomposition engine with 3 operating modes (Strategist, Planner, Executor Controller). Decomposes project visions through 5 layers (L0-L4) into granular, trackable tasks. Manages task lifecycle, enforces controlled expansion, and generates tickets.py-compatible task files.'
 user-invokable: false
-tools: [search/codebase, search/textSearch, search/fileSearch, search/listDirectory, read/readFile, read/problems, edit/createFile, edit/editFiles, execute/runInTerminal, mijur.copilot-terminal-tools/listTerminals, mijur.copilot-terminal-tools/createTerminal, mijur.copilot-terminal-tools/sendCommand, mijur.copilot-terminal-tools/deleteTerminal, mijur.copilot-terminal-tools/cancelCommand, todo]  # runInTerminal constrained: python .github/tickets.py ONLY
+tools: [search/codebase, search/textSearch, search/fileSearch, search/listDirectory, read/readFile, read/problems, edit/createFile, edit/editFiles, execute/runInTerminal,  todo]  # runInTerminal constrained: python .github/tickets.py ONLY
 model: Claude Opus 4.6 (copilot)
 ---
 
