@@ -127,11 +127,3 @@ python3 .github/tickets.py --sync
 RULE: Multiple operators work simultaneously on the same repo.
 RULE: Git push/pull is the only synchronization mechanism.
 
-## 11. Terminal Discipline
-
-RULE: All agents MUST use Copilot Terminal Tools (named terminals) for command execution.
-RULE: Route commands to role-specific named terminals per `terminal-management.instructions.md`.
-PROHIBITED: Spawning anonymous terminals. Reuse named terminals.
-PROHIBITED: Creating more than 5 terminals per agent invocation.
-RULE: Git operations → `git` terminal. tickets.py → `tickets` terminal. Agent work → agent-named terminal.
-RULE: Refer to `.github/instructions/terminal-management.instructions.md` for full protocol.
