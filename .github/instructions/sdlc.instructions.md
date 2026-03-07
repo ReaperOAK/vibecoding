@@ -10,7 +10,7 @@ description: Stage-based lifecycle, per-type flows, post-execution chain, rework
 
 RULE: Ticket state is determined by directory location under `.github/ticket-state/`.
 RULE: There are 11 possible stages. Each ticket type traverses a defined subset.
-RULE: Two-commit protocol applies per stage: CLAIM commit then WORK commit.
+RULE: Dispatcher-claim protocol applies per stage: ReaperOAK performs CLAIM commit, then subagent performs WORK commit.
 
 ### Available Stages
 

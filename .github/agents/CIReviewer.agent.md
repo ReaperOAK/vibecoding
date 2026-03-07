@@ -31,24 +31,19 @@ Execute in order before any work. Halt immediately if step 1 triggers.
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
 6. Read ticket JSON from `.github/ticket-state/CI/{ticket-id}.json`.
 
-## 4. Ticket Discovery & Claiming (Two-Commit Protocol)
+## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
-**Commit 1 — CLAIM (distributed lock):**
-1. `git pull --rebase` — sync with remote.
-2. Scan `.github/ticket-state/CI/` for unclaimed tickets (no `claimed_by` or expired lease).
-3. Update ticket JSON: `claimed_by: CIReviewer`, `machine_id: $(hostname)`, `operator: <name>`, `lease_expiry: now + 30min`.
-4. Stage ONLY ticket files:
-   ```bash
-   git add .github/ticket-state/CI/{ticket-id}.json .github/tickets/{ticket-id}.json
-   git commit -m "[{ticket-id}] CLAIM by CIReviewer on $(hostname) ({operator})"
-   git push
-   ```
-5. Push success = lock acquired. Push failure = abort, try another ticket.
-6. **NO code changes, NO reports, NO analysis in the claim commit.**
+RULE: The ticket is already claimed by ReaperOAK before this agent is launched.
+RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
+
+1. Read ticket JSON from `.github/ticket-state/CI/{ticket-id}.json`.
+2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
+3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
+4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
 
 ## 5. Execution Workflow
 
-After claiming, execute these checks against all files in the ticket's `file_paths`:
+After verifying claim, execute these checks against all files in the ticket's `file_paths`:
 
 1. **Lint check** — run project linter. Require zero errors AND zero warnings.
 2. **Type check** — run `tsc --noEmit --strict` (or equivalent). No implicit any, no unresolved types.

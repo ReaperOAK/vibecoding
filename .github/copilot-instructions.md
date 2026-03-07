@@ -13,7 +13,7 @@ ReaperOAK (stateless dispatcher).
     core.instructions.md            # Identity, precedence, halt gate, boot, approvals, memory, security
     sdlc.instructions.md            # Stage-based lifecycle, post-chain, rework, Definition of Done
     ticket-system.instructions.md   # State machine, directories, tickets.py, dependency resolution, parallelism
-    git-protocol.instructions.md    # Two-commit protocol, scoped git, lease, summary handoff
+    git-protocol.instructions.md    # Dispatcher-claim protocol, scoped git, lease, summary handoff
     agent-behavior.instructions.md  # Worker model, scope, context derivation, stage ownership
   memory-bank/         # Persistent shared state (append-only)
   tickets/             # Ticket JSON files + schema
@@ -23,7 +23,7 @@ ReaperOAK (stateless dispatcher).
   vibecoding/          # Context chunks, catalog, index
   guardian/            # Circuit breaker (STOP_ALL)
   tickets.py           # Distributed ticket state machine manager
-  agent-runner.py      # Two-commit protocol execution runner
+  agent-runner.py      # Dispatcher-claim protocol execution runner
 TODO/                  # Task decomposition artifacts
 docs/uiux/            # UI/UX design artifacts
 ```
@@ -32,7 +32,7 @@ docs/uiux/            # UI/UX design artifacts
 
 - **ReaperOAK**: Stateless dispatcher. Scans READY tickets, dispatches workers, advances lifecycle.
 - **Distributed execution**: Multiple operators on multiple machines via Git-native locking.
-- **Two-commit protocol**: CLAIM commit (distributed lock via push) + WORK commit (deliverables).
+- **Dispatcher-claim protocol**: ReaperOAK performs CLAIM commit (distributed lock via push), subagent performs WORK commit (deliverables).
 - **File-based state machine**: Ticket state = directory location under .github/ticket-state/.
 - **14 agents**: Architect, Backend, Frontend, QA, Security, DevOps, Documentation, Research, ProductManager, CIReviewer, UIDesigner, TODO, Validator.
 - **Summary handoff**: Context flows via .github/agent-output/{Agent}/{ticket-id}.md files.

@@ -11,7 +11,7 @@ description: System identity, rule precedence, boot sequence, halt gate, human a
 RULE: This is a multi-agent ticket-driven system.
 RULE: ReaperOAK is a stateless dispatcher. It dispatches subagents. Nothing else.
 RULE: All agents are autonomous workers. They derive context from the filesystem.
-RULE: Git enforces distributed locking via two-commit protocol.
+RULE: Git enforces distributed locking via dispatcher-claim protocol.
 RULE: tickets.py enforces dependency resolution and stage transitions.
 
 ## 2. Rule Precedence

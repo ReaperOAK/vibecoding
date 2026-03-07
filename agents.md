@@ -48,7 +48,7 @@ No skip, no merge, no reorder. Failure at any stage -> REWORK (max 3, then ESCAL
 
 - PROHIBITED: git add . / git add -A / git add --all
 - Stage explicit files only
-- Two-commit protocol: CLAIM commit then WORK commit per stage
+- Dispatcher-Claim protocol: ReaperOAK performs CLAIM commit before dispatch, subagent performs WORK commit only
 
 ## 5) Memory Gate (pre-DONE)
 

@@ -1,20 +1,25 @@
 ---
 name: Git Protocol
 applyTo: '**'
-description: Two-commit protocol, scoped git, commit format, push-based locking, lease mechanism, failure recovery.
+description: Dispatcher-claim protocol, scoped git, commit format, push-based locking, lease mechanism, failure recovery.
 ---
 
 # Git Protocol
 
-## 1. Two-Commit Protocol
+## 1. Dispatcher-Claim / Worker-Work Protocol
 
-RULE: Every agent executes exactly two git commits per ticket stage.
-RULE: Commit 1 (CLAIM) must complete before Commit 2 (WORK) begins.
+RULE: Every ticket stage requires exactly two git commits: one CLAIM and one WORK.
+RULE: Commit 1 (CLAIM) is performed by the **dispatcher (ReaperOAK)** before launching the subagent.
+RULE: Commit 2 (WORK) is performed by the **subagent** after completing stage work.
+RULE: Subagents NEVER perform claim commits — they receive pre-claimed tickets.
+PROHIBITED: Subagents executing `git pull --rebase` for claim purposes.
+PROHIBITED: Subagents creating claim commits.
 PROHIBITED: Combining claim and work into one commit.
 PROHIBITED: Skipping either commit.
 
-## 2. Commit 1 — CLAIM (Distributed Lock)
+## 2. Commit 1 — CLAIM (Performed by ReaperOAK / Dispatcher)
 
+RULE: Only ReaperOAK (or `agent-runner.py --claim-only`) executes claim commits.
 REQUIRED: `git pull --rebase` before claim.
 REQUIRED: Verify ticket exists in expected stage directory.
 REQUIRED: Verify ticket is unclaimed or lease has expired.
@@ -33,11 +38,12 @@ git commit -m "[<ticket-id>] CLAIM by <agent> on <machine> (<operator>)"
 git push
 ```
 
-RULE: Push success = lock acquired.
+RULE: Push success = lock acquired. Dispatcher then launches subagent.
 RULE: Push failure = another machine claimed first => ABORT. Try another ticket.
 PROHIBITED: Any code changes during claim commit.
+PROHIBITED: Subagents performing this step — it is dispatcher-only.
 
-## 3. Commit 2 — WORK
+## 3. Commit 2 — WORK (Performed by Subagent)
 
 REQUIRED: Execute agent work for the assigned stage.
 REQUIRED: Write summary to `.github/agent-output/{AgentName}/{ticket-id}.md`.
@@ -81,9 +87,10 @@ REQUIRED: Any machine may reclaim an expired-lease ticket.
 
 | Failure | Recovery |
 |---------|----------|
-| Crash after claim, before work | Lease expires => another machine reclaims |
-| Crash during work | Uncommitted work lost => reclaim + restart |
+| Crash after claim, before dispatch | Lease expires => another machine reclaims |
+| Crash during subagent work | Uncommitted work lost => reclaim + restart |
 | Push conflict on work commit | Investigate => likely protocol violation |
+| Subagent attempts claim commit | Protocol violation => abort subagent |
 | Rework count > 3 | Escalate to human |
 
 ## 8. Summary Handoff Protocol

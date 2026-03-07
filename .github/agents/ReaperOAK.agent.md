@@ -24,10 +24,17 @@ Execute in order before any work:
 Repeat until no READY tickets remain and no active workers:
 1. Parse the `--status --json` output for all tickets in READY state.
 2. For each READY ticket: determine the correct agent from ticket type + current stage (see §4).
-3. Dispatch one `runSubagent` call per ticket with a full delegation packet (see §5).
-4. On subagent completion: verify summary written to `.github/agent-output/{Agent}/{ticket-id}.md`.
-5. Advance ticket to next stage via `python3 .github/tickets.py --advance <id> <agent>`.
-6. Re-run `python3 .github/tickets.py --sync` and repeat.
+3. **Execute Commit 1 — CLAIM** before dispatching:
+   a. `git pull --rebase`.
+   b. Update ticket JSON: `claimed_by`, `machine_id`, `operator`, `lease_expiry` (+30min).
+   c. Move ticket to the agent’s stage directory (e.g., READY → BACKEND).
+   d. `git add` ONLY ticket JSON files. Commit: `[TICKET-ID] CLAIM by AGENT on MACHINE (OPERATOR)`.
+   e. `git push` — push success = lock acquired. Push failure = skip ticket (another machine claimed).
+   f. **NO code changes in claim commit. Period.**
+4. Dispatch one `runSubagent` call per successfully claimed ticket with a full delegation packet (see §5).
+5. On subagent completion: verify summary written to `.github/agent-output/{Agent}/{ticket-id}.md`.
+6. Advance ticket to next stage via `python3 .github/tickets.py --advance <id> <agent>`.
+7. Re-run `python3 .github/tickets.py --sync` and repeat.
 
 ## 4. Agent Selection
 
@@ -115,12 +122,13 @@ If uncertain whether an action is destructive, treat it as destructive.
 
 ## 9. Parallelism Rules
 
-- Dispatch one subagent per READY ticket — calls are independent.
-- For N READY tickets, dispatch N subagents in parallel by using N `agent/runSubagent` calls — no grouping or batching.
+- Claim tickets sequentially (each claim requires `git pull --rebase` + push), then dispatch subagents in parallel.
+- For N READY tickets: claim each one via Commit 1, then dispatch N subagents in parallel via N `runSubagent` calls.
+- Subagents do NOT perform claim commits — they receive pre-claimed tickets and only produce work commits.
 - Do NOT compute safe parallel groups.
 - Do NOT reason about file conflicts between tickets.
-- Git push conflicts are the safety mechanism — agents enforce isolation via claim commit.
-- If a claim push fails, the agent aborts and the ticket remains available for another worker.
+- Git push conflicts on the claim commit are the safety mechanism — if a claim push fails, skip that ticket.
+- If a work commit push fails, investigate — likely a protocol violation.
 
 ## 10. Rework Handling
 
@@ -137,4 +145,4 @@ If uncertain whether an action is destructive, treat it as destructive.
 - `.github/instructions/git-protocol.instructions.md`
 - `.github/instructions/agent-behavior.instructions.md`
 - `.github/tickets.py` — ticket state machine manager
-- `.github/agent-runner.py` — two-commit protocol runner
+- `.github/agent-runner.py` — dispatcher-claim protocol runner
