@@ -24,17 +24,15 @@ Context mapping BEFORE any design — architecture without codebase understandin
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
 6. Read ticket JSON from `.github/ticket-state/` or `.github/tickets/`
 
-## 4. Ticket Discovery & Claiming (Two-Commit Protocol)
-**Commit 1 — CLAIM:**
-1. `git pull --rebase`
-2. Read ticket from `.github/ticket-state/READY/{ticket-id}.json`
-3. Verify unclaimed or lease expired
-4. Update: `claimed_by`: Architect, `machine_id`, `operator`, `lease_expiry` +30min
-5. Move to `.github/ticket-state/ARCHITECT/{ticket-id}.json`
-6. `git add` ONLY the ticket JSON files
-7. `git commit -m "[{ticket-id}] CLAIM by Architect on {machine} ({operator})"`
-8. `git push` — success = locked, failure = ABORT (another machine claimed first)
-9. NO code changes in claim commit
+## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
+
+RULE: The ticket is already claimed by ReaperOAK before this agent is launched.
+RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
+
+1. Read ticket JSON from `.github/ticket-state/ARCHITECT/{ticket-id}.json`.
+2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
+3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
+4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
 
 ## 5. Execution Workflow
 Step-by-step architecture process:

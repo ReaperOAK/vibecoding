@@ -29,14 +29,15 @@ Before ANY work, execute in order — no skips:
 **BEFORE implementation**, verify UIDesigner mockup exists at `docs/uiux/mockups/{ticket-id}.md`
 with `APPROVED` status. Missing or not approved = emit `BLOCKED_BY: UIDesigner` and halt.
 
-## 5. Ticket Discovery & Claiming (Two-Commit Protocol)
-### Commit 1 — CLAIM (Distributed Lock)
-1. `git pull --rebase`.
-2. Read ticket from `.github/ticket-state/READY/{ticket-id}.json`. Verify unclaimed or lease expired.
-3. Update: `claimed_by: Frontend`, `machine_id`, `operator`, `lease_expiry` +30min (ISO8601).
-4. Move to `.github/ticket-state/FRONTEND/{ticket-id}.json`.
-5. `git add` ONLY ticket JSON files. Commit: `[{ticket-id}] CLAIM by Frontend on {machine} ({operator})`.
-6. `git push` — success = locked. Failure = ABORT. **NO code changes in claim commit.**
+## 5. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
+
+RULE: The ticket is already claimed by ReaperOAK before this agent is launched.
+RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
+
+1. Read ticket JSON from `.github/ticket-state/FRONTEND/{ticket-id}.json`.
+2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
+3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
+4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
 
 ## 6. Execution Workflow
 ### 6a. Context Analysis

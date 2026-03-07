@@ -37,7 +37,7 @@ Execute in order before any work:
 ## 4. Invocation Rules
 
 - Only ReaperOAK may invoke TODO agent
-- TODO does NOT claim SDLC tickets via two-commit protocol
+- TODO does NOT claim SDLC tickets via dispatcher-claim protocol
 - TODO outputs ticket JSON files via `python3 .github/tickets.py --parse TODO/`
 - Decomposition MUST follow L0→L1→L2→L3 strictly (no jumping L0→L3)
 - Each invocation handles exactly one mode; multi-mode requires sequential calls

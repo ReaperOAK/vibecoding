@@ -33,22 +33,15 @@ Execute in strict order before any work:
 6. Read ticket JSON from `.github/ticket-state/` or `.github/tickets/`
 7. Read Stitch project ID from `.github/stitch-project-id.txt` if exists (persist across tickets for continuity)
 
-## 4. Ticket Discovery & Claiming (Two-Commit Protocol)
+## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
-### Commit 1 — CLAIM (Distributed Lock)
-1. `git pull --rebase` before claim
-2. Verify ticket exists in READY, is unclaimed or lease expired
-3. Update ticket JSON: `claimed_by: UIDesigner`, `machine_id`, `operator`, `lease_expiry` (+30min)
-4. Move ticket to `.github/ticket-state/FRONTEND/`
-5. Stage ONLY ticket JSON files:
-   ```bash
-   git add .github/ticket-state/FRONTEND/{ticket-id}.json
-   git add .github/tickets/{ticket-id}.json
-   git commit -m "[{ticket-id}] CLAIM by UIDesigner on {machine} ({operator})"
-   git push
-   ```
-6. Push success = lock acquired. Push failure = ABORT, try another ticket.
-7. **NO code or design changes in claim commit.**
+RULE: The ticket is already claimed by ReaperOAK before this agent is launched.
+RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
+
+1. Read ticket JSON from `.github/ticket-state/FRONTEND/{ticket-id}.json`.
+2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
+3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
+4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
 
 ## 5. Execution Workflow
 

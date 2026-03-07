@@ -30,19 +30,15 @@ BACKEND stage. Every configuration is declarative, versioned, and testable.
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
 6. Read ticket JSON from `.github/ticket-state/` or `.github/tickets/`
 
-## 4. Ticket Discovery & Claiming (Two-Commit Protocol)
+## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
-**Commit 1 — CLAIM (distributed lock):**
-1. `git pull --rebase` before anything
-2. Read ticket JSON — verify it exists in READY and is unclaimed (or lease expired)
-3. Update ticket metadata: `claimed_by: DevOps`, `machine_id: $(hostname)`,
-   `operator: <human>`, `lease_expiry: now + 30min`
-4. Move ticket to `.github/ticket-state/BACKEND/{ticket-id}.json`
-5. Stage ONLY ticket JSON files:
-   `git add .github/ticket-state/BACKEND/{ticket-id}.json .github/tickets/{ticket-id}.json`
-6. Commit: `[{ticket-id}] CLAIM by DevOps on {machine} ({operator})`
-7. `git push` — success = lock acquired; failure = ABORT, try another ticket
-8. **NO code changes in the claim commit. Period.**
+RULE: The ticket is already claimed by ReaperOAK before this agent is launched.
+RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
+
+1. Read ticket JSON from `.github/ticket-state/BACKEND/{ticket-id}.json`.
+2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
+3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
+4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
 
 ## 5. Execution Workflow
 

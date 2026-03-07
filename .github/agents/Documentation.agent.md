@@ -31,27 +31,19 @@ Execute in order. No skips.
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
 6. Read ticket JSON from `.github/ticket-state/DOCS/{ticket-id}.json`.
 
-## 4. Ticket Discovery & Claiming (Two-Commit Protocol)
+## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
-**Commit 1 — CLAIM (distributed lock):**
+RULE: The ticket is already claimed by ReaperOAK before this agent is launched.
+RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Run `git pull --rebase`.
-2. Read ticket JSON — verify it exists in `DOCS` stage and is unclaimed or lease expired.
-3. Update ticket JSON: `claimed_by: Documentation`, `machine_id: $(hostname)`,
-   `operator: <human>`, `lease_expiry: now + 30min`.
-4. Stage ONLY ticket files:
-   ```bash
-   git add .github/ticket-state/DOCS/{ticket-id}.json
-   git add .github/tickets/{ticket-id}.json
-   git commit -m "[{ticket-id}] CLAIM by Documentation on $(hostname) (<operator>)"
-   git push
-   ```
-5. Push success = lock acquired. Push failure = abort, try another ticket.
-6. **NO documentation changes in the claim commit.**
+1. Read ticket JSON from `.github/ticket-state/DOCS/{ticket-id}.json`.
+2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
+3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
+4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
 
 ## 5. Execution Workflow
 
-After successful claim, execute docs work:
+After verifying claim, execute docs work:
 
 1. **Read artifacts** — implementation files from `file_paths`, upstream summaries, code diffs.
 2. **JSDoc/TSDoc** — add or update doc comments for all new/changed public APIs.
