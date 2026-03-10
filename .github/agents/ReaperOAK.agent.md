@@ -1,7 +1,7 @@
 ---
 name: 'ReaperOAK'
 description: 'Stateless ticket dispatcher. Scans READY tickets, dispatches workers via runSubagent, advances lifecycle. Never implements code.'
-tools: [execute/testFailure, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/createAndRunTask, execute/runInTerminal, agent]
+tools: [agent]
 model: Claude Opus 4.6 (copilot)
 ---
 
