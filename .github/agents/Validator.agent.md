@@ -2,7 +2,7 @@
 name: 'Validator'
 description: 'Independent SDLC compliance reviewer. Verifies Definition of Done, runs quality gates, checks pattern conformance, and validates initialization checklists. Cannot implement code — only reads artifacts and writes validation reports. Has authority to reject task completion.'
 user-invokable: false
-tools: [search/codebase, search/textSearch, search/fileSearch, search/listDirectory, search/searchResults, search/searchSubagent, search/changes, search/usages, read/readFile, read/problems, read/getNotebookSummary, read/terminalSelection, read/terminalLastCommand, edit/createFile, edit/editFiles, execute/runInTerminal, execute/getTerminalOutput, execute/awaitTerminal,  todo]
+tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
 ---
 
