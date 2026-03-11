@@ -66,7 +66,7 @@ Execute in order before any work. Abort if any step fails.
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
-RULE: The ticket is already claimed by ReaperOAK before this agent is launched.
+RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
 1. Read ticket JSON from `.github/ticket-state/SECURITY/{ticket-id}.json`.
