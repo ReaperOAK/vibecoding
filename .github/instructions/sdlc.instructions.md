@@ -15,7 +15,7 @@ RULE: Dispatcher-claim protocol applies per stage: ReaperOAK performs CLAIM comm
 ### Available Stages
 
 ```
-READY | RESEARCH | PM |ARCHITECT | DevOps | BACKEND | UIDesigner | FRONTEND | QA | SECURITY | CI | DOCS | VALIDATION | DONE
+READY > RESEARCH > PM > ARCHITECT > DevOps > BACKEND > UIDesigner > FRONTEND > QA > SECURITY > CI > DOCS  > VALIDATION > DONE
 ```
 
 ## Stage Definitions
