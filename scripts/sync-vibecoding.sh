@@ -41,6 +41,7 @@ SYNC_DIRECTORIES=(
 SYNC_FILES=(
   "agents.md"
   "todo_visual.py"
+  "scripts/sync-vibecoding.sh"
 )
 
 # Per-directory exceptions (space-separated names, matched at top-level only).
