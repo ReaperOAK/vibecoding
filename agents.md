@@ -36,7 +36,7 @@ If unresolved conflict remains: STOP and emit NEEDS_INPUT_FROM: ReaperOAK.
 Each ticket type traverses a defined subset of 11 stages:
 
 ```
-READY | RESEARCH | PM | ARCHITECT | BACKEND | UIDesigner | FRONTEND | QA | SECURITY | CI | DOCS | VALIDATION | DONE
+READY > RESEARCH > PM > ARCHITECT > DevOps > BACKEND > UIDesigner > FRONTEND > QA > SECURITY > CI > DOCS  > VALIDATION > DONE
 ```
 
 Post-implementation chain (strict order): QA → Security → CI → Docs → Validator.

@@ -83,7 +83,7 @@ Do NOT inject code context — agents derive context from the filesystem indepen
 Each ticket type traverses a defined subset of 11 stages:
 
 ```
-READY | RESEARCH | PM | ARCHITECT | DevOPS| BACKEND | UIDesigner | FRONTEND | QA | SECURITY | CI | DOCS | VALIDATION | DONE
+READY > RESEARCH > PM > ARCHITECT > DevOps > BACKEND > UIDesigner > FRONTEND > QA > SECURITY > CI > DOCS  > VALIDATION > DONE
 ```
 
 Post-implementation chain (strict order): QA → Security → CI → Docs → Validator.
