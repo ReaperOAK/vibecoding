@@ -25,7 +25,7 @@ It is a programmable engineering organization that operates as an elastic,
 event-driven agency engine. It decomposes work into tickets, assigns them to
 specialized workers from auto-scaling pools, enforces a strict stage-based SDLC
 lifecycle per ticket, runs strategic planning concurrently with execution,
-and enforces distributed dispatcher-claim execution (ReaperOAK CLAIM + worker WORK) with scoped git.
+and enforces distributed dispatcher-claim execution (Ticketer CLAIM + worker WORK) with scoped git.
 
 The result is not generated code. It is governed, reviewable, production-grade
 engineering output with full audit trails.
@@ -38,7 +38,7 @@ Vibecoding operates a **two-layer concurrent model** with no global phase
 barriers. Strategic discovery and execution run simultaneously.
 
 ```
-ReaperOAK (CTO / Elastic Multi-Worker Parallel Orchestrator)
+Ticketer (CTO / Elastic Multi-Worker Parallel Orchestrator)
 |
 +--- Strategic Layer ----------------------------------------
 |    Research Analyst      Evidence research, PoC, tech radar
@@ -60,10 +60,10 @@ ReaperOAK (CTO / Elastic Multi-Worker Parallel Orchestrator)
      CI Reviewer           Complexity, lint, SARIF findings
 ```
 
-**ReaperOAK** is the singular orchestrator. It never writes code. It selects
+**Ticketer** is the singular orchestrator. It never writes code. It selects
 tickets, assigns workers from elastic pools, drives each ticket through its
 lifecycle, reacts to events, and enforces commits. All inter-agent
-communication routes through ReaperOAK — there is no direct agent-to-agent
+communication routes through Ticketer — there is no direct agent-to-agent
 messaging.
 
 ### Key Properties
@@ -131,7 +131,7 @@ controlled pivots without halting unaffected work.
 
 ### Event Queue
 
-An ordered log of all system events. ReaperOAK consumes events and routes
+An ordered log of all system events. Ticketer consumes events and routes
 them to the appropriate handler. Event types include TASK_STARTED,
 TASK_COMPLETED, TASK_FAILED, WORKER_SPAWNED, WORKER_TERMINATED,
 POOL_SCALED_UP, POOL_SCALED_DOWN, SDR_PROPOSED, SDR_APPROVED,
@@ -257,7 +257,7 @@ Available Stages: READY | ARCHITECT | RESEARCH | BACKEND | FRONTEND | QA | SECUR
 ### Enforcement Rules
 
 - **No skipping.** Guard conditions enforce every transition.
-- **Dispatcher-claim required.** ReaperOAK performs the CLAIM commit before dispatching; subagents produce only the WORK commit.
+- **Dispatcher-claim required.** Ticketer performs the CLAIM commit before dispatching; subagents produce only the WORK commit.
 - **Scoped changes only.** Commits must stage explicit ticket files only.
 - **Ticket isolation.** A worker that modifies files outside its declared
   scope is rejected at QA.
@@ -291,7 +291,7 @@ through the SDR (Strategic Decision Record) protocol.
 
 1. A strategic-layer agent (Research, Architect, Product Manager) identifies
    a necessary direction change and proposes an SDR.
-2. ReaperOAK evaluates the SDR. Scope expansions require operator approval.
+2. Ticketer evaluates the SDR. Scope expansions require operator approval.
    Priority reshuffling can be auto-approved.
 3. On approval, affected tickets are re-prioritized, new tickets are generated
    by the TODO Agent, and obsolete tickets are cancelled.
@@ -415,7 +415,7 @@ autonomous delivery.
                            code review, doc sync, security scan, test validation
   hooks/                   Governance audit, session logger, auto-commit
   tickets.py               Distributed ticket state manager (`--sync --claim --advance`)
-  agent-runner.py          Dispatcher-claim stage runner (CLAIM by ReaperOAK + WORK by subagent)
+  agent-runner.py          Dispatcher-claim stage runner (CLAIM by Ticketer + WORK by subagent)
   proposals/               Self-improvement proposals (PROP-*.md)
   locks/                   File lock schema for concurrent access
   archives/                Historical orchestration artifacts
@@ -439,7 +439,7 @@ TODO/                      Task decomposition artifacts
 ## Example Execution Flow
 
 **Scenario:** 5 conflict-free READY tickets trigger elastic pool spawning.
-ReaperOAK launches 5 workers in parallel. One triggers a strategic review.
+Ticketer launches 5 workers in parallel. One triggers a strategic review.
 Only that ticket pauses. The others continue to completion.
 
 ```
@@ -467,26 +467,26 @@ T+0:03   Parallel dispatch -- 5 simultaneous worker spawns:
 
 T+20:00  BE-011 completes -> enters post-execution chain
          QA PASS -> Validator APPROVED -> Docs updated -> CI PASS
-         ReaperOAK CLAIM + worker WORK commits complete
+         Ticketer CLAIM + worker WORK commits complete
          BE-011 -> DONE. Worker terminated.
 
 T+22:00  BE-010 triggers NEEDS_INPUT_FROM (Architect).
-         BE-010 pauses at BACKEND. ReaperOAK routes question.
+         BE-010 pauses at BACKEND. Ticketer routes question.
          All other tickets continue unaffected.
 
 T+25:00  FE-001 completes -> full chain -> DONE
-         ReaperOAK CLAIM + worker WORK commits complete
+         Ticketer CLAIM + worker WORK commits complete
 
 T+28:00  Architect responds. BE-010 resumes.
 
 T+33:00  BE-010 completes -> full chain -> DONE
-         ReaperOAK CLAIM + worker WORK commits complete
+         Ticketer CLAIM + worker WORK commits complete
 
 T+35:00  DO-003 completes -> full chain -> DONE
-         ReaperOAK CLAIM + worker WORK commits complete
+         Ticketer CLAIM + worker WORK commits complete
 
 T+40:00  FE-002 completes -> full chain -> DONE
-         ReaperOAK CLAIM + worker WORK commits complete
+         Ticketer CLAIM + worker WORK commits complete
 
 T+40:01  All pools at 0 active. System idle.
 
@@ -618,12 +618,12 @@ cat .github/guardian/STOP_ALL
 1. **MCP Connections.** Configure required MCP servers in your VS Code
    settings. At minimum: file system, terminal, and Git access.
 
-2. **Worker Pool Sizes.** Pool bounds are defined in the ReaperOAK agent
-   definition at `.github/agents/ReaperOAK.agent.md` (Section 7). Adjust
+2. **Worker Pool Sizes.** Pool bounds are defined in the Ticketer agent
+   definition at `.github/agents/Ticketer.agent.md` (Section 7). Adjust
    `minSize` and `maxSize` per role based on your workload profile.
 
 3. **Git Provider.** Ensure Git is configured for the target repository.
-  ReaperOAK enforces dispatcher-claim protocol per stage with explicit scoped staging.
+  Ticketer enforces dispatcher-claim protocol per stage with explicit scoped staging.
 
 4. **Optional Integrations.** Connect Stitch MCP for UI design, Playwright
    for E2E testing, Sentry for monitoring, MongoDB for data operations,
@@ -632,11 +632,11 @@ cat .github/guardian/STOP_ALL
 
 ### Starting the Engine
 
-Invoke ReaperOAK in GitHub Copilot Agent Mode. The boot protocol
+Invoke Ticketer in GitHub Copilot Agent Mode. The boot protocol
 (`agents.md`) loads automatically, reads memory bank state, checks the
 guardian circuit breaker, and initializes the scheduling loop.
 
-From there, provide a project vision or feature request. ReaperOAK will:
+From there, provide a project vision or feature request. Ticketer will:
 
 1. Invoke the TODO Agent to decompose work into tickets
 2. Evaluate ticket dependencies and build the execution DAG

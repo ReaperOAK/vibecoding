@@ -15,7 +15,7 @@ Progressive refinement decomposition engine with 3 operating modes:
 - **Planning** (L1→L2): Capabilities to execution blocks (epics)
 - **Execution Planning** (L2→L3): Blocks to granular, delegatable tickets
 
-Decomposes project visions into trackable tasks. Only invoked by ReaperOAK.
+Decomposes project visions into trackable tasks. Only invoked by Ticketer.
 Each invocation operates in exactly ONE mode, selected via delegation packet.
 TODO does NOT implement code — it decomposes only.
 
@@ -63,11 +63,11 @@ Execute in order before any work:
 3. Read upstream summary from `.github/agent-output/TODO/{ticket-id}.md` (if exists)
 4. Read `.github/vibecoding/chunks/TODO.agent/` (all chunk files)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
-6. Read delegation packet / assignment from ReaperOAK
+6. Read delegation packet / assignment from Ticketer
 
 ## 4. Invocation Rules
 
-- Only ReaperOAK may invoke TODO agent
+- Only Ticketer may invoke TODO agent
 - TODO does NOT claim SDLC tickets via dispatcher-claim protocol
 - TODO outputs ticket JSON files via `python3 .github/tickets.py --parse TODO/`
 - Decomposition MUST follow L0→L1→L2→L3 strictly (no jumping L0→L3)

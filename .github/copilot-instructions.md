@@ -2,7 +2,7 @@
 
 This repository implements a **multi-agent vibecoding system** — a ticket-driven
 AI development infrastructure where specialized agents collaborate under
-ReaperOAK (stateless dispatcher).
+Ticketer (stateless dispatcher).
 
 ## Repository Structure
 
@@ -30,9 +30,9 @@ docs/uiux/            # UI/UX design artifacts
 
 ## Architecture
 
-- **ReaperOAK**: Stateless dispatcher. Scans READY tickets, dispatches workers, advances lifecycle.
+- **Ticketer**: Stateless dispatcher. Scans READY tickets, dispatches workers, advances lifecycle.
 - **Distributed execution**: Multiple operators on multiple machines via Git-native locking.
-- **Dispatcher-claim protocol**: ReaperOAK performs CLAIM commit (distributed lock via push), subagent performs WORK commit (deliverables).
+- **Dispatcher-claim protocol**: Ticketer performs CLAIM commit (distributed lock via push), subagent performs WORK commit (deliverables).
 - **File-based state machine**: Ticket state = directory location under .github/ticket-state/.
 - **14 agents**: Architect, Backend, Frontend, QA, Security, DevOps, Documentation, Research, ProductManager, CIReviewer, UIDesigner, TODO, Validator.
 - **Summary handoff**: Context flows via .github/agent-output/{Agent}/{ticket-id}.md files.

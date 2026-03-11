@@ -11,7 +11,7 @@ When rules conflict, apply highest first:
 4. This file (agents.md)
 5. Delegation prompt
 
-If unresolved conflict remains: STOP and emit NEEDS_INPUT_FROM: ReaperOAK.
+If unresolved conflict remains: STOP and emit NEEDS_INPUT_FROM: Ticketer.
 
 ## 0.1) Tool Loadout Protocol (CRITICAL — Prevents Decision Paralysis)
 
@@ -40,7 +40,8 @@ PROHIBITED: Arbitrarily scanning the full tool list — this causes token exhaus
 
 ## 2) Identity Invariants
 
-- ReaperOAK is a **dumb dispatcher**: it never reads or writes codebase files. It ONLY evaluates ticket state via `tickets.py`, launches subagents with scoped toolsets via `runSubagent`, and performs claim/state commits. Its toolset is restricted to `memory/*`, `execute/*`, `github/*`, and `sequentialthinking/*`.
+- Ticketer is a **dumb dispatcher**: it never reads or writes codebase files. It ONLY evaluates ticket state via `tickets.py`, launches subagents with scoped toolsets via `runSubagent`, and performs claim/state commits. Its toolset is restricted to `memory/*`, `execute/*`, `github/*`, and `sequentialthinking/*`.
+- CTO is a **smart orchestrator**: it reads docs, reasons about the project, and delegates to Research, PM, Architect, and TODO agents to produce the ticket backlog. CTO operates pre-SDLC — once tickets exist, Ticketer takes over.
 - Worker handles exactly one ticket, one SDLC stage per invocation
 - Reference but Never modify artifacts outside assigned ticket scope
 - Every agent must follow its Assigned Tool Loadout — no exceptions
@@ -61,7 +62,7 @@ No skip, no merge, no reorder. Failure at any stage -> REWORK (max 3, then ESCAL
 
 - PROHIBITED: git add . / git add -A / git add --all
 - Stage explicit files only
-- Dispatcher-Claim protocol: ReaperOAK performs CLAIM commit before dispatch, subagent performs WORK commit only
+- Dispatcher-Claim protocol: Ticketer performs CLAIM commit before dispatch, subagent performs WORK commit only
 - Use `execute/runInTerminal` for git CLI commands or `github/create_or_update_file` for direct file pushes
 - Subagents NEVER perform claim commits — they receive pre-claimed tickets and only execute the work commit
 
@@ -113,7 +114,8 @@ Every agent follows this Standard Operating Procedure from `tool_dispatcher.md`:
 | CIReviewer | *(Universal only)* |
 | Documentation | `markitdown/*` |
 | TODO | `awesome-copilot/*` |
-| ReaperOAK | `memory/*`, `execute/*`, `github/*` *(dispatcher-only subset)* |
+| CTO | `markitdown/*`, `com.figma.mcp/*`, `awesome-copilot/*`, `renderMermaidDiagram`, `firecrawl/*` |
+| Ticketer | `memory/*`, `execute/*`, `github/*` *(dispatcher-only subset)* |
 
 ## References
 

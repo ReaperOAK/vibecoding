@@ -57,7 +57,7 @@ Independent SDLC compliance reviewer — verifies Definition of Done, runs quali
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
-RULE: The ticket is already claimed by ReaperOAK before this agent is launched.
+RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
 1. Read ticket JSON from `.github/ticket-state/VALIDATION/{ticket-id}.json`.
@@ -87,7 +87,7 @@ RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 - Cross-check CI verdict — must be **PASS**.
 - Independently re-run lint, type-check, and test commands — never trust self-reports.
 - Verify scoped git discipline: no `git add .` in commit history for this ticket.
-- Verify dispatcher-claim protocol: claim commit by ReaperOAK + work commit by subagent per stage in git log.
+- Verify dispatcher-claim protocol: claim commit by Ticketer + work commit by subagent per stage in git log.
 
 ### Verdict Logic
 ```

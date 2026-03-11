@@ -67,7 +67,7 @@ Execute in order before any work:
 ## 4. Ticket Handling
 
 ProductManager does NOT follow the standard dispatcher-claim SDLC protocol:
-- Receives requirements from human operators or ReaperOAK
+- Receives requirements from human operators or Ticketer
 - Produces PRDs, user stories, acceptance criteria, and task specs
 - Outputs feed into **TODO agent** for L1→L2→L3 ticket decomposition
 - Does NOT claim SDLC tickets — does NOT move tickets through stages
