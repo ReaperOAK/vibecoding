@@ -36,7 +36,15 @@ set -euo pipefail
 REPO="https://github.com/ReaperOAK/vibecoding.git"
 BRANCH="${1:-main}"
 DRY_RUN="${DRY_RUN:-}"
-PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+# When piped via `curl | bash`, $0 is 'bash' (not a real file path).
+# Fall back to $PWD (caller's working directory) in that case.
+if [[ -f "$0" ]]; then
+  PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+else
+  PROJECT_ROOT="$PWD"
+fi
+
 TMPDIR="$(mktemp -d)"
 
 # ---- CONFIG: what to sync + exceptions -----------------------------------
