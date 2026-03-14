@@ -12,11 +12,18 @@
 #   CLAUDE.md
 #   todo_visual.py
 #
-# Does NOT sync:
+# Merge strategy (never deletes):
+#   - Files present in upstream are created or overwritten locally.
+#   - Files/dirs that exist only locally are LEFT UNTOUCHED.
+#   - Subdirectory merges are applied recursively (e.g. new .agent.md files
+#     are added, existing ones updated, extra local ones are kept).
+#
+# Protected paths (never touched, even if upstream has them):
 #   README.md (repo-specific)
 #   .github/memory-bank/ (project-specific persistent state)
 #   .github/tickets/ (project-specific ticket definitions)
 #   .github/ticket-state/ (project-specific ticket state machine)
+#   .github/agent-output/ (runtime agent artifacts)
 #   .github/copilot-instructions.md (project-specific Copilot config)
 #
 # Usage:
@@ -44,9 +51,10 @@ SYNC_FILES=(
   "scripts/sync-vibecoding.sh"
 )
 
-# Per-directory exceptions (space-separated names, matched at top-level only).
+# Per-directory exceptions (space-separated names, matched at top-level of that dir).
+# These paths are NEVER touched, even if upstream has updates for them.
 declare -A DIR_EXCEPTIONS=(
-  [".github"]="memory-bank tickets workflows ticket-state agent-output copilot-instructions.md"
+  [".github"]="memory-bank tickets ticket-state agent-output copilot-instructions.md"
 )
 
 # Validate these must exist in upstream before syncing.
@@ -66,6 +74,34 @@ contains_item() {
   return 1
 }
 
+# Recursively merge src into dest: overwrite matching files, add new files,
+# but NEVER delete files/dirs that exist only in dest.
+merge_directory() {
+  local src="$1"
+  local dest="$2"
+  local path item rel
+
+  mkdir -p "$dest"
+  shopt -s dotglob nullglob
+
+  for path in "$src"/*; do
+    item="$(basename "$path")"
+    if [[ -d "$path" ]]; then
+      merge_directory "$path" "$dest/$item"
+    else
+      rel="${dest#$PROJECT_ROOT/}/$item"
+      if [[ -n "$DRY_RUN" ]]; then
+        echo "    [dry-run] Would update $rel"
+      else
+        cp -a "$path" "$dest/$item"
+        echo "    Updated $rel"
+      fi
+    fi
+  done
+
+  shopt -u dotglob nullglob
+}
+
 sync_directory() {
   local dir="$1"
   local src_dir="$SRC/$dir"
@@ -80,20 +116,9 @@ sync_directory() {
   fi
 
   mkdir -p "$dest_dir"
-  echo "==> Syncing $dir/ ..."
+  echo "==> Syncing $dir/ (merge — no deletions) ..."
 
   shopt -s dotglob nullglob
-
-  if [[ -z "$DRY_RUN" ]]; then
-    for path in "$dest_dir"/*; do
-      item="$(basename "$path")"
-      if contains_item "$item" "${exceptions[@]}"; then
-        echo "    Preserving $dir/$item (exception)"
-        continue
-      fi
-      rm -rf "$path"
-    done
-  fi
 
   for path in "$src_dir"/*; do
     item="$(basename "$path")"
@@ -102,11 +127,20 @@ sync_directory() {
       continue
     fi
 
-    if [[ -n "$DRY_RUN" ]]; then
-      echo "    [dry-run] Would copy $dir/$item"
+    if [[ -d "$path" ]]; then
+      if [[ -n "$DRY_RUN" ]]; then
+        echo "    [dry-run] Would merge $dir/$item/"
+      else
+        echo "    Merging $dir/$item/"
+        merge_directory "$path" "$dest_dir/$item"
+      fi
     else
-      cp -a "$path" "$dest_dir/$item"
-      echo "    Copied $dir/$item"
+      if [[ -n "$DRY_RUN" ]]; then
+        echo "    [dry-run] Would update $dir/$item"
+      else
+        cp -a "$path" "$dest_dir/$item"
+        echo "    Updated $dir/$item"
+      fi
     fi
   done
 
@@ -176,7 +210,7 @@ fi
 
 # --- Summary ---
 echo ""
-echo "==> Sync complete!"
+echo "==> Sync complete (merge — no local files deleted)!"
 echo "    Source: ReaperOAK/vibecoding@$BRANCH"
 echo "    Synced directories: ${SYNC_DIRECTORIES[*]}"
 echo "    Synced files: ${SYNC_FILES[*]}"
