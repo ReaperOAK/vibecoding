@@ -205,6 +205,7 @@ for file in "${SYNC_FILES[@]}"; do
     if [[ -n "$DRY_RUN" ]]; then
       echo "    [dry-run] Would copy $file"
     else
+      mkdir -p "$PROJECT_ROOT/$(dirname "$file")"
       cp "$SRC/$file" "$PROJECT_ROOT/$file"
       echo "    Copied $file"
     fi
