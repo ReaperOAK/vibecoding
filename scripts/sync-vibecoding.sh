@@ -158,13 +158,14 @@ sync_directory() {
 cleanup() { rm -rf "$TMPDIR"; }
 trap cleanup EXIT
 
-# ---- Safety: stash uncommitted changes before destructive sync ----------
-if git -C "$PROJECT_ROOT" diff --quiet && git -C "$PROJECT_ROOT" diff --cached --quiet; then
-  STASHED=false
-else
-  echo "==> Stashing uncommitted changes..."
-  git -C "$PROJECT_ROOT" stash push -m "sync-vibecoding: auto-stash before sync $(date +%F_%T)"
-  STASHED=true
+# ---- Safety: stash uncommitted changes (only if this is a git repo) ------
+STASHED=false
+if git -C "$PROJECT_ROOT" rev-parse --git-dir &>/dev/null; then
+  if ! git -C "$PROJECT_ROOT" diff --quiet || ! git -C "$PROJECT_ROOT" diff --cached --quiet; then
+    echo "==> Stashing uncommitted changes..."
+    git -C "$PROJECT_ROOT" stash push -m "sync-vibecoding: auto-stash before sync $(date +%F_%T)"
+    STASHED=true
+  fi
 fi
 
 echo "==> Syncing from ReaperOAK/vibecoding (branch: $BRANCH)..."
@@ -216,6 +217,7 @@ if [[ "$STASHED" == true ]]; then
   git -C "$PROJECT_ROOT" stash pop || echo "WARN: stash pop had conflicts — resolve manually."
 fi
 
+
 # --- Summary ---
 echo ""
 echo "==> Sync complete (merge — no local files deleted)!"
@@ -224,5 +226,5 @@ echo "    Synced directories: ${SYNC_DIRECTORIES[*]}"
 echo "    Synced files: ${SYNC_FILES[*]}"
 echo "    Exceptions configured in DIR_EXCEPTIONS"
 echo ""
-echo "    Review changes with: git diff --stat"
-echo "    Commit with: git add .github/ .claude/ CLAUDE.md todo_visual.py && git commit -m 'chore: sync vibecoding infrastructure from upstream'"
+echo "    Review changes with:  git diff --stat"
+echo "    Commit with:          git add .github/ agents.md todo_visual.py && git commit -m 'chore: sync vibecoding infrastructure'"
