@@ -1,0 +1,56 @@
+{
+  "ticket_id": "TASK-SYS-026",
+  "title": "Migrate remaining vibecoding chunks to skills format",
+  "description": "Convert all remaining vibecoding chunk directories to standard `.github/skills/` format with SKILL.md files. Makes chunks discoverable and portable across VS Code, CLI, and GitHub coding agent.",
+  "type": "infra",
+  "priority": "medium",
+  "stage": "BLOCKED",
+  "sdlc_flow": [
+    "READY",
+    "DEVOPS",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-17T15:54:38.857501+00:00",
+  "created_by": "TODO",
+  "dependencies": [
+    "TASK-SYS-025"
+  ],
+  "blocked_by": [
+    "TASK-SYS-025"
+  ],
+  "file_paths": [
+    ".github/skills/",
+    ".github/vibecoding/chunks/"
+  ],
+  "acceptance_criteria": [
+    "Given all chunk directories are enumerated, when migrated, then each has a corresponding .github/skills/<name>/SKILL.md",
+    "Given skills use the standard format, when VS Code loads them, then they appear in the skills listing",
+    "Given the old chunks still exist, when migration is verified, then the old chunks can be deprecated"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-17T15:54:38.857503+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-skills-mcp.md"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-skills-mcp.md",
+  "tags": [
+    "skills",
+    "migration",
+    "P2"
+  ]
+}

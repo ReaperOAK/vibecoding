@@ -1,0 +1,55 @@
+{
+  "ticket_id": "TASK-SYS-024",
+  "title": "Review and optimize git-protocol instruction scoping",
+  "description": "Review git-protocol.instructions.md and determine if any portion can be split into a scoped sub-instruction. Currently uses `applyTo: '**'` which loads for every file context. Evaluate whether the commit format and lease mechanism sections could be scoped to `.github/**` while keeping the core git safety rules universal.",
+  "type": "research",
+  "priority": "medium",
+  "stage": "READY",
+  "sdlc_flow": [
+    "READY",
+    "RESEARCH",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-17T15:54:38.857331+00:00",
+  "created_by": "TODO",
+  "dependencies": [],
+  "blocked_by": [],
+  "file_paths": [
+    ".github/instructions/git-protocol.instructions.md"
+  ],
+  "acceptance_criteria": [
+    "Given git-protocol.instructions.md is reviewed, when evaluated, then a decision is documented on whether to keep universal or split",
+    "Given splitting is chosen, when implemented, then core git safety rules remain universal and protocol-specific rules are scoped",
+    "Given the instruction is reviewed, when complete, then a brief ADR documents the rationale"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-17T15:54:38.857333+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-prompt-instruction-optimization.md"
+    },
+    {
+      "timestamp": "2026-03-17T15:54:38.861213+00:00",
+      "event": "MOVED_TO_READY",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Dependencies resolved, moved to READY"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-prompt-instruction-optimization.md",
+  "tags": [
+    "instructions",
+    "scoping",
+    "P2"
+  ]
+}
