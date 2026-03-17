@@ -1,0 +1,57 @@
+{
+  "ticket_id": "TASK-SYS-002",
+  "title": "Implement guardian stop hook (SessionStart + PreToolUse)",
+  "description": "Implement a shell-script hook that reads `.github/guardian/STOP_ALL` and blocks all agent activity when it contains \"STOP\". Fires on SessionStart (block session initialization) and PreToolUse (block all tool invocations). Replaces the instruction-based \"Read STOP_ALL \u2014 if STOP: halt\" rule with deterministic enforcement.",
+  "type": "infra",
+  "priority": "critical",
+  "stage": "BLOCKED",
+  "sdlc_flow": [
+    "READY",
+    "DEVOPS",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-17T15:54:38.856513+00:00",
+  "created_by": "TODO",
+  "dependencies": [
+    "TASK-SYS-001"
+  ],
+  "blocked_by": [
+    "TASK-SYS-001"
+  ],
+  "file_paths": [
+    ".github/hooks/scripts/check-guardian-stop.sh",
+    ".github/hooks/policy-enforcement.json"
+  ],
+  "acceptance_criteria": [
+    "Given `.github/guardian/STOP_ALL` contains \"STOP\", when any agent starts a session, then the SessionStart hook blocks",
+    "Given `.github/guardian/STOP_ALL` does not contain \"STOP\", when an agent starts, then the hook allows continuation",
+    "Given the hook fires on PreToolUse, when STOP_ALL is active, then all tool invocations receive `permissionDecision: \"deny\"`"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-17T15:54:38.856515+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-hooks-infrastructure.md"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-hooks-infrastructure.md",
+  "tags": [
+    "hooks",
+    "guardian",
+    "safety",
+    "P0"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "ticket_id": "TASK-SYS-001",
+  "title": "Create hook infrastructure directory and base configuration",
+  "description": "Create the `.github/hooks/` directory structure and base hook configuration file. This is the foundation for all deterministic policy enforcement, replacing instructional rules with shell-script-backed policy gates. Includes the hook scripts directory and a README documenting the hook architecture.",
+  "type": "infra",
+  "priority": "critical",
+  "stage": "READY",
+  "sdlc_flow": [
+    "READY",
+    "DEVOPS",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-17T15:54:38.856429+00:00",
+  "created_by": "TODO",
+  "dependencies": [],
+  "blocked_by": [],
+  "file_paths": [
+    ".github/hooks/policy-enforcement.json",
+    ".github/hooks/scripts/README.md"
+  ],
+  "acceptance_criteria": [
+    "`.github/hooks/` directory exists with a valid JSON hook config (`policy-enforcement.json`)",
+    "`.github/hooks/scripts/` directory exists with a README explaining hook architecture",
+    "VS Code recognizes the hooks directory when `chat.hookFilesLocations` includes `.github/hooks`"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-17T15:54:38.856431+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-hooks-infrastructure.md"
+    },
+    {
+      "timestamp": "2026-03-17T15:54:38.864541+00:00",
+      "event": "MOVED_TO_READY",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Dependencies resolved, moved to READY"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-hooks-infrastructure.md",
+  "tags": [
+    "hooks",
+    "infrastructure",
+    "P0"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "ticket_id": "TASK-SYS-007",
+  "title": "Configure VS Code workspace settings for hooks and agent features",
+  "description": "Configure VS Code workspace settings to enable the hooks system, custom agent hooks, instruction file locations, agent file locations, and prompt file locations. This is the settings glue that activates all hook-based enforcement.",
+  "type": "infra",
+  "priority": "critical",
+  "stage": "BLOCKED",
+  "sdlc_flow": [
+    "READY",
+    "DEVOPS",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-17T15:54:38.856924+00:00",
+  "created_by": "TODO",
+  "dependencies": [
+    "TASK-SYS-001"
+  ],
+  "blocked_by": [
+    "TASK-SYS-001"
+  ],
+  "file_paths": [
+    ".vscode/settings.json"
+  ],
+  "acceptance_criteria": [
+    "Given settings.json is updated, when VS Code loads, then `chat.hookFilesLocations` includes `.github/hooks`",
+    "Given settings are applied, then `chat.useCustomAgentHooks` is `true`",
+    "Given settings are applied, then `chat.instructionsFilesLocations`, `chat.agentFilesLocations`, and `chat.promptFilesLocations` are correctly configured"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-17T15:54:38.856926+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-hooks-infrastructure.md"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-hooks-infrastructure.md",
+  "tags": [
+    "vscode",
+    "configuration",
+    "P0"
+  ]
+}

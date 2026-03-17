@@ -1,0 +1,57 @@
+{
+  "ticket_id": "TASK-SYS-028",
+  "title": "Implement MCP ticket server",
+  "description": "Implement the MCP ticket server designed in TASK-SYS-027. Wraps tickets.py as typed MCP tools with sandboxing. Configure in .vscode/mcp.json for VS Code auto-discovery.",
+  "type": "infra",
+  "priority": "low",
+  "stage": "BLOCKED",
+  "sdlc_flow": [
+    "READY",
+    "DEVOPS",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-17T15:54:38.857637+00:00",
+  "created_by": "TODO",
+  "dependencies": [
+    "TASK-SYS-027"
+  ],
+  "blocked_by": [
+    "TASK-SYS-027"
+  ],
+  "file_paths": [
+    ".github/mcp-servers/ticket-server/",
+    ".vscode/mcp.json"
+  ],
+  "acceptance_criteria": [
+    "Given the MCP server is implemented, when started, then it exposes all ticket management tools via MCP protocol",
+    "Given the server is configured in .vscode/mcp.json, when VS Code starts, then agents can invoke ticket tools directly",
+    "Given the server wraps tickets.py, when tools are called, then they produce identical results to CLI invocation",
+    "Given sandboxing is enabled, when the server runs, then it can only access .github/tickets/ and .github/ticket-state/"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-17T15:54:38.857639+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-skills-mcp.md"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-skills-mcp.md",
+  "tags": [
+    "mcp",
+    "infrastructure",
+    "P3"
+  ]
+}

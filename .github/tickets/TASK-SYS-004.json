@@ -1,0 +1,56 @@
+{
+  "ticket_id": "TASK-SYS-004",
+  "title": "Implement memory gate enforcement hook (SubagentStop)",
+  "description": "Implement a SubagentStop hook that verifies agents have written to `.github/memory-bank/activeContext.md` before being allowed to complete. Replaces the instruction-based \"Before DONE, write to memory bank\" rule with deterministic enforcement.",
+  "type": "infra",
+  "priority": "critical",
+  "stage": "BLOCKED",
+  "sdlc_flow": [
+    "READY",
+    "DEVOPS",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-17T15:54:38.856666+00:00",
+  "created_by": "TODO",
+  "dependencies": [
+    "TASK-SYS-001"
+  ],
+  "blocked_by": [
+    "TASK-SYS-001"
+  ],
+  "file_paths": [
+    ".github/hooks/scripts/verify-memory-gate.sh",
+    ".github/hooks/policy-enforcement.json"
+  ],
+  "acceptance_criteria": [
+    "Given a subagent completes work, when SubagentStop fires, then it checks `.github/memory-bank/activeContext.md` for a recent entry",
+    "Given no recent memory entry exists, when the hook evaluates, then it blocks completion with guidance",
+    "Given a valid memory entry exists, when the hook evaluates, then it allows the stop to proceed"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-17T15:54:38.856668+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-hooks-infrastructure.md"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-hooks-infrastructure.md",
+  "tags": [
+    "hooks",
+    "memory",
+    "P0"
+  ]
+}

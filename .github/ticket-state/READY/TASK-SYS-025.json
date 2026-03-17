@@ -1,0 +1,58 @@
+{
+  "ticket_id": "TASK-SYS-025",
+  "title": "Create skills directory and migrate first chunk",
+  "description": "Create the `.github/skills/` directory structure and migrate the first vibecoding chunk (boot-sequence) to the standard skills format. Each skill gets a `SKILL.md` file with proper frontmatter (name, description, user-invocable). This establishes the pattern for migrating all chunks.",
+  "type": "infra",
+  "priority": "medium",
+  "stage": "READY",
+  "sdlc_flow": [
+    "READY",
+    "DEVOPS",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-17T15:54:38.857430+00:00",
+  "created_by": "TODO",
+  "dependencies": [],
+  "blocked_by": [],
+  "file_paths": [
+    ".github/skills/boot-sequence/SKILL.md"
+  ],
+  "acceptance_criteria": [
+    "Given .github/skills/ directory is created, when VS Code scans for skills, then the directory is recognized",
+    "Given the boot-sequence skill is created, when any agent is invoked, then the boot sequence can be loaded as a skill",
+    "Given the SKILL.md frontmatter is valid, when examined, then it includes name, description, and optionally user-invocable"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-17T15:54:38.857432+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-skills-mcp.md"
+    },
+    {
+      "timestamp": "2026-03-17T15:54:38.864095+00:00",
+      "event": "MOVED_TO_READY",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Dependencies resolved, moved to READY"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-skills-mcp.md",
+  "tags": [
+    "skills",
+    "migration",
+    "P2"
+  ]
+}
