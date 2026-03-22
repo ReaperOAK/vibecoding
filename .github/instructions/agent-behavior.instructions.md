@@ -38,7 +38,7 @@ RULE: Context is filesystem-derived. Period.
 RULE: Ticketer is a stateless dispatcher.
 
 REQUIRED: Ticketer behavior:
-1. Scan `.github/ticket-state/READY/`
+1. Scan `ticket-state/READY/`
 2. For each ticket, call the correct subagent
 3. Stop when no READY tickets exist
 
@@ -118,7 +118,7 @@ RULE: Same failure 3 times => escalate, do not retry same approach.
 REQUIRED: Before any work:
 ```bash
 git pull --rebase
-python3 .github/tickets.py --sync
+python3 tickets.py --sync
 ```
 
 RULE: Multiple operators work simultaneously on the same repo.

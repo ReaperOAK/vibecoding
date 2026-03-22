@@ -57,17 +57,17 @@ Execute in order. No skips.
 
 1. Read `.github/guardian/STOP_ALL` — if `STOP`, halt immediately, zero edits.
 2. Read all 6 files in `.github/instructions/` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management).
-3. Read upstream summary: `.github/agent-output/CIReviewer/{ticket-id}.md`.
+3. Read upstream summary: `agent-output/CIReviewer/{ticket-id}.md`.
 4. Read all files in `.github/vibecoding/chunks/Documentation.agent/`.
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
-6. Read ticket JSON from `.github/ticket-state/DOCS/{ticket-id}.json`.
+6. Read ticket JSON from `ticket-state/DOCS/{ticket-id}.json`.
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
 RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Read ticket JSON from `.github/ticket-state/DOCS/{ticket-id}.json`.
+1. Read ticket JSON from `ticket-state/DOCS/{ticket-id}.json`.
 2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
 3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
 4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
@@ -93,9 +93,9 @@ After verifying claim, execute docs work:
 
 ## 6. Work Commit (Commit 2)
 
-1. Write summary to `.github/agent-output/Documentation/{ticket-id}.md`.
-2. Delete upstream summary: `.github/agent-output/CIReviewer/{ticket-id}.md`.
-3. Move ticket JSON to `.github/ticket-state/VALIDATION/{ticket-id}.json`
+1. Write summary to `agent-output/Documentation/{ticket-id}.md`.
+2. Delete upstream summary: `agent-output/CIReviewer/{ticket-id}.md`.
+3. Move ticket JSON to `ticket-state/VALIDATION/{ticket-id}.json`
    (remove from `DOCS/`). Update ticket metadata with completion info.
 4. Append memory entry to `.github/memory-bank/activeContext.md`:
    ```markdown

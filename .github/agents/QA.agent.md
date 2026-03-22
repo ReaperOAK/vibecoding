@@ -55,17 +55,17 @@ Execute in order before any work. No skips.
 
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: halt, zero edits, report blocked
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
-3. Read upstream summary from `.github/agent-output/{PreviousAgent}/{ticket-id}.md`
+3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md`
 4. Read all files in `.github/vibecoding/chunks/QA.agent/`
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
-6. Read ticket JSON from `.github/ticket-state/QA/{ticket-id}.json`
+6. Read ticket JSON from `ticket-state/QA/{ticket-id}.json`
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
 RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Read ticket JSON from `.github/ticket-state/QA/{ticket-id}.json`.
+1. Read ticket JSON from `ticket-state/QA/{ticket-id}.json`.
 2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
 3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
 4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
@@ -117,20 +117,20 @@ RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
 **PASS** — All quality gates satisfied:
 - All tests pass, coverage ≥80%, mutation score meets targets, no critical defects
-- Advance ticket: `python3 .github/tickets.py --advance {ticket-id} QA`
+- Advance ticket: `python3 tickets.py --advance {ticket-id} QA`
 
 **FAIL** — Any gate fails:
 - Document specific failures: file, line, test name, expected vs actual
-- Send for rework: `python3 .github/tickets.py --rework {ticket-id} QA "{reason}"`
+- Send for rework: `python3 tickets.py --rework {ticket-id} QA "{reason}"`
 - Rework reason must include actionable fix guidance
 
 ## 7. Work Commit (Commit 2)
 
-1. Write QA report to `.github/agent-output/QA/{ticket-id}.md` (include verdict, evidence, metrics)
-2. Delete previous stage summary from `.github/agent-output/{PreviousAgent}/{ticket-id}.md`
-3. If PASS: move ticket to `.github/ticket-state/SECURITY/{ticket-id}.json`
+1. Write QA report to `agent-output/QA/{ticket-id}.md` (include verdict, evidence, metrics)
+2. Delete previous stage summary from `agent-output/{PreviousAgent}/{ticket-id}.md`
+3. If PASS: move ticket to `ticket-state/SECURITY/{ticket-id}.json`
 4. If FAIL: ticket stays in rework state (handled by tickets.py)
-5. Update master copy at `.github/tickets/{ticket-id}.json`
+5. Update master copy at `tickets/{ticket-id}.json`
 6. Append memory entry to `.github/memory-bank/activeContext.md` with ticket-id, artifacts, verdict, mutation score, coverage, and ISO8601 timestamp
 7. Stage ONLY modified files explicitly — NEVER `git add .` or `git add -A`
 8. `git commit -m "[{ticket-id}] QA complete by QA on {machine}"`
@@ -138,7 +138,7 @@ RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
 ## 8. Scope
 
-- **Included:** test files, test configs, test fixtures, coverage reports, QA reports, `.github/agent-output/QA/`
+- **Included:** test files, test configs, test fixtures, coverage reports, QA reports, `agent-output/QA/`
 - **Excluded:** implementation code (read-only), CI/CD configs, infrastructure, architecture decisions, deployment
 
 ## 9. Forbidden Actions

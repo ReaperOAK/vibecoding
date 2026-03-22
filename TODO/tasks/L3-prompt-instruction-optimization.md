@@ -42,7 +42,7 @@ Add `tools` field to prompt files to scope tool availability per workflow. The s
 **Tags:** instructions, scoping, P2
 
 ## Description
-Create a new instruction file scoped to `applyTo: '**/*.py'` with Python-specific conventions for the ticket system code (tickets.py, agent-runner.py). Only loaded when agents work on Python files, reducing context bloat for non-Python work.
+Create a new instruction file scoped to `applyTo: '**/*.py'` with Python-specific conventions for the ticket system code (tickets.py). Only loaded when agents work on Python files, reducing context bloat for non-Python work.
 
 ## Acceptance Criteria
 - [ ] Given a new instruction file with applyTo `**/*.py`, when an agent works on tickets.py, then Python-specific rules are loaded

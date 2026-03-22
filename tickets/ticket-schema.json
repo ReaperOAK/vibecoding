@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-v1",
   "title": "Distributed Ticket Schema",
-  "description": "Canonical schema for ticket files in the distributed Git-native SDLC engine. Each ticket exists as .github/tickets/<ticket-id>.json and its state is determined by its location in .github/ticket-state/<STAGE>/",
+  "description": "Canonical schema for ticket files in the distributed Git-native SDLC engine. Each ticket exists as tickets/<ticket-id>.json and its state is determined by its location in ticket-state/<STAGE>/",
   "type": "object",
   "required": [
     "ticket_id",
@@ -59,7 +59,7 @@
         "VALIDATION",
         "DONE"
       ],
-      "description": "Current lifecycle stage. Must match directory location in .github/ticket-state/"
+      "description": "Current lifecycle stage. Must match directory location in ticket-state/"
     },
     "sdlc_flow": {
       "type": "array",

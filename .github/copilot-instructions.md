@@ -23,7 +23,6 @@ Ticketer (stateless dispatcher).
   vibecoding/          # Context chunks, catalog, index
   guardian/            # Circuit breaker (STOP_ALL)
   tickets.py           # Distributed ticket state machine manager
-  agent-runner.py      # Dispatcher-claim protocol execution runner
 TODO/                  # Task decomposition artifacts
 docs/uiux/            # UI/UX design artifacts
 ```
@@ -33,9 +32,9 @@ docs/uiux/            # UI/UX design artifacts
 - **Ticketer**: Stateless dispatcher. Scans READY tickets, dispatches workers, advances lifecycle.
 - **Distributed execution**: Multiple operators on multiple machines via Git-native locking.
 - **Dispatcher-claim protocol**: Ticketer performs CLAIM commit (distributed lock via push), subagent performs WORK commit (deliverables).
-- **File-based state machine**: Ticket state = directory location under .github/ticket-state/.
+- **File-based state machine**: Ticket state = directory location under ticket-state/.
 - **14 agents**: Architect, Backend, Frontend, QA, Security, DevOps, Documentation, Research, ProductManager, CIReviewer, UIDesigner, TODO, Validator.
-- **Summary handoff**: Context flows via .github/agent-output/{Agent}/{ticket-id}.md files.
+- **Summary handoff**: Context flows via agent-output/{Agent}/{ticket-id}.md files.
 - **Memory bank**: Git-tracked markdown files for cross-session persistence.
 
 ## Key Conventions

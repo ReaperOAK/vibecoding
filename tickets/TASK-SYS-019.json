@@ -1,7 +1,7 @@
 {
   "ticket_id": "TASK-SYS-019",
   "title": "Add agent-scoped PreToolUse hook to Ticketer to block code modifications",
-  "description": "Add an agent-scoped PreToolUse hook to Ticketer that blocks any attempt to edit code files. Only ticket JSON files in .github/tickets/ and .github/ticket-state/ are allowed.",
+  "description": "Add an agent-scoped PreToolUse hook to Ticketer that blocks any attempt to edit code files. Only ticket JSON files in tickets/ and ticket-state/ are allowed.",
   "type": "infra",
   "priority": "high",
   "stage": "BLOCKED",
@@ -29,7 +29,7 @@
   ],
   "acceptance_criteria": [
     "Given Ticketer has a PreToolUse hook, when it attempts to edit a code file, then the hook denies with reason \"Ticketer is a dispatcher, not an implementer\"",
-    "Given the file being edited is a .json in .github/tickets/ or .github/ticket-state/, then the hook allows",
+    "Given the file being edited is a .json in tickets/ or ticket-state/, then the hook allows",
     "Given the hook is agent-scoped, when other agents run, then this hook does NOT fire"
   ],
   "rework_count": 0,

@@ -1,7 +1,7 @@
 {
   "ticket_id": "TASK-SYS-022",
   "title": "Create pattern-scoped instruction for Python files",
-  "description": "Create a new instruction file scoped to `applyTo: '**/*.py'` with Python-specific conventions for the ticket system code (tickets.py, agent-runner.py). Only loaded when agents work on Python files, reducing context bloat for non-Python work.",
+  "description": "Create a new instruction file scoped to `applyTo: '**/*.py'` with Python-specific conventions for the ticket system code (tickets.py). Only loaded when agents work on Python files, reducing context bloat for non-Python work.",
   "type": "architecture",
   "priority": "medium",
   "stage": "READY",

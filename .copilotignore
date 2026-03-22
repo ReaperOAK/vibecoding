@@ -1,7 +1,7 @@
 # Block AI from indexing state and logs
-.github/ticket-state/**
-.github/tickets/**
-.github/agent-output/**
+ticket-state/**
+tickets/**
+agent-output/**
 logs/**
 Copilot-Processing.md
 Claude-Processing.md

@@ -60,10 +60,10 @@ UIDesigner artifacts are a **blocking gate** for Frontend implementation.
 Execute in strict order before any work:
 1. Read `.github/guardian/STOP_ALL` — if `STOP`: halt, zero edits
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
-3. Read upstream summary from `.github/agent-output/{PreviousAgent}/{ticket-id}.md`
+3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md`
 4. Read `.github/vibecoding/chunks/UIDesigner.agent/` (all chunks)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
-6. Read ticket JSON from `.github/ticket-state/` or `.github/tickets/`
+6. Read ticket JSON from `ticket-state/` or `tickets/`
 7. Read Stitch project ID from `.github/stitch-project-id.txt` if exists (persist across tickets for continuity)
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
@@ -71,7 +71,7 @@ Execute in strict order before any work:
 RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Read ticket JSON from `.github/ticket-state/FRONTEND/{ticket-id}.json`.
+1. Read ticket JSON from `ticket-state/FRONTEND/{ticket-id}.json`.
 2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
 3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
 4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
@@ -125,7 +125,7 @@ This document is the **gate artifact** — Frontend cannot start without it.
 
 ## 6. Work Commit (Commit 2)
 
-1. Write summary to `.github/agent-output/UIDesigner/{ticket-id}.md`
+1. Write summary to `agent-output/UIDesigner/{ticket-id}.md`
 2. Write approved mockup to `docs/uiux/mockups/{ticket-id}.md`
 3. Persist Stitch screenshots to `docs/uiux/mockups/{ticket-id}/` as PNGs
 4. Delete previous stage summary after reading it

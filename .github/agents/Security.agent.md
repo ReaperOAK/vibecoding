@@ -59,17 +59,17 @@ Execute in order before any work. Abort if any step fails.
 
 1. Read `.github/guardian/STOP_ALL` — if it contains `STOP`, halt immediately, zero edits.
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management).
-3. Read upstream QA summary from `.github/agent-output/QA/{ticket-id}.md`.
+3. Read upstream QA summary from `agent-output/QA/{ticket-id}.md`.
 4. Read all chunks in `.github/vibecoding/chunks/Security.agent/`.
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
-6. Read ticket JSON from `.github/ticket-state/SECURITY/{ticket-id}.json`.
+6. Read ticket JSON from `ticket-state/SECURITY/{ticket-id}.json`.
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
 RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Read ticket JSON from `.github/ticket-state/SECURITY/{ticket-id}.json`.
+1. Read ticket JSON from `ticket-state/SECURITY/{ticket-id}.json`.
 2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
 3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
 4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
@@ -121,19 +121,19 @@ For every ticket, perform ALL of the following analyses on modified files:
 → Advance ticket to CI stage.
 
 **FAIL** — Any critical or high finding present.
-→ Reject ticket. Execute: `python3 .github/tickets.py --rework {ticket-id} Security "{finding summary}"`
+→ Reject ticket. Execute: `python3 tickets.py --rework {ticket-id} Security "{finding summary}"`
 → Append entry to `.github/memory-bank/riskRegister.md` with threat details, severity, and recommended fix.
 
 ## 7. Work Commit (Commit 2)
 
-1. Write security report to `.github/agent-output/Security/{ticket-id}.md` including: STRIDE model, OWASP checklist, SARIF findings, SBOM summary, verdict.
-2. Delete previous stage summary: `.github/agent-output/QA/{ticket-id}.md`.
-3. If PASS: move ticket to `.github/ticket-state/CI/{ticket-id}.json`.
+1. Write security report to `agent-output/Security/{ticket-id}.md` including: STRIDE model, OWASP checklist, SARIF findings, SBOM summary, verdict.
+2. Delete previous stage summary: `agent-output/QA/{ticket-id}.md`.
+3. If PASS: move ticket to `ticket-state/CI/{ticket-id}.json`.
 4. If FAIL: rework via `tickets.py` (ticket stays in SECURITY or returns to its implementation stage).
 5. Append memory entry to `.github/memory-bank/activeContext.md`:
    ```
    ### [{ticket-id}] — Security Review
-   - **Artifacts:** .github/agent-output/Security/{ticket-id}.md
+   - **Artifacts:** agent-output/Security/{ticket-id}.md
    - **Decisions:** {verdict} — {rationale}
    - **Timestamp:** {ISO8601}
    ```

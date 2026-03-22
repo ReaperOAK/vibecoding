@@ -21,9 +21,9 @@
 # Protected paths (never touched, even if upstream has them):
 #   README.md (repo-specific)
 #   .github/memory-bank/ (project-specific persistent state)
-#   .github/tickets/ (project-specific ticket definitions)
-#   .github/ticket-state/ (project-specific ticket state machine)
-#   .github/agent-output/ (runtime agent artifacts)
+#   tickets/ (project-specific ticket definitions)
+#   ticket-state/ (project-specific ticket state machine)
+#   agent-output/ (runtime agent artifacts)
 #   .github/copilot-instructions.md (project-specific Copilot config)
 #
 # Usage:

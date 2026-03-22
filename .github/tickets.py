@@ -119,7 +119,7 @@ def find_ticket_in_states(ticket_id: str) -> Optional[tuple[str, Path]]:
 
 
 def canonical_ticket_path(ticket_id: str) -> Path:
-    """Master ticket record in .github/tickets/"""
+    """Master ticket record in tickets/"""
     return TICKETS_DIR / f"{ticket_id}.json"
 
 
@@ -165,7 +165,7 @@ def create_ticket(
     source_task_file: str | None = None,
     tags: list[str] | None = None,
 ) -> dict:
-    """Create a new ticket JSON and save it to .github/tickets/"""
+    """Create a new ticket JSON and save it to tickets/"""
     if ticket_type not in SDLC_FLOWS:
         raise ValueError(f"Unknown ticket type: {ticket_type}. Valid: {list(SDLC_FLOWS.keys())}")
 

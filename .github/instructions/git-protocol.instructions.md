@@ -19,7 +19,7 @@ PROHIBITED: Skipping either commit.
 
 ## 2. Commit 1 — CLAIM (Performed by Ticketer / Dispatcher)
 
-RULE: Only Ticketer (or `agent-runner.py --claim-only`) executes claim commits.
+
 REQUIRED: `git pull --rebase` before claim.
 REQUIRED: Verify ticket exists in expected stage directory.
 REQUIRED: Verify ticket is unclaimed or lease has expired.
@@ -32,8 +32,8 @@ REQUIRED: Update ticket JSON metadata:
 
 REQUIRED: Stage ONLY ticket JSON files:
 ```bash
-git add .github/ticket-state/<STAGE>/<ticket-id>.json
-git add .github/tickets/<ticket-id>.json
+git add ticket-state/<STAGE>/<ticket-id>.json
+git add tickets/<ticket-id>.json
 git commit -m "[<ticket-id>] CLAIM by <agent> on <machine> (<operator>)"
 git push
 ```
@@ -46,7 +46,7 @@ PROHIBITED: Subagents performing this step — it is dispatcher-only.
 ## 3. Commit 2 — WORK (Performed by Subagent)
 
 REQUIRED: Execute agent work for the assigned stage.
-REQUIRED: Write summary to `.github/agent-output/{AgentName}/{ticket-id}.md`.
+REQUIRED: Write summary to `agent-output/{AgentName}/{ticket-id}.md`.
 REQUIRED: Delete previous stage summary after reading it.
 REQUIRED: Move ticket JSON to next stage directory.
 REQUIRED: Update ticket JSON with completion metadata.
@@ -97,7 +97,7 @@ REQUIRED: Any machine may reclaim an expired-lease ticket.
 
 RULE: Each agent writes exactly one summary file per ticket.
 RULE: Filename: `{ticket-id}.md`
-RULE: Location: `.github/agent-output/{AgentName}/{ticket-id}.md`
+RULE: Location: `agent-output/{AgentName}/{ticket-id}.md`
 RULE: Agent reads ONLY previous stage summary.
 RULE: Agent deletes previous stage summary after processing.
 PROHIBITED: Cross-stage summary reading.
@@ -105,7 +105,7 @@ PROHIBITED: Cross-agent summary reading outside the chain.
 
 RULE: Summary directories:
 ```
-.github/agent-output/
+agent-output/
     Architect/  
     Research/  
     Backend/  

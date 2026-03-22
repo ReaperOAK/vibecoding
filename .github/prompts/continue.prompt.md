@@ -35,20 +35,20 @@ read_file(".github/memory-bank/activeContext.md")
 read_file(".github/memory-bank/progress.md")
 read_file(".github/memory-bank/decisionLog.md")
 read_file(".github/memory-bank/riskRegister.md")
-run_in_terminal("python3 .github/tickets.py --status --json")
+run_in_terminal("python3 tickets.py --status --json")
 ```
 
 **1c.** Get current ticket landscape:
 
 ```bash
-python3 .github/tickets.py --sync
-python3 .github/tickets.py --status --json
+python3 tickets.py --sync
+python3 tickets.py --status --json
 ```
 
 **1d.** Verify boot sequence compliance — ensure agents follow the 11-step boot from `agents.md`:
 - STOP_ALL check → instructions → agent file (with Tool Loadout) → upstream summary → chunks → catalog → sequentialthinking plan
 
-**1e.** Detect anomalies — scan `.github/ticket-state/*` for:
+**1e.** Detect anomalies — scan `ticket-state/*` for:
 
 - Tickets stuck in: BACKEND, FRONTEND, QA, SECURITY, CI, DOCS, VALIDATION
   (need SDLC chain completion in Step 2)
@@ -136,8 +136,8 @@ share file paths can be processed simultaneously.
 **3a.** Get READY tickets:
 
 ```bash
-python3 .github/tickets.py --sync
-python3 .github/tickets.py --status --json
+python3 tickets.py --sync
+python3 tickets.py --status --json
 ```
 
 **3b.** Filter and sort:
@@ -254,8 +254,8 @@ No skipping stages. No partial execution. Each stage advances via `tickets.py --
 
 After completing Step 4 for dispatched tickets:
 
-1. Re-run `python3 .github/tickets.py --sync` to evaluate dependencies and move newly unblocked tickets to READY.
-2. Re-run `python3 .github/tickets.py --status --json`.
+1. Re-run `python3 tickets.py --sync` to evaluate dependencies and move newly unblocked tickets to READY.
+2. Re-run `python3 tickets.py --status --json`.
 3. If new READY tickets exist → return to Step 3.
 4. If no READY tickets remain and no active workers → proceed to Step 6.
 

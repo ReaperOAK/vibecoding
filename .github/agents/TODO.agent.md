@@ -2,7 +2,7 @@
 name: 'TODO'
 description: 'Progressive refinement decomposition engine with 3 operating modes (Strategist, Planner, Executor Controller). Decomposes project visions through 5 layers (L0-L4) into granular, trackable tasks. Manages task lifecycle, enforces controlled expansion, and generates tickets.py-compatible task files.'
 user-invocable: false
-tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]  # runInTerminal constrained: python .github/tickets.py ONLY
+tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]  # runInTerminal constrained: python tickets.py ONLY
 model: Claude Opus 4.6 (copilot)
 ---
 
@@ -45,7 +45,7 @@ TODO does NOT implement code — it decomposes only.
 2. **Read State:** Use `memory/read_graph` to understand the historical context and existing ticket landscape.
 3. **Navigate Code:** Use `oraios/serena/find_symbol` and `oraios/serena/get_symbols_overview` to understand codebase boundaries for accurate task scoping.
 4. **Decompose:** Use `sequentialthinking/*` to methodically break down L0→L1→L2→L3 layers.
-5. **Generate Tickets:** Use `execute/runInTerminal` to run `python3 .github/tickets.py --parse TODO/`.
+5. **Generate Tickets:** Use `execute/runInTerminal` to run `python3 tickets.py --parse TODO/`.
 6. **Log State:** Use `memory/add_observations` at the end to record decomposition tree, ticket IDs, and dependency graph for the next agent.
 
 ---
@@ -60,7 +60,7 @@ L3 tasks become ticket JSON files that enter the stage-based pipeline at READY.
 Execute in order before any work:
 1. Read `.github/guardian/STOP_ALL` — if STOP: halt, zero edits
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
-3. Read upstream summary from `.github/agent-output/TODO/{ticket-id}.md` (if exists)
+3. Read upstream summary from `agent-output/TODO/{ticket-id}.md` (if exists)
 4. Read `.github/vibecoding/chunks/TODO.agent/` (all chunk files)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
 6. Read delegation packet / assignment from Ticketer
@@ -69,7 +69,7 @@ Execute in order before any work:
 
 - Only Ticketer may invoke TODO agent
 - TODO does NOT claim SDLC tickets via dispatcher-claim protocol
-- TODO outputs ticket JSON files via `python3 .github/tickets.py --parse TODO/`
+- TODO outputs ticket JSON files via `python3 tickets.py --parse TODO/`
 - Decomposition MUST follow L0→L1→L2→L3 strictly (no jumping L0→L3)
 - Each invocation handles exactly one mode; multi-mode requires sequential calls
 - On ambiguous scope: emit `REQUIRES_STRATEGIC_INPUT` and halt
@@ -105,9 +105,9 @@ Execute in order before any work:
 
 L3 tasks are written as markdown in `TODO/` then parsed into ticket JSON:
 ```bash
-python3 .github/tickets.py --parse TODO/
+python3 tickets.py --parse TODO/
 ```
-This creates JSON files in `.github/tickets/` and places them in `.github/ticket-state/READY/`.
+This creates JSON files in `tickets/` and places them in `ticket-state/READY/`.
 
 Task ID convention must match regex: `^(#{2,4})\s+([A-Z][A-Z0-9-]*\d{3,4}):\s*(.+)$`
 
@@ -120,9 +120,9 @@ CIR (CI Reviewer), UID (UIDesigner), SYS (System/cross-cutting).
 | Artifact | Location |
 |----------|----------|
 | L1/L2/L3 decomposition files | `TODO/` |
-| Ticket JSON files | `.github/tickets/` |
-| State copies | `.github/ticket-state/READY/` |
-| Agent summary | `.github/agent-output/TODO/{ticket-id}.md` |
+| Ticket JSON files | `tickets/` |
+| State copies | `ticket-state/READY/` |
+| Agent summary | `agent-output/TODO/{ticket-id}.md` |
 | Memory entry | `.github/memory-bank/activeContext.md` (append-only) |
 
 ## 8. Scope
@@ -131,7 +131,7 @@ CIR (CI Reviewer), UID (UIDesigner), SYS (System/cross-cutting).
 - **Excluded:** Implementation code, test execution, architecture decisions, SDLC stage processing
 
 ## Constraint
-runInTerminal restricted to: python .github/tickets.py commands ONLY.
+runInTerminal restricted to: python tickets.py commands ONLY.
 
 ## 9. Forbidden Actions
 
@@ -141,8 +141,8 @@ runInTerminal restricted to: python .github/tickets.py commands ONLY.
 - Processing SDLC tickets (TODO creates tickets, not processes them)
 - Cross-ticket references in worker output
 - Self-initiating strategic decisions without delegation
-- Running any terminal command other than `python3 .github/tickets.py`
-- Modifying files outside `TODO/`, `.github/tickets/`, `.github/ticket-state/`, `.github/agent-output/TODO/`
+- Running any terminal command other than `python3 tickets.py`
+- Modifying files outside `TODO/`, `tickets/`, `ticket-state/`, `agent-output/TODO/`
 - Using or browsing tools outside the Assigned Tool Loadout section — strict boundary enforced.
 - Hallucinating tool names or capabilities not explicitly listed in the loadout.
 

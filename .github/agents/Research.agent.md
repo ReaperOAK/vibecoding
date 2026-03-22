@@ -56,17 +56,17 @@ Execute in order before any work. No skips.
 
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: halt, zero edits
 2. Read all files in `.github/instructions/` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
-3. Read upstream summary from `.github/agent-output/{PreviousAgent}/{ticket-id}.md` (if exists)
+3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md` (if exists)
 4. Read all files in `.github/vibecoding/chunks/Research.agent/`
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
-6. Read ticket JSON from `.github/ticket-state/RESEARCH/{ticket-id}.json`
+6. Read ticket JSON from `ticket-state/RESEARCH/{ticket-id}.json`
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
 RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Read ticket JSON from `.github/ticket-state/RESEARCH/{ticket-id}.json`.
+1. Read ticket JSON from `ticket-state/RESEARCH/{ticket-id}.json`.
 2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
 3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
 4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
@@ -115,13 +115,13 @@ RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
 ## 6. Work Commit (Commit 2)
 
-1. Write structured research report to `.github/agent-output/Research/{ticket-id}.md` — must include: metadata, executive summary, research question, prior belief, methodology, findings per option with repo health scores, weighted comparison matrix, contradictions found, recommendation with confidence, risks, validity window, refresh schedule
-2. Delete previous stage summary (`.github/agent-output/{PreviousAgent}/{ticket-id}.md`)
-3. Move ticket JSON to `.github/ticket-state/DOCS/{ticket-id}.json`; update completion metadata
+1. Write structured research report to `agent-output/Research/{ticket-id}.md` — must include: metadata, executive summary, research question, prior belief, methodology, findings per option with repo health scores, weighted comparison matrix, contradictions found, recommendation with confidence, risks, validity window, refresh schedule
+2. Delete previous stage summary (`agent-output/{PreviousAgent}/{ticket-id}.md`)
+3. Move ticket JSON to `ticket-state/DOCS/{ticket-id}.json`; update completion metadata
 4. Append memory entry to `.github/memory-bank/activeContext.md`:
    ```markdown
    ### [{ticket-id}] — Summary
-   - **Artifacts:** .github/agent-output/Research/{ticket-id}.md
+   - **Artifacts:** agent-output/Research/{ticket-id}.md
    - **Decisions:** {key recommendation with confidence level}
    - **Timestamp:** {ISO8601}
    ```

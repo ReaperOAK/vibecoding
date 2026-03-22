@@ -35,8 +35,8 @@ REQUIRED: Before any work, read in order:
 2. `.github/instructions/` (all 6 files)
 3. `.github/vibecoding/chunks/{YourAgent}.agent/` (all files)
 4. `.github/vibecoding/catalog.yml` (load task-relevant chunks)
-5. Upstream summary from `.github/agent-output/{PreviousAgent}/{ticket-id}.md`
-6. Ticket JSON from `.github/ticket-state/` or `.github/tickets/`
+5. Upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md`
+6. Ticket JSON from `ticket-state/` or `tickets/`
 
 PROHIBITED: Starting work without completing boot sequence.
 
