@@ -34,7 +34,7 @@ git commit -m "chore: sync vibecoding infrastructure"
 
 ## How it works
 
-**Ticketer** is a stateless dispatcher. It scans `.github/ticket-state/READY/`, performs a CLAIM commit (distributed lock via git push), then dispatches a subagent to do the work. The subagent performs one WORK commit and exits.
+**Ticketer** is a stateless dispatcher. It scans `ticket-state/READY/`, performs a CLAIM commit (distributed lock via git push), then dispatches a subagent to do the work. The subagent performs one WORK commit and exits.
 
 ```
 READY → [impl stage] → QA → SECURITY → CI → DOCS → VALIDATION → DONE
@@ -105,7 +105,6 @@ Every ticket must pass all 10 items before reaching DONE:
   vibecoding/      Token-budgeted YAML instruction chunks + catalog
   guardian/        Circuit breaker (STOP_ALL)
   tickets.py       Ticket state manager (--sync --claim --advance --status)
-  agent-runner.py  Dispatcher-claim protocol runner
 
 agents.md          Boot protocol — loaded on every agent interaction
 todo_visual.py     CLI dashboard for ticket state
@@ -129,13 +128,13 @@ bash scripts/sync-vibecoding.sh
 #   - Read existing docs/code
 #   - Delegate to Research Analyst, Product Manager, Architect
 #   - Run TODO agent to generate tickets
-#   - Sync ticket state: python3 .github/tickets.py --sync
+#   - Sync ticket state: python3 tickets.py --sync
 #
 # 3. Once tickets exist in READY, run Ticketer:
 #    "You are Ticketer. Process all READY tickets."
 
 # Check ticket status anytime
-python3 .github/tickets.py --status
+python3 tickets.py --status
 python3 todo_visual.py
 ```
 

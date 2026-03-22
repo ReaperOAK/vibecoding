@@ -45,22 +45,22 @@ Independent SDLC compliance reviewer — verifies Definition of Done, runs quali
 ---
 
 ## 2. Stage
-`VALIDATION` — processes tickets after Documentation stage. Tickets arrive from `.github/ticket-state/VALIDATION/`.
+`VALIDATION` — processes tickets after Documentation stage. Tickets arrive from `ticket-state/VALIDATION/`.
 
 ## 3. Boot Sequence (run in order, no skips)
 1. Read `.github/guardian/STOP_ALL` — if `STOP`: halt, zero edits.
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management).
-3. Read upstream summary from `.github/agent-output/Documentation/{ticket-id}.md`.
+3. Read upstream summary from `agent-output/Documentation/{ticket-id}.md`.
 4. Read `.github/vibecoding/chunks/Validator.agent/` (all chunk files).
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
-6. Read ticket JSON from `.github/ticket-state/VALIDATION/{ticket-id}.json`.
+6. Read ticket JSON from `ticket-state/VALIDATION/{ticket-id}.json`.
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
 RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Read ticket JSON from `.github/ticket-state/VALIDATION/{ticket-id}.json`.
+1. Read ticket JSON from `ticket-state/VALIDATION/{ticket-id}.json`.
 2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
 3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
 4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
@@ -100,15 +100,15 @@ ELSE → verdict = REJECTED (list all failures with evidence)
 ```
 
 ## 6. Verdict Actions
-- **APPROVE:** `python3 .github/tickets.py --advance {ticket-id} Validator` → move to DONE.
-- **REJECT:** `python3 .github/tickets.py --rework {ticket-id} Validator "{reason}"` → back to implementation stage with evidence.
+- **APPROVE:** `python3 tickets.py --advance {ticket-id} Validator` → move to DONE.
+- **REJECT:** `python3 tickets.py --rework {ticket-id} Validator "{reason}"` → back to implementation stage with evidence.
 
 ## 7. Work Commit (Commit 2)
-1. Write validation report to `.github/agent-output/Validator/{ticket-id}.md`.
+1. Write validation report to `agent-output/Validator/{ticket-id}.md`.
 2. Delete previous stage summary (Documentation's `{ticket-id}.md`).
-3. If APPROVED: move ticket JSON to `.github/ticket-state/DONE/{ticket-id}.json`.
+3. If APPROVED: move ticket JSON to `ticket-state/DONE/{ticket-id}.json`.
 4. If REJECTED: ticket goes back for rework (tickets.py handles state).
-5. Run `python3 .github/tickets.py --sync` to unblock freed downstream tasks.
+5. Run `python3 tickets.py --sync` to unblock freed downstream tasks.
 6. Write memory entry to `.github/memory-bank/activeContext.md`:
    ```
    ### [TICKET-ID] — Validation Summary

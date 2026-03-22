@@ -57,17 +57,17 @@ Before ANY work, execute in order — no skips:
 
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: halt immediately, zero edits.
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management).
-3. Read upstream summary from `.github/agent-output/{PreviousAgent}/{ticket-id}.md` (if exists).
+3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md` (if exists).
 4. Read all chunk files in `.github/vibecoding/chunks/Backend.agent/`.
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
-6. Read ticket JSON from `.github/ticket-state/` or `.github/tickets/`.
+6. Read ticket JSON from `ticket-state/` or `tickets/`.
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
 RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Read ticket JSON from `.github/ticket-state/BACKEND/{ticket-id}.json`.
+1. Read ticket JSON from `ticket-state/BACKEND/{ticket-id}.json`.
 2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
 3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
 4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
@@ -105,11 +105,11 @@ RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
 After implementation is complete:
 
-1. Write summary to `.github/agent-output/Backend/{ticket-id}.md` including:
+1. Write summary to `agent-output/Backend/{ticket-id}.md` including:
    - Files created/modified, tests created, TDD evidence, coverage metrics.
 2. Delete previous stage summary after reading it.
 3. Update ticket JSON with completion metadata (`status`, `completed_at`, `artifacts`).
-4. Move ticket to next stage: `.github/ticket-state/QA/{ticket-id}.json`.
+4. Move ticket to next stage: `ticket-state/QA/{ticket-id}.json`.
 5. Append memory entry to `.github/memory-bank/activeContext.md`:
    ```markdown
    ### [{ticket-id}] — Summary
@@ -120,8 +120,8 @@ After implementation is complete:
 6. Stage ONLY modified files explicitly — one `git add <file>` per file:
    ```bash
    git add src/path/to/file.ts tests/path/to/test.ts
-   git add .github/agent-output/Backend/{ticket-id}.md
-   git add .github/ticket-state/QA/{ticket-id}.json .github/tickets/{ticket-id}.json
+   git add agent-output/Backend/{ticket-id}.md
+   git add ticket-state/QA/{ticket-id}.json tickets/{ticket-id}.json
    git add .github/memory-bank/activeContext.md
    ```
    **NEVER:** `git add .` / `git add -A` / `git add --all`

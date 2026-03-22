@@ -113,7 +113,7 @@ runSubagent("Research Analyst", prompt="
   - Technology comparisons where applicable
   - Specific recommendations with trade-off analysis
   
-  Write summary to: .github/agent-output/Research/CTO-research.md
+  Write summary to: agent-output/Research/CTO-research.md
 ")
 ```
 
@@ -129,7 +129,7 @@ runSubagent("Product Manager", prompt="
   
   Context:
   - Discovery brief: {summary from Phase 1}
-  - Research findings: .github/agent-output/Research/CTO-research.md
+  - Research findings: agent-output/Research/CTO-research.md
   
   Required outputs:
   - Product vision and goals
@@ -140,7 +140,7 @@ runSubagent("Product Manager", prompt="
   - Out-of-scope items (explicit exclusions)
   
   Write PRD to: docs/PRD.md
-  Write summary to: .github/agent-output/ProductManager/CTO-prd.md
+  Write summary to: agent-output/ProductManager/CTO-prd.md
 ")
 ```
 
@@ -156,7 +156,7 @@ runSubagent("Architect", prompt="
   
   Context:
   - PRD: docs/PRD.md
-  - Research: .github/agent-output/Research/CTO-research.md
+  - Research: agent-output/Research/CTO-research.md
   - Discovery: {summary from Phase 1}
   
   Required outputs:
@@ -170,7 +170,7 @@ runSubagent("Architect", prompt="
   
   Write architecture doc to: docs/ARCHITECTURE.md
   Write ADRs to: docs/adr/
-  Write summary to: .github/agent-output/Architect/CTO-architecture.md
+  Write summary to: agent-output/Architect/CTO-architecture.md
 ")
 ```
 
@@ -188,7 +188,7 @@ runSubagent("TODO", prompt="
   Context:
   - PRD: docs/PRD.md
   - Architecture: docs/ARCHITECTURE.md
-  - Research: .github/agent-output/Research/CTO-research.md
+  - Research: agent-output/Research/CTO-research.md
   
   Requirements:
   - L0: Project vision (single entry)
@@ -203,10 +203,10 @@ runSubagent("TODO", prompt="
   4. Frontend components and layouts
   5. Integration, testing, and documentation
   
-  Parse tickets: python3 .github/tickets.py --parse TODO/tasks/
-  Sync state: python3 .github/tickets.py --sync
+  Parse tickets: python3 tickets.py --parse TODO/tasks/
+  Sync state: python3 tickets.py --sync
   
-  Write summary to: .github/agent-output/TODO/CTO-decomposition.md
+  Write summary to: agent-output/TODO/CTO-decomposition.md
 ")
 ```
 
@@ -214,8 +214,8 @@ runSubagent("TODO", prompt="
 
 **Objective:** Verify tickets are ready and hand off to the dumb dispatcher.
 
-1. Run `python3 .github/tickets.py --status --json` — verify tickets exist in READY.
-2. Run `python3 .github/tickets.py --validate` — verify ticket integrity.
+1. Run `python3 tickets.py --status --json` — verify tickets exist in READY.
+2. Run `python3 tickets.py --validate` — verify ticket integrity.
 3. Update `.github/memory-bank/activeContext.md` with CTO session summary:
    ```markdown
    ### CTO Initialization — {date}
@@ -267,5 +267,5 @@ Before declaring initialization complete, CTO must provide:
 - `.github/instructions/ticket-system.instructions.md`
 - `.github/instructions/git-protocol.instructions.md`
 - `.github/instructions/agent-behavior.instructions.md`
-- `.github/tickets.py`
+- `tickets.py`
 - `agents.md`

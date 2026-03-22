@@ -65,7 +65,7 @@ Implement the MCP ticket server designed in TASK-SYS-027. Wraps tickets.py as ty
 - [ ] Given the MCP server is implemented, when started, then it exposes all ticket management tools via MCP protocol
 - [ ] Given the server is configured in .vscode/mcp.json, when VS Code starts, then agents can invoke ticket tools directly
 - [ ] Given the server wraps tickets.py, when tools are called, then they produce identical results to CLI invocation
-- [ ] Given sandboxing is enabled, when the server runs, then it can only access .github/tickets/ and .github/ticket-state/
+- [ ] Given sandboxing is enabled, when the server runs, then it can only access tickets/ and ticket-state/
 
 ---
 

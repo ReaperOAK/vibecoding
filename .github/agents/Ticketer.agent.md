@@ -31,7 +31,7 @@ Stateless ticket dispatcher. Scans READY tickets, dispatches exactly one subagen
 ### Execution SOP (Standard Operating Procedure)
 1. **Plan First:** Invoke `sequentialthinking/sequentialthinking` to map the dispatch plan for READY tickets.
 2. **Read State:** Use `memory/read_graph` to understand active ticket states and claim history.
-3. **Sync Tickets:** Use `execute/runInTerminal` to run `python3 .github/tickets.py --sync` and `--status --json`.
+3. **Sync Tickets:** Use `execute/runInTerminal` to run `python3 tickets.py --sync` and `--status --json`.
 4. **Claim:** Use `execute/runInTerminal` for `git pull --rebase`, ticket JSON updates, `git add <ticket-files>`, `git commit`, `git push`.
 5. **Dispatch:** Use `runSubagent` to launch the correct agent per ticket type and stage.
 6. **Log State:** Use `memory/add_observations` at the end to record dispatch results, ticket transitions, and any claim failures.
@@ -43,8 +43,8 @@ Stateless ticket dispatcher. Scans READY tickets, dispatches exactly one subagen
 Execute in order before any work:
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: halt immediately, zero edits, zero dispatches.
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior).
-3. Run `python3 .github/tickets.py --sync` — releases expired claims, evaluates deps, moves unblocked to READY.
-4. Run `python3 .github/tickets.py --status --json` — get machine-readable state of all tickets.
+3. Run `python3 tickets.py --sync` — releases expired claims, evaluates deps, moves unblocked to READY.
+4. Run `python3 tickets.py --status --json` — get machine-readable state of all tickets.
 
 ## 3. Execution Loop
 
@@ -59,9 +59,9 @@ Repeat until no READY tickets remain and no active workers:
    e. `git push` — push success = lock acquired. Push failure = skip ticket (another machine claimed).
    f. **NO code changes in claim commit. Period.**
 4. Dispatch one `runSubagent` call per successfully claimed ticket with a full delegation packet (see §5).
-5. On subagent completion: verify summary written to `.github/agent-output/{Agent}/{ticket-id}.md`.
-6. Advance ticket to next stage via `python3 .github/tickets.py --advance <id> <agent>`.
-7. Re-run `python3 .github/tickets.py --sync` and repeat.
+5. On subagent completion: verify summary written to `agent-output/{Agent}/{ticket-id}.md`.
+6. Advance ticket to next stage via `python3 tickets.py --advance <id> <agent>`.
+7. Re-run `python3 tickets.py --sync` and repeat.
 
 ## 4. Agent Selection
 
@@ -167,5 +167,4 @@ If uncertain whether an action is destructive, treat it as destructive.
 - `.github/instructions/ticket-system.instructions.md`
 - `.github/instructions/git-protocol.instructions.md`
 - `.github/instructions/agent-behavior.instructions.md`
-- `.github/tickets.py` — ticket state machine manager
-- `.github/agent-runner.py` — dispatcher-claim protocol runner
+- `tickets.py` — ticket state machine manager

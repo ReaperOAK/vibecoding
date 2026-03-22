@@ -33,7 +33,7 @@ PROHIBITED: Arbitrarily scanning the full tool list — this causes token exhaus
 5. Read .github/instructions/git-protocol.instructions.md
 6. Read .github/instructions/agent-behavior.instructions.md
 7. Read your agent file: .github/agents/{YourAgent}.agent.md — internalize the Assigned Tool Loadout
-8. Read upstream summary from .github/agent-output/{PreviousAgent}/{ticket-id}.md (if exists)
+8. Read upstream summary from agent-output/{PreviousAgent}/{ticket-id}.md (if exists)
 9. Read .github/vibecoding/chunks/{YourAgent}.agent/ (all files)
 10. Read .github/vibecoding/catalog.yml; load task-relevant chunks
 11. Invoke `sequentialthinking/sequentialthinking` to plan execution before touching any files
@@ -125,5 +125,4 @@ Every agent follows this Standard Operating Procedure from `tool_dispatcher.md`:
 - .github/instructions/git-protocol.instructions.md
 - .github/instructions/agent-behavior.instructions.md
 - .github/instructions/terminal-management.instructions.md
-- .github/tickets.py
-- .github/agent-runner.py
+- tickets.py

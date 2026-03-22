@@ -53,17 +53,17 @@ Context mapping BEFORE any design — architecture without codebase understandin
 ## 3. Boot Sequence
 1. Read `.github/guardian/STOP_ALL` — if `STOP`: halt, zero edits
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
-3. Read upstream summary from `.github/agent-output/{PreviousAgent}/{ticket-id}.md`
+3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md`
 4. Read `.github/vibecoding/chunks/Architect.agent/` (all chunk files)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
-6. Read ticket JSON from `.github/ticket-state/` or `.github/tickets/`
+6. Read ticket JSON from `ticket-state/` or `tickets/`
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
 RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Read ticket JSON from `.github/ticket-state/ARCHITECT/{ticket-id}.json`.
+1. Read ticket JSON from `ticket-state/ARCHITECT/{ticket-id}.json`.
 2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
 3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
 4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
@@ -96,7 +96,7 @@ Step-by-step architecture process:
 Flag and remediate: Big Ball of Mud, Golden Hammer, Distributed Monolith, God Service, Chatty Services, Shared Database.
 
 ## 6. Work Commit (Commit 2)
-1. Write summary to `.github/agent-output/Architect/{ticket-id}.md`
+1. Write summary to `agent-output/Architect/{ticket-id}.md`
 2. Delete previous stage summary after reading it
 3. Update ticket JSON, move to next stage directory (per SDLC flow, typically DOCS)
 4. Append memory entry to `.github/memory-bank/activeContext.md`:

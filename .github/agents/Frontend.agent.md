@@ -52,10 +52,10 @@ You optimize for Core Web Vitals and treat accessibility as a core feature, not 
 Before ANY work, execute in order — no skips:
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: halt immediately, zero edits.
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management).
-3. Read upstream summary from `.github/agent-output/{PreviousAgent}/{ticket-id}.md` (if exists).
+3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md` (if exists).
 4. Read all chunk files in `.github/vibecoding/chunks/Frontend.agent/`.
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
-6. Read ticket JSON from `.github/ticket-state/` or `.github/tickets/`.
+6. Read ticket JSON from `ticket-state/` or `tickets/`.
 
 ## 4. UI Gate (Frontend-Specific)
 **BEFORE implementation**, verify UIDesigner mockup exists at `docs/uiux/mockups/{ticket-id}.md`
@@ -66,7 +66,7 @@ with `APPROVED` status. Missing or not approved = emit `BLOCKED_BY: UIDesigner` 
 RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Read ticket JSON from `.github/ticket-state/FRONTEND/{ticket-id}.json`.
+1. Read ticket JSON from `ticket-state/FRONTEND/{ticket-id}.json`.
 2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
 3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
 4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
@@ -109,9 +109,9 @@ Shared nearby → lift state/composition. App-wide → Context+useReducer or Zus
 - AI-generated content must have transparency indicators and `aria-label`.
 
 ## 7. Work Commit (Commit 2 — Deliverables)
-1. Write summary to `.github/agent-output/Frontend/{ticket-id}.md` (files, tests, a11y audit, breakpoints).
+1. Write summary to `agent-output/Frontend/{ticket-id}.md` (files, tests, a11y audit, breakpoints).
 2. Delete previous stage summary after reading it.
-3. Update ticket JSON (`status`, `completed_at`, `artifacts`). Move to `.github/ticket-state/QA/`.
+3. Update ticket JSON (`status`, `completed_at`, `artifacts`). Move to `ticket-state/QA/`.
 4. Append to `.github/memory-bank/activeContext.md`:
    `### [{ticket-id}] — Artifacts: [files] | Decisions: [rationale] | Timestamp: {ISO8601}`
 5. Stage ONLY modified files — **NEVER** `git add .` / `git add -A` / `git add --all`.

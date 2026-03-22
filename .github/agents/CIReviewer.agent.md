@@ -55,17 +55,17 @@ Execute in order before any work. Halt immediately if step 1 triggers.
 
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: zero edits, report blocked.
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management).
-3. Read upstream summary from `.github/agent-output/Security/{ticket-id}.md`.
+3. Read upstream summary from `agent-output/Security/{ticket-id}.md`.
 4. Read all files in `.github/vibecoding/chunks/CIReviewer.agent/`.
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
-6. Read ticket JSON from `.github/ticket-state/CI/{ticket-id}.json`.
+6. Read ticket JSON from `ticket-state/CI/{ticket-id}.json`.
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
 RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Read ticket JSON from `.github/ticket-state/CI/{ticket-id}.json`.
+1. Read ticket JSON from `ticket-state/CI/{ticket-id}.json`.
 2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
 3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
 4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
@@ -106,28 +106,28 @@ After verifying claim, execute these checks against all files in the ticket's `f
 - **PASS** → advance ticket to DOCS stage.
 - **FAIL** → reject with SARIF evidence:
   ```bash
-  python3 .github/tickets.py --rework {ticket-id} CIReviewer "{reason with finding summary}"
+  python3 tickets.py --rework {ticket-id} CIReviewer "{reason with finding summary}"
   ```
 
 ## 7. Work Commit (Commit 2)
 
-1. Write CI report to `.github/agent-output/CIReviewer/{ticket-id}.md` containing:
+1. Write CI report to `agent-output/CIReviewer/{ticket-id}.md` containing:
    verdict, quality score, SARIF findings summary, metrics per file.
-2. Delete upstream summary: `rm .github/agent-output/Security/{ticket-id}.md`.
-3. If PASS: move ticket JSON to `.github/ticket-state/DOCS/{ticket-id}.json`.
+2. Delete upstream summary: `rm agent-output/Security/{ticket-id}.md`.
+3. If PASS: move ticket JSON to `ticket-state/DOCS/{ticket-id}.json`.
    If FAIL: ticket stays for rework processing (tickets.py handles move).
 4. Append memory entry to `.github/memory-bank/activeContext.md`:
    ```markdown
    ### [{ticket-id}] — CI Review
-   - **Artifacts:** .github/agent-output/CIReviewer/{ticket-id}.md
+   - **Artifacts:** agent-output/CIReviewer/{ticket-id}.md
    - **Decisions:** {verdict} — Score {N}/100, {N} critical, {N} warnings
    - **Timestamp:** {ISO8601}
    ```
 5. Stage ONLY modified files explicitly — **NEVER `git add .`**:
    ```bash
-   git add .github/agent-output/CIReviewer/{ticket-id}.md
-   git add .github/ticket-state/DOCS/{ticket-id}.json   # or CI/ if rework
-   git add .github/tickets/{ticket-id}.json
+   git add agent-output/CIReviewer/{ticket-id}.md
+   git add ticket-state/DOCS/{ticket-id}.json   # or CI/ if rework
+   git add tickets/{ticket-id}.json
    git add .github/memory-bank/activeContext.md
    git commit -m "[{ticket-id}] CI complete by CIReviewer on $(hostname)"
    git push
@@ -160,7 +160,7 @@ Every completion claim MUST include:
 | Lint results | 0 errors, 0 warnings (or itemized violations) |
 | Type check results | Clean pass or itemized errors |
 | Complexity metrics | Cyclomatic and cognitive per flagged function |
-| SARIF report | Generated at `.github/agent-output/CIReviewer/{ticket-id}.sarif` |
+| SARIF report | Generated at `agent-output/CIReviewer/{ticket-id}.sarif` |
 | Coverage | Percentage on changed files |
 | Verdict | PASS or FAIL with quality score and justification |
 | Confidence | HIGH / MEDIUM / LOW with basis |

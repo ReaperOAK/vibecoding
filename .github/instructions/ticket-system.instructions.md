@@ -9,15 +9,15 @@ description: Ticket state machine, stage directories, tickets.py rules, dependen
 ## 1. State = Directory Location
 
 RULE: Ticket state is determined by which directory contains the ticket JSON.
-RULE: Master copy lives at `.github/tickets/<ticket-id>.json`.
-RULE: State copy lives at `.github/ticket-state/<STAGE>/<ticket-id>.json`.
+RULE: Master copy lives at `tickets/<ticket-id>.json`.
+RULE: State copy lives at `ticket-state/<STAGE>/<ticket-id>.json`.
 RULE: Both must be kept in sync. Master is source of truth for metadata.
 RULE: State directory is source of truth for current stage.
 
 ## 2. Stage Directories
 
 ```
-.github/ticket-state/
+ticket-state/
     READY/       — Unblocked, available for claim
     RESEARCH/    — Being processed by Research Analyst
     ProductManager/          — Being processed by Product Manager
@@ -36,7 +36,7 @@ RULE: State directory is source of truth for current stage.
 
 ## 3. tickets.py Contract
 
-RULE: Location: `.github/tickets.py`
+RULE: Location: `tickets.py`
 
 ### Authorized Callers
 

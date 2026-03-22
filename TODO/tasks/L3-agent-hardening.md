@@ -112,9 +112,9 @@ Add agent-scoped hooks.PostToolUse entries to Backend and Frontend agent frontma
 **Tags:** hooks, scope-enforcement, P1
 
 ## Description
-Add an agent-scoped PreToolUse hook to Ticketer that blocks any attempt to edit code files. Only ticket JSON files in .github/tickets/ and .github/ticket-state/ are allowed.
+Add an agent-scoped PreToolUse hook to Ticketer that blocks any attempt to edit code files. Only ticket JSON files in tickets/ and ticket-state/ are allowed.
 
 ## Acceptance Criteria
 - [ ] Given Ticketer has a PreToolUse hook, when it attempts to edit a code file, then the hook denies with reason "Ticketer is a dispatcher, not an implementer"
-- [ ] Given the file being edited is a .json in .github/tickets/ or .github/ticket-state/, then the hook allows
+- [ ] Given the file being edited is a .json in tickets/ or ticket-state/, then the hook allows
 - [ ] Given the hook is agent-scoped, when other agents run, then this hook does NOT fire

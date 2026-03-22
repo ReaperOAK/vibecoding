@@ -59,7 +59,7 @@ feed into the TODO agent for ticket decomposition. Not assigned to any SDLC stag
 Execute in order before any work:
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: halt, zero edits
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
-3. Read upstream context from `.github/agent-output/{PreviousAgent}/{ticket-id}.md`
+3. Read upstream context from `agent-output/{PreviousAgent}/{ticket-id}.md`
 4. Read `.github/vibecoding/chunks/ProductManager.agent/` (all chunks)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
 6. Read assignment / delegation packet
@@ -125,7 +125,7 @@ ProductManager does NOT follow the standard dispatcher-claim SDLC protocol:
 | PRD document | `docs/prd/{feature-name}.md` | Markdown with YAML metadata |
 | User stories | Embedded in PRD or standalone | INVEST-validated, Given/When/Then AC |
 | Task specs | Handoff to TODO agent | Structured for L3 decomposition |
-| Agent summary | `.github/agent-output/ProductManager/{ticket-id}.md` | Standard summary |
+| Agent summary | `agent-output/ProductManager/{ticket-id}.md` | Standard summary |
 | Memory entry | `.github/memory-bank/activeContext.md` | Append-only, ISO8601 timestamp |
 
 ## 7. Scope

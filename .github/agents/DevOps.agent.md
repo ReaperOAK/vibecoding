@@ -58,17 +58,17 @@ BACKEND stage. Every configuration is declarative, versioned, and testable.
 
 1. Read `.github/guardian/STOP_ALL` — if `STOP`: halt, zero edits, report blocked
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
-3. Read upstream summary from `.github/agent-output/{PreviousAgent}/{ticket-id}.md`
+3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md`
 4. Read `.github/vibecoding/chunks/DevOps.agent/` (all chunk files)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
-6. Read ticket JSON from `.github/ticket-state/` or `.github/tickets/`
+6. Read ticket JSON from `ticket-state/` or `tickets/`
 
 ## 4. Pre-Claimed Ticket (Dispatcher-Claim Protocol)
 
 RULE: The ticket is already claimed by Ticketer before this agent is launched.
 RULE: Subagents NEVER perform claim commits — the dispatcher handles Commit 1.
 
-1. Read ticket JSON from `.github/ticket-state/BACKEND/{ticket-id}.json`.
+1. Read ticket JSON from `ticket-state/BACKEND/{ticket-id}.json`.
 2. Verify claim metadata exists: `claimed_by`, `machine_id`, `operator`, `lease_expiry`.
 3. If claim metadata is missing or invalid, HALT and report `PROTOCOL_VIOLATION: missing claim`.
 4. Proceed directly to execution workflow — no `git pull --rebase` for claiming.
@@ -121,9 +121,9 @@ Is this reversible? What is the blast radius? What is the rollback plan?
 
 ## 6. Work Commit (Commit 2)
 
-1. Write summary to `.github/agent-output/DevOps/{ticket-id}.md`
-2. Delete previous stage summary (`.github/agent-output/{PreviousAgent}/{ticket-id}.md`)
-3. Move ticket JSON to next stage: `.github/ticket-state/QA/{ticket-id}.json`
+1. Write summary to `agent-output/DevOps/{ticket-id}.md`
+2. Delete previous stage summary (`agent-output/{PreviousAgent}/{ticket-id}.md`)
+3. Move ticket JSON to next stage: `ticket-state/QA/{ticket-id}.json`
 4. Update `.github/memory-bank/activeContext.md` with entry:
    `### [{ticket-id}] — Artifacts, Decisions, Timestamp (ISO8601)`
 5. Stage ONLY modified files explicitly — **NEVER `git add .`**
