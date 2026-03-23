@@ -1,9 +1,10 @@
 ---
 name: 'TODO'
 description: 'Progressive refinement decomposition engine with 3 operating modes (Strategist, Planner, Executor Controller). Decomposes project visions through 5 layers (L0-L4) into granular, trackable tasks. Manages task lifecycle, enforces controlled expansion, and generates tickets.py-compatible task files.'
-user-invocable: false
+user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]  # runInTerminal constrained: python tickets.py ONLY
 model: Claude Opus 4.6 (copilot)
+argument-hint: 'Describe the decomposition mode (Strategic/Planning/Execution) and the vision or capability to decompose'
 ---
 
 # TODO Subagent
@@ -61,7 +62,7 @@ Execute in order before any work:
 1. Read `.github/guardian/STOP_ALL` — if STOP: halt, zero edits
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
 3. Read upstream summary from `agent-output/TODO/{ticket-id}.md` (if exists)
-4. Read `.github/vibecoding/chunks/TODO.agent/` (all chunk files)
+4. Read `.github/skills/TODO/` (all chunk files)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
 6. Read delegation packet / assignment from Ticketer
 
@@ -163,4 +164,4 @@ Every completion must include:
 - `.github/instructions/ticket-system.instructions.md`
 - `.github/instructions/git-protocol.instructions.md`
 - `.github/instructions/agent-behavior.instructions.md`
-- `.github/vibecoding/chunks/TODO.agent/`
+- `.github/skills/TODO/`

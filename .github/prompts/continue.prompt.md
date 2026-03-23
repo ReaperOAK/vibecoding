@@ -1,6 +1,10 @@
 ---
 name: continue
-description: Controlled continuation protocol. Loads resume state, repairs incomplete SDLC chains, then resumes ticket processing with full governance enforcement.
+description: Resume development after a stop. Loads resume state, repairs incomplete SDLC chains, then resumes ticket processing with full governance enforcement.
+agent: 'agent'
+model: 'Claude Opus 4.6 (copilot)'
+tools: ['read', 'search/codebase', 'runCommands', 'github/*', 'memory/*']
+argument-hint: 'No arguments needed — just invoke /continue to resume'
 ---
 
 We are resuming structured development.
@@ -286,7 +290,7 @@ This will produce `RESUME_POINT.md`, `SESSION_SUMMARY.md`, and
 - Maintain velocity and governance
 - Ticketer does NOT reason about file conflicts — git push conflicts enforce safety
 - Ticketer does NOT implement code — only dispatches and advances. Its toolset is restricted to `memory/*`, `execute/*`, `github/*`, and `sequentialthinking/*`
-- All agents read their own chunks from `.github/vibecoding/chunks/{Agent}.agent/`
+- All agents read their own chunks from `.github/skills/{Agent}/`
 - All agents derive context from filesystem — Ticketer does NOT inject context
 - All agents follow their Assigned Tool Loadout defined in `.github/agents/{Agent}.agent.md` — no tool browsing or hallucination outside assigned loadout
 - Dispatcher-claim protocol enforced: Ticketer performs CLAIM commit (ticket JSON) → subagent performs WORK commit (deliverables)

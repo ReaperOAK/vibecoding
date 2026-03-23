@@ -4,6 +4,16 @@ description: 'Intelligent project orchestrator. Reads project docs, conducts res
 user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'mongodb/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'tavily/*', 'terraform/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
+argument-hint: 'Describe the project to initialize, vision to plan, or strategic decision to make'
+handoffs:
+  - label: 'Start Execution'
+    agent: 'Ticketer'
+    prompt: 'Project initialization complete. Tickets are ready in READY state. Begin dispatching workers to execute the ticket backlog.'
+    send: false
+  - label: 'Research Gaps'
+    agent: 'Research'
+    prompt: 'Discovery identified knowledge gaps. Research the following topics with evidence-based analysis and provide recommendations with confidence levels.'
+    send: false
 ---
 
 # CTO — Intelligent Project Orchestrator
@@ -70,7 +80,7 @@ N/A — CTO operates at the **pre-SDLC layer**. It produces the ticket backlog t
 Execute in order before any work:
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: halt, zero edits.
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior).
-3. Read `.github/vibecoding/chunks/CTO.agent/` (all files, if exists).
+3. Read `.github/skills/CTO/` (all files, if exists).
 4. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
 5. Invoke `sequentialthinking/sequentialthinking` to plan the initialization pipeline.
 6. Read any existing project docs: README.md, docs/, specs/, PRDs, etc.

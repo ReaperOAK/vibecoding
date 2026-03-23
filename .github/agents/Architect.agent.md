@@ -1,9 +1,23 @@
 ---
 name: 'Architect'
 description: 'Designs system architecture, API contracts, database schemas, and component boundaries. Produces ADRs, architecture diagrams, and technology selection matrices.'
-user-invocable: false
+user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
+argument-hint: 'Describe the system component to architect, API to design, or technology decision to evaluate'
+handoffs:
+  - label: 'Start Implementation'
+    agent: 'Backend'
+    prompt: 'Architecture design complete. Begin implementing the backend components according to the API contracts and database schemas defined in the architecture document.'
+    send: false
+  - label: 'Research Technologies'
+    agent: 'Research'
+    prompt: 'Research the technology options for the architecture decision. Compare candidates with scored evaluation matrix and provide recommendations with confidence levels.'
+    send: false
+  - label: 'Document Architecture'
+    agent: 'Documentation'
+    prompt: 'Architecture design complete. Create comprehensive documentation including architecture diagrams, ADRs, and API specifications.'
+    send: false
 ---
 
 # Architect Subagent
@@ -54,7 +68,7 @@ Context mapping BEFORE any design — architecture without codebase understandin
 1. Read `.github/guardian/STOP_ALL` — if `STOP`: halt, zero edits
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
 3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md`
-4. Read `.github/vibecoding/chunks/Architect.agent/` (all chunk files)
+4. Read `.github/skills/Architect/` (all chunk files)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
 6. Read ticket JSON from `ticket-state/` or `tickets/`
 
@@ -136,4 +150,4 @@ Every completion claim must include:
 
 ## 10. References
 - `.github/instructions/*.instructions.md` (5 canonical rule files)
-- `.github/vibecoding/chunks/Architect.agent/` (domain expertise chunks)
+- `.github/skills/Architect/` (domain expertise chunks)

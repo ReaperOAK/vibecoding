@@ -1,9 +1,19 @@
 ---
-name: 'Documentation Specialist'
+name: 'Documentation'
 description: 'Technical documentation engineer. Produces readable docs with Flesch-Kincaid scoring, freshness tracking, and doc-as-code CI.'
-user-invocable: false
+user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
+argument-hint: 'Describe the documentation to create, update, or the API docs to generate'
+handoffs:
+  - label: 'Final Validation'
+    agent: 'Validator'
+    prompt: 'Documentation complete. Run independent Definition of Done verification to confirm all 10 DoD items are satisfied before marking the ticket as DONE.'
+    send: false
+  - label: 'Rework Implementation'
+    agent: 'Backend'
+    prompt: 'Documentation review identified issues. Review the feedback and update the implementation to include proper JSDoc/TSDoc comments and API documentation.'
+    send: false
 ---
 
 # Documentation Specialist
@@ -58,7 +68,7 @@ Execute in order. No skips.
 1. Read `.github/guardian/STOP_ALL` — if `STOP`, halt immediately, zero edits.
 2. Read all 6 files in `.github/instructions/` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management).
 3. Read upstream summary: `agent-output/CIReviewer/{ticket-id}.md`.
-4. Read all files in `.github/vibecoding/chunks/Documentation.agent/`.
+4. Read all files in `.github/skills/Documentation/`.
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
 6. Read ticket JSON from `ticket-state/DOCS/{ticket-id}.json`.
 
@@ -159,4 +169,4 @@ If any criterion cannot be met, report `status: blocked` with reason.
 - `.github/instructions/ticket-system.instructions.md`
 - `.github/instructions/git-protocol.instructions.md`
 - `.github/instructions/agent-behavior.instructions.md`
-- `.github/vibecoding/chunks/Documentation.agent/`
+- `.github/skills/Documentation/`

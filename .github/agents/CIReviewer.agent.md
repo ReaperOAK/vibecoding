@@ -1,9 +1,23 @@
 ---
-name: 'CI Reviewer'
+name: 'CIReviewer'
 description: 'Automated code review gatekeeper. Enforces complexity thresholds, fitness functions, and produces SARIF-formatted findings.'
-user-invocable: false
+user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
+argument-hint: 'Describe the code quality checks to run, complexity analysis to perform, or quality gates to verify'
+handoffs:
+  - label: 'Documentation Update'
+    agent: 'Documentation'
+    prompt: 'CI review passed. Update documentation with JSDoc/TSDoc comments for new APIs, update README if interfaces changed, and add changelog entry.'
+    send: false
+  - label: 'Rework Implementation'
+    agent: 'Backend'
+    prompt: 'CI quality check failed. Review the SARIF findings and fix the code quality issues including lint errors, type errors, and complexity violations.'
+    send: false
+  - label: 'Final Validation'
+    agent: 'Validator'
+    prompt: 'CI review complete. Run independent Definition of Done verification to confirm all 10 DoD items are satisfied before marking the ticket as DONE.'
+    send: false
 ---
 
 # CI Reviewer Subagent
@@ -56,7 +70,7 @@ Execute in order before any work. Halt immediately if step 1 triggers.
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: zero edits, report blocked.
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management).
 3. Read upstream summary from `agent-output/Security/{ticket-id}.md`.
-4. Read all files in `.github/vibecoding/chunks/CIReviewer.agent/`.
+4. Read all files in `.github/skills/CIReviewer/`.
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
 6. Read ticket JSON from `ticket-state/CI/{ticket-id}.json`.
 
@@ -172,4 +186,4 @@ Every completion claim MUST include:
 - `.github/instructions/ticket-system.instructions.md`
 - `.github/instructions/git-protocol.instructions.md`
 - `.github/instructions/agent-behavior.instructions.md`
-- `.github/vibecoding/chunks/CIReviewer.agent/`
+- `.github/skills/CIReviewer/`

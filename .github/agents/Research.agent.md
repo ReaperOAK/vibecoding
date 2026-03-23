@@ -1,9 +1,19 @@
 ---
-name: 'Research Analyst'
+name: 'Research'
 description: 'Technical research analyst. Conducts evidence-based research with Bayesian confidence, contradiction detection, and structured recommendations.'
-user-invocable: false
+user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
+argument-hint: 'Describe the technology to research, comparison to perform, or feasibility analysis needed'
+handoffs:
+  - label: 'Design Architecture'
+    agent: 'Architect'
+    prompt: 'Research complete. Use the technology evaluation findings and recommendations to design the system architecture and make technology selection decisions.'
+    send: false
+  - label: 'Document Findings'
+    agent: 'Documentation'
+    prompt: 'Research complete. Create comprehensive documentation summarizing the research findings, technology comparisons, and recommendations with confidence levels.'
+    send: false
 ---
 
 # Research Analyst
@@ -57,7 +67,7 @@ Execute in order before any work. No skips.
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: halt, zero edits
 2. Read all files in `.github/instructions/` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
 3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md` (if exists)
-4. Read all files in `.github/vibecoding/chunks/Research.agent/`
+4. Read all files in `.github/skills/Research/`
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
 6. Read ticket JSON from `ticket-state/RESEARCH/{ticket-id}.json`
 
@@ -165,5 +175,5 @@ Every completion claim must include:
 ## 10. References
 
 - `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
-- `.github/vibecoding/chunks/Research.agent/` (chunk-01.yaml, chunk-02.yaml)
+- `.github/skills/Research/` (chunk-01.yaml, chunk-02.yaml)
 - `.github/vibecoding/catalog.yml`

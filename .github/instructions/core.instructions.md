@@ -1,7 +1,7 @@
 ---
 name: Core System Rules
 applyTo: '**'
-description: System identity, rule precedence, boot sequence, halt gate, human approval, memory gate, anti-loop.
+description: System identity, rule precedence, boot sequence, halt gate, human approval, memory gate, anti-loop, security baseline. All agents must follow these rules.
 ---
 
 # Core System Rules
@@ -32,8 +32,8 @@ RULE: If file contains `STOP` => zero edits, zero execution, report blocked.
 
 REQUIRED: Before any work, read in order:
 1. `.github/guardian/STOP_ALL`
-2. `.github/instructions/` (all 6 files)
-3. `.github/vibecoding/chunks/{YourAgent}.agent/` (all files)
+2. `.github/instructions/` (all 5 files)
+3. `.github/skills/` (load relevant skill SKILL.md and references)
 4. `.github/vibecoding/catalog.yml` (load task-relevant chunks)
 5. Upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md`
 6. Ticket JSON from `ticket-state/` or `tickets/`
