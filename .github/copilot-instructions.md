@@ -1,3 +1,7 @@
+---
+description: "Multi-agent vibecoding system for ticket-driven AI development"
+---
+
 # Project Context
 
 This repository implements a **multi-agent vibecoding system** — a ticket-driven
@@ -46,3 +50,23 @@ docs/uiux/            # UI/UX design artifacts
 - Destructive operations require human approval
 - Every agent commits twice per stage: CLAIM then WORK
 - tickets.py handles dependency resolution — agents never compute dependencies
+
+## Tech Stack
+
+- **Language**: TypeScript (strict mode)
+- **Framework**: Node.js with Express/Fastify
+- **Database**: MongoDB/PostgreSQL
+- **Testing**: Jest with TDD red-green-refactor
+- **Linting**: ESLint + Prettier
+- **CI/CD**: GitHub Actions
+- **Containerization**: Docker
+
+## Coding Standards
+
+- SOLID principles mandatory
+- No `any` types — explicit typing required
+- Structured logging with JSON output
+- Repository pattern for data access
+- Dependency injection via constructor
+- Domain errors with typed exceptions
+- 80%+ test coverage for new code

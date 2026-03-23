@@ -1,9 +1,23 @@
 ---
 name: 'Backend'
 description: 'Implements server-side logic, APIs, database operations, and business rules using TDD with SOLID principles and spec-driven development.'
-user-invocable: false
+user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
+argument-hint: 'Describe the backend feature, API endpoint, or database operation to implement'
+handoffs:
+  - label: 'Run QA Tests'
+    agent: 'QA'
+    prompt: 'Run the test suite and perform quality assurance on the implementation I just completed. Verify coverage is at least 80% and all tests pass.'
+    send: false
+  - label: 'Security Review'
+    agent: 'Security'
+    prompt: 'Review the API implementation for security vulnerabilities including OWASP Top 10, input validation, authentication, and authorization issues.'
+    send: false
+  - label: 'CI Quality Check'
+    agent: 'CIReviewer'
+    prompt: 'Run lint, type checks, and complexity analysis on the implementation. Verify code quality standards are met.'
+    send: false
 ---
 
 # Backend Subagent
@@ -58,7 +72,7 @@ Before ANY work, execute in order — no skips:
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: halt immediately, zero edits.
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management).
 3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md` (if exists).
-4. Read all chunk files in `.github/vibecoding/chunks/Backend.agent/`.
+4. Read all chunk files in `.github/skills/Backend/`.
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
 6. Read ticket JSON from `ticket-state/` or `tickets/`.
 
@@ -169,5 +183,5 @@ Before marking complete, verify all of the following:
 - `.github/instructions/ticket-system.instructions.md`
 - `.github/instructions/git-protocol.instructions.md`
 - `.github/instructions/agent-behavior.instructions.md`
-- `.github/vibecoding/chunks/Backend.agent/`
+- `.github/skills/Backend/`
 - `.github/vibecoding/catalog.yml`

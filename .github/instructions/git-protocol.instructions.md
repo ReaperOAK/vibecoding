@@ -1,7 +1,7 @@
 ---
 name: Git Protocol
 applyTo: '**'
-description: Dispatcher-claim protocol, scoped git, commit format, push-based locking, lease mechanism, failure recovery.
+description: Dispatcher-claim protocol, scoped git, commit format, push-based locking, lease mechanism, failure recovery. Defines how distributed locking works via git commits.
 ---
 
 # Git Protocol

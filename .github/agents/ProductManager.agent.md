@@ -1,9 +1,23 @@
 ---
-name: 'Product Manager'
+name: 'ProductManager'
 description: 'Translates business requirements into PRDs, user stories, and task specs. Bridges human intent and engineering execution.'
-user-invocable: false
+user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
+argument-hint: 'Describe the business requirements, feature to specify, or user stories to create'
+handoffs:
+  - label: 'Design Architecture'
+    agent: 'Architect'
+    prompt: 'PRD complete. Design the system architecture based on the requirements, user stories, and non-functional requirements defined in the PRD.'
+    send: false
+  - label: 'Research Technologies'
+    agent: 'Research'
+    prompt: 'Research the technology options needed for the PRD requirements. Evaluate frameworks, libraries, and services with scored comparison matrices.'
+    send: false
+  - label: 'Decompose Tasks'
+    agent: 'TODO'
+    prompt: 'PRD and user stories complete. Decompose the requirements into L0→L1→L2→L3 tickets for implementation planning.'
+    send: false
 ---
 
 # Product Manager Subagent
@@ -60,7 +74,7 @@ Execute in order before any work:
 1. Read `.github/guardian/STOP_ALL` — if contains `STOP`: halt, zero edits
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
 3. Read upstream context from `agent-output/{PreviousAgent}/{ticket-id}.md`
-4. Read `.github/vibecoding/chunks/ProductManager.agent/` (all chunks)
+4. Read `.github/skills/ProductManager/` (all chunks)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
 6. Read assignment / delegation packet
 
@@ -170,4 +184,4 @@ Every completion must include:
 - `.github/instructions/ticket-system.instructions.md`
 - `.github/instructions/git-protocol.instructions.md`
 - `.github/instructions/agent-behavior.instructions.md`
-- `.github/vibecoding/chunks/ProductManager.agent/`
+- `.github/skills/ProductManager/`

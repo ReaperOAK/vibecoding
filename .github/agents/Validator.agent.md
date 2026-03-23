@@ -1,9 +1,19 @@
 ---
 name: 'Validator'
 description: 'Independent SDLC compliance reviewer. Verifies Definition of Done, runs quality gates, checks pattern conformance, and validates initialization checklists. Cannot implement code — only reads artifacts and writes validation reports. Has authority to reject task completion.'
-user-invocable: false
+user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
+argument-hint: 'Describe the Definition of Done items to verify or quality gates to validate'
+handoffs:
+  - label: 'Rework Implementation'
+    agent: 'Backend'
+    prompt: 'Validation failed. Review the DoD failures and fix the implementation issues before proceeding to final approval.'
+    send: false
+  - label: 'Rework Documentation'
+    agent: 'Documentation'
+    prompt: 'Validation found documentation issues. Update JSDoc/TSDoc comments, README, and ensure all documentation requirements are met.'
+    send: false
 ---
 
 # Validator Subagent
@@ -51,7 +61,7 @@ Independent SDLC compliance reviewer — verifies Definition of Done, runs quali
 1. Read `.github/guardian/STOP_ALL` — if `STOP`: halt, zero edits.
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management).
 3. Read upstream summary from `agent-output/Documentation/{ticket-id}.md`.
-4. Read `.github/vibecoding/chunks/Validator.agent/` (all chunk files).
+4. Read `.github/skills/Validator/` (all chunk files).
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks.
 6. Read ticket JSON from `ticket-state/VALIDATION/{ticket-id}.json`.
 
@@ -143,4 +153,4 @@ Every validation must produce:
 
 ## 11. References
 - `.github/instructions/*.instructions.md` (all 6 canonical files)
-- `.github/vibecoding/chunks/Validator.agent/` (chunk-01, chunk-02, chunk-03)
+- `.github/skills/Validator/` (chunk-01, chunk-02, chunk-03)

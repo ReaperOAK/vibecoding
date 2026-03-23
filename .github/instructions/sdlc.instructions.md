@@ -1,7 +1,7 @@
 ---
 name: SDLC Lifecycle
 applyTo: '**'
-description: Stage-based lifecycle, per-type flows, post-execution chain, rework rules, Definition of Done, stage transitions.
+description: Stage-based lifecycle, per-type flows, post-execution chain, rework rules, Definition of Done, stage transitions. Defines the 14-stage SDLC pipeline and ticket type flows.
 ---
 
 # SDLC Lifecycle

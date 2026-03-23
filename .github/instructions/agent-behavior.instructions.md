@@ -1,7 +1,7 @@
 ---
 name: Agent Behavior
 applyTo: '**'
-description: Worker model, scope enforcement, context derivation, forbidden actions, evidence gates, dispatcher contract.
+description: Worker model, scope enforcement, context derivation, forbidden actions, evidence gates, dispatcher contract. Defines how all agents operate within the vibecoding system.
 ---
 
 # Agent Behavior
@@ -27,7 +27,7 @@ RULE: Agents derive context ONLY from:
 2. Previous stage summary file
 3. Codebase files within ticket scope
 4. Instruction files (`.github/instructions/`)
-5. Agent chunk files (`.github/vibecoding/chunks/{Agent}.agent/`)
+5. Agent skill files (`.github/skills/` — SKILL.md and references)
 
 PROHIBITED: Expecting context injection from Ticketer.
 Allowed: Reading other agents' summaries outside the chain.

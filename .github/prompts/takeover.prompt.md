@@ -1,8 +1,10 @@
 ---
 name: Takeover
-agent: Ticketer
-model: Claude Opus 4.6 (copilot)
-description: Initializes legacy repository takeover. Guides structured reconstruction before resuming normal autonomous ticket-driven execution.
+description: Initialize legacy repository takeover with structured reconstruction before resuming normal autonomous ticket-driven execution.
+agent: 'agent'
+model: 'Claude Opus 4.6 (copilot)'
+tools: ['read', 'search/codebase', 'runCommands', 'fetch', 'github/*']
+argument-hint: 'No arguments needed — invoke /takeover to start legacy repo analysis'
 ---
 
 We are entering LEGACY REPOSITORY TAKEOVER MODE.
@@ -31,7 +33,7 @@ Before any work, execute the full 11-step boot sequence:
 3. Read your agent file: `.github/agents/{YourAgent}.agent.md` — internalize the Assigned Tool Loadout.
 4. Run `python3 tickets.py --sync`
 5. Run `python3 tickets.py --status --json`
-6. Read `.github/vibecoding/chunks/{YourAgent}.agent/` (all files).
+6. Read `.github/skills/{YourAgent}/` (all files).
 7. Read `.github/vibecoding/catalog.yml`; load task-relevant chunks.
 8. Invoke `sequentialthinking` to plan execution before touching any files.
 

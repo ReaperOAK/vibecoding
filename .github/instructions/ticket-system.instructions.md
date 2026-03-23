@@ -1,7 +1,7 @@
 ---
 name: Ticket System
 applyTo: '**'
-description: Ticket state machine, stage directories, tickets.py rules, dependency resolution, ticket JSON requirements.
+description: Ticket state machine, stage directories, tickets.py rules, dependency resolution, ticket JSON requirements, parallelism rules. Defines the file-based state machine for ticket management.
 ---
 
 # Ticket System

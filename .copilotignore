@@ -5,3 +5,23 @@ agent-output/**
 logs/**
 Copilot-Processing.md
 Claude-Processing.md
+# Block raw chunks (migrated to skills)
+.github/vibecoding/chunks/**
+
+# Additional patterns
+*.log
+.env*
+.env.local
+.env.*.local
+node_modules/**
+__pycache__/**
+*.pyc
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/**
+!.vscode/mcp.json
+!.vscode/settings.json
+memory-bank/**

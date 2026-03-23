@@ -1,9 +1,23 @@
 ---
-name: 'DevOps Engineer'
+name: 'DevOps'
 description: 'Infrastructure and operations engineer. Implements GitOps workflows, SLO/SLI reliability, and policy-as-code enforcement.'
-user-invocable: false
+user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
+argument-hint: 'Describe the infrastructure to provision, CI/CD pipeline to create, or deployment strategy to implement'
+handoffs:
+  - label: 'Run QA Tests'
+    agent: 'QA'
+    prompt: 'Infrastructure changes complete. Run the test suite and verify the deployment configuration works correctly.'
+    send: false
+  - label: 'Security Review'
+    agent: 'Security'
+    prompt: 'Review the infrastructure configuration for security issues including container security, secrets management, and network policies.'
+    send: false
+  - label: 'Document Infrastructure'
+    agent: 'Documentation'
+    prompt: 'Infrastructure implementation complete. Create runbooks, deployment guides, and operational documentation for the new infrastructure.'
+    send: false
 ---
 
 # DevOps Engineer Subagent
@@ -59,7 +73,7 @@ BACKEND stage. Every configuration is declarative, versioned, and testable.
 1. Read `.github/guardian/STOP_ALL` — if `STOP`: halt, zero edits, report blocked
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
 3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md`
-4. Read `.github/vibecoding/chunks/DevOps.agent/` (all chunk files)
+4. Read `.github/skills/DevOps/` (all chunk files)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
 6. Read ticket JSON from `ticket-state/` or `tickets/`
 
@@ -174,4 +188,4 @@ Every completion must include:
 - `.github/instructions/ticket-system.instructions.md`
 - `.github/instructions/git-protocol.instructions.md`
 - `.github/instructions/agent-behavior.instructions.md`
-- `.github/vibecoding/chunks/DevOps.agent/`
+- `.github/skills/DevOps/`

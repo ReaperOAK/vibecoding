@@ -1,9 +1,19 @@
 ---
 name: 'UIDesigner'
 description: 'Generates UI mockups, iterates on designs via Google Stitch, produces component specs and design tokens for Frontend Engineer. Uses Playwright for visual validation.'
-user-invocable: false
+user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
+argument-hint: 'Describe the UI components to design, mockups to create, or design tokens to define'
+handoffs:
+  - label: 'Implement Frontend'
+    agent: 'Frontend'
+    prompt: 'UI design and mockups approved. Begin implementing the frontend components according to the design specs, component specifications, and design tokens.'
+    send: false
+  - label: 'Iterate Design'
+    agent: 'UIDesigner'
+    prompt: 'Design needs iteration. Review the feedback and generate updated mockups with the requested changes.'
+    send: false
 ---
 
 # UIDesigner Subagent
@@ -61,7 +71,7 @@ Execute in strict order before any work:
 1. Read `.github/guardian/STOP_ALL` — if `STOP`: halt, zero edits
 2. Read all `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
 3. Read upstream summary from `agent-output/{PreviousAgent}/{ticket-id}.md`
-4. Read `.github/vibecoding/chunks/UIDesigner.agent/` (all chunks)
+4. Read `.github/skills/UIDesigner/` (all chunks)
 5. Read `.github/vibecoding/catalog.yml` — load task-relevant chunks
 6. Read ticket JSON from `ticket-state/` or `tickets/`
 7. Read Stitch project ID from `.github/stitch-project-id.txt` if exists (persist across tickets for continuity)
@@ -176,4 +186,4 @@ Every completion claim must include:
 
 ## 10. References
 - `.github/instructions/*.instructions.md` (all 6 canonical instruction files)
-- `.github/vibecoding/chunks/UIDesigner.agent/` (chunk-01, chunk-02)
+- `.github/skills/UIDesigner/` (chunk-01, chunk-02)
