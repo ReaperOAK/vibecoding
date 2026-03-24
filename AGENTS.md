@@ -8,7 +8,7 @@ When rules conflict, apply highest first:
 1. .github/instructions/core.instructions.md
 2. .github/instructions/*.instructions.md
 3. .github/agents/*.agent.md (includes Assigned Tool Loadout)
-4. This file (agents.md)
+4. This file (AGENTS.md)
 5. Delegation prompt
 
 If unresolved conflict remains: STOP and emit NEEDS_INPUT_FROM: Ticketer.

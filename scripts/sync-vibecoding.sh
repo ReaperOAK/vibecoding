@@ -54,7 +54,7 @@ SYNC_DIRECTORIES=(
 )
 
 SYNC_FILES=(
-  "agents.md"
+  "AGENTS.md"
   "todo_visual.py"
   "scripts/sync-vibecoding.sh"
 )
@@ -68,7 +68,7 @@ declare -A DIR_EXCEPTIONS=(
 # Validate these must exist in upstream before syncing.
 REQUIRED_SOURCE_PATHS=(
   ".github"
-  "agents.md"
+  "AGENTS.md"
   "todo_visual.py"
 )
 
@@ -228,4 +228,4 @@ echo "    Synced files: ${SYNC_FILES[*]}"
 echo "    Exceptions configured in DIR_EXCEPTIONS"
 echo ""
 echo "    Review changes with:  git diff --stat"
-echo "    Commit with:          git add .github/ agents.md todo_visual.py && git commit -m 'chore: sync vibecoding infrastructure'"
+echo "    Commit with:          git add .github/ AGENTS.md todo_visual.py && git commit -m 'chore: sync vibecoding infrastructure'"

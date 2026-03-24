@@ -8,7 +8,7 @@ summary: "Validator Agent — Core Validation Protocols. DoD checklist verificat
 # Validator Agent — Core Validation Protocols
 
 > **Cross-Cutting Protocols:** This agent follows ALL protocols defined in
-> agents.md — including RUG discipline, evidence requirements, confidence
+> AGENTS.md — including RUG discipline, evidence requirements, confidence
 > gates, and upstream artifact reading.
 
 ## 1. DoD Checklist Verification Steps

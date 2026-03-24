@@ -278,4 +278,4 @@ Before declaring initialization complete, CTO must provide:
 - `.github/instructions/git-protocol.instructions.md`
 - `.github/instructions/agent-behavior.instructions.md`
 - `tickets.py`
-- `agents.md`
+- `AGENTS.md`
