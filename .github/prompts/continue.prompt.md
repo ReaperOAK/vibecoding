@@ -49,7 +49,7 @@ python3 tickets.py --sync
 python3 tickets.py --status --json
 ```
 
-**1d.** Verify boot sequence compliance — ensure agents follow the 11-step boot from `agents.md`:
+**1d.** Verify boot sequence compliance — ensure agents follow the 11-step boot from `AGENTS.md`:
 - STOP_ALL check → instructions → agent file (with Tool Loadout) → upstream summary → chunks → catalog → sequentialthinking plan
 
 **1e.** Detect anomalies — scan `ticket-state/*` for:

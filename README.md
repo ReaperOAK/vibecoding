@@ -26,7 +26,7 @@ DRY_RUN=1 bash scripts/sync-vibecoding.sh  # preview changes without writing
 After syncing, commit the changes:
 
 ```bash
-git add .github/ agents.md todo_visual.py
+git add .github/ AGENTS.md todo_visual.py
 git commit -m "chore: sync vibecoding infrastructure"
 ```
 
@@ -106,7 +106,7 @@ Every ticket must pass all 10 items before reaching DONE:
   guardian/        Circuit breaker (STOP_ALL)
   tickets.py       Ticket state manager (--sync --claim --advance --status)
 
-agents.md          Boot protocol — loaded on every agent interaction
+AGENTS.md          Boot protocol — loaded on every agent interaction
 todo_visual.py     CLI dashboard for ticket state
 scripts/
   sync-vibecoding.sh  Merge upstream agent infrastructure into your project

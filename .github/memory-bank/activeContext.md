@@ -59,7 +59,7 @@ compaction_threshold: 50
 
 - **Ticketer.agent.md** — COMPLETE REWRITE (811→1077 lines). 20 sections. Worker pool model, two-layer orchestration, continuous scheduling, SDR protocol, updated 9-state machine (READY→LOCKED→IMPLEMENTING→QA_REVIEW→VALIDATION→DOCUMENTATION→CI_REVIEW→COMMIT→DONE), event-driven loop, conflict detection (5 types), two worked examples.
 - **ARCHITECTURE.instructions.md** — COMPLETE REWRITE (1194→1728 lines, 32 sections). Version v8.0.0. Added §30 Two-Layer Orchestration Model, §31 Strategic Layer & SDR Protocol. All sections updated with worker pool model, continuous scheduling, SDR references.
-- **agents.md** — Updated (191→233 lines). Worker Pool Model, Two-Layer Orchestration, Strategy Evolution paragraphs added. TODO Agent SDR restriction noted.
+- **AGENTS.md** — Updated (191→233 lines). Worker Pool Model, Two-Layer Orchestration, Strategy Evolution paragraphs added. TODO Agent SDR restriction noted.
 - **_cross-cutting-protocols.md** — Updated (209→241 lines). §8.1 Worker Pool Events (4 types), §10 Strategic Event Types (6 types) added.
 - **TODO.agent.md** — Updated (175→203 lines). Forbidden Actions 17-18 (SDR restrictions). Strategy Boundary section added.
 - **Validator.agent.md** — Updated (256 lines). v8 state names in validation matrix.
@@ -125,7 +125,7 @@ compaction_threshold: 50
   security guardrails, chunk system, catalog, cross-cutting protocols,
   guardian, locks, sandbox, observability, hooks, workflows
 - Created boot files: `.github/copilot-instructions.md` (45 lines) +
-  `agents.md` at repo root (80 lines) — auto-load chain for all sessions
+  `AGENTS.md` at repo root (80 lines) — auto-load chain for all sessions
 - User deleted `.github/instructions/` folder — chunks are sole source of truth
 - Cleaned `catalog.yml` of stale references to deleted instruction files
 - **Context bloat diagnosed:** agent files were 585-1,052 lines each, consuming
@@ -152,7 +152,7 @@ compaction_threshold: 50
   status) vs what it MUST delegate (all code, tests, docs, architecture, etc.)
 - Added delegation workflow: Read → Plan → Delegate (parallel) → Validate →
   Report
-- Reinforced in `agents.md` boot file: "Ticketer is a PURE ORCHESTRATOR"
+- Reinforced in `AGENTS.md` boot file: "Ticketer is a PURE ORCHESTRATOR"
 
 ### [2026-02-26] Session 7 — Cross-Agent Communication
 
@@ -281,7 +281,7 @@ compaction_threshold: 50
 5. **8-Layer Bug-Catching Strategy** — G1-G3 at IMPLEMENT, G4-G5 at TEST, G6-G8 at VALIDATE. Pass/fail criteria per gate.
 6. **Governance Architecture** — State machine, blocking rules, rework loops (max 3 → user escalation).
 7. **5 New Loop Detection Signals** — SDLC Stage Skip, DoD Non-Compliance, Initialization Skip, UI/UX Gate Bypass, Validator Rejection Loop.
-8. **STOP_ALL Keyword Fix** — Standardized on `STOP` keyword across agents.md and Validator.agent.md.
+8. **STOP_ALL Keyword Fix** — Standardized on `STOP` keyword across AGENTS.md and Validator.agent.md.
 9. **Documentation Agent Write Scope** — Denied writes to docs/reviews/** to prevent Validator report tampering.
 
 ### Validation Results
@@ -307,7 +307,7 @@ compaction_threshold: 50
 - `.github/vibecoding/catalog.yml` — validation: and sdlc-enforcement: tags
 - `.github/sandbox/tool-acl.yaml` — Validator section + Documentation agent deny
 - `.github/copilot-instructions.md` — 14 agents, Validator added
-- `agents.md` — Validator definition + Task-Level SDLC Compliance section + STOP keyword fix
+- `AGENTS.md` — Validator definition + Task-Level SDLC Compliance section + STOP keyword fix
 - `TODO/SDLC_TODO.md` — 13 tasks (all complete)
 
 ---
@@ -322,7 +322,7 @@ compaction_threshold: 50
 - **Ticketer.agent.md** — COMPLETE REWRITE (833→810 lines). 20 sections. Ticket-driven event loop replaces phased model. 9-state machine: BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE. Mandatory per-ticket post-execution chain: QA → Validator → Doc → CI Reviewer → Commit. Event emission protocol (9 types). Anti-one-shot guardrails. Commit enforcement per ticket.
 - **TODO.agent.md** — Updated (133→175 lines). Ticket Compatibility section added. L3 tasks = tickets entering BACKLOG. 9-state backward compat mapping.
 - **_cross-cutting-protocols.md** — Updated (102→209 lines). Section 8: Event Emission Protocol (9 event types, structured payloads). Section 9: Anti-One-Shot Guardrails (scope enforcement, 2-pass minimum, anti-batch detection).
-- **agents.md** — Updated (200→191 lines). Boot protocol references ticket-driven event loop, 9-state machine, post-execution chain, event emission §8, anti-one-shot §9.
+- **AGENTS.md** — Updated (200→191 lines). Boot protocol references ticket-driven event loop, 9-state machine, post-execution chain, event emission §8, anti-one-shot §9.
 - **chunk-01.yaml** — Updated (315→324 lines). Format A default BACKLOG, 9-state values, ticket model notes. Hash: PENDING_RECOMPUTE.
 - **chunk-02.yaml** — Updated (297→306 lines). 9-state model replaces 8-state. Post-execution chain aligned. Governance rules updated. Hash: PENDING_RECOMPUTE.
 - **ARCHITECTURE.instructions.md** — Updated v6.0.0→v7.0.0 (1044→1194 lines). Full ticket-driven architecture documented.
@@ -348,7 +348,7 @@ compaction_threshold: 50
 ### Key Changes
 - **Ticketer.agent.md** — Updated (1077→1453 lines, v8.0.0→v8.1.0). §7 elastic pool registry with minSize/maxSize/scalingPolicy, dynamic worker IDs `{Role}Worker-{shortUuid}`, Worker Instance Schema, 5-state Worker Lifecycle, One-Ticket-One-Worker Rule. §9 auto-scaling + parallel dispatch. §10 6th conflict type (mutual exclusion). §13 4 new scaling events. §15 worker termination on multi-ticket violation. §20-§22 elastic examples.
 - **ARCHITECTURE.instructions.md** — Updated (1728→1960 lines, v8.0.0→v8.1.0). §2 elastic pool table. §5 3-phase scheduling. §6.8 dynamic lock IDs. §8 4 new elastic events (16 total routing entries). §11 full elastic pool rewrite. §32 dynamic worker ID examples.
-- **agents.md** — Updated (233→238 lines). Worker Pool Model paragraph rewritten with elastic pools, dynamic worker IDs, parallel dispatch.
+- **AGENTS.md** — Updated (233→238 lines). Worker Pool Model paragraph rewritten with elastic pools, dynamic worker IDs, parallel dispatch.
 - **_cross-cutting-protocols.md** — Updated (241→245 lines). §8.1 now 6 events including WORKER_SPAWNED, WORKER_TERMINATED, POOL_SCALED_UP, POOL_SCALED_DOWN.
 
 ### Verification Results
@@ -388,7 +388,7 @@ Implementing OIP v1.0.0 — 7-part protocol upgrade from v8.1.0 to v8.2.0:
 
 **_cross-cutting-protocols.md** — (245→339 lines, +94). §11 OIP cross-cutting rules (7 subsections: events, scoped git, memory, evidence, single-ticket, ComplianceWorker, health sweep awareness).
 
-**agents.md** — (238→292 lines, +54). §6 OIP memory enforcement. §9 OIP reference section (scoped git, memory gate, single-ticket, evidence, ComplianceWorker, health sweep).
+**AGENTS.md** — (238→292 lines, +54). §6 OIP memory enforcement. §9 OIP reference section (scoped git, memory gate, single-ticket, evidence, ComplianceWorker, health sweep).
 
 ### OIP-ARCH-001 — Ticketer.agent.md OIP Core
 - **Artifacts:** .github/agents/Ticketer.agent.md
@@ -406,7 +406,7 @@ Implementing OIP v1.0.0 — 7-part protocol upgrade from v8.1.0 to v8.2.0:
 - **Timestamp:** 2026-03-01T00:20:00Z
 
 ### OIP-ARCH-004 — Boot Protocol OIP References
-- **Artifacts:** agents.md
+- **Artifacts:** AGENTS.md
 - **Decisions:** §9 provides concise OIP reference; §6 adds memory gate format template
 - **Timestamp:** 2026-03-01T00:30:00Z
 
@@ -443,7 +443,7 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Timestamp:** 2026-03-01T02:30:00Z
 
 ### SH-005 — Boot Protocol Update
-- **Artifacts:** agents.md
+- **Artifacts:** AGENTS.md
 - **Decisions:** Added governance authority subsection (§3), unbounded pool language (§4), updated OIP references (§9)
 - **Timestamp:** 2026-03-01T02:40:00Z
 

@@ -37,7 +37,7 @@ Before any work, execute the full 11-step boot sequence:
 7. Read `.github/vibecoding/catalog.yml`; load task-relevant chunks.
 8. Invoke `sequentialthinking` to plan execution before touching any files.
 
-All agents operate under strict Tool Loadouts per `agents.md` §0.1. No tool browsing or hallucination outside assigned loadout.
+All agents operate under strict Tool Loadouts per `AGENTS.md` §0.1. No tool browsing or hallucination outside assigned loadout.
 
 ---
 

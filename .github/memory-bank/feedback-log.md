@@ -32,7 +32,7 @@ append_only: true
 ### [2026-02-27T12:00:00Z] Validator → Backend
 - **Session:** Progressive Refinement TODO Architecture BUILD
 - **Phase:** VALIDATE
-- **Subject Artifact:** TODO.agent.md, chunk-01.yaml, chunk-02.yaml, Ticketer.agent.md, agents.md
+- **Subject Artifact:** TODO.agent.md, chunk-01.yaml, chunk-02.yaml, Ticketer.agent.md, AGENTS.md
 - **Feedback Type:** suggestion
 - **Severity:** low
 - **Signal:** 3 advisory findings: (1) L3 Layer Model table says "2–4 hours" but forbidden action #3 caps at 90 min — inconsistent text. (2) SDLC summary table DECOMPOSE output still shows `TODO/{PROJECT}_TODO.md` instead of progressive refinement paths. (3) Chunk hash values are PENDING_RECOMPUTE.

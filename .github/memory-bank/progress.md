@@ -45,7 +45,7 @@ append_only: true
 | Task | Agent | Evidence | Status |
 |------|-------|----------|--------|
 | Phases A-K: Full system build | Ticketer | All 11 phases complete — agents, orchestration, security, chunks, catalog, guardian, hooks, workflows | ✅ Complete |
-| Boot files created | Ticketer | `copilot-instructions.md` (45 lines) + `agents.md` (80 lines) | ✅ Complete |
+| Boot files created | Ticketer | `copilot-instructions.md` (45 lines) + `AGENTS.md` (80 lines) | ✅ Complete |
 | Instructions folder deleted | User | `.github/instructions/` removed — chunks sole source | ✅ Complete |
 | catalog.yml cleaned | Ticketer | Stale instruction file refs removed | ✅ Complete |
 | Context bloat fix — all 12 files slimmed | Ticketer | 7,787 → 826 total lines (89% reduction), `wc -l` verified | ✅ Complete |
@@ -57,7 +57,7 @@ append_only: true
 | Architecture design (1,374-line spec) | DONE | Architect | 2025-07-26 |
 | TODO.agent.md + chunks (2 files) | DONE | Backend | 2025-07-26 |
 | Ticketer DECOMPOSE + UI/UX Gate + TODO Delegation | DONE | Backend | 2025-07-26 |
-| Cross-cutting updates (catalog, ACL, copilot-instructions, agents.md) | DONE | Backend | 2025-07-26 |
+| Cross-cutting updates (catalog, ACL, copilot-instructions, AGENTS.md) | DONE | Backend | 2025-07-26 |
 | ARCHITECTURE.instructions.md v4.1.0 | DONE | Documentation | 2025-07-26 |
 | QA + Security validation | DONE | QA, Security | 2025-07-26 |
 | Fix loop (5 findings resolved) | DONE | Backend | 2025-07-26 |
@@ -141,7 +141,7 @@ append_only: true
 | BUILD — Ticketer SDLC loop + loop detection | DONE | Backend | 2026-02-26 |
 | BUILD — DoD + init templates | DONE | Backend | 2026-02-26 |
 | BUILD — Validator chunks + catalog + schema | DONE | Backend | 2026-02-26 |
-| BUILD — agents.md + copilot + tool-acl | DONE | Backend | 2026-02-26 |
+| BUILD — AGENTS.md + copilot + tool-acl | DONE | Backend | 2026-02-26 |
 | VALIDATE — QA review (FAIL → fix → PASS) | DONE | QA Engineer | 2026-02-26 |
 | VALIDATE — Security review (PASS_WITH_FINDINGS) | DONE | Security Engineer | 2026-02-26 |
 | FIX LOOP — 8 findings resolved (3C + 2H + 2M + 1L) | DONE | Backend | 2026-02-26 |
@@ -167,7 +167,7 @@ append_only: true
 | TDSA-BE001: Ticketer.agent.md Rewrite | Backend | 810 lines, 20 sections, verified | DONE |
 | TDSA-BE002: TODO.agent.md Ticket Alignment | Backend | 175 lines, Ticket Compatibility section | DONE |
 | TDSA-BE003: Cross-Cutting Event Protocols | Backend | 209 lines, §8 Event Emission + §9 Anti-One-Shot | DONE |
-| TDSA-BE004: agents.md Boot Protocol | Backend | 191 lines, 9-state refs + chain refs | DONE |
+| TDSA-BE004: AGENTS.md Boot Protocol | Backend | 191 lines, 9-state refs + chain refs | DONE |
 | TDSA-BE005: chunk-01.yaml Ticket Model | Backend | 324 lines, BACKLOG default, 9-state values | DONE |
 | TDSA-BE006: chunk-02.yaml State Machine | Backend | 306 lines, 9-state replaces 8-state | DONE |
 | TDSA-DOC001: ARCHITECTURE.instructions.md v7.0.0 | Documentation | 1194 lines, v6.0.0→v7.0.0, all new sections | DONE |
@@ -192,7 +192,7 @@ append_only: true
 | WPAE-BE002: Agent Definition Propagation | Backend | 4 files updated, all 6 AC met | DONE |
 | WPAE-BE003: Chunk Content Updates | Backend | 3 chunk files, all 5 AC met | DONE |
 | WPAE-BE004: Schema & Infra Alignment | Backend | 4 infra files, all 6 AC met | DONE |
-| WPAE-BE005: Conceptual v8 Propagation | Backend | 3 files (agents.md, _cross-cutting, TODO), 10 AC met | DONE |
+| WPAE-BE005: Conceptual v8 Propagation | Backend | 3 files (AGENTS.md, _cross-cutting, TODO), 10 AC met | DONE |
 | ARCHITECTURE.instructions.md v8.0.0 Rewrite | Backend | 1728 lines, 32 sections, zero banned terms | DONE |
 
 ### System Now Has (Session 14)
@@ -212,7 +212,7 @@ append_only: true
 |------|-------|----------|--------|
 | EWPE-BE001: Ticketer.agent.md elastic pool rewrite | Backend | 1453 lines, v8.1.0, 14 AC met, 0 static IDs | DONE |
 | EWPE-BE002: ARCHITECTURE.instructions.md elastic pool update | Backend | 1960 lines, v8.1.0, 10 AC met, 0 static IDs | DONE |
-| EWPE-BE003: Boot file & protocol propagation | Backend | agents.md=238, _cross-cutting=245, 7 AC met | DONE |
+| EWPE-BE003: Boot file & protocol propagation | Backend | AGENTS.md=238, _cross-cutting=245, 7 AC met | DONE |
 | Verification sweep | Ticketer | 0 static IDs, versions aligned, dynamic refs confirmed | DONE |
 
 ### System Now Has (Session 14 continued — v8.1.0)
@@ -245,7 +245,7 @@ append_only: true
 | Light Supervision Mode (auto-correct drift, human for strategy only) | DONE |
 | ARCHITECTURE.instructions.md §33 + §5/§8/§10/§15 updates | DONE |
 | _cross-cutting-protocols.md §11 (agent-facing OIP rules) | DONE |
-| agents.md §6 + §9 (boot protocol OIP references) | DONE |
+| AGENTS.md §6 + §9 (boot protocol OIP references) | DONE |
 
 ### System Now Has (Session 15 — v8.2.0)
 - **OIP v1.0.0** — self-healing governance, auto-correct procedural drift
@@ -273,7 +273,7 @@ append_only: true
 | SH-002 | Create core_governance.instructions.md canonical authority | DONE |
 | SH-003 | Rewrite Ticketer.agent.md (1864→723 lines, 61% reduction) | DONE |
 | SH-004 | Agent normalization (reverted — frontmatter off-limits) | DONE |
-| SH-005 | Update agents.md boot protocol (§3, §4, §9) | DONE |
+| SH-005 | Update AGENTS.md boot protocol (§3, §4, §9) | DONE |
 | SH-006 | Update _cross-cutting-protocols.md + ARCHITECTURE.instructions.md | DONE |
 | SH-007 | Update catalog.yml with governance: tag | DONE |
 | Verification | Cross-reference audit — zero stale refs | DONE |
@@ -317,4 +317,4 @@ Implement Operational Concurrency Floor: maintain MIN_ACTIVE_WORKERS=10 at all t
 - **Ticketer.agent.md at v9.1.0** (821 lines, 25 sections)
 - **ARCHITECTURE.instructions.md at v9.1.0** (~2227 lines, 34 sections)
 - **Zero governance file changes** — all OCF logic at scheduler level only
-- **agents.md** (292 lines, 9 sections)
+- **AGENTS.md** (292 lines, 9 sections)
