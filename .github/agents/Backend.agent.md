@@ -10,6 +10,9 @@ tools:
   - search
   - 'github/*'
   - 'io.github.upstash/context7/*'
+tool-sets:
+  - '#universal'
+  - '#code-editing'
 argument-hint: 'Describe the backend feature, API endpoint, or database operation to implement'
 handoffs:
   - label: 'Submit to QA'

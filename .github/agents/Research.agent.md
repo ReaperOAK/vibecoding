@@ -20,6 +20,9 @@ tools:
   - 'playwright/*'
   - 'vscode.mermaid-chat-features/renderMermaidDiagram'
   - todo
+tool-sets:
+  - '#universal'
+  - '#research'
 argument-hint: 'Describe the technology to research, comparison to perform, or feasibility analysis needed'
 handoffs:
   - label: 'Submit to QA'

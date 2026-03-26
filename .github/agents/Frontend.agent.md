@@ -12,6 +12,9 @@ tools:
   - 'github/*'
   - 'com.figma.mcp/mcp/*'
   - 'playwright/*'
+tool-sets:
+  - '#universal'
+  - '#code-editing'
 argument-hint: 'Describe the UI component, page layout, or frontend feature to implement'
 handoffs:
   - label: 'Submit to QA'

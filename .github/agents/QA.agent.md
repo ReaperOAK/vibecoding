@@ -10,6 +10,8 @@ tools:
   - browser
   - 'github/*'
   - 'playwright/*'
+tool-sets:
+  - '#universal'
 argument-hint: 'Describe what to test, test strategy to implement, or quality gates to verify'
 handoffs:
   - label: 'Security Review'

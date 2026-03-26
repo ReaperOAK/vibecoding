@@ -12,6 +12,8 @@ tools:
   - 'github/*'
   - 'com.figma.mcp/mcp/*'
   - 'playwright/*'
+tool-sets:
+  - '#universal'
 argument-hint: 'Describe the UI components to design, mockups to create, or design tokens to define'
 handoffs:
   - label: 'Implement Frontend'

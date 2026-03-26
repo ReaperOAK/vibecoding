@@ -508,4 +508,11 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** .github/mcp-servers/ticket-server/server.py, .github/mcp-servers/ticket-server/requirements.txt
 - **Decisions:** Used official `mcp` PyPI package (v1.26.0) with `from mcp.server.fastmcp import FastMCP` over standalone `fastmcp` package. Preserved camelCase parameter names for API schema compatibility. Used pathlib.Path per python.instructions.md.
 - **Timestamp:** 2026-03-27T00:00:00Z
+
+---
+
+### [TASK-VIB-004] — Wire Tool-Sets to All Agent Frontmatter
+- **Artifacts:** All 15 `.github/agents/*.agent.md` files
+- **Decisions:** Added `tool-sets:` after `tools:` block in YAML frontmatter. DevOps gets `#code-editing` (modifies config files). Existing `tools:` preserved.
+- **Timestamp:** 2026-03-27T00:00:00Z
 - Verify preemption behavior under load

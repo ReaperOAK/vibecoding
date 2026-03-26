@@ -4,7 +4,7 @@
   "description": "`.github/tool-sets/universal.jsonc`, `research.jsonc`, and `code-editing.jsonc` define reusable tool set configurations but no agent file uses them via the `tool-sets:` frontmatter property. The `#universal` shorthand is unused.\n\nFix: Add `tool-sets: [#universal]` to all agent frontmatter. Additionally:\n- Research agent: add `tool-sets: [#universal, #research]`\n- Backend, Frontend, Architect agents: add `tool-sets: [#universal, #code-editing]`\n\nInspect each `.github/tool-sets/*.jsonc` file to understand which tool namespaces they declare, then add appropriate `tool-sets:` references to each agent.",
   "type": "infra",
   "priority": "high",
-  "stage": "READY",
+  "stage": "QA",
   "sdlc_flow": [
     "READY",
     "DEVOPS",
@@ -71,6 +71,15 @@
       "from_stage": "READY",
       "to_stage": "READY",
       "details": "Claimed by reaperoak@pop-os via DevOps, lease until 2026-03-26T19:37:18.975760+00:00"
+    },
+    {
+      "timestamp": "2026-03-27T00:00:00Z",
+      "event": "STAGE_COMPLETE",
+      "agent": "DevOps",
+      "machine_id": "pop-os",
+      "from_stage": "READY",
+      "to_stage": "QA",
+      "details": "DEVOPS complete — tool-sets wired to all 15 agent frontmatters"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",

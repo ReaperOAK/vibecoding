@@ -9,6 +9,9 @@ tools:
   - edit
   - search
   - 'github/*'
+tool-sets:
+  - '#universal'
+  - '#code-editing'
 argument-hint: 'Describe the infrastructure to provision, CI/CD pipeline to create, or deployment strategy to implement'
 handoffs:
   - label: 'Submit to QA'

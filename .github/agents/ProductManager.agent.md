@@ -20,6 +20,8 @@ tools:
   - 'playwright/*'
   - 'vscode.mermaid-chat-features/renderMermaidDiagram'
   - todo
+tool-sets:
+  - '#universal'
 argument-hint: 'Describe the business requirements, feature to specify, or user stories to create'
 handoffs:
   - label: 'Design Architecture'

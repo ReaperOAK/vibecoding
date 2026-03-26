@@ -8,6 +8,8 @@ tools:
   - read
   - search
   - 'github/*'
+tool-sets:
+  - '#universal'
 argument-hint: 'Describe the code quality checks to run, complexity analysis to perform, or quality gates to verify'
 handoffs:
   - label: 'Documentation Update'

@@ -20,6 +20,8 @@ tools:
   - 'playwright/*'
   - 'vscode.mermaid-chat-features/renderMermaidDiagram'
   - todo
+tool-sets:
+  - '#universal'
 argument-hint: 'Describe the documentation to create, update, or the API docs to generate'
 handoffs:
   - label: 'Final Validation'
