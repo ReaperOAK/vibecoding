@@ -212,9 +212,9 @@ If uncertain whether an action is destructive, treat it as destructive.
 
 ## 11. References
 
-- `.github/instructions/core.instructions.md`
-- `.github/instructions/sdlc.instructions.md`
-- `.github/instructions/ticket-system.instructions.md`
-- `.github/instructions/git-protocol.instructions.md`
-- `.github/instructions/agent-behavior.instructions.md`
+- [.github/instructions/core.instructions.md](../.github/instructions/core.instructions.md)
+- [.github/instructions/sdlc.instructions.md](../.github/instructions/sdlc.instructions.md)
+- [.github/instructions/ticket-system.instructions.md](../.github/instructions/ticket-system.instructions.md)
+- [.github/instructions/git-protocol.instructions.md](../.github/instructions/git-protocol.instructions.md)
+- [.github/instructions/agent-behavior.instructions.md](../.github/instructions/agent-behavior.instructions.md)
 - `tickets.py` — ticket state machine manager

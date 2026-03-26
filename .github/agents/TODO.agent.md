@@ -159,9 +159,9 @@ Every completion must include:
 
 ## 11. References
 
-- `.github/instructions/core.instructions.md`
-- `.github/instructions/sdlc.instructions.md`
-- `.github/instructions/ticket-system.instructions.md`
-- `.github/instructions/git-protocol.instructions.md`
-- `.github/instructions/agent-behavior.instructions.md`
-- `.github/skills/TODO/`
+- [.github/instructions/core.instructions.md](../.github/instructions/core.instructions.md)
+- [.github/instructions/sdlc.instructions.md](../.github/instructions/sdlc.instructions.md)
+- [.github/instructions/ticket-system.instructions.md](../.github/instructions/ticket-system.instructions.md)
+- [.github/instructions/git-protocol.instructions.md](../.github/instructions/git-protocol.instructions.md)
+- [.github/instructions/agent-behavior.instructions.md](../.github/instructions/agent-behavior.instructions.md)
+- [.github/skills/TODO/](../.github/skills/TODO/)

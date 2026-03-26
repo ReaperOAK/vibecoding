@@ -2,7 +2,7 @@
 name: 'Backend'
 description: 'Implements server-side logic, APIs, database operations, and business rules using TDD with SOLID principles and spec-driven development.'
 user-invocable: false
-tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
+tools: [vscode, execute, read, edit, search, 'github/*', 'io.github.upstash/context7/*']
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the backend feature, API endpoint, or database operation to implement'
 handoffs:
@@ -186,10 +186,10 @@ Before marking complete, verify all of the following:
 
 ## 10. References
 
-- `.github/instructions/core.instructions.md`
-- `.github/instructions/sdlc.instructions.md`
-- `.github/instructions/ticket-system.instructions.md`
-- `.github/instructions/git-protocol.instructions.md`
-- `.github/instructions/agent-behavior.instructions.md`
-- `.github/skills/Backend/`
-- `.github/vibecoding/catalog.yml`
+- [.github/instructions/core.instructions.md](../.github/instructions/core.instructions.md)
+- [.github/instructions/sdlc.instructions.md](../.github/instructions/sdlc.instructions.md)
+- [.github/instructions/ticket-system.instructions.md](../.github/instructions/ticket-system.instructions.md)
+- [.github/instructions/git-protocol.instructions.md](../.github/instructions/git-protocol.instructions.md)
+- [.github/instructions/agent-behavior.instructions.md](../.github/instructions/agent-behavior.instructions.md)
+- [.github/skills/Backend/](../.github/skills/Backend/)
+- [.github/vibecoding/catalog.yml](../.github/vibecoding/catalog.yml)

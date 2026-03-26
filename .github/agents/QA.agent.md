@@ -184,5 +184,5 @@ Every QA report must include:
 
 ## 11. References
 
-- `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
-- `.github/skills/QA/` (test strategy details, examples, report templates)
+- [.github/instructions/*.instructions.md](../.github/instructions/*.instructions.md) (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
+- [.github/skills/QA/](../.github/skills/QA/) (test strategy details, examples, report templates)

@@ -148,5 +148,5 @@ Every validation must produce:
 - Artifact paths for all files created/modified.
 
 ## 11. References
-- `.github/instructions/*.instructions.md` (all 6 canonical files)
-- `.github/skills/Validator/` (chunk-01, chunk-02, chunk-03)
+- [.github/instructions/*.instructions.md](../.github/instructions/*.instructions.md) (all 6 canonical files)
+- [.github/skills/Validator/](../.github/skills/Validator/) (chunk-01, chunk-02, chunk-03)

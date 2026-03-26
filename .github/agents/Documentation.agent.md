@@ -160,9 +160,9 @@ If any criterion cannot be met, report `status: blocked` with reason.
 
 ## 10. References
 
-- `.github/instructions/core.instructions.md`
-- `.github/instructions/sdlc.instructions.md`
-- `.github/instructions/ticket-system.instructions.md`
-- `.github/instructions/git-protocol.instructions.md`
-- `.github/instructions/agent-behavior.instructions.md`
-- `.github/skills/Documentation/`
+- [.github/instructions/core.instructions.md](../.github/instructions/core.instructions.md)
+- [.github/instructions/sdlc.instructions.md](../.github/instructions/sdlc.instructions.md)
+- [.github/instructions/ticket-system.instructions.md](../.github/instructions/ticket-system.instructions.md)
+- [.github/instructions/git-protocol.instructions.md](../.github/instructions/git-protocol.instructions.md)
+- [.github/instructions/agent-behavior.instructions.md](../.github/instructions/agent-behavior.instructions.md)
+- [.github/skills/Documentation/](../.github/skills/Documentation/)

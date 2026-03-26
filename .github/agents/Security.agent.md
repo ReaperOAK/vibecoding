@@ -182,5 +182,5 @@ Every completion claim must include:
 
 ## 11. References
 
-- `.github/instructions/*.instructions.md` — canonical system rules.
-- `.github/skills/Security/` — detailed patterns, code examples, checklists.
+- [.github/instructions/*.instructions.md](../.github/instructions/*.instructions.md) — canonical system rules.
+- [.github/skills/Security/](../.github/skills/Security/) — detailed patterns, code examples, checklists.

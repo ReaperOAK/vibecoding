@@ -186,6 +186,6 @@ Every completion claim must include:
 
 ## 10. References
 
-- `.github/instructions/*.instructions.md` (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
-- `.github/skills/Research/` (chunk-01.yaml, chunk-02.yaml)
-- `.github/vibecoding/catalog.yml`
+- [.github/instructions/*.instructions.md](../.github/instructions/*.instructions.md) (core, sdlc, ticket-system, git-protocol, agent-behavior, terminal-management)
+- [.github/skills/Research/](../.github/skills/Research/) (chunk-01.yaml, chunk-02.yaml)
+- [.github/vibecoding/catalog.yml](../.github/vibecoding/catalog.yml)
