@@ -1,0 +1,60 @@
+{
+  "ticket_id": "TASK-VIB-010",
+  "title": "Register MCP Ticket Server as MCP App via Extension",
+  "description": "The MCP ticket server should be registered as an MCP App using the VS Code extension's `contributes.mcpServerDefinitionProviders` mechanism so it is available workspace-wide without requiring users to manually edit `.vscode/mcp.json`.\n\nFix:\n1. In `extension/package.json`, add `contributes.mcpServerDefinitionProviders` with a unique provider ID\n2. In `extension/src/extension.ts`, import and call `vscode.lm.registerMcpServerDefinitionProvider` to register the ticket server with its Python script path and environment\n\nThe server definition should point to `.github/mcp-servers/ticket-server/server.py`, use `python3` as the command, and set the workspace root as the cwd.",
+  "type": "backend",
+  "priority": "medium",
+  "stage": "BLOCKED",
+  "sdlc_flow": [
+    "READY",
+    "BACKEND",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-26T13:19:04.702639+00:00",
+  "created_by": "TODO",
+  "dependencies": [
+    "TASK-VIB-008",
+    "TASK-VIB-009"
+  ],
+  "blocked_by": [
+    "TASK-VIB-008",
+    "TASK-VIB-009"
+  ],
+  "file_paths": [
+    "extension/src/extension.ts",
+    "extension/package.json"
+  ],
+  "acceptance_criteria": [
+    "Given the updated extension is activated, When VS Code starts, Then the ticket MCP server is registered and available in the MCP server list without manual `mcp.json` configuration",
+    "Given `extension/package.json`, When audited, Then it contains a valid `contributes.mcpServerDefinitionProviders` entry with the extension's publisher ID",
+    "Given `extension/src/extension.ts`, When audited, Then it calls `vscode.lm.registerMcpServerDefinitionProvider` with the correct server path and provider configuration",
+    "Given the registered MCP server, When a MCP client connects, Then all 7 tools plus Resources and Prompts from TASK-VIB-008 and TASK-VIB-009 are accessible"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-26T13:19:04.702641+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-vibecoding-improvements.md"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
+  "tags": [
+    "p3",
+    "extension",
+    "mcp-app",
+    "registration"
+  ]
+}

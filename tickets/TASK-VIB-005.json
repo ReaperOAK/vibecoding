@@ -1,0 +1,60 @@
+{
+  "ticket_id": "TASK-VIB-005",
+  "title": "Add Agents Property to Coordinator Agent Files",
+  "description": "Ticketer and CTO agent files have `handoffs` defined but no `agents: [...]` property to restrict which subagents they can invoke. VS Code 1.100+ supports the `agents` frontmatter property for subagent restriction.\n\nFix:\n- `Ticketer.agent.md`: Add `agents: [Research, ProductManager, Architect, DevOps, Backend, UIDesigner, Frontend, QA, Security, CIReviewer, Documentation, Validator, TODO]`\n- `CTO.agent.md`: Add `agents: [Research, ProductManager, Architect, TODO, Ticketer]` (CTO only invokes planning agents and delegates execution to Ticketer)",
+  "type": "infra",
+  "priority": "high",
+  "stage": "READY",
+  "sdlc_flow": [
+    "READY",
+    "DEVOPS",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-26T13:19:04.702186+00:00",
+  "created_by": "TODO",
+  "dependencies": [],
+  "blocked_by": [],
+  "file_paths": [
+    ".github/agents/Ticketer.agent.md",
+    ".github/agents/CTO.agent.md"
+  ],
+  "acceptance_criteria": [
+    "Given `Ticketer.agent.md` frontmatter, When parsed by VS Code, Then it contains an `agents:` property listing all 13 worker/specialist agent names",
+    "Given `CTO.agent.md` frontmatter, When parsed by VS Code, Then it contains an `agents:` property listing only the 5 agents CTO is authorized to invoke",
+    "Given both files, When the `agents:` property is added, Then all existing frontmatter properties (name, description, tools, model, handoffs) are preserved"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-26T13:19:04.702188+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-vibecoding-improvements.md"
+    },
+    {
+      "timestamp": "2026-03-26T13:19:04.704058+00:00",
+      "event": "MOVED_TO_READY",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Dependencies resolved, moved to READY"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
+  "tags": [
+    "p1",
+    "agent-config",
+    "governance",
+    "coordinator"
+  ]
+}
