@@ -4,7 +4,7 @@
   "description": "All agent instruction files reference `.github/vibecoding/catalog.yml` in the boot sequence (step 4: \"Read `.github/vibecoding/catalog.yml`\"). This directory does not exist \u2014 it is `.github/skills/` that holds the catalog. Every agent silently fails to load catalog context on boot.\n\nFix: Create `.github/vibecoding/` directory and populate `catalog.yml` with the full catalog content from `.github/skills/catalog.yml` (copy content, not symlink, for portability). The catalog index must list all available skill chunk files so agents can locate and load task-relevant context.",
   "type": "infra",
   "priority": "critical",
-  "stage": "QA",
+  "stage": "SECURITY",
   "sdlc_flow": [
     "READY",
     "DEVOPS",
@@ -28,10 +28,10 @@
     "Given `.github/skills/catalog.yml` contains the authoritative skill index, When the vibecoding catalog is created, Then the content at `.github/vibecoding/catalog.yml` references all the same skill chunks available in `.github/skills/`"
   ],
   "rework_count": 0,
-  "claimed_by": "QA",
-  "machine_id": "pop-os",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-26T20:04:24.908222+00:00",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -83,6 +83,15 @@
       "from_stage": "QA",
       "to_stage": "QA",
       "details": "Claimed by reaperoak@pop-os via QA, lease until 2026-03-26T20:04:24.908222+00:00"
+    },
+    {
+      "timestamp": "2026-03-26T19:37:29.750678+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "QA",
+      "machine_id": "system",
+      "from_stage": "QA",
+      "to_stage": "SECURITY",
+      "details": "Advanced from QA to SECURITY"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",

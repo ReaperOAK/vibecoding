@@ -533,3 +533,11 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Decisions:** Added `model: [claude-3-7-sonnet, claude-3-5-sonnet]` to review-chain agents only. Other agents untouched — they retain the default (most capable) model.
 - **Timestamp:** 2026-03-27T00:00:00Z
 - Verify preemption behavior under load
+### [TASK-VIB-001] — Fix Catalog Path — Create .github/vibecoding/ Directory
+- **Artifacts:** `.github/vibecoding/catalog.yml`
+- **Decisions:** QA PASS — all 3 acceptance criteria verified. YAML valid (26 keys), all 20 skill directories covered, source catalog fully mirrored with 6 additional on-disk skill keys. 13 dangling refs are pre-existing in source catalog (out of scope).
+- **Verdict:** PASS
+- **Coverage:** N/A (infrastructure config file)
+- **Mutation Score:** N/A
+- **Confidence:** HIGH
+- **Timestamp:** 2026-03-27T00:15:00Z
