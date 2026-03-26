@@ -26,6 +26,32 @@
         ],
         "enabled": false,
         "comment": "Enable when VS Code hooks feature exits Preview"
+      },
+      {
+        "description": "Block destructive terminal commands (rm -rf, DROP TABLE, git reset --hard, etc.)",
+        "command": "bash .github/hooks/scripts/block-destructive-ops.sh",
+        "toolNames": [
+          "run_in_terminal",
+          "execute/runInTerminal"
+        ],
+        "enabled": false,
+        "comment": "Enable when VS Code hooks feature exits Preview"
+      }
+    ],
+    "Stop": [
+      {
+        "description": "Verify agent output summary contains required evidence (artifacts, confidence)",
+        "command": "bash .github/hooks/scripts/verify-evidence.sh",
+        "enabled": false,
+        "comment": "Enable when VS Code hooks feature exits Preview"
+      }
+    ],
+    "SubagentStop": [
+      {
+        "description": "Verify agent wrote to activeContext.md before completing",
+        "command": "bash .github/hooks/scripts/verify-memory-gate.sh",
+        "enabled": false,
+        "comment": "Enable when VS Code hooks feature exits Preview"
       }
     ]
   },
