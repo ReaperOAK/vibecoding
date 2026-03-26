@@ -557,3 +557,10 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Verdict:** PASS (Confidence: HIGH)
 - **Agent:** QA
 - **Timestamp:** 2026-03-27T00:00:00+00:00
+
+### [TASK-VIB-004] — Wire Tool-Sets to All Agent Frontmatter
+- **Artifacts:** agent-output/QA/TASK-VIB-004.md
+- **Decisions:** All 4 AC verified: 15/15 agents have tool-sets with #universal, Research has #research, Architect/Backend/Frontend/DevOps have #code-editing, all tools: properties preserved. No code under test — structural verification only.
+- **Verdict:** PASS (Confidence: HIGH)
+- **Agent:** QA
+- **Timestamp:** 2026-03-27T12:00:00Z
