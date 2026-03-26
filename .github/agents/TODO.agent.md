@@ -3,7 +3,7 @@ name: 'TODO'
 description: 'Progressive refinement decomposition engine with 3 operating modes (Strategist, Planner, Executor Controller). Decomposes project visions through 5 layers (L0-L4) into granular, trackable tasks. Manages task lifecycle, enforces controlled expansion, and generates tickets.py-compatible task files.'
 user-invocable: false
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]  # runInTerminal constrained: python tickets.py ONLY
-model: Claude Opus 4.6 (copilot)
+
 argument-hint: 'Describe the decomposition mode (Strategic/Planning/Execution) and the vision or capability to decompose'
 ---
 

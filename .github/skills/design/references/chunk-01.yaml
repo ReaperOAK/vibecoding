@@ -9,7 +9,7 @@ summary: "--- name: 'UIDesigner' description: 'Generates UI mockups via Google S
 name: 'UIDesigner'
 description: 'Generates UI mockups, iterates on designs via Google Stitch, produces component specs and design tokens for Frontend Engineer. Uses Playwright for visual validation. Bridges PM/Architect intent and Frontend implementation.'
 tools: ['search/codebase', 'search/textSearch', 'search/fileSearch', 'search/listDirectory', 'read/readFile', 'read/problems', 'edit/createFile', 'edit/editFile', 'stitch/create_project', 'stitch/generate_screen_from_text', 'stitch/edit_screens', 'stitch/generate_variants', 'stitch/get_project', 'stitch/get_screen', 'stitch/list_projects', 'stitch/list_screens', 'playwright/browser_snapshot', 'playwright/browser_take_screenshot', 'playwright/browser_navigate', 'memory/create_entities', 'memory/search_nodes', 'memory/add_observations']
-model: Claude Opus 4.6 (copilot)
+
 user-invokable: false
 ---
 
