@@ -1,0 +1,13 @@
+// Code editing tool set — for implementing agents (Backend, Frontend, DevOps)
+// Reference with #code-editing in agent tools array
+{
+  "name": "code-editing",
+  "description": "Tools for code implementation, editing, and testing",
+  "tools": [
+    "edit",
+    "agent",
+    "todo",
+    "io.github.upstash/context7/*",
+    "vscode.mermaid-chat-features/renderMermaidDiagram"
+  ]
+}
