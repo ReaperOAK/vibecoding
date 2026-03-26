@@ -4,7 +4,7 @@
   "description": "`.github/tool-sets/universal.jsonc`, `research.jsonc`, and `code-editing.jsonc` define reusable tool set configurations but no agent file uses them via the `tool-sets:` frontmatter property. The `#universal` shorthand is unused.\n\nFix: Add `tool-sets: [#universal]` to all agent frontmatter. Additionally:\n- Research agent: add `tool-sets: [#universal, #research]`\n- Backend, Frontend, Architect agents: add `tool-sets: [#universal, #code-editing]`\n\nInspect each `.github/tool-sets/*.jsonc` file to understand which tool namespaces they declare, then add appropriate `tool-sets:` references to each agent.",
   "type": "infra",
   "priority": "high",
-  "stage": "VALIDATION",
+  "stage": "DONE",
   "sdlc_flow": [
     "READY",
     "DEVOPS",
@@ -43,10 +43,10 @@
     "Given the existing `tools:` property on each agent, When `tool-sets:` is added, Then the existing `tools:` property is preserved (not replaced)"
   ],
   "rework_count": 0,
-  "claimed_by": "Validator",
-  "machine_id": "pop-os",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-26T20:36:59.370534+00:00",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -159,6 +159,15 @@
       "from_stage": "VALIDATION",
       "to_stage": "VALIDATION",
       "details": "Claimed by reaperoak@pop-os via Validator, lease until 2026-03-26T20:36:59.370534+00:00"
+    },
+    {
+      "timestamp": "2026-03-26T20:10:17.020650+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Validator",
+      "machine_id": "system",
+      "from_stage": "VALIDATION",
+      "to_stage": "DONE",
+      "details": "Advanced from VALIDATION to DONE"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",

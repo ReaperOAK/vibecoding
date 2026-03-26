@@ -4,7 +4,7 @@
   "description": "All agents currently use `` \u2014 the most expensive model. Review-chain agents (CIReviewer, QA, Validator, Documentation) perform structured, pattern-matching tasks that do not require the most capable model. Using a model array with preferred/fallback reduces cost.\n\nFix: Update the `model:` field in the 4 review-chain agents to `model: [claude-3-7-sonnet, claude-3-5-sonnet]`. This sets a cheaper preferred model with fallback. Keep Ticketer, CTO, Architect, Backend, Frontend, UIDesigner, Research, ProductManager, DevOps, Security, and TODO on the current or appropriate model.",
   "type": "infra",
   "priority": "medium",
-  "stage": "VALIDATION",
+  "stage": "DONE",
   "sdlc_flow": [
     "READY",
     "DEVOPS",
@@ -33,10 +33,10 @@
     "Given all other agent files (not in the review-chain), When audited after the fix, Then their model field is not modified by this ticket"
   ],
   "rework_count": 0,
-  "claimed_by": "Validator",
-  "machine_id": "pop-os",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-26T20:36:59.479793+00:00",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -151,6 +151,15 @@
       "from_stage": "VALIDATION",
       "to_stage": "VALIDATION",
       "details": "Claimed by reaperoak@pop-os via Validator, lease until 2026-03-26T20:36:59.479793+00:00"
+    },
+    {
+      "timestamp": "2026-03-26T20:10:17.145048+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Validator",
+      "machine_id": "system",
+      "from_stage": "VALIDATION",
+      "to_stage": "DONE",
+      "details": "Advanced from VALIDATION to DONE"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
