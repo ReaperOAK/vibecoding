@@ -1,8 +1,8 @@
 {
   // Hook file locations — tells VS Code where to find agent lifecycle hooks
-  "chat.hookFilesLocations": [
-    ".github/hooks"
-  ],
+  "chat.hookFilesLocations": {
+    "hooks": ".github/hooks/*.hook.md"
+  },
 
   // Agent features — enable agent mode capabilities
   "chat.agent.enabled": true,
@@ -11,17 +11,17 @@
   "github.copilot.chat.codeGeneration.useInstructionFiles": true,
 
   // Skill files — ensure .github/skills/ SKILL.md files are loaded
-  "chat.skillFilesLocations": [
-    ".github/skills"
-  ],
+  "chat.skillFilesLocations": {
+    "skills": ".github/skills/*.skill.md"
+  },
 
   // Agent files — ensure .github/agents/ .agent.md files are loaded
-  "chat.agentFilesLocations": [
-    ".github/agents"
-  ],
+  "chat.agentFilesLocations": {
+    "agents": ".github/agents/*.agent.md"
+  },
 
   // Prompt files — ensure .github/prompts/ .prompt.md files are loaded
-  "chat.promptFilesLocations": [
-    ".github/prompts"
-  ]
+  "chat.promptFilesLocations": {
+    "prompts": ".github/prompts/*.prompt.md"
+  }
 }
