@@ -4,7 +4,7 @@
   "description": "`.github/tool-sets/universal.jsonc`, `research.jsonc`, and `code-editing.jsonc` define reusable tool set configurations but no agent file uses them via the `tool-sets:` frontmatter property. The `#universal` shorthand is unused.\n\nFix: Add `tool-sets: [#universal]` to all agent frontmatter. Additionally:\n- Research agent: add `tool-sets: [#universal, #research]`\n- Backend, Frontend, Architect agents: add `tool-sets: [#universal, #code-editing]`\n\nInspect each `.github/tool-sets/*.jsonc` file to understand which tool namespaces they declare, then add appropriate `tool-sets:` references to each agent.",
   "type": "infra",
   "priority": "high",
-  "stage": "QA",
+  "stage": "SECURITY",
   "sdlc_flow": [
     "READY",
     "DEVOPS",
@@ -43,10 +43,10 @@
     "Given the existing `tools:` property on each agent, When `tool-sets:` is added, Then the existing `tools:` property is preserved (not replaced)"
   ],
   "rework_count": 0,
-  "claimed_by": "QA",
-  "machine_id": "pop-os",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-26T20:04:25.008946+00:00",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -96,6 +96,15 @@
       "from_stage": "QA",
       "to_stage": "QA",
       "details": "Claimed by reaperoak@pop-os via QA, lease until 2026-03-26T20:04:25.008946+00:00"
+    },
+    {
+      "timestamp": "2026-03-26T19:45:38.221831+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "QA",
+      "machine_id": "system",
+      "from_stage": "QA",
+      "to_stage": "SECURITY",
+      "details": "Advanced from QA to SECURITY"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
