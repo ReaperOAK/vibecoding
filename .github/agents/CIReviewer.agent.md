@@ -8,15 +8,11 @@ argument-hint: 'Describe the code quality checks to run, complexity analysis to 
 handoffs:
   - label: 'Documentation Update'
     agent: 'Documentation'
-    prompt: 'CI review passed. Update documentation with JSDoc/TSDoc comments for new APIs, update README if interfaces changed, and add changelog entry.'
+    prompt: 'CI review passed. Update documentation with JSDoc/TSDoc comments, README changes, and changelog.'
     send: false
-  - label: 'Rework Implementation'
+  - label: 'Rework: CI Failed'
     agent: 'Backend'
-    prompt: 'CI quality check failed. Review the SARIF findings and fix the code quality issues including lint errors, type errors, and complexity violations.'
-    send: false
-  - label: 'Final Validation'
-    agent: 'Validator'
-    prompt: 'CI review complete. Run independent Definition of Done verification to confirm all 10 DoD items are satisfied before marking the ticket as DONE.'
+    prompt: 'CI quality check failed. Fix lint errors, type errors, and complexity violations.'
     send: false
 ---
 

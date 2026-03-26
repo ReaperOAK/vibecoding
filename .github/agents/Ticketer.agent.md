@@ -5,6 +5,55 @@ user-invocable: true
 tools: [agent, execute, read, 'github/*']
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Say "process all READY tickets" to dispatch workers or specify ticket IDs to process'
+handoffs:
+  - label: 'Dispatch Research'
+    agent: 'Research'
+    prompt: 'Conduct evidence-based research for this ticket with Bayesian confidence scoring.'
+    send: false
+  - label: 'Dispatch PM'
+    agent: 'ProductManager'
+    prompt: 'Create PRD, user stories, and task specifications for this ticket.'
+    send: false
+  - label: 'Dispatch Architect'
+    agent: 'Architect'
+    prompt: 'Design architecture, API contracts, and produce ADRs for this ticket.'
+    send: false
+  - label: 'Dispatch DevOps'
+    agent: 'DevOps'
+    prompt: 'Implement infrastructure, CI/CD pipelines, and deployment for this ticket.'
+    send: false
+  - label: 'Dispatch Backend'
+    agent: 'Backend'
+    prompt: 'Implement server-side code, APIs, and business logic for this ticket.'
+    send: false
+  - label: 'Dispatch UIDesigner'
+    agent: 'UIDesigner'
+    prompt: 'Create UI mockups, design tokens, and component specs for this ticket.'
+    send: false
+  - label: 'Dispatch Frontend'
+    agent: 'Frontend'
+    prompt: 'Implement UI components, layouts, and client-side logic for this ticket.'
+    send: false
+  - label: 'Dispatch QA'
+    agent: 'QA'
+    prompt: 'Design and execute test strategy for this ticket.'
+    send: false
+  - label: 'Dispatch Security'
+    agent: 'Security'
+    prompt: 'Perform security review including OWASP Top 10 and STRIDE for this ticket.'
+    send: false
+  - label: 'Dispatch CI Review'
+    agent: 'CIReviewer'
+    prompt: 'Run lint, type checks, and complexity analysis for this ticket.'
+    send: false
+  - label: 'Dispatch Documentation'
+    agent: 'Documentation'
+    prompt: 'Update documentation, JSDoc/TSDoc, and README for this ticket.'
+    send: false
+  - label: 'Dispatch Validator'
+    agent: 'Validator'
+    prompt: 'Run independent Definition of Done verification for this ticket.'
+    send: false
 ---
 
 # Ticketer — Stateless Ticket Dispatcher

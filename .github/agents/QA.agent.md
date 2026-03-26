@@ -8,13 +8,9 @@ argument-hint: 'Describe what to test, test strategy to implement, or quality ga
 handoffs:
   - label: 'Security Review'
     agent: 'Security'
-    prompt: 'The QA tests have passed. Now perform a security review including OWASP Top 10, STRIDE threat modeling, and vulnerability scanning.'
+    prompt: 'QA tests passed. Perform security review including OWASP Top 10, STRIDE threat modeling, and vulnerability scanning.'
     send: false
-  - label: 'CI Quality Check'
-    agent: 'CIReviewer'
-    prompt: 'QA verification complete. Run lint, type checks, complexity analysis, and generate SARIF report for the implementation.'
-    send: false
-  - label: 'Rework Implementation'
+  - label: 'Rework: QA Failed'
     agent: 'Backend'
     prompt: 'QA tests failed. Review the failure evidence and fix the implementation issues identified in the QA report.'
     send: false

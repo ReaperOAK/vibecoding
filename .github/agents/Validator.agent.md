@@ -6,13 +6,9 @@ tools: [vscode, execute, read, search, browser, 'github/*', 'playwright/*']
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the Definition of Done items to verify or quality gates to validate'
 handoffs:
-  - label: 'Rework Implementation'
+  - label: 'Rework: Validation Failed'
     agent: 'Backend'
-    prompt: 'Validation failed. Review the DoD failures and fix the implementation issues before proceeding to final approval.'
-    send: false
-  - label: 'Rework Documentation'
-    agent: 'Documentation'
-    prompt: 'Validation found documentation issues. Update JSDoc/TSDoc comments, README, and ensure all documentation requirements are met.'
+    prompt: 'Validation failed. Review the DoD failures and fix the implementation issues.'
     send: false
 ---
 

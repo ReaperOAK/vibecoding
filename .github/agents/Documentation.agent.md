@@ -8,11 +8,7 @@ argument-hint: 'Describe the documentation to create, update, or the API docs to
 handoffs:
   - label: 'Final Validation'
     agent: 'Validator'
-    prompt: 'Documentation complete. Run independent Definition of Done verification to confirm all 10 DoD items are satisfied before marking the ticket as DONE.'
-    send: false
-  - label: 'Rework Implementation'
-    agent: 'Backend'
-    prompt: 'Documentation review identified issues. Review the feedback and update the implementation to include proper JSDoc/TSDoc comments and API documentation.'
+    prompt: 'Documentation complete. Run independent Definition of Done verification to confirm all DoD items are satisfied.'
     send: false
 ---
 
