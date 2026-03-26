@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vscode/main/src/vs/workbench/contrib/chat/common/hooks/hookSchema.json",
+  "description": "Vibecoding policy enforcement hooks. These hooks provide deterministic enforcement of system rules that were previously reliant on LLM instruction-following.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "description": "Check STOP_ALL guardian file before any agent work begins",
+        "command": "bash .github/hooks/scripts/check-guardian.sh",
+        "enabled": false,
+        "comment": "Enable when VS Code hooks feature exits Preview"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "description": "Block prohibited git commands (git add ., git add -A, git add --all)",
+        "command": "bash .github/hooks/scripts/check-git-policy.sh",
+        "toolNames": ["run_in_terminal", "execute/runInTerminal"],
+        "enabled": false,
+        "comment": "Enable when VS Code hooks feature exits Preview"
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "created_by": "TASK-SYS-001",
+    "created_at": "2026-03-26T00:00:00Z",
+    "requires": "VS Code agent hooks (Preview)"
+  }
+}

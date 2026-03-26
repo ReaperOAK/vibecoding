@@ -5,6 +5,8 @@ user-invocable: true
 tools: [vscode, execute, read, agent, edit, search, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'mongodb/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'tavily/*', 'terraform/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the project to initialize, vision to plan, or strategic decision to make'
+agents: ['Research', 'ProductManager', 'Architect', 'TODO']
+disable-model-invocation: true
 handoffs:
   - label: 'Start Execution'
     agent: 'Ticketer'
