@@ -501,4 +501,11 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** .github/vibecoding/catalog.yml
 - **Decisions:** Copied content from .github/skills/catalog.yml and added 6 missing top-level keys (boot-sequence, git-protocol, sdlc-lifecycle, ticket-system, agent-protocols, orchestration) to ensure all skill directories are indexed. Used content copy over symlink for portability per ticket spec.
 - **Timestamp:** 2026-03-27T00:00:00Z
+
+---
+
+### [TASK-VIB-003] — Rewrite MCP Ticket Server with FastMCP Transport
+- **Artifacts:** .github/mcp-servers/ticket-server/server.py, .github/mcp-servers/ticket-server/requirements.txt
+- **Decisions:** Used official `mcp` PyPI package (v1.26.0) with `from mcp.server.fastmcp import FastMCP` over standalone `fastmcp` package. Preserved camelCase parameter names for API schema compatibility. Used pathlib.Path per python.instructions.md.
+- **Timestamp:** 2026-03-27T00:00:00Z
 - Verify preemption behavior under load
