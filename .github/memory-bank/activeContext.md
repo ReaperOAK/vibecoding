@@ -482,4 +482,11 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - Rechunk Ticketer.agent.md (now 821 lines with §25 OCF)
 - Update ARCHITECTURE.instructions.md chunks (now 2227 lines with §34 OCF)
 - Test OCF scheduling loop with mixed Class A/B ticket scenarios
+
+---
+
+### VIBECODING-IMPROVEMENTS — TODO Decomposition
+- **Artifacts:** TODO/L1-vibecoding-improvements.md, TODO/L2-vibecoding-improvements.md, TODO/tasks/L3-vibecoding-improvements.md, tickets/TASK-VIB-001.json through TASK-VIB-012.json, ticket-state/READY/ (7 tickets), agent-output/TODO/vibecoding-improvements.md
+- **Decisions:** 12 improvements from CTO brief decomposed into 5 L1 capabilities, 11 L2 execution blocks, 12 L3 tickets. Dependency encoding: VIB-008/009 hard-depend on VIB-003 (MCP transport must exist before Resources/Prompts); VIB-010 depends on VIB-008+009; VIB-011/012 depend on VIB-001 (catalog fix). P0 tickets (001-003) and independent P1 tickets (004-007) are READY immediately. Empty **Dependencies:** field in L3 markdown must be omitted (not left blank) to prevent the parser's `\s*` regex from consuming the next line's **Files:** value.
+- **Timestamp:** 2026-03-26T00:00:00Z
 - Verify preemption behavior under load
