@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+Quality assurance best practices including test coverage, mutation testing, E2E testing, and comprehensive QA strategy guidelines.
+
+
 # Quality Assurance
 
 ## When to Use
@@ -28,3 +33,8 @@ See the `references/` directory for:
 - QA strategy guide
 - Test coverage checklist
 - Mutation testing reference
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

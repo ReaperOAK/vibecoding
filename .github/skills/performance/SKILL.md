@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+Performance optimization best practices including Core Web Vitals, bundle optimization, caching strategies, and runtime performance tuning.
+
+
 # Performance Optimization
 
 ## When to Use
@@ -34,3 +39,8 @@ See the `references/` directory for:
 - Core Web Vitals optimization guide
 - Caching strategies reference
 - Bundle optimization checklist
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

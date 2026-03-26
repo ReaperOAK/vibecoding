@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+Accessibility best practices including WCAG 2.2 AA compliance, ARIA patterns, keyboard navigation, and screen reader optimization for web applications.
+
+
 # Accessibility Best Practices
 
 ## When to Use
@@ -29,3 +34,8 @@ See the `references/` directory for:
 - ARIA patterns and examples
 - Keyboard navigation patterns
 - Screen reader testing checklist
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

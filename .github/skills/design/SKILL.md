@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+UI/UX design practices including Figma prototyping, design tokens, component specifications, and pixel-perfect implementation from design systems.
+
+
 # UI/UX Design
 
 ## When to Use
@@ -28,3 +33,8 @@ See the `references/` directory for:
 - Figma to code workflow guide
 - Design token extraction checklist
 - Component specification template
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

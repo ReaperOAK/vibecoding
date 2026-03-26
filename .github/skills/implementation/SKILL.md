@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+Implementation phase best practices including TDD, SOLID principles, clean code, and production-grade software construction guidelines.
+
+
 # Implementation Best Practices
 
 ## When to Use
@@ -28,3 +33,8 @@ See the `references/` directory for:
 - TDD workflow guide
 - SOLID principles reference
 - Clean code checklist
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

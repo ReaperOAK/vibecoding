@@ -2,17 +2,29 @@
 name: 'Research'
 description: 'Technical research analyst. Conducts evidence-based research with Bayesian confidence, contradiction detection, and structured recommendations.'
 user-invocable: true
-tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
+tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the technology to research, comparison to perform, or feasibility analysis needed'
 handoffs:
-  - label: 'Design Architecture'
-    agent: 'Architect'
-    prompt: 'Research complete. Use the technology evaluation findings and recommendations to design the system architecture and make technology selection decisions.'
+  - label: 'Submit to QA'
+    agent: 'QA'
+    prompt: 'Implementation complete. Run test strategy including unit tests, integration tests, and E2E validation.'
     send: false
-  - label: 'Document Findings'
+  - label: 'Security Review'
+    agent: 'Security'
+    prompt: 'Submit for security review including OWASP Top 10, STRIDE threat modeling, and vulnerability scanning.'
+    send: false
+  - label: 'CI Quality Check'
+    agent: 'CIReviewer'
+    prompt: 'Submit for CI review including lint, type checks, complexity analysis, and SARIF report generation.'
+    send: false
+  - label: 'Documentation Update'
     agent: 'Documentation'
-    prompt: 'Research complete. Create comprehensive documentation summarizing the research findings, technology comparisons, and recommendations with confidence levels.'
+    prompt: 'Update documentation with JSDoc/TSDoc comments, README changes, and changelog entries.'
+    send: false
+  - label: 'Final Validation'
+    agent: 'Validator'
+    prompt: 'Run independent Definition of Done verification to confirm all DoD items are satisfied.'
     send: false
 ---
 

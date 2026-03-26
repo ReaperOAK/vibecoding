@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+Testing best practices including unit testing, integration testing, E2E testing with Playwright, and test writing guidelines for TypeScript.
+
+
 # Testing Best Practices
 
 ## When to Use
@@ -35,3 +40,8 @@ See the `../qa/references/` directory for:
 - QA Agent reference (chunks 1-2)
 - Playwright testing guide
 - Test writing guidelines
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

@@ -2,7 +2,15 @@
 name: Boot Sequence
 description: Required boot sequence all agents must execute before starting work. Reads guardian file, instruction files, agent definition, upstream summaries, and context chunks.
 user-invocable: false
+metadata:
+  version: '1.0.0'
+  author: 'Vibecoding'
 ---
+
+## Overview
+
+Required boot sequence all agents must execute before starting work. Reads guardian file, instruction files, agent definition, upstream summaries, and context chunks.
+
 
 # Boot Sequence
 
@@ -25,3 +33,8 @@ Every agent must execute this boot sequence before any work:
 
 - [core.instructions.md](../../instructions/core.instructions.md) — Section 4: Boot Sequence
 - [agent-behavior.instructions.md](../../instructions/agent-behavior.instructions.md)
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

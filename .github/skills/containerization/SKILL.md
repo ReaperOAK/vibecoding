@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+Containerization and Docker best practices including multi-stage builds, security hardening, orchestration, and production deployment patterns.
+
+
 # Containerization & Docker
 
 ## When to Use
@@ -28,3 +33,8 @@ See the `references/` directory for:
 - Dockerfile best practices
 - Multi-stage build patterns
 - Security hardening checklist
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

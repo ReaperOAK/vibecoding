@@ -6,17 +6,25 @@ tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the backend feature, API endpoint, or database operation to implement'
 handoffs:
-  - label: 'Run QA Tests'
+  - label: 'Submit to QA'
     agent: 'QA'
-    prompt: 'Run the test suite and perform quality assurance on the implementation I just completed. Verify coverage is at least 80% and all tests pass.'
+    prompt: 'Implementation complete. Run test strategy including unit tests, integration tests, and E2E validation.'
     send: false
   - label: 'Security Review'
     agent: 'Security'
-    prompt: 'Review the API implementation for security vulnerabilities including OWASP Top 10, input validation, authentication, and authorization issues.'
+    prompt: 'Submit for security review including OWASP Top 10, STRIDE threat modeling, and vulnerability scanning.'
     send: false
   - label: 'CI Quality Check'
     agent: 'CIReviewer'
-    prompt: 'Run lint, type checks, and complexity analysis on the implementation. Verify code quality standards are met.'
+    prompt: 'Submit for CI review including lint, type checks, complexity analysis, and SARIF report generation.'
+    send: false
+  - label: 'Documentation Update'
+    agent: 'Documentation'
+    prompt: 'Update documentation with JSDoc/TSDoc comments, README changes, and changelog entries.'
+    send: false
+  - label: 'Final Validation'
+    agent: 'Validator'
+    prompt: 'Run independent Definition of Done verification to confirm all DoD items are satisfied.'
     send: false
 ---
 

@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+Software Development Lifecycle enforcement including stage transitions, Definition of Done validation, rework rules, and lifecycle governance.
+
+
 # SDLC Enforcement
 
 ## When to Use
@@ -39,3 +44,8 @@ See the `references/` directory for:
 - Stage transition guards
 - DoD validation checklist
 - Rework handling procedures
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

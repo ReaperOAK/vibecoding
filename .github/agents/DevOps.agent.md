@@ -2,21 +2,29 @@
 name: 'DevOps'
 description: 'Infrastructure and operations engineer. Implements GitOps workflows, SLO/SLI reliability, and policy-as-code enforcement.'
 user-invocable: true
-tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
+tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the infrastructure to provision, CI/CD pipeline to create, or deployment strategy to implement'
 handoffs:
-  - label: 'Run QA Tests'
+  - label: 'Submit to QA'
     agent: 'QA'
-    prompt: 'Infrastructure changes complete. Run the test suite and verify the deployment configuration works correctly.'
+    prompt: 'Implementation complete. Run test strategy including unit tests, integration tests, and E2E validation.'
     send: false
   - label: 'Security Review'
     agent: 'Security'
-    prompt: 'Review the infrastructure configuration for security issues including container security, secrets management, and network policies.'
+    prompt: 'Submit for security review including OWASP Top 10, STRIDE threat modeling, and vulnerability scanning.'
     send: false
-  - label: 'Document Infrastructure'
+  - label: 'CI Quality Check'
+    agent: 'CIReviewer'
+    prompt: 'Submit for CI review including lint, type checks, complexity analysis, and SARIF report generation.'
+    send: false
+  - label: 'Documentation Update'
     agent: 'Documentation'
-    prompt: 'Infrastructure implementation complete. Create runbooks, deployment guides, and operational documentation for the new infrastructure.'
+    prompt: 'Update documentation with JSDoc/TSDoc comments, README changes, and changelog entries.'
+    send: false
+  - label: 'Final Validation'
+    agent: 'Validator'
+    prompt: 'Run independent Definition of Done verification to confirm all DoD items are satisfied.'
     send: false
 ---
 
