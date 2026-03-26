@@ -2,8 +2,6 @@
 name: stop
 description: Structured shutdown protocol. Drains active tickets, consolidates memory, and produces resume artifacts for continue.prompt.md.
 agent: 'Ticketer'
-model: 'Claude Opus 4.6 (copilot)'
-tools: ['read', 'search/codebase', 'runCommands', 'github/*']
 argument-hint: 'No arguments needed — just invoke /stop to cleanly pause development'
 ---
 

@@ -2,8 +2,6 @@
 name: expensify
 description: Win Expensify bug bounties by generating competition-killer proposals faster and more accurately than competitors.
 agent: 'CTO'
-model: 'Claude Opus 4.6 (copilot)'
-tools: ['read', 'search/codebase', 'runCommands', 'fetch', 'github/*']
 argument-hint: 'Paste the Expensify GitHub issue URL or issue number'
 ---
 
