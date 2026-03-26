@@ -1,7 +1,7 @@
 {
   "ticket_id": "TASK-SYS-036",
   "title": "Create auto-sync tickets hook (SessionStart)",
-  "description": "Implement `auto-sync.json` hook that fires on SessionStart and runs `python3 tickets.py --sync` automatically before any agent session begins. This ensures dependency resolution and READY-state promotion happen without requiring operators to manually run sync commands. The hook should execute as a shell command hook, capture stdout/stderr, and surface any sync errors to the agent session context. This replaces the step in `.github/instructions/agent-behavior.instructions.md` section 10 that requires `python3 tickets.py --sync` before work \u2014 making it deterministic and automatic.",
+  "description": "Implement `auto-sync.json` hook that fires on SessionStart and runs `python3 tickets.py --sync` automatically before any agent session begins. This ensures dependency resolution and READY-state promotion happen without requiring operators to manually run sync commands. The hook should execute as a shell command hook, capture stdout/stderr, and surface any sync errors to the agent session context. This replaces the step in `.github/instructions/agent-behavior.instructions.md` section 10 that requires `python3 tickets.py --sync` before work — making it deterministic and automatic.",
   "type": "infra",
   "priority": "high",
   "stage": "READY",
@@ -20,7 +20,9 @@
   "dependencies": [
     "TASK-SYS-001"
   ],
-  "blocked_by": [],
+  "blocked_by": [
+    "TASK-SYS-001"
+  ],
   "file_paths": [
     ".github/hooks/auto-sync.json",
     ".github/hooks/scripts/auto-sync-tickets.sh"
@@ -44,14 +46,7 @@
       "event": "CREATED",
       "agent": "TODO",
       "machine_id": "system",
-      "details": "Ticket created from TODO/tasks/L2-vscode-copilot-improvements.md \u2014 gap identified in L2-02-D: auto-sync hook not covered by existing tickets"
-    },
-    {
-      "timestamp": "2026-03-26T10:13:23.495975+00:00",
-      "event": "MOVED_TO_READY",
-      "agent": "tickets.py",
-      "machine_id": "system",
-      "details": "Dependencies resolved, moved to READY"
+      "details": "Ticket created from TODO/tasks/L2-vscode-copilot-improvements.md — gap identified in L2-02-D: auto-sync hook not covered by existing tickets"
     }
   ],
   "source_task_file": "TODO/tasks/L2-vscode-copilot-improvements.md",

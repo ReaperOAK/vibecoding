@@ -1,7 +1,7 @@
 ---
 name: 'Architect'
 description: 'Designs system architecture, API contracts, database schemas, and component boundaries. Produces ADRs, architecture diagrams, and technology selection matrices.'
-user-invocable: true
+user-invocable: false
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the system component to architect, API to design, or technology decision to evaluate'

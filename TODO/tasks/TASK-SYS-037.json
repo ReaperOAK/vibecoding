@@ -17,7 +17,9 @@
   "dependencies": [
     "TASK-SYS-020"
   ],
-  "blocked_by": [],
+  "blocked_by": [
+    "TASK-SYS-020"
+  ],
   "file_paths": [
     ".github/prompts/start.prompt.md",
     ".github/prompts/continue.prompt.md",
@@ -45,14 +47,7 @@
       "event": "CREATED",
       "agent": "TODO",
       "machine_id": "system",
-      "details": "Ticket created from TODO/tasks/L2-vscode-copilot-improvements.md \u2014 gap identified in L2-06-D: model: frontmatter not covered by TASK-SYS-020 (agent:) or TASK-SYS-021 (tools:)"
-    },
-    {
-      "timestamp": "2026-03-26T10:16:19.769423+00:00",
-      "event": "MOVED_TO_READY",
-      "agent": "tickets.py",
-      "machine_id": "system",
-      "details": "Dependencies resolved, moved to READY"
+      "details": "Ticket created from TODO/tasks/L2-vscode-copilot-improvements.md — gap identified in L2-06-D: model: frontmatter not covered by TASK-SYS-020 (agent:) or TASK-SYS-021 (tools:)"
     }
   ],
   "source_task_file": "TODO/tasks/L2-vscode-copilot-improvements.md",
