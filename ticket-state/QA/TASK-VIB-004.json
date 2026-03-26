@@ -43,10 +43,10 @@
     "Given the existing `tools:` property on each agent, When `tool-sets:` is added, Then the existing `tools:` property is preserved (not replaced)"
   ],
   "rework_count": 0,
-  "claimed_by": "DevOps",
+  "claimed_by": "QA",
   "machine_id": "pop-os",
   "operator": "reaperoak",
-  "lease_expiry": "2026-03-26T19:37:18.975760+00:00",
+  "lease_expiry": "2026-03-26T20:04:25.008946+00:00",
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -79,7 +79,23 @@
       "machine_id": "pop-os",
       "from_stage": "READY",
       "to_stage": "QA",
-      "details": "DEVOPS complete — tool-sets wired to all 15 agent frontmatters"
+      "details": "DEVOPS complete \u2014 tool-sets wired to all 15 agent frontmatters"
+    },
+    {
+      "timestamp": "2026-03-26T19:34:24.872738+00:00",
+      "event": "CLAIM_RELEASED",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Released claim from DevOps: manual release"
+    },
+    {
+      "timestamp": "2026-03-26T19:34:25.008965+00:00",
+      "event": "CLAIMED",
+      "agent": "QA",
+      "machine_id": "pop-os",
+      "from_stage": "QA",
+      "to_stage": "QA",
+      "details": "Claimed by reaperoak@pop-os via QA, lease until 2026-03-26T20:04:25.008946+00:00"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
