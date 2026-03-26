@@ -525,4 +525,11 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** All 15 `.github/agents/*.agent.md` files
 - **Decisions:** Added `tool-sets:` after `tools:` block in YAML frontmatter. DevOps gets `#code-editing` (modifies config files). Existing `tools:` preserved.
 - **Timestamp:** 2026-03-27T00:00:00Z
+
+---
+
+### [TASK-VIB-007] — Update Review-Chain Agent Models to Cost-Efficient Arrays
+- **Artifacts:** `.github/agents/CIReviewer.agent.md`, `.github/agents/QA.agent.md`, `.github/agents/Validator.agent.md`, `.github/agents/Documentation.agent.md`
+- **Decisions:** Added `model: [claude-3-7-sonnet, claude-3-5-sonnet]` to review-chain agents only. Other agents untouched — they retain the default (most capable) model.
+- **Timestamp:** 2026-03-27T00:00:00Z
 - Verify preemption behavior under load
