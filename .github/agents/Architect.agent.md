@@ -20,6 +20,9 @@ tools:
   - 'playwright/*'
   - 'vscode.mermaid-chat-features/renderMermaidDiagram'
   - todo
+tool-sets:
+  - '#universal'
+  - '#code-editing'
 argument-hint: 'Describe the system component to architect, API to design, or technology decision to evaluate'
 handoffs:
   - label: 'Submit to QA'

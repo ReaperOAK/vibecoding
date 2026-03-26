@@ -10,6 +10,8 @@ tools:
   - browser
   - 'github/*'
   - 'playwright/*'
+tool-sets:
+  - '#universal'
 argument-hint: 'Describe the Definition of Done items to verify or quality gates to validate'
 handoffs:
   - label: 'Rework: Validation Failed'

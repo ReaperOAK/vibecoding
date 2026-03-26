@@ -9,6 +9,8 @@ tools:
   - search
   - browser
   - 'github/*'
+tool-sets:
+  - '#universal'
 argument-hint: 'Describe the security review scope, vulnerability to analyze, or threat model to perform'
 handoffs:
   - label: 'CI Quality Check'

@@ -20,6 +20,8 @@ tools:
   - 'playwright/*'
   - 'vscode.mermaid-chat-features/renderMermaidDiagram'
   - todo
+tool-sets:
+  - '#universal'
 argument-hint: 'Describe the project to initialize, vision to plan, or strategic decision to make'
 disable-model-invocation: true
 handoffs:

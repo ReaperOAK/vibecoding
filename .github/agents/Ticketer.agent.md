@@ -19,6 +19,8 @@ tools:
   - 'playwright/*'
   - 'vscode.mermaid-chat-features/renderMermaidDiagram'
   - todo
+tool-sets:
+  - '#universal'
 argument-hint: 'Say "process all READY tickets" to dispatch workers or specify ticket IDs to process'
 handoffs:
   - label: 'Dispatch Research'
