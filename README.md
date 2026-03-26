@@ -96,13 +96,16 @@ Every ticket must pass all 10 items before reaching DONE:
 
 ```
 .github/
-  agents/          14 agent definitions (*.agent.md)
+  agents/          14 agent definitions (*.agent.md) — each has tool-sets: frontmatter
   instructions/    6 canonical instruction files (system rules)
   tickets/         Ticket JSON + schema
   ticket-state/    File-based state machine (READY → DONE)
   agent-output/    Stage handoff summaries ({Agent}/{ticket-id}.md)
   memory-bank/     Persistent shared state (append-only)
-  vibecoding/      Token-budgeted YAML instruction chunks + catalog
+  vibecoding/      catalog.yml — skill chunk index loaded by agents during boot
+  hooks/           Governance hooks (policy-enforcement, auto-sync) — all enabled
+  tool-sets/       Reusable tool-set configs (universal, research, code-editing)
+  mcp-servers/     MCP server wrappers (ticket-server for typed ticket ops)
   guardian/        Circuit breaker (STOP_ALL)
   tickets.py       Ticket state manager (--sync --claim --advance --status)
 
@@ -145,6 +148,35 @@ python3 todo_visual.py
 - VS Code with GitHub Copilot (Agent Mode enabled)
 - Git with commit permissions on the target repo
 - Python 3 (for `tickets.py`)
+
+---
+
+## MCP Ticket Server
+
+An MCP server wraps `tickets.py` for typed tool access via the Model Context Protocol. Located at `.github/mcp-servers/ticket-server/server.py`, it provides 7 tools over stdio transport:
+
+| Tool | Purpose |
+|------|---------|
+| `syncTickets` | Release expired claims, resolve deps, move unblocked to READY |
+| `getStatus` | Dashboard view (text or JSON) |
+| `claimTicket` | Claim a READY ticket for an agent |
+| `advanceTicket` | Move ticket to next SDLC stage |
+| `releaseTicket` | Release a stale claim |
+| `reworkTicket` | Send back for rework with reason |
+| `validateIntegrity` | Full integrity check |
+
+Setup: `pip install -r .github/mcp-servers/ticket-server/requirements.txt`
+
+---
+
+## Agent Configuration
+
+Each agent's `.agent.md` file includes frontmatter properties that control behavior:
+
+- **`tool-sets:`** — References reusable tool configurations from `.github/tool-sets/` (e.g., `#universal`, `#research`, `#code-editing`)
+- **`agents:`** — Restricts which subagents a coordinator can invoke (Ticketer dispatches all 13 workers; CTO invokes 5 strategic agents)
+- **`user-invocable:`** — Only Ticketer and CTO are `true`; all workers are `false` (dispatched by coordinators only)
+- **`model:`** — Review-chain agents (QA, CI, Validator, Documentation) use cost-efficient model arrays `[claude-3-7-sonnet, claude-3-5-sonnet]`; implementation agents use the default model
 
 ---
 

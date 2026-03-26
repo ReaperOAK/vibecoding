@@ -55,6 +55,11 @@ compaction_threshold: 50
 
 <!-- Reverse chronological log of significant changes -->
 
+### [TASK-VIB-001..007] — Documentation Review (Batch)
+- **Artifacts:** `README.md`, `.github/hooks/scripts/README.md`, `docs/adr/mcp-ticket-server.md`, `agent-output/Documentation/TASK-VIB-001-007.md`
+- **Decisions:** Updated README with MCP server section, agent configuration conventions (tool-sets, agents, user-invocable, model arrays), and corrected repo structure. Fixed stale hooks README (disabled→enabled). Updated MCP ADR from Proposed→Accepted with correct file paths. Server.py docstrings already adequate — no changes.
+- **Timestamp:** 2026-03-27T00:00:00Z
+
 ### [TASK-VIB-006] — Set user-invocable:false on All Worker Agents
 - **Artifacts:** No files modified — all 15 agent files already had correct `user-invocable` values
 - **Decisions:** Audit-only pass; all 13 workers already have `user-invocable: false`, both coordinators retain `true`

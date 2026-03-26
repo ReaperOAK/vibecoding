@@ -6,11 +6,16 @@ This directory contains shell scripts invoked by VS Code agent lifecycle hooks d
 
 ```
 .github/hooks/
-├── policy-enforcement.json    # Hook definitions (SessionStart, PreToolUse, etc.)
+├── policy-enforcement.json    # Hook definitions (SessionStart, PreToolUse, Stop, SubagentStop)
+├── auto-sync.json             # Auto-sync ticket state on SessionStart
 └── scripts/
     ├── README.md              # This file
-    ├── check-guardian.sh       # STOP_ALL circuit breaker check (SessionStart)
-    └── check-git-policy.sh    # Block `git add .` / `-A` / `--all` (PreToolUse)
+    ├── check-guardian-stop.sh  # STOP_ALL circuit breaker check
+    ├── block-git-add-all.sh   # Block `git add .` / `-A` / `--all`
+    ├── block-destructive-ops.sh # Block rm -rf, DROP TABLE, git reset --hard, etc.
+    ├── verify-evidence.sh     # Verify agent output contains required evidence
+    ├── verify-memory-gate.sh  # Verify activeContext.md entry before completion
+    └── auto-sync-tickets.sh   # Run tickets.py --sync on session start
 ```
 
 ## Hook Lifecycle Events
@@ -26,13 +31,13 @@ This directory contains shell scripts invoked by VS Code agent lifecycle hooks d
 
 ## Status
 
-Hooks are currently **disabled** (`"enabled": false`) because the VS Code agent hooks feature is in Preview. Enable them when the feature reaches stable.
+All hooks are **enabled** (`"enabled": true`) as of TASK-VIB-002. The governance hooks enforce guardian STOP checks, git policy, destructive operation blocking, evidence verification, and memory gate checks at runtime.
 
 ## Adding New Hooks
 
 1. Create a new shell script in this directory
 2. Add a hook entry in `../policy-enforcement.json` under the appropriate lifecycle event
-3. Set `"enabled": false` initially and test manually before enabling
+3. Test the hook manually, then set `"enabled": true`
 
 ## Script Contract
 

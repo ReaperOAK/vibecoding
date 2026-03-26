@@ -4,7 +4,7 @@
   "description": "Worker agents should not be directly invocable by users \u2014 they should only be dispatched by Ticketer or CTO. The `user-invocable: false` field must be set on all worker agents. Backend and CIReviewer already have this property set correctly; the remaining agents need it added or verified.\n\nFix: Audit all 15 agent files. For every agent that is NOT intended to be directly user-invocable (all except Ticketer and CTO), set `user-invocable: false` in frontmatter. Ticketer and CTO remain `user-invocable: true`.",
   "type": "infra",
   "priority": "medium",
-  "stage": "DOCS",
+  "stage": "VALIDATION",
   "sdlc_flow": [
     "READY",
     "DEVOPS",
@@ -38,10 +38,10 @@
     "Given Backend.agent.md and CIReviewer.agent.md which already have `user-invocable: false`, When the fix is applied, Then their existing value is preserved unchanged"
   ],
   "rework_count": 0,
-  "claimed_by": "Documentation",
-  "machine_id": "pop-os",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-26T20:31:56.793539+00:00",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -129,6 +129,15 @@
       "from_stage": "DOCS",
       "to_stage": "DOCS",
       "details": "Claimed by reaperoak@pop-os via Documentation, lease until 2026-03-26T20:31:56.793539+00:00"
+    },
+    {
+      "timestamp": "2026-03-26T20:06:03.369643+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Documentation",
+      "machine_id": "system",
+      "from_stage": "DOCS",
+      "to_stage": "VALIDATION",
+      "details": "Advanced from DOCS to VALIDATION"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
