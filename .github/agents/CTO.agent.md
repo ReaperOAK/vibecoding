@@ -24,6 +24,12 @@ tool-sets:
   - '#universal'
 argument-hint: 'Describe the project to initialize, vision to plan, or strategic decision to make'
 disable-model-invocation: true
+agents:
+  - Ticketer
+  - TODO
+  - Research
+  - ProductManager
+  - Architect
 handoffs:
   - label: 'Execute Ticket Backlog'
     agent: 'Ticketer'

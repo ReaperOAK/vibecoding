@@ -22,6 +22,20 @@ tools:
 tool-sets:
   - '#universal'
 argument-hint: 'Say "process all READY tickets" to dispatch workers or specify ticket IDs to process'
+agents:
+  - TODO
+  - Architect
+  - Backend
+  - Frontend
+  - QA
+  - Security
+  - CIReviewer
+  - DevOps
+  - Documentation
+  - Research
+  - ProductManager
+  - UIDesigner
+  - Validator
 handoffs:
   - label: 'Dispatch Research'
     agent: 'Research'
