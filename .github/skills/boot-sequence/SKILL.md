@@ -1,5 +1,5 @@
 ---
-name: Boot Sequence
+name: boot-sequence
 description: Required boot sequence all agents must execute before starting work. Reads guardian file, instruction files, agent definition, upstream summaries, and context chunks.
 user-invocable: false
 metadata:
