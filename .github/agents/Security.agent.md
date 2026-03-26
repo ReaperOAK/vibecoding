@@ -8,15 +8,11 @@ argument-hint: 'Describe the security review scope, vulnerability to analyze, or
 handoffs:
   - label: 'CI Quality Check'
     agent: 'CIReviewer'
-    prompt: 'Security review complete. Run lint, type checks, complexity analysis, and generate SARIF report to finalize the quality gates.'
+    prompt: 'Security review passed. Run lint, type checks, complexity analysis, and generate SARIF report.'
     send: false
-  - label: 'Rework Implementation'
+  - label: 'Rework: Security Failed'
     agent: 'Backend'
-    prompt: 'Security vulnerabilities found. Review the security findings and fix the critical/high severity issues before proceeding.'
-    send: false
-  - label: 'Documentation Update'
-    agent: 'Documentation'
-    prompt: 'Security review passed. Update documentation with security considerations, threat model findings, and any security-related configuration changes.'
+    prompt: 'Security vulnerabilities found. Fix the critical/high severity issues before proceeding.'
     send: false
 ---
 
