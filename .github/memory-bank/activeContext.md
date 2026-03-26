@@ -55,6 +55,11 @@ compaction_threshold: 50
 
 <!-- Reverse chronological log of significant changes -->
 
+### [TASK-VIB-006] — Set user-invocable:false on All Worker Agents
+- **Artifacts:** No files modified — all 15 agent files already had correct `user-invocable` values
+- **Decisions:** Audit-only pass; all 13 workers already have `user-invocable: false`, both coordinators retain `true`
+- **Timestamp:** 2026-03-27T00:00:00Z
+
 ### [TASK-VIB-005] — Add Agents Property to Coordinator Agent Files
 - **Artifacts:** `.github/agents/Ticketer.agent.md`, `.github/agents/CTO.agent.md`
 - **Decisions:** Added `agents:` frontmatter property to restrict subagent invocation — Ticketer gets all 13 workers, CTO gets 5 strategic agents
