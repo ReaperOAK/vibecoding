@@ -2,8 +2,23 @@
 name: 'Ticketer'
 description: 'Stateless ticket dispatcher. Scans READY tickets, dispatches workers via runSubagent, advances lifecycle. Never implements code.'
 user-invocable: true
-tools: [vscode, execute, read, agent, edit, search, web, 'tickets/*', 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
-
+tools:
+  - vscode
+  - execute
+  - read
+  - agent
+  - edit
+  - search
+  - web
+  - 'com.figma.mcp/mcp/*'
+  - 'forgeos/*'
+  - 'github/*'
+  - 'io.github.tavily-ai/tavily-mcp/*'
+  - 'io.github.upstash/context7/*'
+  - 'microsoft/markitdown/*'
+  - 'playwright/*'
+  - 'vscode.mermaid-chat-features/renderMermaidDiagram'
+  - todo
 argument-hint: 'Say "process all READY tickets" to dispatch workers or specify ticket IDs to process'
 handoffs:
   - label: 'Dispatch Research'

@@ -2,8 +2,12 @@
 name: 'CIReviewer'
 description: 'Automated code review gatekeeper. Enforces complexity thresholds, fitness functions, and produces SARIF-formatted findings.'
 user-invocable: false
-tools: [vscode, execute, read, search, 'github/*']
-
+tools:
+  - vscode
+  - execute
+  - read
+  - search
+  - 'github/*'
 argument-hint: 'Describe the code quality checks to run, complexity analysis to perform, or quality gates to verify'
 handoffs:
   - label: 'Documentation Update'

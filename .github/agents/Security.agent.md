@@ -2,8 +2,13 @@
 name: 'Security'
 description: 'Proactive appsec engineer. Performs STRIDE threat modeling, OWASP Top 10 / LLM Top 10 coverage, SBOM generation, and SARIF-formatted findings.'
 user-invocable: false
-tools: [vscode, execute, read, search, browser, 'github/*']
-
+tools:
+  - vscode
+  - execute
+  - read
+  - search
+  - browser
+  - 'github/*'
 argument-hint: 'Describe the security review scope, vulnerability to analyze, or threat model to perform'
 handoffs:
   - label: 'CI Quality Check'
