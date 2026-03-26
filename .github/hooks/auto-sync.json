@@ -6,8 +6,8 @@
       {
         "description": "Auto-sync ticket state: resolve dependencies, release expired claims, move unblocked tickets to READY",
         "command": "bash .github/hooks/scripts/auto-sync-tickets.sh",
-        "enabled": false,
-        "comment": "Enable when VS Code hooks feature exits Preview"
+        "enabled": true,
+        "comment": "Enabled by TASK-VIB-002"
       }
     ]
   },

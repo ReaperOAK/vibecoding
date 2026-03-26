@@ -55,6 +55,11 @@ compaction_threshold: 50
 
 <!-- Reverse chronological log of significant changes -->
 
+### [TASK-VIB-002] — Enable All Governance Hooks
+- **Artifacts:** `.github/hooks/policy-enforcement.json`, `.github/hooks/auto-sync.json`
+- **Decisions:** Enabled all 7 hooks (6 policy-enforcement + 1 auto-sync) and updated comment fields to reflect activation
+- **Timestamp:** 2026-03-27T00:00:00Z
+
 ### [2026-02-28T00:00:00Z] Worker-Pool Adaptive Engine v8.0.0
 
 - **Ticketer.agent.md** — COMPLETE REWRITE (811→1077 lines). 20 sections. Worker pool model, two-layer orchestration, continuous scheduling, SDR protocol, updated 9-state machine (READY→LOCKED→IMPLEMENTING→QA_REVIEW→VALIDATION→DOCUMENTATION→CI_REVIEW→COMMIT→DONE), event-driven loop, conflict detection (5 types), two worked examples.
