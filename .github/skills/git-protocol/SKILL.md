@@ -1,5 +1,5 @@
 ---
-name: Git Protocol
+name: git-protocol
 description: Dispatcher-claim protocol, scoped git rules, commit format, lease mechanism. Quick reference for git-based distributed locking.
 user-invocable: false
 metadata:

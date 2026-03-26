@@ -1,5 +1,5 @@
 ---
-name: SDLC Lifecycle
+name: sdlc-lifecycle
 description: Stage-based pipeline, Definition of Done, rework rules. Quick reference for the 14-stage SDLC process.
 user-invocable: false
 metadata:

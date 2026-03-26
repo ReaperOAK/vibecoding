@@ -1,5 +1,5 @@
 ---
-name: Ticket System
+name: ticket-system
 description: File-based ticket state machine. Quick reference for ticket operations, stage directories, and tickets.py commands.
 user-invocable: false
 metadata:
