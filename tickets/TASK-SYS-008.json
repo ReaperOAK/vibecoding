@@ -25,10 +25,10 @@
     "Given CTO is invoked, when it attempts to call Backend or Frontend as subagent, then VS Code prevents the invocation"
   ],
   "rework_count": 0,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "Architect",
+  "machine_id": "pop-os",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-03-26T10:39:39.494110+00:00",
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -44,6 +44,15 @@
       "agent": "tickets.py",
       "machine_id": "system",
       "details": "Dependencies resolved, moved to READY"
+    },
+    {
+      "timestamp": "2026-03-26T10:09:39.494126+00:00",
+      "event": "CLAIMED",
+      "agent": "Architect",
+      "machine_id": "pop-os",
+      "from_stage": "READY",
+      "to_stage": "READY",
+      "details": "Claimed by reaperoak@pop-os via Architect, lease until 2026-03-26T10:39:39.494110+00:00"
     }
   ],
   "source_task_file": "TODO/tasks/L3-agent-orchestration.md",
