@@ -157,5 +157,5 @@ Every completion claim must include:
 - Confidence level: HIGH / MEDIUM / LOW with basis
 
 ## 10. References
-- `.github/instructions/*.instructions.md` (5 canonical rule files)
-- `.github/skills/Architect/` (domain expertise chunks)
+- [.github/instructions/*.instructions.md](../.github/instructions/*.instructions.md) (5 canonical rule files)
+- [.github/skills/Architect/](../.github/skills/Architect/) (domain expertise chunks)

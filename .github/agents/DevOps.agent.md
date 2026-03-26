@@ -2,7 +2,7 @@
 name: 'DevOps'
 description: 'Infrastructure and operations engineer. Implements GitOps workflows, SLO/SLI reliability, and policy-as-code enforcement.'
 user-invocable: true
-tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
+tools: [vscode, execute, read, edit, search, 'github/*']
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the infrastructure to provision, CI/CD pipeline to create, or deployment strategy to implement'
 handoffs:
@@ -191,9 +191,9 @@ Every completion must include:
 
 ## 10. References
 
-- `.github/instructions/core.instructions.md`
-- `.github/instructions/sdlc.instructions.md`
-- `.github/instructions/ticket-system.instructions.md`
-- `.github/instructions/git-protocol.instructions.md`
-- `.github/instructions/agent-behavior.instructions.md`
-- `.github/skills/DevOps/`
+- [.github/instructions/core.instructions.md](../.github/instructions/core.instructions.md)
+- [.github/instructions/sdlc.instructions.md](../.github/instructions/sdlc.instructions.md)
+- [.github/instructions/ticket-system.instructions.md](../.github/instructions/ticket-system.instructions.md)
+- [.github/instructions/git-protocol.instructions.md](../.github/instructions/git-protocol.instructions.md)
+- [.github/instructions/agent-behavior.instructions.md](../.github/instructions/agent-behavior.instructions.md)
+- [.github/skills/DevOps/](../.github/skills/DevOps/)

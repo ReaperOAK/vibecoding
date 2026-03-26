@@ -2,7 +2,7 @@
 name: 'UIDesigner'
 description: 'Generates UI mockups, iterates on designs via Google Stitch, produces component specs and design tokens for Frontend Engineer. Uses Playwright for visual validation.'
 user-invocable: true
-tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
+tools: [vscode, execute, read, edit, search, browser, 'github/*', 'com.figma.mcp/mcp/*', 'playwright/*']
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the UI components to design, mockups to create, or design tokens to define'
 handoffs:
@@ -185,5 +185,5 @@ Every completion claim must include:
 - Confidence level: HIGH / MEDIUM / LOW
 
 ## 10. References
-- `.github/instructions/*.instructions.md` (all 6 canonical instruction files)
-- `.github/skills/UIDesigner/` (chunk-01, chunk-02)
+- [.github/instructions/*.instructions.md](../.github/instructions/*.instructions.md) (all 6 canonical instruction files)
+- [.github/skills/UIDesigner/](../.github/skills/UIDesigner/) (chunk-01, chunk-02)
