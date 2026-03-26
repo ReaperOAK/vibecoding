@@ -55,6 +55,11 @@ compaction_threshold: 50
 
 <!-- Reverse chronological log of significant changes -->
 
+### [TASK-VIB-005] — Add Agents Property to Coordinator Agent Files
+- **Artifacts:** `.github/agents/Ticketer.agent.md`, `.github/agents/CTO.agent.md`
+- **Decisions:** Added `agents:` frontmatter property to restrict subagent invocation — Ticketer gets all 13 workers, CTO gets 5 strategic agents
+- **Timestamp:** 2026-03-27T00:00:00Z
+
 ### [TASK-VIB-002] — Enable All Governance Hooks
 - **Artifacts:** `.github/hooks/policy-enforcement.json`, `.github/hooks/auto-sync.json`
 - **Decisions:** Enabled all 7 hooks (6 policy-enforcement + 1 auto-sync) and updated comment fields to reflect activation
