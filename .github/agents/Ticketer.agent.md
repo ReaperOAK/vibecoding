@@ -2,10 +2,9 @@
 name: 'Ticketer'
 description: 'Stateless ticket dispatcher. Scans READY tickets, dispatches workers via runSubagent, advances lifecycle. Never implements code.'
 user-invocable: true
-tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
+tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Say "process all READY tickets" to dispatch workers or specify ticket IDs to process'
-agents: ['Backend', 'Frontend', 'DevOps', 'UIDesigner', 'QA', 'Security', 'CIReviewer', 'Documentation', 'Validator', 'TODO']
 ---
 
 # Ticketer — Stateless Ticket Dispatcher
