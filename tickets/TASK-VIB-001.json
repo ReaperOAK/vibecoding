@@ -28,10 +28,10 @@
     "Given `.github/skills/catalog.yml` contains the authoritative skill index, When the vibecoding catalog is created, Then the content at `.github/vibecoding/catalog.yml` references all the same skill chunks available in `.github/skills/`"
   ],
   "rework_count": 0,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "DevOps",
+  "machine_id": "pop-os",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-03-26T19:37:18.862981+00:00",
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -47,6 +47,15 @@
       "agent": "tickets.py",
       "machine_id": "system",
       "details": "Dependencies resolved, moved to READY"
+    },
+    {
+      "timestamp": "2026-03-26T19:07:18.862997+00:00",
+      "event": "CLAIMED",
+      "agent": "DevOps",
+      "machine_id": "pop-os",
+      "from_stage": "READY",
+      "to_stage": "READY",
+      "details": "Claimed by reaperoak@pop-os via DevOps, lease until 2026-03-26T19:37:18.862981+00:00"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
