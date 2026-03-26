@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+Security best practices including STRIDE threat modeling, OWASP Top 10, agentic guardrails, and vulnerability assessment guidelines.
+
+
 # Security Engineering
 
 ## When to Use
@@ -28,3 +33,8 @@ See the `references/` directory for:
 - STRIDE threat modeling guide
 - OWASP Top 10 reference
 - Agentic guardrails checklist
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

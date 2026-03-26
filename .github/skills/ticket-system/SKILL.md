@@ -2,7 +2,15 @@
 name: Ticket System
 description: File-based ticket state machine. Quick reference for ticket operations, stage directories, and tickets.py commands.
 user-invocable: false
+metadata:
+  version: '1.0.0'
+  author: 'Vibecoding'
 ---
+
+## Overview
+
+File-based ticket state machine. Quick reference for ticket operations, stage directories, and tickets.py commands.
+
 
 # Ticket System Quick Reference
 
@@ -21,3 +29,8 @@ READY → ARCHITECT/RESEARCH/BACKEND/... → QA → SECURITY → CI → DOCS →
 
 ## References
 - [ticket-system.instructions.md](../../instructions/ticket-system.instructions.md)
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

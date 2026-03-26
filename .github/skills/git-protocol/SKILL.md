@@ -2,7 +2,15 @@
 name: Git Protocol
 description: Dispatcher-claim protocol, scoped git rules, commit format, lease mechanism. Quick reference for git-based distributed locking.
 user-invocable: false
+metadata:
+  version: '1.0.0'
+  author: 'Vibecoding'
 ---
+
+## Overview
+
+Dispatcher-claim protocol, scoped git rules, commit format, lease mechanism. Quick reference for git-based distributed locking.
+
 
 # Git Protocol Quick Reference
 
@@ -21,3 +29,8 @@ user-invocable: false
 
 ## References
 - [git-protocol.instructions.md](../../instructions/git-protocol.instructions.md)
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

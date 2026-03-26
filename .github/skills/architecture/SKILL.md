@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+System architecture design including technical design documents, API contract definition, database schema design, and architecture decision records (ADRs).
+
+
 # Architecture & Design
 
 ## When to Use
@@ -28,3 +33,8 @@ See the `references/` directory for:
 - Technical design document template
 - API contract definition guide
 - Database schema patterns
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

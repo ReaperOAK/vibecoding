@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+CTO playbook for engineering leadership including project selection, startup scalability, technical foundations, and organizational growth strategies.
+
+
 # CTO Playbook
 
 ## When to Use
@@ -28,3 +33,8 @@ See the `references/` directory for:
 - CTO leadership principles
 - Startup scalability guide
 - Technical foundations playbook
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

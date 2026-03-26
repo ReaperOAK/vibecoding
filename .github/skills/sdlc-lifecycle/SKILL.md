@@ -2,7 +2,15 @@
 name: SDLC Lifecycle
 description: Stage-based pipeline, Definition of Done, rework rules. Quick reference for the 14-stage SDLC process.
 user-invocable: false
+metadata:
+  version: '1.0.0'
+  author: 'Vibecoding'
 ---
+
+## Overview
+
+Stage-based pipeline, Definition of Done, rework rules. Quick reference for the 14-stage SDLC process.
+
 
 # SDLC Lifecycle Quick Reference
 
@@ -30,3 +38,8 @@ READY > RESEARCH > PM > ARCHITECT > DevOps > BACKEND > UIDesigner > FRONTEND > Q
 
 ## References
 - [sdlc.instructions.md](../../instructions/sdlc.instructions.md)
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

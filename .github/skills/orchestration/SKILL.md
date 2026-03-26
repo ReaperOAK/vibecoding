@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+Multi-agent orchestration rules including agent dispatching, parallel execution, dependency resolution, and workflow coordination.
+
+
 # Orchestration Rules
 
 ## When to Use
@@ -29,3 +34,8 @@ See the `../agent-protocols/references/` directory for:
 - Orchestration rules (chunk-01, chunk-02)
 - Agent dispatch patterns
 - Dependency resolution guide
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

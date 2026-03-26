@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+Project planning and discovery including PRD creation, SRS documentation, user stories, high-level project plans, and project selection tactics.
+
+
 # Planning & Discovery
 
 ## When to Use
@@ -29,3 +34,8 @@ See the `references/` directory for:
 - SRS creation guide
 - User story writing guide
 - Project selection tactics
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

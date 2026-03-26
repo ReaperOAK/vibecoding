@@ -2,21 +2,29 @@
 name: 'Architect'
 description: 'Designs system architecture, API contracts, database schemas, and component boundaries. Produces ADRs, architecture diagrams, and technology selection matrices.'
 user-invocable: true
-tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
+tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the system component to architect, API to design, or technology decision to evaluate'
 handoffs:
-  - label: 'Start Implementation'
-    agent: 'Backend'
-    prompt: 'Architecture design complete. Begin implementing the backend components according to the API contracts and database schemas defined in the architecture document.'
+  - label: 'Submit to QA'
+    agent: 'QA'
+    prompt: 'Implementation complete. Run test strategy including unit tests, integration tests, and E2E validation.'
     send: false
-  - label: 'Research Technologies'
-    agent: 'Research'
-    prompt: 'Research the technology options for the architecture decision. Compare candidates with scored evaluation matrix and provide recommendations with confidence levels.'
+  - label: 'Security Review'
+    agent: 'Security'
+    prompt: 'Submit for security review including OWASP Top 10, STRIDE threat modeling, and vulnerability scanning.'
     send: false
-  - label: 'Document Architecture'
+  - label: 'CI Quality Check'
+    agent: 'CIReviewer'
+    prompt: 'Submit for CI review including lint, type checks, complexity analysis, and SARIF report generation.'
+    send: false
+  - label: 'Documentation Update'
     agent: 'Documentation'
-    prompt: 'Architecture design complete. Create comprehensive documentation including architecture diagrams, ADRs, and API specifications.'
+    prompt: 'Update documentation with JSDoc/TSDoc comments, README changes, and changelog entries.'
+    send: false
+  - label: 'Final Validation'
+    agent: 'Validator'
+    prompt: 'Run independent Definition of Done verification to confirm all DoD items are satisfied.'
     send: false
 ---
 

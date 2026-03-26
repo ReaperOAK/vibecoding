@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+AI prompt engineering and safety best practices including guardrails, injection prevention, output validation, and responsible AI usage guidelines.
+
+
 # AI Safety & Prompt Engineering
 
 ## When to Use
@@ -28,3 +33,8 @@ See the `references/` directory for:
 - Prompt engineering guidelines
 - Safety guardrail patterns
 - Injection prevention techniques
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

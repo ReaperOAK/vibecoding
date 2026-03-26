@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+CI/CD best practices including GitHub Actions workflows, automated testing, deployment pipelines, and DevOps core principles.
+
+
 # CI/CD & DevOps
 
 ## When to Use
@@ -28,3 +33,8 @@ See the `references/` directory for:
 - GitHub Actions workflow templates
 - CI/CD pipeline patterns
 - DevOps core principles guide
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

@@ -1,0 +1,60 @@
+{
+  "name": "vibecoding",
+  "displayName": "Vibecoding - Multi-Agent Development System",
+  "description": "Ticket-driven AI development with 14 specialized agents",
+  "version": "0.1.0",
+  "publisher": "vibecoding",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vibecoding.scaffold",
+        "title": "Vibecoding: Scaffold Agent Infrastructure"
+      },
+      {
+        "command": "vibecoding.refreshAgents",
+        "title": "Vibecoding: Refresh Agent Templates"
+      },
+      {
+        "command": "vibecoding.syncTickets",
+        "title": "Vibecoding: Sync Tickets"
+      }
+    ],
+    "configuration": {
+      "title": "Vibecoding",
+      "properties": {
+        "vibecoding.autoScaffold": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-scaffold .github/ structure on new workspaces"
+        },
+        "vibecoding.enableHooks": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable agent hooks (requires VS Code hooks Preview feature)"
+        },
+        "vibecoding.ticketSyncOnStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-sync tickets on session start"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "npx @vscode/vsce package --out vibecoding.vsix"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.100.0",
+    "typescript": "^5.8.0",
+    "@vscode/vsce": "^3.0.0"
+  }
+}

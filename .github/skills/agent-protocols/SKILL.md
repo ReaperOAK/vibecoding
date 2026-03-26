@@ -9,6 +9,11 @@ metadata:
   last-updated: '2026-02-26'
 ---
 
+## Overview
+
+Cross-cutting agent protocols including boot sequence, context derivation, forbidden actions, evidence requirements, and orchestration rules for multi-agent systems.
+
+
 # Agent Protocols
 
 ## When to Use
@@ -28,3 +33,8 @@ See the `references/` directory for:
 - Cross-cutting protocols reference
 - Orchestration rules
 - Boot sequence checklist
+
+## Rules
+
+- Follow the conventions defined in this skill
+- Apply these patterns consistently across all relevant code

@@ -6,17 +6,25 @@ tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the UI component, page layout, or frontend feature to implement'
 handoffs:
-  - label: 'Run QA Tests'
+  - label: 'Submit to QA'
     agent: 'QA'
-    prompt: 'Run the test suite and perform quality assurance on the frontend implementation. Verify WCAG 2.2 AA accessibility, Core Web Vitals, and 80%+ coverage.'
+    prompt: 'Implementation complete. Run test strategy including unit tests, integration tests, and E2E validation.'
     send: false
   - label: 'Security Review'
     agent: 'Security'
-    prompt: 'Review the frontend implementation for XSS vulnerabilities, CSP headers, input sanitization, and secure authentication handling.'
+    prompt: 'Submit for security review including OWASP Top 10, STRIDE threat modeling, and vulnerability scanning.'
     send: false
   - label: 'CI Quality Check'
     agent: 'CIReviewer'
-    prompt: 'Run lint, type checks, and complexity analysis on the frontend implementation. Verify bundle size and code quality standards.'
+    prompt: 'Submit for CI review including lint, type checks, complexity analysis, and SARIF report generation.'
+    send: false
+  - label: 'Documentation Update'
+    agent: 'Documentation'
+    prompt: 'Update documentation with JSDoc/TSDoc comments, README changes, and changelog entries.'
+    send: false
+  - label: 'Final Validation'
+    agent: 'Validator'
+    prompt: 'Run independent Definition of Done verification to confirm all DoD items are satisfied.'
     send: false
 ---
 
