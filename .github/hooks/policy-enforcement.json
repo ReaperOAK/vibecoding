@@ -19,7 +19,7 @@
       },
       {
         "description": "Block prohibited git commands (git add ., git add -A, git add --all)",
-        "command": "bash .github/hooks/scripts/check-git-policy.sh",
+        "command": "bash .github/hooks/scripts/block-git-add-all.sh",
         "toolNames": [
           "run_in_terminal",
           "execute/runInTerminal"
