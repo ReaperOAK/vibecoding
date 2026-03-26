@@ -3,7 +3,7 @@ name: 'QA'
 description: 'Designs and executes test strategies: TDD, mutation testing, property-based testing, E2E browser testing, and performance benchmarking.'
 user-invocable: false
 tools: [vscode, execute, read, search, browser, 'github/*', 'playwright/*']
-model: Claude Opus 4.6 (copilot)
+
 argument-hint: 'Describe what to test, test strategy to implement, or quality gates to verify'
 handoffs:
   - label: 'Security Review'

@@ -3,7 +3,7 @@ name: 'Frontend'
 description: 'Implements UIs, responsive layouts, state management, and WCAG 2.2 AA compliant components with Core Web Vitals optimization.'
 user-invocable: false
 tools: [vscode, execute, read, edit, search, browser, 'github/*', 'com.figma.mcp/mcp/*', 'playwright/*']
-model: Claude Opus 4.6 (copilot)
+
 argument-hint: 'Describe the UI component, page layout, or frontend feature to implement'
 handoffs:
   - label: 'Submit to QA'

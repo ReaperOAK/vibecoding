@@ -3,7 +3,7 @@ name: 'Backend'
 description: 'Implements server-side logic, APIs, database operations, and business rules using TDD with SOLID principles and spec-driven development.'
 user-invocable: false
 tools: [vscode, execute, read, edit, search, 'github/*', 'io.github.upstash/context7/*']
-model: Claude Opus 4.6 (copilot)
+
 argument-hint: 'Describe the backend feature, API endpoint, or database operation to implement'
 handoffs:
   - label: 'Submit to QA'

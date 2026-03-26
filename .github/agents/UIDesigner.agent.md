@@ -3,7 +3,7 @@ name: 'UIDesigner'
 description: 'Generates UI mockups, iterates on designs via Google Stitch, produces component specs and design tokens for Frontend Engineer. Uses Playwright for visual validation.'
 user-invocable: false
 tools: [vscode, execute, read, edit, search, browser, 'github/*', 'com.figma.mcp/mcp/*', 'playwright/*']
-model: Claude Opus 4.6 (copilot)
+
 argument-hint: 'Describe the UI components to design, mockups to create, or design tokens to define'
 handoffs:
   - label: 'Implement Frontend'
