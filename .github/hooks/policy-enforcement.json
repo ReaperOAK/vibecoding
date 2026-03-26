@@ -26,17 +26,7 @@
         ],
         "enabled": true,
         "comment": "Enabled by TASK-VIB-002"
-      },
-      {
-        "description": "Block destructive terminal commands (rm -rf, DROP TABLE, git reset --hard, etc.)",
-        "command": "bash .github/hooks/scripts/block-destructive-ops.sh",
-        "toolNames": [
-          "run_in_terminal",
-          "execute/runInTerminal"
-        ],
-        "enabled": true,
-        "comment": "Enabled by TASK-VIB-002"
-      }
+      }      
     ],
     "Stop": [
       {

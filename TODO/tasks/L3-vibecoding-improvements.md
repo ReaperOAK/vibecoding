@@ -154,7 +154,7 @@ Fix: Audit all 15 agent files. For every agent that is NOT intended to be direct
 
 ## Description
 
-All agents currently use `` — the most expensive model. Review-chain agents (CIReviewer, QA, Validator, Documentation) perform structured, pattern-matching tasks that do not require the most capable model. Using a model array with preferred/fallback reduces cost.
+All agents currently use `model: Claude Opus 4.6 (copilot)` — the most expensive model. Review-chain agents (CIReviewer, QA, Validator, Documentation) perform structured, pattern-matching tasks that do not require the most capable model. Using a model array with preferred/fallback reduces cost.
 
 Fix: Update the `model:` field in the 4 review-chain agents to `model: [claude-3-7-sonnet, claude-3-5-sonnet]`. This sets a cheaper preferred model with fallback. Keep Ticketer, CTO, Architect, Backend, Frontend, UIDesigner, Research, ProductManager, DevOps, Security, and TODO on the current or appropriate model.
 
