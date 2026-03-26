@@ -1,7 +1,7 @@
 ---
 name: 'Research'
 description: 'Technical research analyst. Conducts evidence-based research with Bayesian confidence, contradiction detection, and structured recommendations.'
-user-invocable: true
+user-invocable: false
 tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the technology to research, comparison to perform, or feasibility analysis needed'

@@ -1,7 +1,7 @@
 ---
 name: 'DevOps'
 description: 'Infrastructure and operations engineer. Implements GitOps workflows, SLO/SLI reliability, and policy-as-code enforcement.'
-user-invocable: true
+user-invocable: false
 tools: [vscode, execute, read, edit, search, 'github/*']
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the infrastructure to provision, CI/CD pipeline to create, or deployment strategy to implement'
