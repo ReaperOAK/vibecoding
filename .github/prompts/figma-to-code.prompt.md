@@ -2,8 +2,6 @@
 name: figma-to-code
 description: End-to-end conversion of a Figma design into production-ready implementation with maximum reuse of existing components/icons, Storybook-assisted discovery, and screenshot-verified 1:1 accuracy.
 agent: 'CTO'
-model: 'Claude Opus 4.6 (copilot)'
-tools: ['read', 'search/codebase', 'runCommands', 'github/*']
 argument-hint: 'Paste the Figma file URL or node ID to convert'
 ---
 
