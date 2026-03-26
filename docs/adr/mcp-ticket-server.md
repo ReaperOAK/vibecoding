@@ -1,7 +1,7 @@
 # ADR: MCP Ticket Server Architecture
 
 ## Status
-Proposed
+Accepted — implemented by TASK-VIB-003
 
 ## Context
 `tickets.py` provides CLI-based ticket management. Agents currently invoke it via shell commands (`python3 tickets.py --claim`, `--advance`, etc.). An MCP server wrapping this functionality would provide typed tool interfaces, better error handling, and eliminate shell invocation overhead.
@@ -15,8 +15,8 @@ Proposed
 
 ### Implementation Language: Python
 - **Chosen**: Python (same as tickets.py)
-- **Rationale**: Direct import of tickets.py functions. No serialization boundary. Single dependency chain.
-- **Rejected alternative**: TypeScript — would require subprocess calls to tickets.py, losing direct access.
+- **Rationale**: Single dependency chain. Uses subprocess delegation to tickets.py (list-based args, no shell=True) for security isolation.
+- **Rejected alternative**: TypeScript — would require subprocess calls with less natural integration.
 
 ### Tool Definitions
 
@@ -37,7 +37,7 @@ Proposed
   "mcpServers": {
     "tickets": {
       "command": "python3",
-      "args": [".github/mcp/ticket-server.py"],
+      "args": [".github/mcp-servers/ticket-server/server.py"],
       "cwd": "${workspaceFolder}",
       "env": {}
     }
@@ -48,9 +48,9 @@ Proposed
 ### File Structure
 
 ```
-.github/mcp/
-├── ticket-server.py    # MCP server wrapping tickets.py
-└── README.md           # Usage documentation
+.github/mcp-servers/ticket-server/
+├── server.py          # MCP server (FastMCP + stdio transport)
+└── requirements.txt   # mcp>=1.0.0
 ```
 
 ## Consequences

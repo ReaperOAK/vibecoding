@@ -4,7 +4,7 @@
   "description": "All hooks in `.github/hooks/policy-enforcement.json` and `.github/hooks/auto-sync.json` are set to `\"enabled\": false`. The hook scripts exist and are correct, but they are never fired. This means guardian STOP checks, `git add .` blocking, destructive operation blocking, and evidence verification are all silently bypassed at runtime.\n\nFix: Update both JSON files to set `\"enabled\": true` on every hook entry. Remove or update the `\"comment\"` fields noting the Preview status \u2014 the feature is now stable.",
   "type": "infra",
   "priority": "critical",
-  "stage": "DOCS",
+  "stage": "VALIDATION",
   "sdlc_flow": [
     "READY",
     "DEVOPS",
@@ -30,10 +30,10 @@
     "Given an agent attempts `git add .` or `git add -A`, When the PreToolUse hook fires, Then the block-git-add-all script runs and returns a non-zero exit code"
   ],
   "rework_count": 0,
-  "claimed_by": "Documentation",
-  "machine_id": "pop-os",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-26T20:31:56.654927+00:00",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -130,6 +130,15 @@
       "from_stage": "DOCS",
       "to_stage": "DOCS",
       "details": "Claimed by reaperoak@pop-os via Documentation, lease until 2026-03-26T20:31:56.654927+00:00"
+    },
+    {
+      "timestamp": "2026-03-26T20:06:03.223124+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Documentation",
+      "machine_id": "system",
+      "from_stage": "DOCS",
+      "to_stage": "VALIDATION",
+      "details": "Advanced from DOCS to VALIDATION"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
