@@ -1,7 +1,7 @@
 ---
 name: Takeover
 description: Initialize legacy repository takeover with structured reconstruction before resuming normal autonomous ticket-driven execution.
-agent: 'agent'
+agent: 'CTO'
 model: 'Claude Opus 4.6 (copilot)'
 tools: ['read', 'search/codebase', 'runCommands', 'fetch', 'github/*']
 argument-hint: 'No arguments needed — invoke /takeover to start legacy repo analysis'
