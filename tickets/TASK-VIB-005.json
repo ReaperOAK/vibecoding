@@ -4,7 +4,7 @@
   "description": "Ticketer and CTO agent files have `handoffs` defined but no `agents: [...]` property to restrict which subagents they can invoke. VS Code 1.100+ supports the `agents` frontmatter property for subagent restriction.\n\nFix:\n- `Ticketer.agent.md`: Add `agents: [Research, ProductManager, Architect, DevOps, Backend, UIDesigner, Frontend, QA, Security, CIReviewer, Documentation, Validator, TODO]`\n- `CTO.agent.md`: Add `agents: [Research, ProductManager, Architect, TODO, Ticketer]` (CTO only invokes planning agents and delegates execution to Ticketer)",
   "type": "infra",
   "priority": "high",
-  "stage": "VALIDATION",
+  "stage": "DONE",
   "sdlc_flow": [
     "READY",
     "DEVOPS",
@@ -29,10 +29,10 @@
     "Given both files, When the `agents:` property is added, Then all existing frontmatter properties (name, description, tools, model, handoffs) are preserved"
   ],
   "rework_count": 0,
-  "claimed_by": "Validator",
-  "machine_id": "pop-os",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-26T20:36:59.405537+00:00",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -156,6 +156,15 @@
       "from_stage": "VALIDATION",
       "to_stage": "VALIDATION",
       "details": "Claimed by reaperoak@pop-os via Validator, lease until 2026-03-26T20:36:59.405537+00:00"
+    },
+    {
+      "timestamp": "2026-03-26T20:10:17.071844+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Validator",
+      "machine_id": "system",
+      "from_stage": "VALIDATION",
+      "to_stage": "DONE",
+      "details": "Advanced from VALIDATION to DONE"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",

@@ -4,7 +4,7 @@
   "description": "`.github/mcp-servers/ticket-server/server.py` defines 7 tool schemas (syncTickets, getStatus, claimTicket, advanceTicket, releaseTicket, reworkTicket, validateIntegrity) but has NO JSON-RPC/stdio transport layer. The server cannot communicate as an MCP server \u2014 it has no `if __name__ == \"__main__\"` entry point and no protocol handling.\n\nFix: Rewrite `server.py` using the `mcp` Python SDK with FastMCP pattern. Keep all 7 tool definitions intact; wrap them with `@mcp.tool()` decorators. Add `mcp.run(transport=\"stdio\")` as the entry point. Create `requirements.txt` with `mcp>=1.0.0` dependency.\n\nThe tool implementations must call `subprocess.run` against `tickets.py` (path: `../../../../tickets.py` relative to server.py) and return structured results.",
   "type": "backend",
   "priority": "critical",
-  "stage": "VALIDATION",
+  "stage": "DONE",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -32,10 +32,10 @@
     "Given `requirements.txt` exists in the server directory, When `pip install -r requirements.txt` is run, Then `mcp` package installs without error"
   ],
   "rework_count": 0,
-  "claimed_by": "Validator",
-  "machine_id": "pop-os",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-26T20:36:59.335327+00:00",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -150,6 +150,15 @@
       "from_stage": "VALIDATION",
       "to_stage": "VALIDATION",
       "details": "Claimed by reaperoak@pop-os via Validator, lease until 2026-03-26T20:36:59.335327+00:00"
+    },
+    {
+      "timestamp": "2026-03-26T20:10:16.976583+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Validator",
+      "machine_id": "system",
+      "from_stage": "VALIDATION",
+      "to_stage": "DONE",
+      "details": "Advanced from VALIDATION to DONE"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
