@@ -8,9 +8,9 @@ argument-hint: 'Describe the project to initialize, vision to plan, or strategic
 agents: ['Research', 'ProductManager', 'Architect', 'TODO']
 disable-model-invocation: true
 handoffs:
-  - label: 'Start Execution'
+  - label: 'Execute Ticket Backlog'
     agent: 'Ticketer'
-    prompt: 'Project initialization complete. Tickets are ready in READY state. Begin dispatching workers to execute the ticket backlog.'
+    prompt: 'Scan READY tickets and begin dispatching workers. Run python3 tickets.py --sync first, then dispatch one subagent per READY ticket following the SDLC pipeline.'
     send: false
   - label: 'Research Gaps'
     agent: 'Research'

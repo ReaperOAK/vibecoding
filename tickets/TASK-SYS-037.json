@@ -1,0 +1,67 @@
+{
+  "ticket_id": "TASK-SYS-037",
+  "title": "Add model field to prompt files",
+  "description": "Add `model:` frontmatter field to all 6 `.github/prompts/*.prompt.md` files to specify the preferred LLM model for each workflow. The `start` and `continue` prompts are compute-intensive (orchestration) and benefit from specifying `gpt-4o` or `claude-sonnet`. The `figma-to-code` prompt benefits from a vision-capable model. Adding `model:` alongside the existing `agent:` (from TASK-SYS-020) and `tools:` (from TASK-SYS-021) completes the full execution context triple required by the VS Code prompt file specification (March 2026).",
+  "type": "architecture",
+  "priority": "medium",
+  "stage": "READY",
+  "sdlc_flow": [
+    "READY",
+    "ARCHITECT",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-26T00:00:00.000000+00:00",
+  "created_by": "TODO",
+  "dependencies": [
+    "TASK-SYS-020"
+  ],
+  "blocked_by": [],
+  "file_paths": [
+    ".github/prompts/start.prompt.md",
+    ".github/prompts/continue.prompt.md",
+    ".github/prompts/stop.prompt.md",
+    ".github/prompts/takeover.prompt.md",
+    ".github/prompts/figma-to-code.prompt.md",
+    ".github/prompts/expensify.prompt.md"
+  ],
+  "acceptance_criteria": [
+    "Given start.prompt.md has `model: gpt-4o` (or equivalent capable model) in frontmatter, when /start is invoked, then the specified model is used for CTO orchestration",
+    "Given figma-to-code.prompt.md has a vision-capable model specified, when invoked, then a model capable of processing visual context is selected",
+    "Given all 6 prompt files have `model:` field, when each prompt is invoked, then the model field is respected by VS Code agent routing",
+    "Given `model:` is added after `agent:` and before `tools:` in frontmatter, then frontmatter ordering follows VS Code documentation conventions",
+    "Given TASK-SYS-020 (agent:) and TASK-SYS-021 (tools:) are complete, when model: is added, then all three execution context fields are present in every prompt file"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-26T00:00:00.000000+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L2-vscode-copilot-improvements.md \u2014 gap identified in L2-06-D: model: frontmatter not covered by TASK-SYS-020 (agent:) or TASK-SYS-021 (tools:)"
+    },
+    {
+      "timestamp": "2026-03-26T10:16:19.769423+00:00",
+      "event": "MOVED_TO_READY",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Dependencies resolved, moved to READY"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L2-vscode-copilot-improvements.md",
+  "estimated_effort": "XS",
+  "tags": [
+    "prompts",
+    "frontmatter",
+    "model",
+    "P2",
+    "L2-06-D"
+  ]
+}

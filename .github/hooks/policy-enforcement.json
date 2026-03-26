@@ -5,16 +5,25 @@
     "SessionStart": [
       {
         "description": "Check STOP_ALL guardian file before any agent work begins",
-        "command": "bash .github/hooks/scripts/check-guardian.sh",
+        "command": "bash .github/hooks/scripts/check-guardian-stop.sh",
         "enabled": false,
         "comment": "Enable when VS Code hooks feature exits Preview"
       }
     ],
     "PreToolUse": [
       {
+        "description": "Block all tool use when STOP_ALL guardian is active",
+        "command": "bash .github/hooks/scripts/check-guardian-stop.sh",
+        "enabled": false,
+        "comment": "Enable when VS Code hooks feature exits Preview"
+      },
+      {
         "description": "Block prohibited git commands (git add ., git add -A, git add --all)",
         "command": "bash .github/hooks/scripts/check-git-policy.sh",
-        "toolNames": ["run_in_terminal", "execute/runInTerminal"],
+        "toolNames": [
+          "run_in_terminal",
+          "execute/runInTerminal"
+        ],
         "enabled": false,
         "comment": "Enable when VS Code hooks feature exits Preview"
       }

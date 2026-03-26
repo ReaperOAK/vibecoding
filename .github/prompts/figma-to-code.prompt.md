@@ -1,7 +1,7 @@
 ---
 name: figma-to-code
 description: End-to-end conversion of a Figma design into production-ready React/Tailwind implementation with pixel-perfect accuracy and responsiveness.
-agent: 'agent'
+agent: 'UIDesigner'
 model: 'Claude Opus 4.6 (copilot)'
 tools: ['read', 'search/codebase', 'runCommands', 'github/*']
 argument-hint: 'Paste the Figma file URL or node ID to convert'

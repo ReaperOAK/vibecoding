@@ -1,7 +1,7 @@
 ---
 name: start
 description: Initialize a new project from scratch with full SDLC planning
-agent: 'agent'
+agent: 'CTO'
 model: 'Claude Opus 4.6 (copilot)'
 tools: ['read', 'search/codebase', 'runCommands', 'fetch', 'github/*']
 argument-hint: 'Describe your project vision or paste link to project docs'
