@@ -1,0 +1,103 @@
+{
+  "ticket_id": "TASK-RES-001",
+  "title": "Research VS Code agent plugin packaging requirements",
+  "description": "Research requirements for packaging a VS Code Copilot multi-agent system as a distributable vsix plugin. Cover extension manifest, skill and hook bundling, marketplace requirements, minimum VS Code version, and recommended scaffold structure.",
+  "type": "research",
+  "priority": "low",
+  "stage": "DONE",
+  "sdlc_flow": [
+    "READY",
+    "RESEARCH",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-03-25T17:04:52.593340+00:00",
+  "created_by": "TODO",
+  "dependencies": [],
+  "blocked_by": [],
+  "file_paths": [
+    "agent-output/Research/TASK-RES-001.md"
+  ],
+  "acceptance_criteria": [
+    "Research document covers extension manifest requirements",
+    "Research document covers skill and hook bundling strategy",
+    "Research document covers marketplace listing requirements",
+    "Research document identifies minimum VS Code version needed",
+    "Research document provides recommended extension scaffold"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-03-25T17:04:52.593346+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/EP5-plugin-packaging.md"
+    },
+    {
+      "timestamp": "2026-03-25T17:05:15.452627+00:00",
+      "event": "MOVED_TO_READY",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Dependencies resolved, moved to READY"
+    },
+    {
+      "timestamp": "2026-03-26T10:40:51.515472+00:00",
+      "event": "CLAIMED",
+      "agent": "Research",
+      "machine_id": "pop-os",
+      "from_stage": "READY",
+      "to_stage": "READY",
+      "details": "Claimed by reaperoak@pop-os via Research, lease until 2026-03-26T11:10:51.515455+00:00"
+    },
+    {
+      "timestamp": "2026-03-26T10:42:50.328677+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Research",
+      "machine_id": "system",
+      "from_stage": "READY",
+      "to_stage": "RESEARCH",
+      "details": "Advanced from READY to RESEARCH"
+    },
+    {
+      "timestamp": "2026-03-26T10:42:50.364903+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Research",
+      "machine_id": "system",
+      "from_stage": "RESEARCH",
+      "to_stage": "DOCS",
+      "details": "Advanced from RESEARCH to DOCS"
+    },
+    {
+      "timestamp": "2026-03-26T10:42:50.405600+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Validator",
+      "machine_id": "system",
+      "from_stage": "DOCS",
+      "to_stage": "VALIDATION",
+      "details": "Advanced from DOCS to VALIDATION"
+    },
+    {
+      "timestamp": "2026-03-26T10:42:58.682187+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Research",
+      "machine_id": "system",
+      "from_stage": "VALIDATION",
+      "to_stage": "DONE",
+      "details": "Advanced from VALIDATION to DONE"
+    }
+  ],
+  "source_task_file": "TODO/tasks/EP5-plugin-packaging.md",
+  "tags": [
+    "plugin",
+    "marketplace",
+    "research",
+    "EP5"
+  ]
+}
