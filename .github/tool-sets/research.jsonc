@@ -1,0 +1,12 @@
+// Research tool set — for research and planning agents (Research, PM, Architect, CTO)
+// Reference with #research in agent tools array
+{
+  "name": "research",
+  "description": "Tools for research, documentation analysis, and design",
+  "tools": [
+    "microsoft/markitdown/*",
+    "com.figma.mcp/mcp/*",
+    "vscode.mermaid-chat-features/renderMermaidDiagram",
+    "playwright/*"
+  ]
+}
