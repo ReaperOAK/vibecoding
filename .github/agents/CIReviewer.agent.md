@@ -2,7 +2,7 @@
 name: 'CIReviewer'
 description: 'Automated code review gatekeeper. Enforces complexity thresholds, fitness functions, and produces SARIF-formatted findings.'
 user-invocable: false
-tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
+tools: [vscode, execute, read, search, 'github/*']
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the code quality checks to run, complexity analysis to perform, or quality gates to verify'
 handoffs:

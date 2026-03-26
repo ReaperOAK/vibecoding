@@ -2,7 +2,7 @@
 name: 'Security'
 description: 'Proactive appsec engineer. Performs STRIDE threat modeling, OWASP Top 10 / LLM Top 10 coverage, SBOM generation, and SARIF-formatted findings.'
 user-invocable: false
-tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
+tools: [vscode, execute, read, search, browser, 'github/*']
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the security review scope, vulnerability to analyze, or threat model to perform'
 handoffs:
