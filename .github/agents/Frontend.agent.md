@@ -1,8 +1,8 @@
 ---
 name: 'Frontend'
 description: 'Implements UIs, responsive layouts, state management, and WCAG 2.2 AA compliant components with Core Web Vitals optimization.'
-user-invocable: true
-tools: [vscode, execute, read, agent, edit, search, web, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'io.github.upstash/context7/*', 'markitdown/*', 'memory/*', 'microsoft-docs/*', 'mongodb/*', 'oraios/serena/*', 'playwright/*', 'sentry/*', 'sequentialthinking/*', 'stitch/*', 'terraform/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram, ms-azuretools.vscode-containers/containerToolsConfig, todo]
+user-invocable: false
+tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the UI component, page layout, or frontend feature to implement'
 handoffs:
