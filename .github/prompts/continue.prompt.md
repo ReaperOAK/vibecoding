@@ -3,7 +3,7 @@ name: continue
 description: Resume development after a stop. Loads resume state, repairs incomplete SDLC chains, then resumes ticket processing with full governance enforcement.
 agent: 'Ticketer'
 model: 'Claude Opus 4.6 (copilot)'
-tools: ['read', 'search/codebase', 'runCommands', 'github/*', 'memory/*']
+tools: ['read', 'search/codebase', 'runCommands', 'github/*']
 argument-hint: 'No arguments needed — just invoke /continue to resume'
 ---
 

@@ -2,10 +2,9 @@
 name: 'CTO'
 description: 'Intelligent project orchestrator. Reads project docs, conducts research, produces architecture and PRD, then drives TODO agent to generate tickets. Unlike Ticketer (dumb dispatcher), CTO reasons about the project holistically and coordinates all strategic agents.'
 user-invocable: true
-tools: [vscode, execute, read, agent, edit, search, browser, 'awesome-copilot/*', 'com.figma.mcp/mcp/*', 'firecrawl/*', 'github/*', 'markitdown/*', 'memory/*', 'oraios/serena/*', 'sequentialthinking/*', 'tavily/*', vscode.mermaid-chat-features/renderMermaidDiagram]
+tools: [vscode, execute, read, agent, edit, search, web, browser, 'com.figma.mcp/mcp/*', 'forgeos/*', 'github/*', 'io.github.tavily-ai/tavily-mcp/*', 'io.github.upstash/context7/*', 'microsoft/markitdown/*', 'playwright/*', vscode.mermaid-chat-features/renderMermaidDiagram, todo]
 model: Claude Opus 4.6 (copilot)
 argument-hint: 'Describe the project to initialize, vision to plan, or strategic decision to make'
-agents: ['Research', 'ProductManager', 'Architect', 'TODO']
 disable-model-invocation: true
 handoffs:
   - label: 'Execute Ticket Backlog'
