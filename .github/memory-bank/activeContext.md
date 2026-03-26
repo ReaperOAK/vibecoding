@@ -564,3 +564,8 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Verdict:** PASS (Confidence: HIGH)
 - **Agent:** QA
 - **Timestamp:** 2026-03-27T12:00:00Z
+
+### TASK-VIB-005 — QA PASS: Add Agents Property to Coordinator Agent Files
+- **Artifacts:** agent-output/QA/TASK-VIB-005.md
+- **Decisions:** PASS — all 3 acceptance criteria verified. Ticketer has 13 agents, CTO has 5 agents, all existing frontmatter preserved.
+- **Timestamp:** 2026-03-27T00:00:00Z
