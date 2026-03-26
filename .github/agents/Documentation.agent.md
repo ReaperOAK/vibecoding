@@ -2,6 +2,7 @@
 name: 'Documentation'
 description: 'Technical documentation engineer. Produces readable docs with Flesch-Kincaid scoring, freshness tracking, and doc-as-code CI.'
 user-invocable: false
+model: [claude-3-7-sonnet, claude-3-5-sonnet]
 tools:
   - vscode
   - execute

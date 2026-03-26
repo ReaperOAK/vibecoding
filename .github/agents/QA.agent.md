@@ -2,6 +2,7 @@
 name: 'QA'
 description: 'Designs and executes test strategies: TDD, mutation testing, property-based testing, E2E browser testing, and performance benchmarking.'
 user-invocable: false
+model: [claude-3-7-sonnet, claude-3-5-sonnet]
 tools:
   - vscode
   - execute

@@ -2,6 +2,7 @@
 name: 'Validator'
 description: 'Independent SDLC compliance reviewer. Verifies Definition of Done, runs quality gates, checks pattern conformance, and validates initialization checklists. Cannot implement code — only reads artifacts and writes validation reports. Has authority to reject task completion.'
 user-invocable: false
+model: [claude-3-7-sonnet, claude-3-5-sonnet]
 tools:
   - vscode
   - execute

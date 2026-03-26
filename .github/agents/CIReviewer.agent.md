@@ -2,6 +2,7 @@
 name: 'CIReviewer'
 description: 'Automated code review gatekeeper. Enforces complexity thresholds, fitness functions, and produces SARIF-formatted findings.'
 user-invocable: false
+model: [claude-3-7-sonnet, claude-3-5-sonnet]
 tools:
   - vscode
   - execute
