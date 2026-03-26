@@ -38,10 +38,10 @@
     "Given Backend.agent.md and CIReviewer.agent.md which already have `user-invocable: false`, When the fix is applied, Then their existing value is preserved unchanged"
   ],
   "rework_count": 0,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "DevOps",
+  "machine_id": "pop-os",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-03-26T19:37:19.063471+00:00",
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -57,6 +57,15 @@
       "agent": "tickets.py",
       "machine_id": "system",
       "details": "Dependencies resolved, moved to READY"
+    },
+    {
+      "timestamp": "2026-03-26T19:07:19.063492+00:00",
+      "event": "CLAIMED",
+      "agent": "DevOps",
+      "machine_id": "pop-os",
+      "from_stage": "READY",
+      "to_stage": "READY",
+      "details": "Claimed by reaperoak@pop-os via DevOps, lease until 2026-03-26T19:37:19.063471+00:00"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
