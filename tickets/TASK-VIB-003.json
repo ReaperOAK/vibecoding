@@ -32,10 +32,10 @@
     "Given `requirements.txt` exists in the server directory, When `pip install -r requirements.txt` is run, Then `mcp` package installs without error"
   ],
   "rework_count": 0,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "Security",
+  "machine_id": "pop-os",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-03-26T20:24:35.515651+00:00",
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -96,6 +96,15 @@
       "from_stage": "QA",
       "to_stage": "SECURITY",
       "details": "Advanced from QA to SECURITY"
+    },
+    {
+      "timestamp": "2026-03-26T19:54:35.515668+00:00",
+      "event": "CLAIMED",
+      "agent": "Security",
+      "machine_id": "pop-os",
+      "from_stage": "SECURITY",
+      "to_stage": "SECURITY",
+      "details": "Claimed by reaperoak@pop-os via Security, lease until 2026-03-26T20:24:35.515651+00:00"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
