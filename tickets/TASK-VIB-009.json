@@ -4,7 +4,7 @@
   "description": "The MCP ticket server should expose canned prompt templates via the MCP Prompts API so Ticketer can generate delegation prompts for agents programmatically.\n\nFix: Add MCP Prompts to `server.py` using the `@mcp.prompt()` decorator pattern:\n- `process-ticket` (argument: `ticket_id: str`) \u2014 reads the ticket JSON, determines the current stage and appropriate agent, generates the full delegation prompt including ticket context, acceptance criteria, and file scope\n- `ticket-status` (no arguments) \u2014 calls `tickets.py --status` and formats the output as a structured status report prompt",
   "type": "backend",
   "priority": "medium",
-  "stage": "SECURITY",
+  "stage": "CI",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -31,10 +31,10 @@
     "Given an invalid ticket ID, When `process-ticket` is called, Then an informative error message is returned (not a server crash)"
   ],
   "rework_count": 1,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "CIReviewer",
+  "machine_id": "dispatcher",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-03-27T09:12:42.275502Z",
   "lease_duration_minutes": 30,
   "history": [
     {
