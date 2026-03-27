@@ -743,3 +743,8 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** agent-output/Validator/TASK-VIB-011.md, ticket-state/DONE/TASK-VIB-011.json
 - **Decisions:** APPROVED — All 10/10 DoD items PASS. 18 tests, 98% statement coverage, 0 lint violations, 0 console.log, 0 TODO, proper JSDoc, all 6 acceptance criteria met. Protocol concern: Security agent advanced ticket through CI and DOCS stages without dedicated agent runs — substance independently verified by Validator to PASS. Rework #1 was correctly resolved.
 - **Timestamp:** 2026-03-27T09:55:00Z
+
+### [TASK-VIB-009] — Validation Rejection (Rework #2)
+- **Artifacts:** agent-output/Validator/TASK-VIB-009.md
+- **Decisions:** REJECTED — BLOCKING-1: Security stage skipped (no Security work commit, no agent-output/Security/TASK-VIB-009.md, ticket moved SECURITY→CI directly via dispatcher claim commit `951af8e`). BLOCKING-2: SyntaxWarning `\d{3}` in server.py line 83 docstring introduced by VIB-009 Backend rework commit `2158113`. Ticket returned to BACKEND for rework #2.
+- **Timestamp:** 2026-03-27T05:35:00Z
