@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "CIReviewer",
+          "version": "1.0.0",
+          "informationUri": "https://sarifweb.azurewebsites.net/",
+          "rules": [
+            {
+              "id": "CI-TASK-VIB-008-001",
+              "name": "MissingUpstreamSecuritySummary",
+              "shortDescription": {
+                "text": "Expected upstream Security summary file was not present at handoff path"
+              },
+              "fullDescription": {
+                "text": "CI stage expected agent-output/Security/TASK-VIB-008.md for direct verdict verification, but the file was absent. Ticket history and QA evidence were used as fallback context."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "CI-TASK-VIB-008-001",
+          "level": "warning",
+          "message": {
+            "text": "Upstream Security summary file agent-output/Security/TASK-VIB-008.md not found during CI boot sequence."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "agent-output/Security/.gitkeep"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
