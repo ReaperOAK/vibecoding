@@ -4,7 +4,7 @@
   "description": "The MCP ticket server should expose canned prompt templates via the MCP Prompts API so Ticketer can generate delegation prompts for agents programmatically.\n\nFix: Add MCP Prompts to `server.py` using the `@mcp.prompt()` decorator pattern:\n- `process-ticket` (argument: `ticket_id: str`) \u2014 reads the ticket JSON, determines the current stage and appropriate agent, generates the full delegation prompt including ticket context, acceptance criteria, and file scope\n- `ticket-status` (no arguments) \u2014 calls `tickets.py --status` and formats the output as a structured status report prompt",
   "type": "backend",
   "priority": "medium",
-  "stage": "VALIDATION",
+  "stage": "BACKEND",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -30,11 +30,11 @@
     "Given no arguments, When `ticket-status` prompt is called, Then a formatted ticket dashboard is returned as prompt content",
     "Given an invalid ticket ID, When `process-ticket` is called, Then an informative error message is returned (not a server crash)"
   ],
-  "rework_count": 1,
-  "claimed_by": "Validator",
-  "machine_id": "dispatcher",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-27T09:31:08.051445Z",
+  "rework_count": 2,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -111,6 +111,15 @@
       "from_stage": "DOCS",
       "to_stage": "VALIDATION",
       "details": "Advanced from DOCS to VALIDATION"
+    },
+    {
+      "timestamp": "2026-03-27T09:12:33.060622+00:00",
+      "event": "REWORK",
+      "agent": "Validator",
+      "machine_id": "system",
+      "from_stage": "VALIDATION",
+      "to_stage": "BACKEND",
+      "details": "Rework #2: BLOCKING-1: Security stage was skipped \u2014 no Security work commit exists, no agent-output/Security/TASK-VIB-009.md, ticket moved SECURITY\u2192CI without Security agent execution. Security verdict required. BLOCKING-2: SyntaxWarning in server.py line 83 introduced by VIB-009 Backend rework (\\d{3} in docstring, fix to \\\\d{3})."
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
