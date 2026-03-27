@@ -4,7 +4,7 @@
   "description": "The MCP ticket server (after TASK-VIB-003 makes it functional) exposes no MCP Resources. Resources allow agents and tools to read structured ticket data without calling a tool \u2014 they are accessible via `resources/read` RPC.\n\nFix: Add MCP Resources to `server.py` using the `@mcp.resource()` decorator pattern:\n- `ticket://READY` \u2014 returns JSON array of all READY ticket summaries `[{id, title, type, priority}]`\n- `ticket://{ticket-id}` \u2014 returns full ticket JSON for a specific ticket (404-style error if not found)\n- `ticket://DONE` \u2014 returns JSON array of completed tickets with completion timestamps\n\nResource implementations read from `ticket-state/READY/` and `ticket-state/DONE/` directories.",
   "type": "backend",
   "priority": "high",
-  "stage": "BACKEND",
+  "stage": "QA",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -123,6 +123,15 @@
       "from_stage": "BACKEND",
       "to_stage": "BACKEND",
       "details": "Claimed by reaperoak@pop-os via Backend, lease until 2026-03-27T06:37:59.983792+00:00"
+    },
+    {
+      "timestamp": "2026-03-27T06:10:34.828471+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Backend",
+      "machine_id": "pop-os",
+      "from_stage": "BACKEND",
+      "to_stage": "QA",
+      "details": "Advanced from BACKEND to QA after security rework fixes for ticket resource ID validation and path containment"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
@@ -131,5 +140,12 @@
     "mcp-server",
     "resources",
     "ticket-state"
+  ],
+  "status": "BACKEND_COMPLETE",
+  "completed_at": "2026-03-27T06:10:34.828471+00:00",
+  "artifacts": [
+    ".github/mcp-servers/ticket-server/server.py",
+    ".github/mcp-servers/ticket-server/tests/test_server_resources.py",
+    "agent-output/Backend/TASK-VIB-008.md"
   ]
 }
