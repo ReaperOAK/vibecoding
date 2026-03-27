@@ -31,10 +31,10 @@
     "Given an invalid ticket ID, When `process-ticket` is called, Then an informative error message is returned (not a server crash)"
   ],
   "rework_count": 1,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "Documentation",
+  "machine_id": "dispatcher",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-03-27T09:21:04.642290Z",
   "lease_duration_minutes": 30,
   "history": [
     {
