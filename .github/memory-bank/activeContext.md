@@ -781,3 +781,15 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** extension/eslint.config.cjs, extension/package.json, extension/package-lock.json, jest.config.js, extension/src/ticketTreeProvider.test.ts, agent-output/Backend/TASK-VIB-012.md
 - **Decisions:** Added extension-local ESLint flat config and converted ticketTreeProvider tests to Jest so lint is runnable and per-file coverage threshold (>=80%) is enforceable and evidenced.
 - **Timestamp:** 2026-03-27T09:49:19Z
+
+### [TASK-VIB-012] - QA Summary
+- **Agent:** QA
+- **Artifacts:** agent-output/QA/TASK-VIB-012.md, tickets/TASK-VIB-012.json, ticket-state/BACKEND/TASK-VIB-012.json
+- **Decisions:** REJECTED in QA because TreeView omits IN_PROGRESS/active stages; lint and coverage evidence verified valid.
+- **Timestamp:** 2026-03-27T10:00:09Z
+
+### [TASK-VIB-012] - QA Summary
+- **Artifacts:** agent-output/QA/TASK-VIB-012.md, tickets/TASK-VIB-012.json, ticket-state/BACKEND/TASK-VIB-012.json
+- **Decisions:** REJECT in QA. Lint and changed-file coverage evidence are valid, but TreeView does not implement IN_PROGRESS/all-active-stage aggregation required by ticket behavior.
+- **Timestamp:** 2026-03-27T10:00:10Z
+- **Agent:** QA
