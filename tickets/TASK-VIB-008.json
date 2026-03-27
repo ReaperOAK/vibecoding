@@ -32,10 +32,10 @@
     "Given completed tickets, When `ticket://DONE` resource is read, Then a JSON array of done ticket summaries with completion timestamps is returned"
   ],
   "rework_count": 0,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "Security",
+  "machine_id": "pop-os",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-03-27T06:26:30.721851+00:00",
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -96,6 +96,15 @@
       "from_stage": "QA",
       "to_stage": "SECURITY",
       "details": "Advanced from QA to SECURITY"
+    },
+    {
+      "timestamp": "2026-03-27T05:56:30.721873+00:00",
+      "event": "CLAIMED",
+      "agent": "Security",
+      "machine_id": "pop-os",
+      "from_stage": "SECURITY",
+      "to_stage": "SECURITY",
+      "details": "Claimed by reaperoak@pop-os via Security, lease until 2026-03-27T06:26:30.721851+00:00"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
