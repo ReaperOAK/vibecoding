@@ -81,11 +81,10 @@ export class VibecodingParticipant {
         } else if (prompt.includes('/next')) {
             response = await this.handleNextCommand();
         } else {
-            response = 'Available commands: `/status`, `/sync`, `/next\'';
+            response = 'Available commands: `/status`, `/sync`, `/next`';
         }
 
         // Send response to chat
-        const chatResponse = vscode.LanguageModelChatMessage.User(response);
         await request.stream.markdown(response);
     }
 
@@ -225,7 +224,7 @@ export class VibecodingParticipant {
     /**
      * Format next ticket output
      */
-    private formatNextTicketOutput(ticket: any): string {
+    private formatNextTicketOutput(ticket: TicketInfo): string {
         if (!ticket || !ticket.ticket_id) {
             return 'No READY tickets found';
         }

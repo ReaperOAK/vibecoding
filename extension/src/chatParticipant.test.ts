@@ -1,81 +1,266 @@
-import * as assert from 'assert';
+import { EventEmitter } from 'events';
 import { VibecodingParticipant } from './chatParticipant';
 
-/**
- * Unit tests for VibecodingParticipant chat handler
- * 
- * Note: These are component tests that verify the interface layer.
- * Subprocess execution tests would require mocking the child_process module,
- * which VS Code Insiders' native testing framework handles via @vscode/test-electron.
- */
+const mockCreateChatParticipant = jest.fn(() => ({
+    dispose: jest.fn(),
+    iconPath: undefined,
+    slashCommandProvider: undefined
+}));
 
-// Test suite for VibecodingParticipant
-export function runTests(): Promise<void> {
-    return runTestSuite();
+jest.mock('vscode', () => ({
+    workspace: { workspaceFolders: [{ uri: { fsPath: '/workspace' } }] },
+    ThemeIcon: function ThemeIcon(id: string): { id: string } {
+        return { id };
+    },
+    chat: {
+        createChatParticipant: (...args: unknown[]) => mockCreateChatParticipant.apply(null, args as never[])
+    }
+}), { virtual: true });
+
+const mockSpawn = jest.fn();
+jest.mock('child_process', () => ({
+    spawn: (...args: unknown[]) => mockSpawn(...args)
+}));
+
+const mockExistsSync = jest.fn();
+const mockReaddirSync = jest.fn();
+const mockReadFileSync = jest.fn();
+
+jest.mock('fs', () => ({
+    existsSync: (...args: unknown[]) => mockExistsSync(...args),
+    readdirSync: (...args: unknown[]) => mockReaddirSync(...args),
+    readFileSync: (...args: unknown[]) => mockReadFileSync(...args)
+}));
+
+type SpawnMockProcess = EventEmitter & {
+    stdout: EventEmitter;
+    stderr: EventEmitter;
+};
+
+function createSpawnProcess(exitCode: number, stdout = '', stderr = ''): SpawnMockProcess {
+    const processEmitter = new EventEmitter() as SpawnMockProcess;
+    processEmitter.stdout = new EventEmitter();
+    processEmitter.stderr = new EventEmitter();
+
+    setImmediate(() => {
+        if (stdout) {
+            processEmitter.stdout.emit('data', Buffer.from(stdout));
+        }
+        if (stderr) {
+            processEmitter.stderr.emit('data', Buffer.from(stderr));
+        }
+        processEmitter.emit('close', exitCode);
+    });
+
+    return processEmitter;
 }
 
-async function runTestSuite(): Promise<void> {
-    const tests: Array<{ name: string; fn: () => Promise<void> | void }> = [];
-
-    // Test: Participant can be instantiated
-    tests.push({
-        name: 'VibecodingParticipant.create() returns instance',
-        fn: () => {
-            const participant = VibecodingParticipant.create();
-            assert.ok(participant, 'Participant should be created');
-        }
+describe('VibecodingParticipant', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        VibecodingParticipant.disposeInstance();
     });
 
-    // Test: Singleton pattern works
-    tests.push({
-        name: 'VibecodingParticipant uses singleton pattern',
-        fn: () => {
-            const p1 = VibecodingParticipant.getInstance();
-            assert.ok(p1, 'Should have instance');
-        }
+    it('formats status dashboard from valid JSON output', async () => {
+        mockSpawn.mockReturnValue(
+            createSpawnProcess(0, JSON.stringify({ summary: { READY: 2, BACKEND: 1 } }))
+        );
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleStatusCommand();
+
+        expect(response).toContain('Ticket Dashboard');
+        expect(response).toContain('| READY | 2 |');
+        expect(response).toContain('| BACKEND | 1 |');
     });
 
-    // Test: Dispose clears instance
-    tests.push({
-        name: 'VibecodingParticipant.disposeInstance() clears singleton',
-        fn: () => {
-            VibecodingParticipant.create();
-            VibecodingParticipant.disposeInstance();
-            const instance = VibecodingParticipant.getInstance();
-            assert.strictEqual(instance, null, 'Instance should be null after dispose');
-        }
+    it('returns fallback when status output is empty', async () => {
+        mockSpawn.mockReturnValue(createSpawnProcess(0, ''));
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleStatusCommand();
+
+        expect(response).toBe('Unable to retrieve status.');
     });
 
-    // Test: Command interface exists
-    tests.push({
-        name: 'VibecodingParticipant has command handlers',
-        fn: async () => {
-            const participant = VibecodingParticipant.create();
-            assert.ok(typeof participant.handleStatusCommand === 'function');
-            assert.ok(typeof participant.handleSyncCommand === 'function');
-            assert.ok(typeof participant.handleNextCommand === 'function');
-            assert.ok(typeof participant.handleChatRequest === 'function');
-        }
+    it('returns error text when status JSON is invalid', async () => {
+        mockSpawn.mockReturnValue(createSpawnProcess(0, '{bad json'));
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleStatusCommand();
+
+        expect(response).toContain('Error retrieving status');
     });
 
-    // Run all tests
-    let passed = 0;
-    let failed = 0;
+    it('formats sync output in fenced markdown block', async () => {
+        mockSpawn.mockReturnValue(createSpawnProcess(0, 'Moved TASK-1 to READY'));
 
-    for (const test of tests) {
-        try {
-            await Promise.resolve(test.fn());
-            console.log(`✓ ${test.name}`);
-            passed++;
-        } catch (error) {
-            console.error(`✗ ${test.name}`, error instanceof Error ? error.message : String(error));
-            failed++;
-        }
-    }
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleSyncCommand();
 
-    console.log(`\nTest Results: ${passed} passed, ${failed} failed`);
-    
-    if (failed > 0) {
-        throw new Error(`${failed} test(s) failed`);
-    }
-}
+        expect(response).toContain('Sync Complete');
+        expect(response).toContain('```');
+        expect(response).toContain('Moved TASK-1 to READY');
+    });
+
+    it('returns fallback when sync output is empty', async () => {
+        mockSpawn.mockReturnValue(createSpawnProcess(0, ''));
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleSyncCommand();
+
+        expect(response).toBe('Sync completed but no output returned.');
+    });
+
+    it('returns sync error on subprocess failure', async () => {
+        mockSpawn.mockReturnValue(createSpawnProcess(1, '', 'boom'));
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleSyncCommand();
+
+        expect(response).toContain('Error running sync');
+    });
+
+    it('returns no ready ticket when READY directory is missing', async () => {
+        mockExistsSync.mockReturnValue(false);
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleNextCommand();
+
+        expect(response).toBe('No READY tickets found');
+    });
+
+    it('returns no ready ticket when READY directory has no ticket files', async () => {
+        mockExistsSync.mockReturnValue(true);
+        mockReaddirSync.mockReturnValue([]);
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleNextCommand();
+
+        expect(response).toBe('No READY tickets found');
+    });
+
+    it('formats next ticket details and acceptance criteria', async () => {
+        mockExistsSync.mockReturnValue(true);
+        mockReaddirSync.mockReturnValue(['TASK-VIB-011.json']);
+        mockReadFileSync.mockReturnValue(
+            JSON.stringify({
+                ticket_id: 'TASK-VIB-011',
+                title: 'Sample ticket',
+                type: 'backend',
+                priority: 'high',
+                acceptance_criteria: ['first', 'second']
+            })
+        );
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleNextCommand();
+
+        expect(response).toContain('Next Ticket');
+        expect(response).toContain('TASK-VIB-011');
+        expect(response).toContain('1. first');
+        expect(response).toContain('2. second');
+    });
+
+    it('returns no ready ticket when parsed file has no ticket_id', async () => {
+        mockExistsSync.mockReturnValue(true);
+        mockReaddirSync.mockReturnValue(['bad.json']);
+        mockReadFileSync.mockReturnValue(JSON.stringify({ title: 'Missing id', type: 'backend' }));
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleNextCommand();
+
+        expect(response).toBe('No READY tickets found');
+    });
+
+    it('returns error when ticket file read throws', async () => {
+        mockExistsSync.mockReturnValue(true);
+        mockReaddirSync.mockReturnValue(['TASK-VIB-011.json']);
+        mockReadFileSync.mockImplementation(() => {
+            throw new Error('read failed');
+        });
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleNextCommand();
+
+        expect(response).toContain('Error retrieving next ticket');
+    });
+
+    it('returns help text for unknown chat command', async () => {
+        const participant = VibecodingParticipant.create();
+        const markdown = jest.fn().mockResolvedValue(undefined);
+
+        await participant.handleChatRequest(
+            {
+                prompt: '/unknown',
+                stream: { markdown }
+            } as never,
+            {} as never,
+            {} as never
+        );
+
+        expect(markdown).toHaveBeenCalledWith('Available commands: `/status`, `/sync`, `/next`');
+    });
+});
+
+describe('VibecodingParticipant additional coverage', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        VibecodingParticipant.disposeInstance();
+    });
+
+    it('returns empty dashboard message when summary has no stage entries', async () => {
+        mockSpawn.mockReturnValue(createSpawnProcess(0, JSON.stringify({ summary: {} })));
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleStatusCommand();
+
+        expect(response).toContain('_No tickets found_');
+    });
+
+    it('returns no changes message when sync output is whitespace only', async () => {
+        mockSpawn.mockReturnValue(createSpawnProcess(0, '   \n\n'));
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleSyncCommand();
+
+        expect(response).toContain('No changes detected.');
+    });
+
+    it('handles subprocess error events in command execution', async () => {
+        const processEmitter = new EventEmitter() as SpawnMockProcess;
+        processEmitter.stdout = new EventEmitter();
+        processEmitter.stderr = new EventEmitter();
+        setImmediate(() => processEmitter.emit('error', new Error('spawn failed')));
+        mockSpawn.mockReturnValue(processEmitter);
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleStatusCommand();
+
+        expect(response).toContain('Error retrieving status: spawn failed');
+    });
+
+    it('uses default priority when next ticket has no priority field', async () => {
+        mockExistsSync.mockReturnValue(true);
+        mockReaddirSync.mockReturnValue(['TASK-VIB-011.json']);
+        mockReadFileSync.mockReturnValue(
+            JSON.stringify({
+                ticket_id: 'TASK-VIB-011',
+                title: 'Sample ticket',
+                type: 'backend'
+            })
+        );
+
+        const participant = VibecodingParticipant.create();
+        const response = await participant.handleNextCommand();
+
+        expect(response).toContain('**Priority:** Normal');
+    });
+
+    it('exposes and clears singleton instance', () => {
+        VibecodingParticipant.create();
+        expect(VibecodingParticipant.getInstance()).not.toBeNull();
+        VibecodingParticipant.disposeInstance();
+        expect(VibecodingParticipant.getInstance()).toBeNull();
+    });
+});

@@ -84,8 +84,9 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "package": "npx @vscode/vsce package --out vibecoding.vsix",
-    "test": "tsc --strict --module commonjs --target ES2022 --esModuleInterop --skipLibCheck --types node --outDir out src/ticketTreeProvider.ts src/ticketTreeProvider.test.ts && node ./out/ticketTreeProvider.test.js",
-    "test:coverage": "jest --config ../jest.config.js --coverage"
+    "test": "jest --config ../jest.config.js",
+    "test:coverage": "jest --config ../jest.config.js --coverage",
+    "test:legacy": "tsc --strict --module commonjs --target ES2022 --esModuleInterop --skipLibCheck --types node --outDir out src/ticketTreeProvider.ts src/ticketTreeProvider.test.ts && node ./out/ticketTreeProvider.test.js"
   },
   "devDependencies": {
     "@types/vscode": "^1.100.0",
