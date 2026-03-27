@@ -669,3 +669,8 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** agent-output/CIReviewer/TASK-VIB-008.md, agent-output/CIReviewer/TASK-VIB-008.sarif
 - **Decisions:** PASS - Score 95/100, 0 critical, 1 warning (missing upstream Security summary artifact).
 - **Timestamp:** 2026-03-27T11:55:37+05:30
+
+### [TASK-VIB-008] — Documentation Summary
+- **Artifacts:** README.md, agent-output/Documentation/TASK-VIB-008.md, tickets/TASK-VIB-008.json, ticket-state/VALIDATION/TASK-VIB-008.json
+- **Decisions:** Updated only README MCP Ticket Server section to add resource behavior and preserve existing tool documentation.
+- **Timestamp:** 2026-03-27T06:32:15.974131+00:00
