@@ -1,42 +1,91 @@
-# TASK-VIB-008 - Validation Report
+# TASK-VIB-008 — Validation Review
 
 ## Verdict
 REJECTED
 
-## Summary
-Independent runtime checks confirm the MCP resources implementation works and current tests pass, but the SDLC evidence chain is incomplete after rework: there is no post-rework Security PASS artifact from the Security stage owner.
+## DoD Compliance (10 Items)
+1. Code: PASS
+2. Tests: FAIL
+3. Lint: FAIL
+4. Types: FAIL
+5. CI: PASS
+6. Docs: PASS
+7. Review: PASS
+8. Logging: PASS
+9. Unhandled Promises: PASS
+10. TODO: PASS
 
-## Independent Checks
-1. Acceptance criteria and runtime behavior: PASS
-- `ticket://READY`, `ticket://DONE`, and `ticket://{ticket_id}` are registered.
-- `read_ticket('TASK-VIB-008')` returns full ticket JSON.
-- Invalid and traversal IDs raise `FileNotFoundError`.
+## Evidence
 
-2. Test suite in scope: PASS
-- Command: `python3 -m unittest discover -s .github/mcp-servers/ticket-server/tests -p test_server_resources.py`
-- Result: `Ran 14 tests ... OK`
+### 1) Code Implemented (Acceptance Criteria)
+PASS.
+- MCP resources are present in server implementation:
+  - ticket://READY
+  - ticket://DONE
+  - ticket://{ticket_id}
+- Resource handlers return expected shapes:
+  - READY/DONE -> JSON arrays
+  - ticket_id -> full JSON object
+- Traversal defenses are implemented:
+  - strict allowlist regex in _validate_ticket_id()
+  - canonical containment via Path.resolve() + relative_to() in _load_ticket()
+- Regression tests include valid IDs, invalid IDs, traversal payloads, and malformed IDs.
 
-3. Syntax and prohibited marker checks in scope: PASS
-- `python3 -m py_compile .github/mcp-servers/ticket-server/server.py .github/mcp-servers/ticket-server/tests/test_server_resources.py`
-- No `TODO|FIXME|HACK|XXX` markers found in scoped files.
+### 2) Tests (>=80% coverage)
+FAIL (independent gate not fully verifiable with required command/tooling).
+- Required command from checklist could not run:
+  - python3 -m pytest ... -> No module named pytest
+- Independent fallback run succeeded:
+  - python3 -m unittest discover -s .github/mcp-servers/ticket-server/tests -p test_server_resources.py
+  - Result: Ran 20 tests, OK
+- Coverage tooling unavailable in this environment for independent threshold proof:
+  - pytest-cov not available because pytest missing
+  - stdlib trace coverage extraction unavailable for this run (no server.cover emitted)
 
-4. Documentation update: PASS
-- README MCP Resources section and documentation-stage summary are present.
+### 3) Lint (pylint >= 8.0)
+FAIL (tool unavailable).
+- pylint command not found in environment.
 
-5. Memory gate: PASS
-- `.github/memory-bank/activeContext.md` contains TASK-VIB-008 entries.
+### 4) Type Checks (mypy strict)
+FAIL (tool unavailable).
+- mypy command not found in environment.
 
-## Blocking Failure Evidence
-1. Post-rework Security gate cannot be verified as PASS: FAIL
-- The only Security report retrievable from Security completion commit (`7db93e1`) is:
-  - `agent-output/Security/TASK-VIB-008.md` with `## Verdict` = `FAIL`.
-- Current workspace has no `agent-output/Security/TASK-VIB-008.md` and no newer Security PASS summary after the rework cycle.
-- Ticket history shows transition `SECURITY -> CI` performed by `QA` (not Security), so there is no independent Security-owner completion evidence for the final candidate.
+### 5) CI Passes
+PASS.
+- agent-output/CIReviewer/TASK-VIB-008.md reports PASS and quality score 88/100.
 
-## Required Rework
-1. Run Security stage after the latest QA pass and produce a Security summary for the post-rework implementation.
-2. Ensure stage transition `SECURITY -> CI` is performed by Security stage completion, with synchronized ticket history and artifacts.
-3. Preserve handoff evidence so Validator can verify final QA/Security/CI chain without ambiguity.
+### 6) Docs Updated
+PASS.
+- README includes MCP Resources, URI list, examples, usage, and security note.
+- CHANGELOG includes TASK-VIB-008 entry for MCP resources and traversal defense.
+
+### 7) Code Review Quality
+PASS.
+- Naming and structure are clear.
+- Error handling for missing/invalid IDs is consistent and non-crashing.
+- Security design follows defense-in-depth for path traversal.
+
+### 8) console.log Audit
+PASS.
+- grep for console.log in server.py returned no matches.
+
+### 9) Unhandled Promises
+PASS.
+- Not applicable to Python promise semantics; review confirms no unhandled async-style error patterns in scope.
+
+### 10) TODO/FIXME/HACK/XXX Audit
+PASS.
+- grep in server.py returned no matches.
+
+## Protocol/State Gate Failure
+Independent validation cannot be finalized for DONE transition because ticket state is currently DOCS, not VALIDATION, and there is no active Validator claim metadata in the state ticket JSON.
+
+## Issues Found
+1. Ticket not in VALIDATION stage at review time (state file present in ticket-state/DOCS).
+2. Required independent tooling (pytest, pylint, mypy) is not installed, preventing strict execution of DoD items 2-4 with mandated commands.
 
 ## Confidence
 HIGH
+
+## Recommendation
+Do not advance to DONE yet. Re-queue TASK-VIB-008 into VALIDATION with valid claim metadata, then rerun validator gates in an environment with pytest, pylint, and mypy available.
