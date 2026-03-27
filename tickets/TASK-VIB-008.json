@@ -32,10 +32,10 @@
     "Given completed tickets, When `ticket://DONE` resource is read, Then a JSON array of done ticket summaries with completion timestamps is returned"
   ],
   "rework_count": 1,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "Validator",
+  "machine_id": "pop-os",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-03-27T07:03:49.329008+00:00",
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -202,6 +202,15 @@
       "from_stage": "DOCS",
       "to_stage": "VALIDATION",
       "details": "Advanced from DOCS to VALIDATION"
+    },
+    {
+      "timestamp": "2026-03-27T06:33:49.329028+00:00",
+      "event": "CLAIMED",
+      "agent": "Validator",
+      "machine_id": "pop-os",
+      "from_stage": "VALIDATION",
+      "to_stage": "VALIDATION",
+      "details": "Claimed by reaperoak@pop-os via Validator, lease until 2026-03-27T07:03:49.329008+00:00"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
