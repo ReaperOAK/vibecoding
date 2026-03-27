@@ -2,9 +2,17 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { VibecodingParticipant } from './chatParticipant';
+import { TicketTreeProvider } from './ticketTreeProvider';
 
 export function activate(context: vscode.ExtensionContext): void {
     const config = vscode.workspace.getConfiguration('vibecoding');
+    const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const provider = new TicketTreeProvider(workspaceRoot);
+
+    context.subscriptions.push(
+        vscode.window.registerTreeDataProvider('vibecoding-tickets-view', provider),
+        vscode.commands.registerCommand('vibecoding.refreshTickets', () => provider.refresh())
+    );
 
     // Auto-scaffold on first activation
     if (config.get<boolean>('autoScaffold', true)) {

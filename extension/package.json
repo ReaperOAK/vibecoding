@@ -8,8 +8,12 @@
   "engines": {
     "vscode": "^1.100.0"
   },
-  "categories": ["Other"],
-  "activationEvents": ["onStartupFinished"],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "chatParticipants": [
@@ -32,8 +36,29 @@
       {
         "command": "vibecoding.syncTickets",
         "title": "Vibecoding: Sync Tickets"
+      },
+      {
+        "command": "vibecoding.refreshTickets",
+        "title": "Vibecoding: Refresh Tickets"
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vibecoding-tickets",
+          "title": "Vibecoding Tickets",
+          "icon": "resources/tickets.svg"
+        }
+      ]
+    },
+    "views": {
+      "vibecoding-tickets": [
+        {
+          "id": "vibecoding-tickets-view",
+          "name": "Tickets"
+        }
+      ]
+    },
     "configuration": {
       "title": "Vibecoding",
       "properties": {
@@ -58,11 +83,17 @@
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "npx @vscode/vsce package --out vibecoding.vsix"
+    "package": "npx @vscode/vsce package --out vibecoding.vsix",
+    "test": "tsc --strict --module commonjs --target ES2022 --esModuleInterop --skipLibCheck --types node --outDir out src/ticketTreeProvider.ts src/ticketTreeProvider.test.ts && node ./out/ticketTreeProvider.test.js",
+    "test:coverage": "jest --config ../jest.config.js --coverage"
   },
   "devDependencies": {
     "@types/vscode": "^1.100.0",
     "typescript": "^5.8.0",
-    "@vscode/vsce": "^3.0.0"
+    "@vscode/vsce": "^3.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.5"
   }
 }
