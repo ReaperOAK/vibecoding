@@ -4,7 +4,7 @@
   "description": "The VS Code extension has no UI for ticket state. A TreeView provider showing tickets grouped by stage directory provides visual feedback on the pipeline.\n\nFix:\n1. Create `extension/src/ticketTreeProvider.ts` implementing `vscode.TreeDataProvider<TicketTreeItem>`\n2. The tree root shows stage groups: READY, IN_PROGRESS (all active stages), DONE\n3. Each group expands to show individual ticket items (ticket ID + title, with type icon)\n4. Register the provider with `vscode.window.createTreeView('vibecoding.tickets', {...})`\n5. Update `extension/package.json` with `contributes.viewsContainers` (sidebar) and `contributes.views.vibecoding-sidebar`\n6. Add a `vibecoding.refreshTickets` command that calls `provider.refresh()`",
   "type": "backend",
   "priority": "medium",
-  "stage": "CI",
+  "stage": "VALIDATION",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -34,10 +34,10 @@
     "Given `extension/package.json`, When audited, Then it contains valid `contributes.viewsContainers` and `contributes.views` entries for the sidebar panel"
   ],
   "rework_count": 0,
-  "claimed_by": "CIReviewer",
-  "machine_id": "dispatcher",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-27T09:46:46.801936Z",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -80,6 +80,24 @@
       "from_stage": "CI",
       "to_stage": "DOCS",
       "details": "Advanced from CI to DOCS"
+    },
+    {
+      "timestamp": "2026-03-27T09:23:54.937775+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "CIReviewer",
+      "machine_id": "system",
+      "from_stage": "CI",
+      "to_stage": "DOCS",
+      "details": "Advanced from CI to DOCS"
+    },
+    {
+      "timestamp": "2026-03-27T09:26:44.949341+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "CIReviewer",
+      "machine_id": "system",
+      "from_stage": "DOCS",
+      "to_stage": "VALIDATION",
+      "details": "Advanced from DOCS to VALIDATION"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
