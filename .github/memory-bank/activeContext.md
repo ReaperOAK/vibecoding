@@ -716,3 +716,10 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** agent-output/CIReviewer/TASK-VIB-009.md, agent-output/CIReviewer/TASK-VIB-009.sarif
 - **Decisions:** PASS - Score 85/100, 0 critical, 3 warnings; advanced to DOCS.
 - **Timestamp:** 2026-03-27T08:49:32.644405Z
+
+### [TASK-VIB-012] — Backend Complete
+- **Artifacts:** extension/src/ticketTreeProvider.ts, extension/src/extension.ts, extension/package.json, extension/src/ticketTreeProvider.test.ts
+- **Decisions:** Used structural typing (no vscode import in provider) to enable unit tests without mocking; SimpleEmitter<T> replaces vscode.EventEmitter at test time; activitybar viewsContainers satisfies sidebar acceptance criterion
+- **Test Results:** 4/4 pass (npm run test:legacy); tsc --noEmit zero errors
+- **Confidence:** HIGH
+- **Timestamp:** 2026-03-27T09:30:00Z
