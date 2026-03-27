@@ -765,3 +765,9 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Decisions:** PASS — No critical/high findings in MCP prompt handlers; path traversal and subprocess injection defenses verified.
 - **Timestamp:** 2026-03-27T09:36:26Z
 - **Agent:** Security
+
+### [TASK-VIB-012] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-VIB-012.md
+- **Decisions:** REJECTED — Missing QA and Documentation stage artifacts/commits, lint gate not runnable due missing ESLint v9 config, and no >=80% changed-file coverage evidence for new TreeView provider code. Sent to BACKEND rework #1.
+- **Timestamp:** 2026-03-27T09:36:52Z
+- **Agent:** Validator
