@@ -4,7 +4,7 @@
   "description": "The MCP ticket server should expose canned prompt templates via the MCP Prompts API so Ticketer can generate delegation prompts for agents programmatically.\n\nFix: Add MCP Prompts to `server.py` using the `@mcp.prompt()` decorator pattern:\n- `process-ticket` (argument: `ticket_id: str`) \u2014 reads the ticket JSON, determines the current stage and appropriate agent, generates the full delegation prompt including ticket context, acceptance criteria, and file scope\n- `ticket-status` (no arguments) \u2014 calls `tickets.py --status` and formats the output as a structured status report prompt",
   "type": "backend",
   "priority": "medium",
-  "stage": "SECURITY",
+  "stage": "CI",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -31,10 +31,10 @@
     "Given an invalid ticket ID, When `process-ticket` is called, Then an informative error message is returned (not a server crash)"
   ],
   "rework_count": 2,
-  "claimed_by": "Security",
-  "machine_id": "dispatcher",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-27T10:00:00.108969Z",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -129,6 +129,15 @@
       "from_stage": "BACKEND",
       "to_stage": "QA",
       "details": "Advanced from BACKEND to QA"
+    },
+    {
+      "timestamp": "2026-03-27T09:36:26.664886+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Security",
+      "machine_id": "system",
+      "from_stage": "SECURITY",
+      "to_stage": "CI",
+      "details": "Advanced from SECURITY to CI"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
