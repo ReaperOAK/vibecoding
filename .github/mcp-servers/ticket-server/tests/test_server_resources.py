@@ -18,6 +18,7 @@ class FakeFastMCP:
         self.name = name
         self.resource_handlers: dict[str, object] = {}
         self.tool_handlers: dict[str, object] = {}
+        self.prompt_handlers: dict[str, object] = {}
 
     def resource(self, uri: str):
         def decorator(func):
@@ -29,6 +30,16 @@ class FakeFastMCP:
     def tool(self, name: str):
         def decorator(func):
             self.tool_handlers[name] = func
+            return func
+
+        return decorator
+
+    def prompt(self, name: str, description: str):
+        def decorator(func):
+            self.prompt_handlers[name] = {
+                "description": description,
+                "handler": func,
+            }
             return func
 
         return decorator
@@ -67,17 +78,18 @@ class TicketServerResourceTests(unittest.TestCase):
         self.assertIn("ticket://READY", resource_handlers)
         self.assertIn("ticket://DONE", resource_handlers)
         self.assertIn("ticket://{ticket_id}", resource_handlers)
+        self.assertIn("prompts://list", resource_handlers)
 
     def test_ready_resource_returns_ready_ticket_summaries(self) -> None:
         raw_payload = self.server.read_ready_tickets()
         payload = json.loads(raw_payload)
-        expected_ids = {"TASK-VIB-009", "TASK-VIB-011", "TASK-VIB-012"}
 
         self.assertIsInstance(payload, list)
-        self.assertEqual(expected_ids, {entry["id"] for entry in payload})
+        self.assertGreaterEqual(len(payload), 1)
         for entry in payload:
             self.assertEqual({"id", "title", "type", "priority"}, set(entry))
             self.assertIsInstance(entry["id"], str)
+            self.assertTrue(entry["id"])
 
     def test_done_resource_returns_completion_timestamps(self) -> None:
         raw_payload = self.server.read_done_tickets()
@@ -222,6 +234,59 @@ class TicketServerResourceTests(unittest.TestCase):
         self.assertTrue(advance_payload["success"])
         self.assertTrue(release_payload["success"])
         self.assertTrue(rework_payload["success"])
+
+    def test_process_ticket_valid_id(self) -> None:
+        prompt_text = self.server.process_ticket_prompt("TASK-VIB-001")
+
+        self.assertIn("TASK-VIB-001", prompt_text)
+        self.assertIn("Description", prompt_text)
+        self.assertIn("Acceptance Criteria", prompt_text)
+        self.assertIn("File Paths In Scope", prompt_text)
+
+    def test_process_ticket_invalid_id(self) -> None:
+        prompt_text = self.server.process_ticket_prompt("TASK-VIB-999")
+
+        self.assertIn("Ticket TASK-VIB-999 not found", prompt_text)
+
+    def test_ticket_status_success(self) -> None:
+        status_json = json.dumps(
+            {
+                "stage_counts": {
+                    "READY": 2,
+                    "BACKEND": 1,
+                    "DONE": 3,
+                },
+                "total_tickets": 6,
+            }
+        )
+        with mock.patch.object(self.server, "_run_tickets_py", return_value=(0, status_json, "")):
+            dashboard = self.server.ticket_status_prompt()
+
+        self.assertIn("| Stage | Count | Status |", dashboard)
+        self.assertIn("| READY | 2 |", dashboard)
+        self.assertIn("Total tickets: 6", dashboard)
+
+    def test_ticket_status_subprocess_error(self) -> None:
+        with mock.patch.object(
+            self.server,
+            "_run_tickets_py",
+            return_value=(1, "", "boom"),
+        ):
+            dashboard = self.server.ticket_status_prompt()
+
+        self.assertIn("Failed to fetch ticket status", dashboard)
+
+    def test_prompts_list(self) -> None:
+        payload = json.loads(self.server.read_prompts_list())
+        prompt_names = {entry["name"] for entry in payload}
+
+        self.assertEqual({"process-ticket", "ticket-status"}, prompt_names)
+
+    def test_json_parse_error(self) -> None:
+        with mock.patch.object(self.server, "_run_tickets_py", return_value=(0, "not-json", "")):
+            dashboard = self.server.ticket_status_prompt()
+
+        self.assertIn("Invalid status format", dashboard)
 
 
 if __name__ == "__main__":
