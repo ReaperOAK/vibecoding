@@ -4,7 +4,7 @@
   "description": "The VS Code extension has no chat participant. Adding a `@vibecoding` participant enables interactive ticket management from the chat panel without leaving VS Code.\n\nFix:\n1. Create `extension/src/chatParticipant.ts` implementing the chat participant handler\n2. Register the participant using `vscode.chat.createChatParticipant('vibecoding', handler)`\n3. Implement three slash commands:\n   - `/status` \u2014 run `tickets.py --status` and render the output as markdown in chat\n   - `/sync` \u2014 run `tickets.py --sync` and report which tickets moved to READY\n   - `/next` \u2014 find and display the highest-priority READY ticket with its title and acceptance criteria\n4. Update `extension/package.json` with `contributes.chatParticipants` entry",
   "type": "backend",
   "priority": "medium",
-  "stage": "QA",
+  "stage": "BACKEND",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -34,7 +34,7 @@
     "Given no READY tickets, When `@vibecoding /next` is invoked, Then a \"No READY tickets found\" message is returned",
     "Given `extension/package.json`, When audited, Then it contains a valid `contributes.chatParticipants` entry with the `vibecoding` participant ID"
   ],
-  "rework_count": 0,
+  "rework_count": 1,
   "claimed_by": null,
   "machine_id": null,
   "operator": null,
@@ -70,6 +70,15 @@
       "from_stage": "QA",
       "to_stage": "SECURITY",
       "details": "Advanced from QA to SECURITY"
+    },
+    {
+      "timestamp": "2026-03-27T06:59:08.665437+00:00",
+      "event": "REWORK",
+      "agent": "QA",
+      "machine_id": "system",
+      "from_stage": "QA",
+      "to_stage": "BACKEND",
+      "details": "Rework #1: Code quality issues and insufficient test coverage: (1) Type safety - any type in formatNextTicketOutput; (2) String syntax error in error message; (3) Unused variable; (4) Missing test framework (npm test fails); (5) Insufficient test coverage (<25%, requires \u226580%)"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
