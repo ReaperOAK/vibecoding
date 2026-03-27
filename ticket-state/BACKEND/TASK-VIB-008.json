@@ -4,7 +4,7 @@
   "description": "The MCP ticket server (after TASK-VIB-003 makes it functional) exposes no MCP Resources. Resources allow agents and tools to read structured ticket data without calling a tool \u2014 they are accessible via `resources/read` RPC.\n\nFix: Add MCP Resources to `server.py` using the `@mcp.resource()` decorator pattern:\n- `ticket://READY` \u2014 returns JSON array of all READY ticket summaries `[{id, title, type, priority}]`\n- `ticket://{ticket-id}` \u2014 returns full ticket JSON for a specific ticket (404-style error if not found)\n- `ticket://DONE` \u2014 returns JSON array of completed tickets with completion timestamps\n\nResource implementations read from `ticket-state/READY/` and `ticket-state/DONE/` directories.",
   "type": "backend",
   "priority": "high",
-  "stage": "VALIDATION",
+  "stage": "BACKEND",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -31,11 +31,11 @@
     "Given an invalid ticket ID, When `ticket://{ticket-id}` resource is read, Then an appropriate error response is returned (not a server crash)",
     "Given completed tickets, When `ticket://DONE` resource is read, Then a JSON array of done ticket summaries with completion timestamps is returned"
   ],
-  "rework_count": 1,
-  "claimed_by": "Validator",
-  "machine_id": "pop-os",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-27T07:03:49.329008+00:00",
+  "rework_count": 2,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -211,6 +211,15 @@
       "from_stage": "VALIDATION",
       "to_stage": "VALIDATION",
       "details": "Claimed by reaperoak@pop-os via Validator, lease until 2026-03-27T07:03:49.329008+00:00"
+    },
+    {
+      "timestamp": "2026-03-27T06:38:37.305656+00:00",
+      "event": "REWORK",
+      "agent": "Validator",
+      "machine_id": "system",
+      "from_stage": "VALIDATION",
+      "to_stage": "BACKEND",
+      "details": "Rework #2: Post-rework Security PASS evidence missing; latest security artifact is FAIL and final SECURITY->CI transition lacks Security-owner completion evidence"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
