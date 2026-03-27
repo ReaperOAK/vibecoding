@@ -1,62 +1,56 @@
-# TASK-VIB-009 — Documentation Update
+# TASK-VIB-009 - Documentation Rework #2 Verification
 
 ## Outcome
 PASS
 
 ## Scope
 
-Ticket: TASK-VIB-009 — Add MCP Prompts to Ticket Server
+Ticket: TASK-VIB-009 - Add MCP Prompts to Ticket Server
 
-Implementation file: `.github/mcp-servers/ticket-server/server.py`
+Documentation scope verified and updated after validator-triggered rework #2.
 
 ## Changes Made
 
-### 1. server.py — docstring improvements
+### 1. Ticket-server prompt docs re-validated
 
-Added `Args`, `Returns`, and `Raises` sections to the four new
-public-facing symbols introduced in this ticket:
+Verified MCP prompt docs in `.github/mcp-servers/ticket-server/README.md`
+against current implementation in `.github/mcp-servers/ticket-server/server.py`:
 
-- `_format_process_ticket_prompt(ticket)` — Args/Returns
-- `_extract_stage_counts(status_payload)` — Args/Returns/Raises
-- `_format_ticket_status_prompt(status_payload)` — Args/Returns/Raises
-- `process_ticket_prompt(ticket_id)` — Args/Returns
-- `ticket_status_prompt()` — Returns
+- `process-ticket` prompt name, argument contract, and error responses
+- `ticket-status` prompt name and error responses
+- `prompts://list` metadata resource and sample payload
 
-### 2. README.md — MCP Prompts section added
+No README content change was required because the published prompt behavior
+and examples remain accurate after Backend rework #2.
 
-Added a new `## MCP Prompts` section before `## Security` covering:
+### 2. Changelog corrected for rework #2
 
-- `process-ticket` prompt — arguments table, example usage, example output,
-  and error response table
-- `ticket-status` prompt — example usage, example output, and error response
-  table
-- `prompts://list` resource — example JSON response
+Updated `CHANGELOG.md` under 2026-03-27 with a fix entry noting:
 
-Updated `## Overview` to mention prompts alongside tools and resources.
-
-### 3. CHANGELOG.md — feature entry added
-
-Added entry under `## 2026-03-27` for TASK-VIB-009 MCP Prompts feature.
+- regex docstring escaping update (`\\d{3}` in source) to resolve
+  SyntaxWarning without functional prompt changes
 
 ## Files Modified
 
-- `.github/mcp-servers/ticket-server/server.py` (doc comments only)
-- `.github/mcp-servers/ticket-server/README.md`
 - `CHANGELOG.md`
+- `agent-output/Documentation/TASK-VIB-009.md`
 
 ## Evidence
 
 | Criterion | Status |
 | --- | --- |
-| API coverage — all new public APIs have docstrings | PASS |
-| README updated with user-facing prompt documentation | PASS |
-| Readability — active voice, sentences ≤ 20 words avg | PASS |
-| Link integrity — no external links added | N/A |
-| `last_reviewed` date present in README | PASS (2026-03-27) |
-| Changelog entry added | PASS |
+| Prompt docs match `server.py` implementation | PASS |
+| Changelog reflects rework #2 fix | PASS |
+| Existing README `last_reviewed` date present | PASS (2026-03-27) |
+| Link integrity risk introduced by this docs delta | NONE |
+
+## Test Results
+
+- N/A for code execution in DOCS stage. Validation based on direct contract
+  comparison between README prompt docs and current server implementation.
 
 ## Confidence
 HIGH
 
 ## Timestamp
-2026-03-27T09:21:00Z
+2026-03-27T10:00:00Z
