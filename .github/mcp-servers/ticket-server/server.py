@@ -80,7 +80,7 @@ def _validate_ticket_id(ticket_id: str) -> None:
         ticket_id: Ticket identifier, for example ``TASK-VIB-008``.
 
     Raises:
-        FileNotFoundError: If the ID does not match ``TASK-[A-Z]+-\d{3}``.
+        FileNotFoundError: If the ID does not match ``TASK-[A-Z]+-\\d{3}``.
 
     Security:
         First defense against path traversal. Rejects malformed IDs before any
