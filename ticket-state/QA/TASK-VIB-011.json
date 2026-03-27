@@ -35,10 +35,10 @@
     "Given `extension/package.json`, When audited, Then it contains a valid `contributes.chatParticipants` entry with the `vibecoding` participant ID"
   ],
   "rework_count": 0,
-  "claimed_by": "Runner",
-  "machine_id": "ci-dispatcher",
-  "operator": "vibecoding-ticketer",
-  "lease_expiry": "2026-03-27T07:12:53.964029Z",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -61,6 +61,15 @@
       "agent": "Backend",
       "machine_id": "local",
       "details": "Chat participant implementation complete, moved to QA for testing"
+    },
+    {
+      "timestamp": "2026-03-27T06:54:35.457980+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Backend",
+      "machine_id": "system",
+      "from_stage": "QA",
+      "to_stage": "SECURITY",
+      "details": "Advanced from QA to SECURITY"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
