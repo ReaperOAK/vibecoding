@@ -4,9 +4,9 @@ last_reviewed: 2026-03-27
 
 ## Overview
 
-The ticket server exposes ticket operations over MCP tools and resources.
-Tools wrap `tickets.py` actions, while resources provide direct read access to
-structured ticket data.
+The ticket server exposes ticket operations over MCP tools, resources, and
+prompts. Tools wrap `tickets.py` actions, resources provide direct read access
+to structured ticket data, and prompts generate delegation content for agents.
 
 ## MCP Resources
 
@@ -91,6 +91,132 @@ Example usage (pseudo-code):
 ```python
 ticket_json = mcp_client.resources.read("ticket://TASK-VIB-008")
 ticket = json.loads(ticket_json)
+```
+
+## MCP Prompts
+
+The server exposes two MCP prompt templates via the MCP Prompts API.
+Use `mcp_client.prompts.get(name, arguments)` to call them.
+
+A metadata resource is also available at `prompts://list`.
+
+### Prompt: `process-ticket`
+
+Generates a complete agent delegation prompt from ticket metadata.
+
+**Arguments:**
+
+| Argument | Type | Required | Description |
+| --- | --- | --- | --- |
+| `ticket_id` | string | Yes | Ticket ID matching `TASK-[A-Z]+-NNN` |
+
+**Returns:** A Markdown delegation prompt containing:
+
+- Ticket ID and title
+- Full description
+- Acceptance criteria list
+- File paths in scope
+- Current stage and suggested agent
+
+**Example usage (pseudo-code):**
+
+```python
+delegation = mcp_client.prompts.get(
+    "process-ticket", {"ticket_id": "TASK-VIB-009"}
+)
+```
+
+**Example output:**
+
+```markdown
+# Ticket Delegation Prompt
+
+## Ticket
+- ID: TASK-VIB-009
+- Title: Add MCP Prompts to Ticket Server
+
+## Description
+The MCP ticket server should expose canned prompt templates ...
+
+## Acceptance Criteria
+- Given the updated server.py, When a MCP client calls `prompts/list`, ...
+
+## File Paths In Scope
+- .github/mcp-servers/ticket-server/server.py
+
+## Stage
+- Current stage: DOCS
+
+## Agent Assignment Hint
+- Suggested agent: Documentation
+```
+
+**Error responses:**
+
+| Condition | Response |
+| --- | --- |
+| Invalid or missing ticket ID | `Ticket {id} not found` |
+| Ticket file unreadable or malformed | `Failed to read ticket metadata` |
+
+### Prompt: `ticket-status`
+
+Generates a formatted Markdown dashboard of all ticket stages and counts.
+
+**Arguments:** None
+
+**Returns:** A Markdown table showing per-stage ticket counts and a total
+summary line.
+
+**Example usage (pseudo-code):**
+
+```python
+dashboard = mcp_client.prompts.get("ticket-status")
+```
+
+**Example output:**
+
+```markdown
+# Ticket Status Dashboard
+
+| Stage | Count | Status |
+| --- | ---: | --- |
+| READY | 2 | Has tickets |
+| BACKEND | 1 | Has tickets |
+| DONE | 7 | Has tickets |
+...
+
+Total tickets: 10 (READY: 2, BACKEND: 1, ...)
+```
+
+**Error responses:**
+
+| Condition | Response |
+| --- | --- |
+| `tickets.py` subprocess fails | `Failed to fetch ticket status` |
+| Ticket system not found or uninitialized | `Ticket system not initialized` |
+| Status JSON is malformed | `Invalid status format` |
+
+### Resource: `prompts://list`
+
+Returns metadata for all available prompt templates as a JSON array.
+
+**Example response:**
+
+```json
+[
+  {
+    "name": "process-ticket",
+    "description": "Generate delegation prompt for given ticket",
+    "arguments": [
+      {"name": "ticket_id", "type": "string", "required": true}
+    ]
+  },
+  {
+    "name": "ticket-status",
+    "description": "Generate ticket status dashboard",
+    "arguments": []
+  }
+]
 ```
 
 ## Security
