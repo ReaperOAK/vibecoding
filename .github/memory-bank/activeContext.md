@@ -630,3 +630,12 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** agent-output/Validator/TASK-VIB-001-007.md
 - **Decisions:** ALL 7 tickets APPROVED after independent verification of every AC from source files. QA/Security/Documentation upstream verdicts cross-checked.
 - **Timestamp:** 2026-03-27T00:00:00Z
+
+### [TASK-VIB-008] - QA PASS: Add MCP Resources to Ticket Server
+- **Artifacts:** `.github/mcp-servers/ticket-server/server.py`, `.github/mcp-servers/ticket-server/tests/test_server_resources.py`, `agent-output/QA/TASK-VIB-008.md`
+- **Decisions:** PASS - all 5 acceptance criteria verified against live workspace ticket data. Added 12 deterministic QA tests and measured 91.38% line coverage on `server.py`. Mutation and property tooling were unavailable in the environment, so manual adversarial branch coverage was used instead.
+- **Verdict:** PASS
+- **Coverage:** 91.38% line coverage on `.github/mcp-servers/ticket-server/server.py`
+- **Mutation Score:** N/A (`mutmut` unavailable)
+- **Confidence:** MEDIUM
+- **Timestamp:** 2026-03-27T05:53:47+00:00
