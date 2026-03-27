@@ -639,3 +639,13 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Mutation Score:** N/A (`mutmut` unavailable)
 - **Confidence:** MEDIUM
 - **Timestamp:** 2026-03-27T05:53:47+00:00
+
+### [TASK-VIB-008] — Security Review
+- **Artifacts:** `agent-output/Security/TASK-VIB-008.md`
+- **Decisions:** FAIL — `ticket://{ticket_id}` allows path traversal outside `tickets/` via unsanitized relative paths such as `../ticket-state/READY/TASK-VIB-009`; ticket returned to BACKEND for remediation.
+- **Timestamp:** 2026-03-27T05:59:33+00:00
+
+### [TASK-VIB-008] — Security Review
+- **Artifacts:** agent-output/Security/TASK-VIB-008.md
+- **Decisions:** FAIL — ticket resource allows path traversal outside tickets/ and returns READY ticket-state data for traversal payloads.
+- **Timestamp:** 2026-03-27T05:59:33+00:00

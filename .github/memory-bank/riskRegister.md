@@ -114,3 +114,28 @@ append_only: true
 <!-- Risks that have been resolved or are no longer applicable -->
 
 _None_
+
+### RISK-005: Ticket Resource Path Traversal
+
+- **Date Identified:** 2026-03-27
+- **Identified By:** Security
+- **Severity:** High
+- **Likelihood:** Medium
+- **Category:** Security
+- **Description:** The MCP ticket resource reads `ticket://{ticket_id}` by joining the caller-controlled `ticket_id` directly into `tickets/{ticket_id}.json` without validating path separators or canonical path containment.
+- **Impact:** A caller can read JSON files outside the intended `tickets/` directory, including ticket-state documents that expose stage and operational metadata.
+- **Mitigation:** Validate ticket IDs against a strict allowlist, resolve the candidate path, verify it stays under the canonical `tickets/` directory, and add traversal regression tests.
+- **Status:** Open
+- **Evidence:** `agent-output/Security/TASK-VIB-008.md` documents a successful read of `../ticket-state/READY/TASK-VIB-009` through the resource handler.
+
+### RISK-005: Ticket Resource Path Traversal
+- **Date Identified:** 2026-03-27
+- **Identified By:** Security
+- **Severity:** High
+- **Likelihood:** Medium
+- **Category:** Security
+- **Description:** ticket://{ticket_id} can escape tickets/ through relative paths.
+- **Impact:** callers can read ticket-state JSON outside the intended resource boundary.
+- **Mitigation:** allowlist IDs, enforce canonical containment, add regression tests.
+- **Status:** Open
+- **Evidence:** agent-output/Security/TASK-VIB-008.md
