@@ -35,10 +35,10 @@
     "Given `extension/package.json`, When audited, Then it contains a valid `contributes.chatParticipants` entry with the `vibecoding` participant ID"
   ],
   "rework_count": 1,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "Runner",
+  "machine_id": "ci-dispatcher",
+  "operator": "vibecoding-ticketer",
+  "lease_expiry": "2026-03-27T07:46:34.853154Z",
   "lease_duration_minutes": 30,
   "history": [
     {
