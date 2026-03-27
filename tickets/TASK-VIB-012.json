@@ -34,10 +34,10 @@
     "Given `extension/package.json`, When audited, Then it contains valid `contributes.viewsContainers` and `contributes.views` entries for the sidebar panel"
   ],
   "rework_count": 0,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "Validator",
+  "machine_id": "dispatcher",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-03-27T10:00:15.952900Z",
   "lease_duration_minutes": 30,
   "history": [
     {
