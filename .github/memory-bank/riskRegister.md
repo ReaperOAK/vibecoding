@@ -139,3 +139,15 @@ _None_
 - **Mitigation:** allowlist IDs, enforce canonical containment, add regression tests.
 - **Status:** Open
 - **Evidence:** agent-output/Security/TASK-VIB-008.md
+
+### RISK-006: TASK-VIB-009 Backend Work Not Committed
+- **Date Identified:** 2026-03-27T06:57:31.963845+00:00
+- **Identified By:** QA
+- **Severity:** High
+- **Likelihood:** Already occurred
+- **Category:** Process/Quality
+- **Description:** Backend agent claimed completion but did not commit prompt handler implementation to server.py.
+- **Impact:** Ticket incorrectly advanced through CI/QA pipeline; rework required.
+- **Mitigation:** Backend agent must verify commits exist before marking stage complete.
+- **Status:** Open (REWORK in progress)
+- **Evidence:** agent-output/QA/TASK-VIB-009.md
