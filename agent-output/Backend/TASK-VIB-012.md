@@ -1,101 +1,55 @@
-# TASK-VIB-012 — Backend Stage Summary
+# TASK-VIB-012 — Backend Rework Summary
 
 ## Agent: Backend | Stage: BACKEND | Machine: dispatcher | Operator: reaperoak
-## Timestamp: 2026-03-27T09:30:00Z
+## Timestamp: 2026-03-27T09:49:19Z
 
----
+## Rework Objective
+Address Validator blockers for TASK-VIB-012 by making lint executable in extension scope and by producing explicit >=80% changed-file coverage evidence for `ticketTreeProvider.ts`, while preserving feature acceptance criteria.
 
-## Objective
+## Validator Blockers Addressed
+1. Lint gate satisfiable in extension scope: FIXED
+- Added `extension/eslint.config.cjs` (flat config, extension-local).
+- Added `lint` script in `extension/package.json`: `eslint src --max-warnings=0`.
+- Added minimal dev dependencies only in extension scope:
+  - `eslint`
+  - `@typescript-eslint/parser`
+  - `@typescript-eslint/eslint-plugin`
+- Evidence command:
+  - `cd extension && npm run lint`
+  - Result: PASS (exit 0)
 
-Add a VS Code TreeView provider for ticket state, showing tickets grouped by READY/DONE stage directories, with a refresh command and proper package.json contributions.
+2. Explicit >=80% coverage evidence for changed file `extension/src/ticketTreeProvider.ts`: FIXED
+- Converted `extension/src/ticketTreeProvider.test.ts` from custom runner format to Jest tests so coverage is tracked by Jest.
+- Expanded branch tests to cover previously missed branches (`undefined` workspace root path, ticket-node child lookup, direct `getTreeItem` path).
+- Updated `jest.config.js`:
+  - `testMatch` now includes all `*.test.ts` files.
+  - `collectCoverageFrom` includes `extension/src/ticketTreeProvider.ts`.
+  - Added per-file threshold for `**/ticketTreeProvider.ts` at 80/80/80/80.
+- Evidence command:
+  - `cd extension && npm run test:coverage -- --runInBand`
+  - Result: PASS (exit 0)
+  - File metric for `ticketTreeProvider.ts`:
+    - Statements: 97.77%
+    - Branches: 80.00%
+    - Functions: 94.44%
+    - Lines: 100.00%
 
----
+3. Acceptance criteria alignment: VERIFIED
+- `extension/src/ticketTreeProvider.ts` still provides grouped READY/DONE ticket display and refresh behavior.
+- `extension/src/extension.ts` still registers `vibecoding.refreshTickets` and the tree provider.
+- `extension/package.json` still contains required views container and view contributions.
 
-## Acceptance Criteria Verification
+## Rework Artifacts
+- `extension/eslint.config.cjs` (new)
+- `extension/package.json`
+- `extension/package-lock.json`
+- `jest.config.js`
+- `extension/src/ticketTreeProvider.test.ts`
 
-| # | Criterion | Status |
-|---|-----------|--------|
-| 1 | Sidebar "Vibecoding Tickets" panel in activity bar | ✅ PASS — `package.json` `viewsContainers.activitybar` id: `vibecoding-tickets` |
-| 2 | READY group shows individual ticket items with IDs + titles | ✅ PASS — `readTicketStage()` reads `ticket-state/READY/*.json`, `toTicketNode()` maps id + title |
-| 3 | DONE group shows completed ticket items | ✅ PASS — `readTicketStage()` reads `ticket-state/DONE/*.json` |
-| 4 | `vibecoding.refreshTickets` command re-reads and refreshes | ✅ PASS — `extension.ts` registers command calling `provider.refresh()` |
-| 5 | `package.json` valid `contributes.viewsContainers` and `contributes.views` | ✅ PASS — both sections present and validated |
-
----
-
-## Artifacts
-
-| File | Action | Notes |
-|------|--------|-------|
-| `extension/src/ticketTreeProvider.ts` | VALIDATED | Full `TreeDataProvider<TicketTreeNode>` implementation |
-| `extension/src/extension.ts` | VALIDATED | Registers provider to `vibecoding-tickets-view` + refresh command |
-| `extension/package.json` | VALIDATED | `viewsContainers`, `views`, `commands` all contributed |
-| `extension/src/ticketTreeProvider.test.ts` | VALIDATED | 4 standalone tests (no vscode dependency) |
-
----
-
-## TDD Evidence
-
-```
-PASS TreeProvider instantiation creates READY and DONE groups
-PASS Loading tickets from filesystem returns READY and DONE data
-PASS Tree structure returns tickets under READY and DONE groups
-PASS Refresh re-reads filesystem and emits change event
-
-Results: 4 passed, 0 failed
-```
-
-Test command: `npm run test:legacy --prefix extension`
-
----
-
-## Type Check
-
-```
-$ cd extension && ./node_modules/.bin/tsc --noEmit
-(no output — zero errors, zero warnings)
-```
-
----
-
-## Architecture Notes
-
-- **No `vscode` runtime dependency in provider** — `TicketTreeProvider` uses plain `fs`/`path`; VS Code `TreeDataProvider` interface satisfied via structural typing. Enables unit testing without mocking.
-- **`SimpleEmitter<T>`** — custom event emitter, avoids `vscode.EventEmitter` at test time.
-- **Collapsible state** — stage nodes with tickets: `1`; empty stages: `0`.
-- **Sorted output** — tickets sorted by id for deterministic order.
-
----
-
-## Confidence Level
-
-**HIGH** — All 4 tests pass, TypeScript zero errors, all 5 acceptance criteria met.
-
----
-
-## Next Stage: QA
-- extension/resources/tickets.svg (new)
-
-## Acceptance Criteria Mapping
-1. TreeView panel appears in sidebar with Vibecoding tickets label
-   - Added `contributes.viewsContainers.activitybar` and `contributes.views` entries.
-2. READY group displays READY tickets
-   - `TicketTreeProvider` reads `ticket-state/READY/*.json`.
-3. DONE group displays DONE tickets
-   - `TicketTreeProvider` reads `ticket-state/DONE/*.json`.
-4. `vibecoding.refreshTickets` refreshes tree
-   - Added command registration in activation and provider `refresh()`.
-5. Valid contribution points in package.json
-   - Added container and tree view contribution entries with a valid SVG icon path.
-
-## TDD Evidence
-- RED: Added tests for instantiation, stage loading, tree structure, and refresh behavior.
-- GREEN: Implemented file-backed provider and refresh event emission.
-- REFACTOR: Centralized stage loading via `loadTicketGroups` and stable sorting.
-
-## Test Results
-- Command: `cd extension && npm test`
-- Result: 4 passed, 0 failed
+## Validation Commands and Results
+- `cd extension && npm run compile` -> PASS
+- `cd extension && npm run lint` -> PASS
+- `cd extension && npm run test:coverage -- --runInBand` -> PASS
 
 ## Confidence
 HIGH

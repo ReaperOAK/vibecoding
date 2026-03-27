@@ -1,4 +1,3 @@
-import * as assert from 'assert';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -20,44 +19,34 @@ function writeTicket(rootPath: string, stage: 'READY' | 'DONE', ticketId: string
 
 function getStage(nodes: TicketTreeNode[], stage: 'READY' | 'DONE'): TicketTreeNode {
     const found = nodes.find((node) => node.kind === 'stage' && node.stage === stage);
-    assert.ok(found, `${stage} stage should exist`);
+    expect(found).toBeDefined();
     return found as TicketTreeNode;
 }
 
-async function runSuite(): Promise<void> {
-    const tests: Array<{ name: string; fn: () => void | Promise<void> }> = [];
-
-    tests.push({
-        name: 'TreeProvider instantiation creates READY and DONE groups',
-        fn: () => {
+describe('TicketTreeProvider', () => {
+    test('TreeProvider instantiation creates READY and DONE groups', () => {
             const rootPath = createTempWorkspace();
             const provider = new TicketTreeProvider(rootPath);
             const root = provider.getChildren();
 
-            assert.strictEqual(root.length, 2, 'Expected exactly two root groups');
-            assert.ok(root.some((node) => node.kind === 'stage' && node.label === 'READY'));
-            assert.ok(root.some((node) => node.kind === 'stage' && node.label === 'DONE'));
-        }
+            expect(root).toHaveLength(2);
+            expect(root.some((node) => node.kind === 'stage' && node.label === 'READY')).toBe(true);
+            expect(root.some((node) => node.kind === 'stage' && node.label === 'DONE')).toBe(true);
     });
 
-    tests.push({
-        name: 'Loading tickets from filesystem returns READY and DONE data',
-        fn: () => {
+    test('Loading tickets from filesystem returns READY and DONE data', () => {
             const rootPath = createTempWorkspace();
             writeTicket(rootPath, 'READY', 'TASK-VIB-100', 'Ready ticket');
             writeTicket(rootPath, 'DONE', 'TASK-VIB-101', 'Done ticket');
 
             const groups = loadTicketGroups(rootPath);
-            assert.strictEqual(groups.READY.length, 1);
-            assert.strictEqual(groups.DONE.length, 1);
-            assert.strictEqual(groups.READY[0].id, 'TASK-VIB-100');
-            assert.strictEqual(groups.DONE[0].id, 'TASK-VIB-101');
-        }
+            expect(groups.READY).toHaveLength(1);
+            expect(groups.DONE).toHaveLength(1);
+            expect(groups.READY[0].id).toBe('TASK-VIB-100');
+            expect(groups.DONE[0].id).toBe('TASK-VIB-101');
     });
 
-    tests.push({
-        name: 'Tree structure returns tickets under READY and DONE groups',
-        fn: () => {
+    test('Tree structure returns tickets under READY and DONE groups', () => {
             const rootPath = createTempWorkspace();
             writeTicket(rootPath, 'READY', 'TASK-VIB-110', 'Ready item');
             writeTicket(rootPath, 'DONE', 'TASK-VIB-111', 'Done item');
@@ -70,18 +59,15 @@ async function runSuite(): Promise<void> {
             const readyChildren = provider.getChildren(readyGroup);
             const doneChildren = provider.getChildren(doneGroup);
 
-            assert.strictEqual(readyChildren.length, 1);
-            assert.strictEqual(doneChildren.length, 1);
-            assert.strictEqual(readyChildren[0].kind, 'ticket');
-            assert.strictEqual(doneChildren[0].kind, 'ticket');
-            assert.strictEqual(readyChildren[0].label, 'TASK-VIB-110');
-            assert.strictEqual(doneChildren[0].label, 'TASK-VIB-111');
-        }
+            expect(readyChildren).toHaveLength(1);
+            expect(doneChildren).toHaveLength(1);
+            expect(readyChildren[0].kind).toBe('ticket');
+            expect(doneChildren[0].kind).toBe('ticket');
+            expect(readyChildren[0].label).toBe('TASK-VIB-110');
+            expect(doneChildren[0].label).toBe('TASK-VIB-111');
     });
 
-    tests.push({
-        name: 'Refresh re-reads filesystem and emits change event',
-        fn: () => {
+    test('Refresh re-reads filesystem and emits change event', () => {
             const rootPath = createTempWorkspace();
             const provider = new TicketTreeProvider(rootPath);
             let fired = 0;
@@ -97,41 +83,47 @@ async function runSuite(): Promise<void> {
             const readyGroup = getStage(roots, 'READY');
             const readyChildren = provider.getChildren(readyGroup);
 
-            assert.strictEqual(fired, 1, 'Refresh should fire one event');
-            assert.strictEqual(readyChildren.length, 1);
-            assert.strictEqual(readyChildren[0].label, 'TASK-VIB-120');
+            expect(fired).toBe(1);
+            expect(readyChildren).toHaveLength(1);
+            expect(readyChildren[0].label).toBe('TASK-VIB-120');
 
             subscription.dispose();
-        }
     });
 
-    let passed = 0;
-    let failed = 0;
+    test('loadTicketGroups returns empty arrays when stage directories are missing', () => {
+            const rootPath = createTempWorkspace();
+            const groups = loadTicketGroups(rootPath);
 
-    for (const test of tests) {
-        try {
-            await Promise.resolve(test.fn());
-            process.stdout.write(`PASS ${test.name}\n`);
-            passed += 1;
-        } catch (error) {
-            process.stderr.write(`FAIL ${test.name}: ${error instanceof Error ? error.message : String(error)}\n`);
-            failed += 1;
-        }
-    }
-
-    process.stdout.write(`\nResults: ${passed} passed, ${failed} failed\n`);
-    if (failed > 0) {
-        throw new Error(`${failed} test(s) failed`);
-    }
-}
-
-export function runTests(): Promise<void> {
-    return runSuite();
-}
-
-if (require.main === module) {
-    runSuite().catch((error: unknown) => {
-        process.stderr.write(`${error instanceof Error ? error.stack ?? error.message : String(error)}\n`);
-        process.exit(1);
+            expect(groups.READY).toHaveLength(0);
+            expect(groups.DONE).toHaveLength(0);
     });
-}
+
+        test('Provider without workspace root creates non-collapsible empty stages', () => {
+            const provider = new TicketTreeProvider(undefined);
+            const roots = provider.getChildren();
+
+            const ready = getStage(roots, 'READY');
+            const done = getStage(roots, 'DONE');
+
+            expect(ready.kind).toBe('stage');
+            expect(done.kind).toBe('stage');
+            expect(ready.collapsibleState).toBe(0);
+            expect(done.collapsibleState).toBe(0);
+            expect(ready.description).toBe('0');
+            expect(done.description).toBe('0');
+        });
+
+        test('Ticket node has no children and getTreeItem returns the same node', () => {
+            const rootPath = createTempWorkspace();
+            writeTicket(rootPath, 'READY', 'TASK-VIB-130', 'Tree item ticket');
+            const provider = new TicketTreeProvider(rootPath);
+
+            const rootNodes = provider.getChildren();
+            const ready = getStage(rootNodes, 'READY');
+            const ticket = provider.getChildren(ready)[0];
+
+            expect(ticket.kind).toBe('ticket');
+            expect(provider.getChildren(ticket)).toHaveLength(0);
+            expect(provider.getTreeItem(ticket)).toBe(ticket);
+        });
+});
