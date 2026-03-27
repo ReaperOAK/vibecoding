@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import { VibecodingParticipant } from './chatParticipant';
 
 export function activate(context: vscode.ExtensionContext): void {
     const config = vscode.workspace.getConfiguration('vibecoding');
@@ -16,10 +17,17 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.commands.registerCommand('vibecoding.refreshAgents', () => refreshAgents(context)),
         vscode.commands.registerCommand('vibecoding.syncTickets', () => syncTickets())
     );
+
+    // Create and register the vibecoding chat participant
+    const participant = VibecodingParticipant.create();
+    context.subscriptions.push({
+        dispose: () => VibecodingParticipant.disposeInstance()
+    });
 }
 
 export function deactivate(): void {
-    // No cleanup needed
+    // Clean up chat participant
+    VibecodingParticipant.disposeInstance();
 }
 
 async function scaffoldIfNeeded(context: vscode.ExtensionContext): Promise<void> {
