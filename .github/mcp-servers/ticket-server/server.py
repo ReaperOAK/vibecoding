@@ -195,7 +195,15 @@ def _agent_hint(ticket: dict[str, Any], stage: str) -> str:
 
 
 def _format_process_ticket_prompt(ticket: dict[str, Any]) -> str:
-    """Build a markdown delegation prompt for one ticket."""
+    """Build a markdown delegation prompt for one ticket.
+
+    Args:
+        ticket: Parsed ticket JSON document.
+
+    Returns:
+        Markdown string containing ticket ID, title, description,
+        acceptance criteria, file scope, stage, and agent assignment hint.
+    """
     ticket_id = str(ticket.get("ticket_id", "UNKNOWN"))
     title = str(ticket.get("title", "Untitled ticket"))
     description = str(ticket.get("description", "No description provided.")).strip()
@@ -219,7 +227,19 @@ def _format_process_ticket_prompt(ticket: dict[str, Any]) -> str:
 
 
 def _extract_stage_counts(status_payload: dict[str, Any]) -> dict[str, int]:
-    """Extract stage counts from tickets.py status JSON output."""
+    """Extract stage counts from tickets.py status JSON output.
+
+    Args:
+        status_payload: Parsed JSON object returned by
+            ``tickets.py --status --json``.
+
+    Returns:
+        Mapping of uppercase stage name to non-negative ticket count.
+
+    Raises:
+        ValueError: If the payload contains neither ``stage_counts`` nor
+            ``stages`` data in a recognisable format.
+    """
     stage_counts = status_payload.get("stage_counts")
     if isinstance(stage_counts, dict):
         counts: dict[str, int] = {}
@@ -242,7 +262,19 @@ def _extract_stage_counts(status_payload: dict[str, Any]) -> dict[str, int]:
 
 
 def _format_ticket_status_prompt(status_payload: dict[str, Any]) -> str:
-    """Render stage counts and totals as markdown."""
+    """Render stage counts and totals as a Markdown dashboard.
+
+    Args:
+        status_payload: Parsed JSON object returned by
+            ``tickets.py --status --json``.
+
+    Returns:
+        Markdown string with a stage count table and a total summary line.
+
+    Raises:
+        ValueError: Propagated from :func:`_extract_stage_counts` when count
+            data cannot be extracted.
+    """
     stage_counts = _extract_stage_counts(status_payload)
     total_tickets = status_payload.get("total_tickets")
     if not isinstance(total_tickets, int):
@@ -336,7 +368,16 @@ def read_prompts_list() -> str:
 
 @mcp.prompt(name="process-ticket", description="Generate delegation prompt for given ticket")
 def process_ticket_prompt(ticket_id: str) -> str:
-    """Generate a delegation prompt from ticket metadata."""
+    """Generate a delegation prompt from ticket metadata.
+
+    Args:
+        ticket_id: Ticket identifier in ``TASK-[A-Z]+-\\d{3}`` format.
+
+    Returns:
+        Markdown delegation prompt with ticket title, description,
+        acceptance criteria, file scope, stage, and agent assignment hint.
+        Returns an error string when the ticket cannot be found or read.
+    """
     try:
         ticket = _load_ticket(ticket_id)
     except FileNotFoundError:
@@ -349,7 +390,13 @@ def process_ticket_prompt(ticket_id: str) -> str:
 
 @mcp.prompt(name="ticket-status", description="Generate ticket status dashboard")
 def ticket_status_prompt() -> str:
-    """Generate a status dashboard for all ticket stages."""
+    """Generate a status dashboard for all ticket stages.
+
+    Returns:
+        Markdown table summarising per-stage ticket counts and a total
+        summary line. Returns an error string when ``tickets.py`` cannot
+        be reached or returns malformed output.
+    """
     rc, out, err = _run_tickets_py(["--status", "--json"])
     if rc != 0:
         error_text = f"{out}\n{err}".lower()
