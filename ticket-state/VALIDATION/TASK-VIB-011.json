@@ -4,7 +4,7 @@
   "description": "The VS Code extension has no chat participant. Adding a `@vibecoding` participant enables interactive ticket management from the chat panel without leaving VS Code.\n\nFix:\n1. Create `extension/src/chatParticipant.ts` implementing the chat participant handler\n2. Register the participant using `vscode.chat.createChatParticipant('vibecoding', handler)`\n3. Implement three slash commands:\n   - `/status` \u2014 run `tickets.py --status` and render the output as markdown in chat\n   - `/sync` \u2014 run `tickets.py --sync` and report which tickets moved to READY\n   - `/next` \u2014 find and display the highest-priority READY ticket with its title and acceptance criteria\n4. Update `extension/package.json` with `contributes.chatParticipants` entry",
   "type": "backend",
   "priority": "medium",
-  "stage": "DOCS",
+  "stage": "VALIDATION",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -35,10 +35,10 @@
     "Given `extension/package.json`, When audited, Then it contains a valid `contributes.chatParticipants` entry with the `vibecoding` participant ID"
   ],
   "rework_count": 1,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "Validator",
+  "machine_id": "dispatcher",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-03-27T09:31:53.002635Z",
   "lease_duration_minutes": 30,
   "history": [
     {
