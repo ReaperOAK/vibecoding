@@ -153,7 +153,11 @@ python3 todo_visual.py
 
 ## MCP Ticket Server
 
-An MCP server wraps `tickets.py` for typed tool access via the Model Context Protocol. Located at `.github/mcp-servers/ticket-server/server.py`, it provides 7 tools over stdio transport:
+An MCP server wraps `tickets.py` for typed access via the Model Context Protocol. Located at `.github/mcp-servers/ticket-server/server.py`, it provides 7 tools and 3 resources over stdio transport.
+
+Last reviewed: 2026-03-27
+
+### Tools
 
 | Tool | Purpose |
 |------|---------|
@@ -164,6 +168,16 @@ An MCP server wraps `tickets.py` for typed tool access via the Model Context Pro
 | `releaseTicket` | Release a stale claim |
 | `reworkTicket` | Send back for rework with reason |
 | `validateIntegrity` | Full integrity check |
+
+### Resources
+
+| Resource | Returns |
+|----------|---------|
+| `ticket://READY` | JSON array of READY ticket summaries (`id`, `title`, `type`, `priority`) |
+| `ticket://DONE` | JSON array of DONE ticket summaries with `completed_at` |
+| `ticket://{ticket_id}` | Full ticket JSON for a valid ticket ID |
+
+Invalid ticket resource IDs return a not-found error. Ticket IDs are validated against the server allowlist format before file access.
 
 Setup: `pip install -r .github/mcp-servers/ticket-server/requirements.txt`
 
