@@ -674,3 +674,8 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** README.md, agent-output/Documentation/TASK-VIB-008.md, tickets/TASK-VIB-008.json, ticket-state/VALIDATION/TASK-VIB-008.json
 - **Decisions:** Updated only README MCP Ticket Server section to add resource behavior and preserve existing tool documentation.
 - **Timestamp:** 2026-03-27T06:32:15.974131+00:00
+
+### [TASK-VIB-008] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-VIB-008.md
+- **Decisions:** REJECTED — missing post-rework Security PASS evidence; rework required before DONE.
+- **Timestamp:** 2026-03-27T06:38:37.335857+00:00
