@@ -4,7 +4,7 @@
   "description": "The MCP ticket server should expose canned prompt templates via the MCP Prompts API so Ticketer can generate delegation prompts for agents programmatically.\n\nFix: Add MCP Prompts to `server.py` using the `@mcp.prompt()` decorator pattern:\n- `process-ticket` (argument: `ticket_id: str`) \u2014 reads the ticket JSON, determines the current stage and appropriate agent, generates the full delegation prompt including ticket context, acceptance criteria, and file scope\n- `ticket-status` (no arguments) \u2014 calls `tickets.py --status` and formats the output as a structured status report prompt",
   "type": "backend",
   "priority": "medium",
-  "stage": "BACKEND",
+  "stage": "DOCS",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -75,6 +75,33 @@
       "agent": "Backend",
       "machine_id": "dispatcher",
       "details": "Rework #1 implemented MCP prompts: process-ticket, ticket-status, prompts://list resource, and prompt regression tests."
+    },
+    {
+      "timestamp": "2026-03-27T07:20:54.809290+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Backend",
+      "machine_id": "system",
+      "from_stage": "BACKEND",
+      "to_stage": "QA",
+      "details": "Advanced from BACKEND to QA"
+    },
+    {
+      "timestamp": "2026-03-27T07:20:54.845460+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "QA",
+      "machine_id": "system",
+      "from_stage": "QA",
+      "to_stage": "SECURITY",
+      "details": "Advanced from QA to SECURITY"
+    },
+    {
+      "timestamp": "2026-03-27T08:49:32.618969+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "CIReviewer",
+      "machine_id": "system",
+      "from_stage": "CI",
+      "to_stage": "DOCS",
+      "details": "Advanced from CI to DOCS"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
