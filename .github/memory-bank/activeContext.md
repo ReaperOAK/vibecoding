@@ -771,3 +771,13 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Decisions:** REJECTED — Missing QA and Documentation stage artifacts/commits, lint gate not runnable due missing ESLint v9 config, and no >=80% changed-file coverage evidence for new TreeView provider code. Sent to BACKEND rework #1.
 - **Timestamp:** 2026-03-27T09:36:52Z
 - **Agent:** Validator
+
+### [TASK-VIB-009] — CI Review
+- **Artifacts:** agent-output/CIReviewer/TASK-VIB-009.md, agent-output/CIReviewer/TASK-VIB-009.sarif
+- **Decisions:** PASS — Score 85/100, 0 critical, 3 warnings
+- **Timestamp:** 2026-03-27T09:49:44.760002Z
+
+### [TASK-VIB-012] — Summary
+- **Artifacts:** extension/eslint.config.cjs, extension/package.json, extension/package-lock.json, jest.config.js, extension/src/ticketTreeProvider.test.ts, agent-output/Backend/TASK-VIB-012.md
+- **Decisions:** Added extension-local ESLint flat config and converted ticketTreeProvider tests to Jest so lint is runnable and per-file coverage threshold (>=80%) is enforceable and evidenced.
+- **Timestamp:** 2026-03-27T09:49:19Z
