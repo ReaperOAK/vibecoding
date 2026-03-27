@@ -11,11 +11,15 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
-TICKETS_PY = str(Path(__file__).resolve().parent.parent.parent.parent / "tickets.py")
-WORKSPACE = str(Path(__file__).resolve().parent.parent.parent.parent)
+WORKSPACE_PATH = Path(__file__).resolve().parent.parent.parent.parent
+TICKETS_PY = str(WORKSPACE_PATH / "tickets.py")
+WORKSPACE = str(WORKSPACE_PATH)
+TICKET_STATE_DIR = WORKSPACE_PATH / "ticket-state"
+TICKETS_DIR = WORKSPACE_PATH / "tickets"
 
 mcp = FastMCP("ticket-server")
 
@@ -27,6 +31,89 @@ def _run_tickets_py(args: list[str]) -> tuple[int, str, str]:
         cmd, capture_output=True, text=True, cwd=WORKSPACE, timeout=30
     )
     return result.returncode, result.stdout, result.stderr
+
+
+def _read_json_file(file_path: Path) -> dict[str, Any]:
+    """Read and parse a JSON file from disk."""
+    with file_path.open("r", encoding="utf-8") as file_handle:
+        return json.load(file_handle)
+
+
+def _load_ticket(ticket_id: str) -> dict[str, Any]:
+    """Load a ticket JSON document by ticket ID."""
+    ticket_path = TICKETS_DIR / f"{ticket_id}.json"
+    if not ticket_path.exists():
+        raise FileNotFoundError(f"Ticket '{ticket_id}' not found")
+    return _read_json_file(ticket_path)
+
+
+def _load_stage_tickets(stage: str) -> list[dict[str, Any]]:
+    """Load all ticket JSON documents for a stage directory."""
+    stage_dir = TICKET_STATE_DIR / stage
+    if not stage_dir.exists():
+        return []
+    return [_read_json_file(ticket_path) for ticket_path in sorted(stage_dir.glob("*.json"))]
+
+
+def _ready_ticket_summary(ticket: dict[str, Any]) -> dict[str, Any]:
+    """Create the READY ticket summary shape exposed by the resource."""
+    return {
+        "id": ticket.get("ticket_id"),
+        "title": ticket.get("title"),
+        "type": ticket.get("type"),
+        "priority": ticket.get("priority"),
+    }
+
+
+def _completed_at(ticket: dict[str, Any]) -> str | None:
+    """Extract the completion timestamp for DONE tickets."""
+    completed_at = ticket.get("completed_at")
+    if isinstance(completed_at, str) and completed_at:
+        return completed_at
+
+    history = ticket.get("history")
+    if not isinstance(history, list):
+        return None
+
+    for event in reversed(history):
+        if not isinstance(event, dict):
+            continue
+        if event.get("event") == "STAGE_COMPLETED" and event.get("to_stage") == "DONE":
+            timestamp = event.get("timestamp")
+            if isinstance(timestamp, str) and timestamp:
+                return timestamp
+    return None
+
+
+def _done_ticket_summary(ticket: dict[str, Any]) -> dict[str, Any]:
+    """Create the DONE ticket summary shape exposed by the resource."""
+    return {
+        "id": ticket.get("ticket_id"),
+        "title": ticket.get("title"),
+        "type": ticket.get("type"),
+        "priority": ticket.get("priority"),
+        "completed_at": _completed_at(ticket),
+    }
+
+
+@mcp.resource("ticket://READY")
+def read_ready_tickets() -> str:
+    """Return JSON summaries for all READY tickets."""
+    ready_tickets = [_ready_ticket_summary(ticket) for ticket in _load_stage_tickets("READY")]
+    return json.dumps(ready_tickets, indent=2)
+
+
+@mcp.resource("ticket://DONE")
+def read_done_tickets() -> str:
+    """Return JSON summaries for all completed tickets."""
+    done_tickets = [_done_ticket_summary(ticket) for ticket in _load_stage_tickets("DONE")]
+    return json.dumps(done_tickets, indent=2)
+
+
+@mcp.resource("ticket://{ticket_id}")
+def read_ticket(ticket_id: str) -> str:
+    """Return the full ticket JSON for a specific ticket ID."""
+    return json.dumps(_load_ticket(ticket_id), indent=2)
 
 
 @mcp.tool(name="syncTickets")
