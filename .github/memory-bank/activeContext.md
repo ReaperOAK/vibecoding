@@ -649,3 +649,8 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** agent-output/Security/TASK-VIB-008.md
 - **Decisions:** FAIL — ticket resource allows path traversal outside tickets/ and returns READY ticket-state data for traversal payloads.
 - **Timestamp:** 2026-03-27T05:59:33+00:00
+
+### [TASK-VIB-008] — Summary
+- **Artifacts:** `.github/mcp-servers/ticket-server/server.py`, `.github/mcp-servers/ticket-server/tests/test_server_resources.py`, `agent-output/Backend/TASK-VIB-008.md`, `ticket-state/QA/TASK-VIB-008.json`, `tickets/TASK-VIB-008.json`
+- **Decisions:** Enforced strict ticket ID allowlist and canonical path containment to prevent traversal and normalize not-found errors for malformed IDs.
+- **Timestamp:** 2026-03-27T06:10:34.828471+00:00

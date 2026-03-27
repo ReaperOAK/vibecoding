@@ -106,6 +106,32 @@ class TicketServerResourceTests(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             self.server.read_ticket("TASK-VIB-404")
 
+    def test_traversal_ticket_ids_raise_file_not_found(self) -> None:
+        traversal_payloads = [
+            "../ticket-state/READY/TASK-VIB-009",
+            "..\\ticket-state\\READY\\TASK-VIB-009",
+            "TASK-VIB-009/../../ticket-state/READY/TASK-VIB-009",
+        ]
+
+        for payload in traversal_payloads:
+            with self.subTest(payload=payload):
+                with self.assertRaises(FileNotFoundError):
+                    self.server.read_ticket(payload)
+
+    def test_separator_bearing_ticket_ids_raise_file_not_found(self) -> None:
+        malformed_ids = [
+            "TASK/VIB-009",
+            "TASK-VIB-009/extra",
+            "TASK-VIB-009\\extra",
+            "TASK VIB 009",
+            "TASK-VIB-009.json",
+        ]
+
+        for ticket_id in malformed_ids:
+            with self.subTest(ticket_id=ticket_id):
+                with self.assertRaises(FileNotFoundError):
+                    self.server.read_ticket(ticket_id)
+
     def test_completed_at_prefers_top_level_completed_at(self) -> None:
         completed_at = self.server._completed_at(
             {

@@ -8,6 +8,7 @@ All 7 tools delegate to tickets.py via subprocess.
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -20,6 +21,7 @@ TICKETS_PY = str(WORKSPACE_PATH / "tickets.py")
 WORKSPACE = str(WORKSPACE_PATH)
 TICKET_STATE_DIR = WORKSPACE_PATH / "ticket-state"
 TICKETS_DIR = WORKSPACE_PATH / "tickets"
+TICKET_ID_PATTERN = re.compile(r"TASK-[A-Z]+-\d{3}")
 
 mcp = FastMCP("ticket-server")
 
@@ -39,9 +41,24 @@ def _read_json_file(file_path: Path) -> dict[str, Any]:
         return json.load(file_handle)
 
 
+def _validate_ticket_id(ticket_id: str) -> None:
+    """Enforce strict ticket ID format for resource reads."""
+    if not TICKET_ID_PATTERN.fullmatch(ticket_id):
+        raise FileNotFoundError(f"Ticket '{ticket_id}' not found")
+
+
 def _load_ticket(ticket_id: str) -> dict[str, Any]:
     """Load a ticket JSON document by ticket ID."""
-    ticket_path = TICKETS_DIR / f"{ticket_id}.json"
+    _validate_ticket_id(ticket_id)
+    tickets_dir = TICKETS_DIR.resolve()
+    ticket_path = (TICKETS_DIR / f"{ticket_id}.json").resolve()
+
+    # Defense-in-depth: ensure the final path stays under tickets/.
+    try:
+        ticket_path.relative_to(tickets_dir)
+    except ValueError as exc:
+        raise FileNotFoundError(f"Ticket '{ticket_id}' not found") from exc
+
     if not ticket_path.exists():
         raise FileNotFoundError(f"Ticket '{ticket_id}' not found")
     return _read_json_file(ticket_path)
