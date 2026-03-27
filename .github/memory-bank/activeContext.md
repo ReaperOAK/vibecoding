@@ -128,6 +128,11 @@ compaction_threshold: 50
 
 <!-- Per-session working notes. Append only. -->
 
+### [TASK-VIB-008] — Summary
+- **Artifacts:** `.github/mcp-servers/ticket-server/server.py`, `agent-output/Backend/TASK-VIB-008.md`
+- **Decisions:** Added native FastMCP resources instead of routing resource reads through tools; derived DONE completion timestamps from `completed_at` when present and from the DONE transition history entry otherwise.
+- **Timestamp:** 2026-03-27T05:50:00Z
+
 ### [2026-02-21] Session 1
 
 - Initialized vibecoding multi-agent system
