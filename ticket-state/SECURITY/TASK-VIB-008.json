@@ -4,7 +4,7 @@
   "description": "The MCP ticket server (after TASK-VIB-003 makes it functional) exposes no MCP Resources. Resources allow agents and tools to read structured ticket data without calling a tool \u2014 they are accessible via `resources/read` RPC.\n\nFix: Add MCP Resources to `server.py` using the `@mcp.resource()` decorator pattern:\n- `ticket://READY` \u2014 returns JSON array of all READY ticket summaries `[{id, title, type, priority}]`\n- `ticket://{ticket-id}` \u2014 returns full ticket JSON for a specific ticket (404-style error if not found)\n- `ticket://DONE` \u2014 returns JSON array of completed tickets with completion timestamps\n\nResource implementations read from `ticket-state/READY/` and `ticket-state/DONE/` directories.",
   "type": "backend",
   "priority": "high",
-  "stage": "QA",
+  "stage": "SECURITY",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -32,10 +32,10 @@
     "Given completed tickets, When `ticket://DONE` resource is read, Then a JSON array of done ticket summaries with completion timestamps is returned"
   ],
   "rework_count": 0,
-  "claimed_by": "QA",
-  "machine_id": "pop-os",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-27T06:17:03.145956+00:00",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -87,6 +87,15 @@
       "from_stage": "QA",
       "to_stage": "QA",
       "details": "Claimed by reaperoak@pop-os via QA, lease until 2026-03-27T06:17:03.145956+00:00"
+    },
+    {
+      "timestamp": "2026-03-27T05:55:40.551065+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "QA",
+      "machine_id": "system",
+      "from_stage": "QA",
+      "to_stage": "SECURITY",
+      "details": "Advanced from QA to SECURITY"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
