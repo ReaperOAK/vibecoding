@@ -4,7 +4,7 @@
   "description": "The VS Code extension has no chat participant. Adding a `@vibecoding` participant enables interactive ticket management from the chat panel without leaving VS Code.\n\nFix:\n1. Create `extension/src/chatParticipant.ts` implementing the chat participant handler\n2. Register the participant using `vscode.chat.createChatParticipant('vibecoding', handler)`\n3. Implement three slash commands:\n   - `/status` \u2014 run `tickets.py --status` and render the output as markdown in chat\n   - `/sync` \u2014 run `tickets.py --sync` and report which tickets moved to READY\n   - `/next` \u2014 find and display the highest-priority READY ticket with its title and acceptance criteria\n4. Update `extension/package.json` with `contributes.chatParticipants` entry",
   "type": "backend",
   "priority": "medium",
-  "stage": "VALIDATION",
+  "stage": "DONE",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -35,10 +35,10 @@
     "Given `extension/package.json`, When audited, Then it contains a valid `contributes.chatParticipants` entry with the `vibecoding` participant ID"
   ],
   "rework_count": 1,
-  "claimed_by": "Validator",
-  "machine_id": "dispatcher",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-27T09:31:53.002635Z",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -120,6 +120,15 @@
       "from_stage": "CI",
       "to_stage": "DOCS",
       "details": "Advanced from CI to DOCS"
+    },
+    {
+      "timestamp": "2026-03-27T09:09:57.277629+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Validator",
+      "machine_id": "system",
+      "from_stage": "VALIDATION",
+      "to_stage": "DONE",
+      "details": "Advanced from VALIDATION to DONE"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
