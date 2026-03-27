@@ -1,60 +1,26 @@
-# TASK-VIB-009 — BACKEND Rework #1
+# TASK-VIB-009 - BACKEND Rework #2
 
 ## Outcome
 PASS
 
 ## Scope Delivered
-- Implemented MCP prompt handlers in `.github/mcp-servers/ticket-server/server.py`:
-  - `@mcp.prompt(name="process-ticket", description="Generate delegation prompt for given ticket")`
-  - `@mcp.prompt(name="ticket-status", description="Generate ticket status dashboard")`
-- Added `prompts://list` resource returning prompt metadata for both prompts.
-- Added prompt formatting helpers and robust error handling paths:
-  - Invalid ticket id: `Ticket {id} not found`
-  - Ticket metadata read/parse errors: `Failed to read ticket metadata`
-  - Status subprocess failure: `Failed to fetch ticket status`
-  - Status JSON parse/shape error: `Invalid status format`
-  - Missing ticket-system context: `Ticket system not initialized` (error-string detection path)
-- Added and validated six prompt-focused tests in `.github/mcp-servers/ticket-server/tests/test_server_resources.py`.
-- Stabilized one pre-existing brittle READY resource assertion to avoid coupling to mutable live stage state.
+- Fixed validator-reported Python escape warning in `.github/mcp-servers/ticket-server/server.py` by changing the `_validate_ticket_id` docstring regex example from `\d{3}` to `\\d{3}` in source.
+- Kept all prompt implementations intact (`process-ticket`, `ticket-status`) with no behavior changes.
 
-## TDD Evidence
-1. RED
-- Added tests for:
-  - `test_process_ticket_valid_id`
-  - `test_process_ticket_invalid_id`
-  - `test_ticket_status_success`
-  - `test_ticket_status_subprocess_error`
-  - `test_prompts_list`
-  - `test_json_parse_error`
-- Ran suite via unittest discovery before implementation and observed expected failures for missing prompt handlers/resource.
-
-2. GREEN
-- Implemented prompt/resource handlers and helper functions in `server.py`.
-- Re-ran tests and resolved remaining failure.
-
-3. REFACTOR
-- Consolidated prompt text creation and stage-count extraction in dedicated helper functions.
-- Kept controller functions thin and deterministic.
-
-## Verification
-- Presence check:
-  - `grep -n "@mcp.prompt" .github/mcp-servers/ticket-server/server.py` -> 2 matches
-  - Prompt and resource function definitions present.
-- Test run:
-  - `python3 -m unittest discover -s .github/mcp-servers/ticket-server/tests -p test_server_resources.py -v`
-  - Result: `Ran 20 tests ... OK`
-- Functional smoke check (direct module call):
-  - `read_prompts_list()` includes `process-ticket` and `ticket-status`
-  - `process_ticket_prompt("TASK-VIB-001")` includes ticket and acceptance criteria sections
-  - `ticket_status_prompt()` includes markdown table and total summary line
-
-## Notes
-- `pytest` is not installed in this runtime (`No module named pytest`), so verification used unittest discovery.
-- `coverage` is not installed in this runtime (`No module named coverage`), so numeric coverage report could not be generated locally.
+## Validation
+- Syntax warning gate:
+  - `python3 -W error::SyntaxWarning -m py_compile server.py`
+  - Result: PASS (no invalid escape warnings)
+- Prompt regression tests (TASK-VIB-009 scope):
+  - `python3 -m unittest tests.test_server_resources.TicketServerResourceTests.test_process_ticket_valid_id tests.test_server_resources.TicketServerResourceTests.test_process_ticket_invalid_id tests.test_server_resources.TicketServerResourceTests.test_ticket_status_success tests.test_server_resources.TicketServerResourceTests.test_ticket_status_subprocess_error tests.test_server_resources.TicketServerResourceTests.test_prompts_list tests.test_server_resources.TicketServerResourceTests.test_json_parse_error`
+  - Result: `Ran 6 tests ... OK`
+- Full ticket-server test suite note:
+  - `python3 -m unittest discover -s tests -p 'test_server_resources.py'` currently has one known pre-existing env-sensitive failure:
+    - `test_ready_resource_returns_ready_ticket_summaries` (READY stage empty)
+  - This is outside TASK-VIB-009 prompt logic and unchanged by this rework.
 
 ## Artifacts
 - `.github/mcp-servers/ticket-server/server.py`
-- `.github/mcp-servers/ticket-server/tests/test_server_resources.py`
 - `agent-output/Backend/TASK-VIB-009.md`
 
 ## Confidence
