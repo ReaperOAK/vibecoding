@@ -188,18 +188,40 @@ describe('VibecodingParticipant', () => {
 
     it('returns help text for unknown chat command', async () => {
         const participant = VibecodingParticipant.create();
-        const markdown = jest.fn().mockResolvedValue(undefined);
+        const markdown = jest.fn();
 
         await participant.handleChatRequest(
             {
                 prompt: '/unknown',
-                stream: { markdown }
+                command: undefined
             } as never,
             {} as never,
+            { markdown } as never,
             {} as never
         );
 
         expect(markdown).toHaveBeenCalledWith('Available commands: `/status`, `/sync`, `/next`');
+    });
+
+    it('handles slash command via request.command field', async () => {
+        mockSpawn.mockReturnValue(
+            createSpawnProcess(0, JSON.stringify({ summary: { READY: 1 } }))
+        );
+
+        const participant = VibecodingParticipant.create();
+        const markdown = jest.fn();
+
+        await participant.handleChatRequest(
+            {
+                prompt: 'show me status',
+                command: 'status'
+            } as never,
+            {} as never,
+            { markdown } as never,
+            {} as never
+        );
+
+        expect(markdown).toHaveBeenCalledWith(expect.stringContaining('Ticket Dashboard'));
     });
 });
 

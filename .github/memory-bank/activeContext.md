@@ -701,3 +701,13 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** agent-output/QA/TASK-VIB-009.md
 - **Decisions:** PASS — MCP prompts implemented and verified via code presence checks, acceptance criteria validation, and 20/20 unittest pass.
 - **Timestamp:** 2026-03-27T12:50:59+05:30
+
+### [TASK-VIB-008] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-VIB-008.md
+- **Decisions:** APPROVED — DoD 10/10 passed via artifact-based independent validation (unittest + QA/Security/CI/docs evidence).
+- **Timestamp:** 2026-03-27T07:27:44.977963Z
+
+### [TASK-VIB-011] — Backend Summary
+- **Artifacts:** extension/src/chatParticipant.ts, extension/src/chatParticipant.test.ts, agent-output/Backend/TASK-VIB-011.md, ticket-state/QA/TASK-VIB-011.json
+- **Decisions:** Aligned chat participant handler with current VS Code ChatRequestHandler API (response stream + command field) to fix compile-time contract mismatch.
+- **Timestamp:** 2026-03-27T08:47:11.249510Z

@@ -1,39 +1,39 @@
-# TASK-VIB-011 — Backend Rework #1
+# TASK-VIB-011 — Backend Stage Completion
 
 ## Completion Status
-PASS — BACKEND rework fixes applied and verified.
+PASS — BACKEND stage validated, scoped fixes applied, and ticket ready for QA.
 
-## Rework Scope Addressed
-1. Replaced `any` type in `formatNextTicketOutput` with `TicketInfo`.
-2. Fixed slash-command help string quote mismatch.
-3. Removed unused `chatResponse` variable.
-4. Added Jest framework setup in `extension/package.json` and root `jest.config.js`.
-5. Added comprehensive Jest test suite in `extension/src/chatParticipant.test.ts`.
+## Scope Worked
+1. Verified ticket-scoped files:
+	- extension/src/chatParticipant.ts
+	- extension/src/chatParticipant.test.ts
+	- extension/src/extension.ts
+	- extension/package.json
+2. Fixed VS Code API typing/runtime contract mismatch in chat participant handler:
+	- Updated `handleChatRequest` signature to match `ChatRequestHandler` (`request`, `context`, `response`, `token`).
+	- Switched output streaming from `request.stream.markdown(...)` to `response.markdown(...)`.
+	- Removed unsupported `slashCommandProvider` assignment from `ChatParticipant`.
+	- Added handling for `request.command` to support slash-command execution path.
+3. Updated tests to match the new handler signature and added command-field coverage.
 
 ## Verification Evidence
-- `grep -c "any" extension/src/chatParticipant.ts` => `0`
-- `npm test -- --runInBand` => PASS
-- `npm run test:coverage -- --runInBand` => PASS
+- `cd extension && npm run compile` => PASS
+- `cd extension && npm test -- --runInBand` => PASS
+- `cd extension && npm run test:coverage -- --runInBand` => PASS
 
 Coverage summary (`extension/src/chatParticipant.ts`):
-- Statements: 96.19%
-- Branches: 80.00%
-- Functions: 95.65%
-- Lines: 96.11%
+- Statements: 98.07%
+- Branches: 86.04%
+- Functions: 100.00%
+- Lines: 98.03%
 
-## Tests Added
-17 passing tests covering:
-- `/status` success, empty output, invalid JSON, spawn error
-- `/sync` success, empty output, whitespace-only output, non-zero exit
-- `/next` missing READY dir, empty READY dir, valid ticket, malformed ticket, file-read error, default priority branch
-- Chat unknown-command help output
-- Singleton instance lifecycle (`getInstance`, `disposeInstance`)
+Test summary:
+- Suites: 1 passed
+- Tests: 18 passed, 0 failed
 
-## Files Updated
+## Files Updated (Ticket Scope)
 - extension/src/chatParticipant.ts
 - extension/src/chatParticipant.test.ts
-- extension/package.json
-- jest.config.js
 
 ## Confidence
 HIGH

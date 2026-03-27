@@ -56,36 +56,35 @@ export class VibecodingParticipant {
         // Configure participant
         if (this.participant) {
             this.participant.iconPath = new vscode.ThemeIcon('sync-spinning');
-            this.participant.slashCommandProvider = {
-                provideSlashCommands: (_token) => [
-                    { command: 'status', description: 'Show ticket dashboard with stage counts' },
-                    { command: 'sync', description: 'Run ticket sync and report moved tickets' },
-                    { command: 'next', description: 'Display highest-priority READY ticket' }
-                ]
-            };
         }
     }
 
     /**
      * Handle incoming chat requests
      */
-    public async handleChatRequest(request: vscode.ChatRequest, _context: vscode.ChatContext, _token: vscode.CancellationToken): Promise<void> {
+    public async handleChatRequest(
+        request: vscode.ChatRequest,
+        _context: vscode.ChatContext,
+        response: vscode.ChatResponseStream,
+        _token: vscode.CancellationToken
+    ): Promise<void> {
         const prompt = request.prompt.toLowerCase().trim();
+        const command = (request.command ?? '').toLowerCase();
 
-        let response: string = '';
+        let responseText: string = '';
 
-        if (prompt.includes('/status')) {
-            response = await this.handleStatusCommand();
-        } else if (prompt.includes('/sync')) {
-            response = await this.handleSyncCommand();
-        } else if (prompt.includes('/next')) {
-            response = await this.handleNextCommand();
+        if (command === 'status' || prompt.includes('/status')) {
+            responseText = await this.handleStatusCommand();
+        } else if (command === 'sync' || prompt.includes('/sync')) {
+            responseText = await this.handleSyncCommand();
+        } else if (command === 'next' || prompt.includes('/next')) {
+            responseText = await this.handleNextCommand();
         } else {
-            response = 'Available commands: `/status`, `/sync`, `/next`';
+            responseText = 'Available commands: `/status`, `/sync`, `/next`';
         }
 
         // Send response to chat
-        await request.stream.markdown(response);
+        response.markdown(responseText);
     }
 
     /**
