@@ -32,10 +32,10 @@
     "Given completed tickets, When `ticket://DONE` resource is read, Then a JSON array of done ticket summaries with completion timestamps is returned"
   ],
   "rework_count": 1,
-  "claimed_by": "Backend",
-  "machine_id": "pop-os",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-03-27T06:37:59.983792+00:00",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -132,6 +132,13 @@
       "from_stage": "BACKEND",
       "to_stage": "QA",
       "details": "Advanced from BACKEND to QA after security rework fixes for ticket resource ID validation and path containment"
+    },
+    {
+      "timestamp": "2026-03-27T06:11:59.247394+00:00",
+      "event": "CLAIM_RELEASED",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Released claim from Backend: manual release"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
