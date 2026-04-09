@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:86d2d8e4-8f69-4cde-bb18-b26e08a49c12",
+  "serialNumber": "urn:uuid:412c4e57-3efe-49f4-86ed-a2cdfe1cb9e0",
   "metadata": {
-    "timestamp": "2026-04-09T16:33:12.965Z",
+    "timestamp": "2026-04-09T17:00:47.640Z",
     "tools": {
       "components": [
         {
@@ -984,6 +984,118 @@
               "name": "cdx:npm:package:path",
               "value": "node_modules/eslint/node_modules/minimatch"
             }
+          ],
+          "components": [
+            {
+              "type": "library",
+              "name": "brace-expansion",
+              "version": "1.1.13",
+              "bom-ref": "vibecoding@0.1.0|eslint@10.1.0|minimatch@10.2.4|brace-expansion@1.1.13",
+              "author": "Julian Gruber",
+              "description": "Brace expansion as known from sh/bash",
+              "licenses": [
+                {
+                  "license": {
+                    "id": "MIT",
+                    "acknowledgement": "declared"
+                  }
+                }
+              ],
+              "purl": "pkg:npm/brace-expansion@1.1.13",
+              "externalReferences": [
+                {
+                  "url": "git://github.com/juliangruber/brace-expansion.git",
+                  "type": "vcs",
+                  "comment": "as detected from PackageJson property \"repository.url\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/brace-expansion",
+                  "type": "website",
+                  "comment": "as detected from PackageJson property \"homepage\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/brace-expansion/issues",
+                  "type": "issue-tracker",
+                  "comment": "as detected from PackageJson property \"bugs.url\""
+                },
+                {
+                  "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.13.tgz",
+                  "type": "distribution",
+                  "hashes": [
+                    {
+                      "alg": "SHA-512",
+                      "content": "f592e9ad64ba1043668443a98c2616d9cf159263af72420965f92beeb056e9d39b99f809fcbd46a52616e47a68f650f3e03d7e9f40a4cfcad4ec5c070d0886ff"
+                    }
+                  ],
+                  "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+                }
+              ],
+              "properties": [
+                {
+                  "name": "cdx:npm:package:development",
+                  "value": "true"
+                },
+                {
+                  "name": "cdx:npm:package:path",
+                  "value": "node_modules/eslint/node_modules/minimatch/node_modules/brace-expansion"
+                }
+              ]
+            },
+            {
+              "type": "library",
+              "name": "balanced-match",
+              "version": "1.0.2",
+              "bom-ref": "vibecoding@0.1.0|eslint@10.1.0|minimatch@10.2.4|balanced-match@1.0.2",
+              "author": "Julian Gruber",
+              "description": "Match balanced character pairs, like \"{\" and \"}\"",
+              "licenses": [
+                {
+                  "license": {
+                    "id": "MIT",
+                    "acknowledgement": "declared"
+                  }
+                }
+              ],
+              "purl": "pkg:npm/balanced-match@1.0.2",
+              "externalReferences": [
+                {
+                  "url": "git://github.com/juliangruber/balanced-match.git",
+                  "type": "vcs",
+                  "comment": "as detected from PackageJson property \"repository.url\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/balanced-match",
+                  "type": "website",
+                  "comment": "as detected from PackageJson property \"homepage\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/balanced-match/issues",
+                  "type": "issue-tracker",
+                  "comment": "as detected from PackageJson property \"bugs.url\""
+                },
+                {
+                  "url": "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
+                  "type": "distribution",
+                  "hashes": [
+                    {
+                      "alg": "SHA-512",
+                      "content": "de849e50ed13315ebb84dd4099b5ec2b8c9aa94eed8e21e56f144364ea47d0a5bdf82797e1b440697d009f1b74b71d8cae94695b041a3f02252121098585393f"
+                    }
+                  ],
+                  "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+                }
+              ],
+              "properties": [
+                {
+                  "name": "cdx:npm:package:development",
+                  "value": "true"
+                },
+                {
+                  "name": "cdx:npm:package:path",
+                  "value": "node_modules/eslint/node_modules/minimatch/node_modules/balanced-match"
+                }
+              ]
+            }
           ]
         },
         {
@@ -1098,60 +1210,6 @@
         },
         {
           "type": "library",
-          "name": "brace-expansion",
-          "version": "5.0.5",
-          "bom-ref": "vibecoding@0.1.0|eslint@10.1.0|brace-expansion@5.0.5",
-          "description": "Brace expansion as known from sh/bash",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/brace-expansion@5.0.5",
-          "externalReferences": [
-            {
-              "url": "git+ssh://git@github.com/juliangruber/brace-expansion.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/juliangruber/brace-expansion#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/juliangruber/brace-expansion/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.5.tgz",
-              "type": "distribution",
-              "hashes": [
-                {
-                  "alg": "SHA-512",
-                  "content": "559ce72e0b70867f8c69cb7db5f8b0c7ae1f03d7ab1c7fcc0971147c1ff46d7ffa173ea7cb91064d7625b4ca1caa0e31140419b673b70c75965e2f118ae37b71"
-                }
-              ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
-            },
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/eslint/node_modules/brace-expansion"
-            }
-          ]
-        },
-        {
-          "type": "library",
           "name": "p-locate",
           "version": "5.0.0",
           "bom-ref": "vibecoding@0.1.0|eslint@10.1.0|p-locate@5.0.0",
@@ -1202,60 +1260,6 @@
             {
               "name": "cdx:npm:package:path",
               "value": "node_modules/eslint/node_modules/p-locate"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "balanced-match",
-          "version": "4.0.4",
-          "bom-ref": "vibecoding@0.1.0|eslint@10.1.0|balanced-match@4.0.4",
-          "description": "Match balanced character pairs, like \"{\" and \"}\"",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/balanced-match@4.0.4",
-          "externalReferences": [
-            {
-              "url": "git://github.com/juliangruber/balanced-match.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/juliangruber/balanced-match#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/juliangruber/balanced-match/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/balanced-match/-/balanced-match-4.0.4.tgz",
-              "type": "distribution",
-              "hashes": [
-                {
-                  "alg": "SHA-512",
-                  "content": "04bae011c453c17da8ea01b118e08dc8cbc64a9df96287ee633c3d87520c4d198aaadb40659554ebb6dd6fd3ebdaf50703cfa3de2dad25f8cee82ebee26c864c"
-                }
-              ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
-            },
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/eslint/node_modules/balanced-match"
             }
           ]
         }
@@ -2248,113 +2252,117 @@
               "name": "cdx:npm:package:path",
               "value": "node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch"
             }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "brace-expansion",
-          "version": "5.0.5",
-          "bom-ref": "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|brace-expansion@5.0.5",
-          "description": "Brace expansion as known from sh/bash",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
           ],
-          "purl": "pkg:npm/brace-expansion@5.0.5",
-          "externalReferences": [
+          "components": [
             {
-              "url": "git+ssh://git@github.com/juliangruber/brace-expansion.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/juliangruber/brace-expansion#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/juliangruber/brace-expansion/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.5.tgz",
-              "type": "distribution",
-              "hashes": [
+              "type": "library",
+              "name": "brace-expansion",
+              "version": "1.1.13",
+              "bom-ref": "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|minimatch@10.2.4|brace-expansion@1.1.13",
+              "author": "Julian Gruber",
+              "description": "Brace expansion as known from sh/bash",
+              "licenses": [
                 {
-                  "alg": "SHA-512",
-                  "content": "559ce72e0b70867f8c69cb7db5f8b0c7ae1f03d7ab1c7fcc0971147c1ff46d7ffa173ea7cb91064d7625b4ca1caa0e31140419b673b70c75965e2f118ae37b71"
+                  "license": {
+                    "id": "MIT",
+                    "acknowledgement": "declared"
+                  }
                 }
               ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
-            },
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "balanced-match",
-          "version": "4.0.4",
-          "bom-ref": "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|balanced-match@4.0.4",
-          "description": "Match balanced character pairs, like \"{\" and \"}\"",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/balanced-match@4.0.4",
-          "externalReferences": [
-            {
-              "url": "git://github.com/juliangruber/balanced-match.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/juliangruber/balanced-match#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/juliangruber/balanced-match/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/balanced-match/-/balanced-match-4.0.4.tgz",
-              "type": "distribution",
-              "hashes": [
+              "purl": "pkg:npm/brace-expansion@1.1.13",
+              "externalReferences": [
                 {
-                  "alg": "SHA-512",
-                  "content": "04bae011c453c17da8ea01b118e08dc8cbc64a9df96287ee633c3d87520c4d198aaadb40659554ebb6dd6fd3ebdaf50703cfa3de2dad25f8cee82ebee26c864c"
+                  "url": "git://github.com/juliangruber/brace-expansion.git",
+                  "type": "vcs",
+                  "comment": "as detected from PackageJson property \"repository.url\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/brace-expansion",
+                  "type": "website",
+                  "comment": "as detected from PackageJson property \"homepage\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/brace-expansion/issues",
+                  "type": "issue-tracker",
+                  "comment": "as detected from PackageJson property \"bugs.url\""
+                },
+                {
+                  "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.13.tgz",
+                  "type": "distribution",
+                  "hashes": [
+                    {
+                      "alg": "SHA-512",
+                      "content": "f592e9ad64ba1043668443a98c2616d9cf159263af72420965f92beeb056e9d39b99f809fcbd46a52616e47a68f650f3e03d7e9f40a4cfcad4ec5c070d0886ff"
+                    }
+                  ],
+                  "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
                 }
               ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
+              "properties": [
+                {
+                  "name": "cdx:npm:package:development",
+                  "value": "true"
+                },
+                {
+                  "name": "cdx:npm:package:path",
+                  "value": "node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch/node_modules/brace-expansion"
+                }
+              ]
             },
             {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/@typescript-eslint/typescript-estree/node_modules/balanced-match"
+              "type": "library",
+              "name": "balanced-match",
+              "version": "1.0.2",
+              "bom-ref": "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|minimatch@10.2.4|balanced-match@1.0.2",
+              "author": "Julian Gruber",
+              "description": "Match balanced character pairs, like \"{\" and \"}\"",
+              "licenses": [
+                {
+                  "license": {
+                    "id": "MIT",
+                    "acknowledgement": "declared"
+                  }
+                }
+              ],
+              "purl": "pkg:npm/balanced-match@1.0.2",
+              "externalReferences": [
+                {
+                  "url": "git://github.com/juliangruber/balanced-match.git",
+                  "type": "vcs",
+                  "comment": "as detected from PackageJson property \"repository.url\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/balanced-match",
+                  "type": "website",
+                  "comment": "as detected from PackageJson property \"homepage\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/balanced-match/issues",
+                  "type": "issue-tracker",
+                  "comment": "as detected from PackageJson property \"bugs.url\""
+                },
+                {
+                  "url": "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
+                  "type": "distribution",
+                  "hashes": [
+                    {
+                      "alg": "SHA-512",
+                      "content": "de849e50ed13315ebb84dd4099b5ec2b8c9aa94eed8e21e56f144364ea47d0a5bdf82797e1b440697d009f1b74b71d8cae94695b041a3f02252121098585393f"
+                    }
+                  ],
+                  "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+                }
+              ],
+              "properties": [
+                {
+                  "name": "cdx:npm:package:development",
+                  "value": "true"
+                },
+                {
+                  "name": "cdx:npm:package:path",
+                  "value": "node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch/node_modules/balanced-match"
+                }
+              ]
             }
           ]
         }
@@ -3348,113 +3356,117 @@
               "name": "cdx:npm:package:path",
               "value": "node_modules/glob/node_modules/minimatch"
             }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "brace-expansion",
-          "version": "5.0.5",
-          "bom-ref": "vibecoding@0.1.0|glob@11.1.0|brace-expansion@5.0.5",
-          "description": "Brace expansion as known from sh/bash",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
           ],
-          "purl": "pkg:npm/brace-expansion@5.0.5",
-          "externalReferences": [
+          "components": [
             {
-              "url": "git+ssh://git@github.com/juliangruber/brace-expansion.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/juliangruber/brace-expansion#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/juliangruber/brace-expansion/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.5.tgz",
-              "type": "distribution",
-              "hashes": [
+              "type": "library",
+              "name": "brace-expansion",
+              "version": "1.1.13",
+              "bom-ref": "vibecoding@0.1.0|glob@11.1.0|minimatch@10.2.4|brace-expansion@1.1.13",
+              "author": "Julian Gruber",
+              "description": "Brace expansion as known from sh/bash",
+              "licenses": [
                 {
-                  "alg": "SHA-512",
-                  "content": "559ce72e0b70867f8c69cb7db5f8b0c7ae1f03d7ab1c7fcc0971147c1ff46d7ffa173ea7cb91064d7625b4ca1caa0e31140419b673b70c75965e2f118ae37b71"
+                  "license": {
+                    "id": "MIT",
+                    "acknowledgement": "declared"
+                  }
                 }
               ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
-            },
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/glob/node_modules/brace-expansion"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "balanced-match",
-          "version": "4.0.4",
-          "bom-ref": "vibecoding@0.1.0|glob@11.1.0|balanced-match@4.0.4",
-          "description": "Match balanced character pairs, like \"{\" and \"}\"",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/balanced-match@4.0.4",
-          "externalReferences": [
-            {
-              "url": "git://github.com/juliangruber/balanced-match.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/juliangruber/balanced-match#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/juliangruber/balanced-match/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/balanced-match/-/balanced-match-4.0.4.tgz",
-              "type": "distribution",
-              "hashes": [
+              "purl": "pkg:npm/brace-expansion@1.1.13",
+              "externalReferences": [
                 {
-                  "alg": "SHA-512",
-                  "content": "04bae011c453c17da8ea01b118e08dc8cbc64a9df96287ee633c3d87520c4d198aaadb40659554ebb6dd6fd3ebdaf50703cfa3de2dad25f8cee82ebee26c864c"
+                  "url": "git://github.com/juliangruber/brace-expansion.git",
+                  "type": "vcs",
+                  "comment": "as detected from PackageJson property \"repository.url\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/brace-expansion",
+                  "type": "website",
+                  "comment": "as detected from PackageJson property \"homepage\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/brace-expansion/issues",
+                  "type": "issue-tracker",
+                  "comment": "as detected from PackageJson property \"bugs.url\""
+                },
+                {
+                  "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.13.tgz",
+                  "type": "distribution",
+                  "hashes": [
+                    {
+                      "alg": "SHA-512",
+                      "content": "f592e9ad64ba1043668443a98c2616d9cf159263af72420965f92beeb056e9d39b99f809fcbd46a52616e47a68f650f3e03d7e9f40a4cfcad4ec5c070d0886ff"
+                    }
+                  ],
+                  "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
                 }
               ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
+              "properties": [
+                {
+                  "name": "cdx:npm:package:development",
+                  "value": "true"
+                },
+                {
+                  "name": "cdx:npm:package:path",
+                  "value": "node_modules/glob/node_modules/minimatch/node_modules/brace-expansion"
+                }
+              ]
             },
             {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/glob/node_modules/balanced-match"
+              "type": "library",
+              "name": "balanced-match",
+              "version": "1.0.2",
+              "bom-ref": "vibecoding@0.1.0|glob@11.1.0|minimatch@10.2.4|balanced-match@1.0.2",
+              "author": "Julian Gruber",
+              "description": "Match balanced character pairs, like \"{\" and \"}\"",
+              "licenses": [
+                {
+                  "license": {
+                    "id": "MIT",
+                    "acknowledgement": "declared"
+                  }
+                }
+              ],
+              "purl": "pkg:npm/balanced-match@1.0.2",
+              "externalReferences": [
+                {
+                  "url": "git://github.com/juliangruber/balanced-match.git",
+                  "type": "vcs",
+                  "comment": "as detected from PackageJson property \"repository.url\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/balanced-match",
+                  "type": "website",
+                  "comment": "as detected from PackageJson property \"homepage\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/balanced-match/issues",
+                  "type": "issue-tracker",
+                  "comment": "as detected from PackageJson property \"bugs.url\""
+                },
+                {
+                  "url": "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
+                  "type": "distribution",
+                  "hashes": [
+                    {
+                      "alg": "SHA-512",
+                      "content": "de849e50ed13315ebb84dd4099b5ec2b8c9aa94eed8e21e56f144364ea47d0a5bdf82797e1b440697d009f1b74b71d8cae94695b041a3f02252121098585393f"
+                    }
+                  ],
+                  "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+                }
+              ],
+              "properties": [
+                {
+                  "name": "cdx:npm:package:development",
+                  "value": "true"
+                },
+                {
+                  "name": "cdx:npm:package:path",
+                  "value": "node_modules/glob/node_modules/minimatch/node_modules/balanced-match"
+                }
+              ]
             }
           ]
         }
@@ -4616,113 +4628,117 @@
               "name": "cdx:npm:package:path",
               "value": "node_modules/@eslint/config-array/node_modules/minimatch"
             }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "brace-expansion",
-          "version": "5.0.5",
-          "bom-ref": "vibecoding@0.1.0|@eslint/config-array@0.23.3|brace-expansion@5.0.5",
-          "description": "Brace expansion as known from sh/bash",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
           ],
-          "purl": "pkg:npm/brace-expansion@5.0.5",
-          "externalReferences": [
+          "components": [
             {
-              "url": "git+ssh://git@github.com/juliangruber/brace-expansion.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/juliangruber/brace-expansion#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/juliangruber/brace-expansion/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.5.tgz",
-              "type": "distribution",
-              "hashes": [
+              "type": "library",
+              "name": "brace-expansion",
+              "version": "1.1.13",
+              "bom-ref": "vibecoding@0.1.0|@eslint/config-array@0.23.3|minimatch@10.2.4|brace-expansion@1.1.13",
+              "author": "Julian Gruber",
+              "description": "Brace expansion as known from sh/bash",
+              "licenses": [
                 {
-                  "alg": "SHA-512",
-                  "content": "559ce72e0b70867f8c69cb7db5f8b0c7ae1f03d7ab1c7fcc0971147c1ff46d7ffa173ea7cb91064d7625b4ca1caa0e31140419b673b70c75965e2f118ae37b71"
+                  "license": {
+                    "id": "MIT",
+                    "acknowledgement": "declared"
+                  }
                 }
               ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
-            },
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/@eslint/config-array/node_modules/brace-expansion"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "balanced-match",
-          "version": "4.0.4",
-          "bom-ref": "vibecoding@0.1.0|@eslint/config-array@0.23.3|balanced-match@4.0.4",
-          "description": "Match balanced character pairs, like \"{\" and \"}\"",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/balanced-match@4.0.4",
-          "externalReferences": [
-            {
-              "url": "git://github.com/juliangruber/balanced-match.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/juliangruber/balanced-match#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/juliangruber/balanced-match/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/balanced-match/-/balanced-match-4.0.4.tgz",
-              "type": "distribution",
-              "hashes": [
+              "purl": "pkg:npm/brace-expansion@1.1.13",
+              "externalReferences": [
                 {
-                  "alg": "SHA-512",
-                  "content": "04bae011c453c17da8ea01b118e08dc8cbc64a9df96287ee633c3d87520c4d198aaadb40659554ebb6dd6fd3ebdaf50703cfa3de2dad25f8cee82ebee26c864c"
+                  "url": "git://github.com/juliangruber/brace-expansion.git",
+                  "type": "vcs",
+                  "comment": "as detected from PackageJson property \"repository.url\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/brace-expansion",
+                  "type": "website",
+                  "comment": "as detected from PackageJson property \"homepage\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/brace-expansion/issues",
+                  "type": "issue-tracker",
+                  "comment": "as detected from PackageJson property \"bugs.url\""
+                },
+                {
+                  "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.13.tgz",
+                  "type": "distribution",
+                  "hashes": [
+                    {
+                      "alg": "SHA-512",
+                      "content": "f592e9ad64ba1043668443a98c2616d9cf159263af72420965f92beeb056e9d39b99f809fcbd46a52616e47a68f650f3e03d7e9f40a4cfcad4ec5c070d0886ff"
+                    }
+                  ],
+                  "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
                 }
               ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
+              "properties": [
+                {
+                  "name": "cdx:npm:package:development",
+                  "value": "true"
+                },
+                {
+                  "name": "cdx:npm:package:path",
+                  "value": "node_modules/@eslint/config-array/node_modules/minimatch/node_modules/brace-expansion"
+                }
+              ]
             },
             {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/@eslint/config-array/node_modules/balanced-match"
+              "type": "library",
+              "name": "balanced-match",
+              "version": "1.0.2",
+              "bom-ref": "vibecoding@0.1.0|@eslint/config-array@0.23.3|minimatch@10.2.4|balanced-match@1.0.2",
+              "author": "Julian Gruber",
+              "description": "Match balanced character pairs, like \"{\" and \"}\"",
+              "licenses": [
+                {
+                  "license": {
+                    "id": "MIT",
+                    "acknowledgement": "declared"
+                  }
+                }
+              ],
+              "purl": "pkg:npm/balanced-match@1.0.2",
+              "externalReferences": [
+                {
+                  "url": "git://github.com/juliangruber/balanced-match.git",
+                  "type": "vcs",
+                  "comment": "as detected from PackageJson property \"repository.url\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/balanced-match",
+                  "type": "website",
+                  "comment": "as detected from PackageJson property \"homepage\""
+                },
+                {
+                  "url": "https://github.com/juliangruber/balanced-match/issues",
+                  "type": "issue-tracker",
+                  "comment": "as detected from PackageJson property \"bugs.url\""
+                },
+                {
+                  "url": "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
+                  "type": "distribution",
+                  "hashes": [
+                    {
+                      "alg": "SHA-512",
+                      "content": "de849e50ed13315ebb84dd4099b5ec2b8c9aa94eed8e21e56f144364ea47d0a5bdf82797e1b440697d009f1b74b71d8cae94695b041a3f02252121098585393f"
+                    }
+                  ],
+                  "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+                }
+              ],
+              "properties": [
+                {
+                  "name": "cdx:npm:package:development",
+                  "value": "true"
+                },
+                {
+                  "name": "cdx:npm:package:path",
+                  "value": "node_modules/@eslint/config-array/node_modules/minimatch/node_modules/balanced-match"
+                }
+              ]
             }
           ]
         }
@@ -11357,8 +11373,8 @@
     {
       "type": "library",
       "name": "brace-expansion",
-      "version": "1.1.12",
-      "bom-ref": "vibecoding@0.1.0|brace-expansion@1.1.12",
+      "version": "1.1.13",
+      "bom-ref": "vibecoding@0.1.0|brace-expansion@1.1.13",
       "author": "Julian Gruber",
       "description": "Brace expansion as known from sh/bash",
       "licenses": [
@@ -11369,7 +11385,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/brace-expansion@1.1.12",
+      "purl": "pkg:npm/brace-expansion@1.1.13",
       "externalReferences": [
         {
           "url": "git://github.com/juliangruber/brace-expansion.git",
@@ -11387,12 +11403,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.12.tgz",
+          "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.13.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "f53f548d6debd145b973543b193c25969b57c21bd8984cc587331f67d1fb1505adfae65e3e364f8c13ff5b5644c99d6dc065a89b9ff9e9317894f72a8e70c772"
+              "content": "f592e9ad64ba1043668443a98c2616d9cf159263af72420965f92beeb056e9d39b99f809fcbd46a52616e47a68f650f3e03d7e9f40a4cfcad4ec5c070d0886ff"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -27665,8 +27681,8 @@
     {
       "type": "library",
       "name": "lodash",
-      "version": "4.17.23",
-      "bom-ref": "vibecoding@0.1.0|lodash@4.17.23",
+      "version": "4.18.1",
+      "bom-ref": "vibecoding@0.1.0|lodash@4.18.1",
       "author": "John-David Dalton",
       "description": "Lodash modular utilities.",
       "licenses": [
@@ -27677,7 +27693,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/lodash@4.17.23",
+      "purl": "pkg:npm/lodash@4.18.1",
       "externalReferences": [
         {
           "url": "git+https://github.com/lodash/lodash.git",
@@ -27695,12 +27711,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/lodash/-/lodash-4.17.23.tgz",
+          "url": "https://registry.npmjs.org/lodash/-/lodash-4.18.1.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "2e055332942d228a428bbf5225e0e23f44df5a2e4234473f2ff691753877c88be66574e785e5a92a3499867bcc97c8976c2d6d160f607471c330ba15ec29c6fb"
+              "content": "74c22789c4cf544f1dd5ee68b5fc269a3971919a14a6254bc32793754b22fc26a3fe07f3cdb941702139b111d5fc0b23b829b15abb5ed93346498b82782abed1"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -36109,8 +36125,18 @@
     {
       "ref": "vibecoding@0.1.0|eslint@10.1.0|minimatch@10.2.4",
       "dependsOn": [
-        "vibecoding@0.1.0|eslint@10.1.0|brace-expansion@5.0.5"
+        "vibecoding@0.1.0|eslint@10.1.0|minimatch@10.2.4|brace-expansion@1.1.13"
       ]
+    },
+    {
+      "ref": "vibecoding@0.1.0|eslint@10.1.0|minimatch@10.2.4|brace-expansion@1.1.13",
+      "dependsOn": [
+        "vibecoding@0.1.0|eslint@10.1.0|minimatch@10.2.4|balanced-match@1.0.2",
+        "vibecoding@0.1.0|concat-map@0.0.1"
+      ]
+    },
+    {
+      "ref": "vibecoding@0.1.0|eslint@10.1.0|minimatch@10.2.4|balanced-match@1.0.2"
     },
     {
       "ref": "vibecoding@0.1.0|eslint@10.1.0|json-schema-traverse@0.4.1"
@@ -36122,19 +36148,10 @@
       ]
     },
     {
-      "ref": "vibecoding@0.1.0|eslint@10.1.0|brace-expansion@5.0.5",
-      "dependsOn": [
-        "vibecoding@0.1.0|eslint@10.1.0|balanced-match@4.0.4"
-      ]
-    },
-    {
       "ref": "vibecoding@0.1.0|eslint@10.1.0|p-locate@5.0.0",
       "dependsOn": [
         "vibecoding@0.1.0|p-limit@3.1.0"
       ]
-    },
-    {
-      "ref": "vibecoding@0.1.0|eslint@10.1.0|balanced-match@4.0.4"
     },
     {
       "ref": "vibecoding@0.1.0|jest@29.7.0",
@@ -36261,17 +36278,18 @@
     {
       "ref": "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|minimatch@10.2.4",
       "dependsOn": [
-        "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|brace-expansion@5.0.5"
+        "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|minimatch@10.2.4|brace-expansion@1.1.13"
       ]
     },
     {
-      "ref": "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|brace-expansion@5.0.5",
+      "ref": "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|minimatch@10.2.4|brace-expansion@1.1.13",
       "dependsOn": [
-        "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|balanced-match@4.0.4"
+        "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|minimatch@10.2.4|balanced-match@1.0.2",
+        "vibecoding@0.1.0|concat-map@0.0.1"
       ]
     },
     {
-      "ref": "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|balanced-match@4.0.4"
+      "ref": "vibecoding@0.1.0|@typescript-eslint/typescript-estree@8.57.2|minimatch@10.2.4|balanced-match@1.0.2"
     },
     {
       "ref": "vibecoding@0.1.0|debug@4.4.3",
@@ -36404,17 +36422,18 @@
     {
       "ref": "vibecoding@0.1.0|glob@11.1.0|minimatch@10.2.4",
       "dependsOn": [
-        "vibecoding@0.1.0|glob@11.1.0|brace-expansion@5.0.5"
+        "vibecoding@0.1.0|glob@11.1.0|minimatch@10.2.4|brace-expansion@1.1.13"
       ]
     },
     {
-      "ref": "vibecoding@0.1.0|glob@11.1.0|brace-expansion@5.0.5",
+      "ref": "vibecoding@0.1.0|glob@11.1.0|minimatch@10.2.4|brace-expansion@1.1.13",
       "dependsOn": [
-        "vibecoding@0.1.0|glob@11.1.0|balanced-match@4.0.4"
+        "vibecoding@0.1.0|glob@11.1.0|minimatch@10.2.4|balanced-match@1.0.2",
+        "vibecoding@0.1.0|concat-map@0.0.1"
       ]
     },
     {
-      "ref": "vibecoding@0.1.0|glob@11.1.0|balanced-match@4.0.4"
+      "ref": "vibecoding@0.1.0|glob@11.1.0|minimatch@10.2.4|balanced-match@1.0.2"
     },
     {
       "ref": "vibecoding@0.1.0|hosted-git-info@4.1.0",
@@ -36452,7 +36471,7 @@
     {
       "ref": "vibecoding@0.1.0|minimatch@3.1.5",
       "dependsOn": [
-        "vibecoding@0.1.0|brace-expansion@1.1.12"
+        "vibecoding@0.1.0|brace-expansion@1.1.13"
       ]
     },
     {
@@ -36537,17 +36556,18 @@
     {
       "ref": "vibecoding@0.1.0|@eslint/config-array@0.23.3|minimatch@10.2.4",
       "dependsOn": [
-        "vibecoding@0.1.0|@eslint/config-array@0.23.3|brace-expansion@5.0.5"
+        "vibecoding@0.1.0|@eslint/config-array@0.23.3|minimatch@10.2.4|brace-expansion@1.1.13"
       ]
     },
     {
-      "ref": "vibecoding@0.1.0|@eslint/config-array@0.23.3|brace-expansion@5.0.5",
+      "ref": "vibecoding@0.1.0|@eslint/config-array@0.23.3|minimatch@10.2.4|brace-expansion@1.1.13",
       "dependsOn": [
-        "vibecoding@0.1.0|@eslint/config-array@0.23.3|balanced-match@4.0.4"
+        "vibecoding@0.1.0|@eslint/config-array@0.23.3|minimatch@10.2.4|balanced-match@1.0.2",
+        "vibecoding@0.1.0|concat-map@0.0.1"
       ]
     },
     {
-      "ref": "vibecoding@0.1.0|@eslint/config-array@0.23.3|balanced-match@4.0.4"
+      "ref": "vibecoding@0.1.0|@eslint/config-array@0.23.3|minimatch@10.2.4|balanced-match@1.0.2"
     },
     {
       "ref": "vibecoding@0.1.0|@eslint/config-helpers@0.5.3",
@@ -37061,7 +37081,7 @@
         "vibecoding@0.1.0|@secretlint/formatter@10.2.2|@textlint/linter-formatter@15.5.2|chalk@4.1.2",
         "vibecoding@0.1.0|debug@4.4.3",
         "vibecoding@0.1.0|js-yaml@4.1.1",
-        "vibecoding@0.1.0|lodash@4.17.23",
+        "vibecoding@0.1.0|lodash@4.18.1",
         "vibecoding@0.1.0|@secretlint/formatter@10.2.2|@textlint/linter-formatter@15.5.2|pluralize@2.0.0",
         "vibecoding@0.1.0|string-width@4.2.3",
         "vibecoding@0.1.0|@secretlint/formatter@10.2.2|@textlint/linter-formatter@15.5.2|strip-ansi@6.0.1",
@@ -37344,7 +37364,7 @@
       "ref": "vibecoding@0.1.0|uc.micro@2.1.0"
     },
     {
-      "ref": "vibecoding@0.1.0|brace-expansion@1.1.12",
+      "ref": "vibecoding@0.1.0|brace-expansion@1.1.13",
       "dependsOn": [
         "vibecoding@0.1.0|balanced-match@1.0.2",
         "vibecoding@0.1.0|concat-map@0.0.1"
@@ -39134,7 +39154,7 @@
       "ref": "vibecoding@0.1.0|@textlint/resolver@15.5.2"
     },
     {
-      "ref": "vibecoding@0.1.0|lodash@4.17.23"
+      "ref": "vibecoding@0.1.0|lodash@4.18.1"
     },
     {
       "ref": "vibecoding@0.1.0|text-table@0.2.0"
