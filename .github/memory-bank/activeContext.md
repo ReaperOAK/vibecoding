@@ -814,3 +814,8 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** agent-output/Security/TASK-VIB-012.md
 - **Decisions:** PASS for ticket-scoped ingestion review (no exploitable path traversal/injection/secrets findings in scope); logged transitive dependency advisory as tracked risk.
 - **Timestamp:** 2026-04-09T16:29:00Z
+
+### [TASK-VIB-012] — Documentation Summary
+- **Artifacts:** extension/src/ticketTreeProvider.ts, README.md, CHANGELOG.md, agent-output/Documentation/TASK-VIB-012.md
+- **Decisions:** Documented IN_PROGRESS as aggregated active stages in README and changelog; added JSDoc on exported tree provider APIs to keep behavior and docs aligned.
+- **Timestamp:** 2026-04-09T16:34:17Z
