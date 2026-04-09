@@ -37,8 +37,8 @@ _log = logging.getLogger("board")
 
 # ─── Configuration ───────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent
-TICKET_STATE_DIR = ROOT / ".github" / "ticket-state"
-TICKETS_DIR = ROOT / ".github" / "tickets"
+TICKET_STATE_DIR = ROOT / "ticket-state"
+TICKETS_DIR = ROOT / "tickets"
 
 STAGE_ORDER: list[str] = [
     "READY", "RESEARCH", "PM", "ARCHITECT", "DEVOPS", "BACKEND",
