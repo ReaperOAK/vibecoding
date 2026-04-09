@@ -182,6 +182,22 @@
       "from_stage": "DOCS",
       "to_stage": "VALIDATION",
       "details": "Advanced from DOCS to VALIDATION"
+    },
+    {
+      "timestamp": "2026-04-09T16:34:24.719323+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Documentation",
+      "machine_id": "system",
+      "from_stage": "VALIDATION",
+      "to_stage": "DONE",
+      "details": "Advanced from VALIDATION to DONE"
+    },
+    {
+      "timestamp": "2026-04-09T16:34:49.491736Z",
+      "event": "STAGE_CORRECTION",
+      "agent": "Documentation",
+      "machine_id": "dispatcher",
+      "details": "Corrected unintended advance to DONE during DOCS handoff; set stage to VALIDATION."
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
