@@ -8,9 +8,12 @@ export function activate(context: vscode.ExtensionContext): void {
     const config = vscode.workspace.getConfiguration('vibecoding');
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     const provider = new TicketTreeProvider(workspaceRoot);
+    const ticketTreeView = vscode.window.createTreeView('vibecoding.tickets', {
+        treeDataProvider: provider
+    });
 
     context.subscriptions.push(
-        vscode.window.registerTreeDataProvider('vibecoding-tickets-view', provider),
+        ticketTreeView,
         vscode.commands.registerCommand('vibecoding.refreshTickets', () => provider.refresh())
     );
 

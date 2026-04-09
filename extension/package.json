@@ -45,16 +45,16 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "vibecoding-tickets",
+          "id": "vibecoding-sidebar",
           "title": "Vibecoding Tickets",
           "icon": "resources/tickets.svg"
         }
       ]
     },
     "views": {
-      "vibecoding-tickets": [
+      "vibecoding-sidebar": [
         {
-          "id": "vibecoding-tickets-view",
+          "id": "vibecoding.tickets",
           "name": "Tickets"
         }
       ]

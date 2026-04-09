@@ -1,7 +1,24 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-type TicketStage = 'READY' | 'DONE';
+type TicketGroup = 'READY' | 'IN_PROGRESS' | 'DONE';
+type ActiveStage = 'RESEARCH' | 'PM' | 'ARCHITECT' | 'DEVOPS' | 'BACKEND' | 'UIDESIGNER' | 'FRONTEND' | 'QA' | 'SECURITY' | 'CI' | 'DOCS' | 'VALIDATION';
+type TicketStage = 'READY' | ActiveStage | 'DONE';
+
+const ACTIVE_STAGES: readonly ActiveStage[] = [
+    'RESEARCH',
+    'PM',
+    'ARCHITECT',
+    'DEVOPS',
+    'BACKEND',
+    'UIDESIGNER',
+    'FRONTEND',
+    'QA',
+    'SECURITY',
+    'CI',
+    'DOCS',
+    'VALIDATION'
+];
 
 interface TicketRecord {
     id: string;
@@ -12,10 +29,11 @@ interface TicketRecord {
 interface StageNode {
     kind: 'stage';
     label: string;
-    stage: TicketStage;
+    group: TicketGroup;
     collapsibleState: number;
     description: string;
     contextValue: 'vibecoding.stage';
+    iconId: string;
 }
 
 interface TicketNode {
@@ -27,6 +45,7 @@ interface TicketNode {
     description: string;
     tooltip: string;
     contextValue: 'vibecoding.ticket';
+    iconId: string;
 }
 
 export type TicketTreeNode = StageNode | TicketNode;
@@ -79,16 +98,23 @@ function readTicketStage(rootPath: string, stage: TicketStage): TicketRecord[] {
     return tickets;
 }
 
-export function loadTicketGroups(rootPath: string): Record<TicketStage, TicketRecord[]> {
+function sortTickets(tickets: TicketRecord[]): TicketRecord[] {
+    tickets.sort((a, b) => a.id.localeCompare(b.id));
+    return tickets;
+}
+
+export function loadTicketGroups(rootPath: string): Record<TicketGroup, TicketRecord[]> {
+    const inProgress = ACTIVE_STAGES.flatMap((stage) => readTicketStage(rootPath, stage));
     return {
         READY: readTicketStage(rootPath, 'READY'),
+        IN_PROGRESS: sortTickets(inProgress),
         DONE: readTicketStage(rootPath, 'DONE')
     };
 }
 
 export class TicketTreeProvider {
     private readonly emitter = new SimpleEmitter<TicketTreeNode>();
-    private groups: Record<TicketStage, TicketRecord[]>;
+    private groups: Record<TicketGroup, TicketRecord[]>;
 
     public readonly onDidChangeTreeData: Event<TicketTreeNode> = this.emitter.event;
 
@@ -106,7 +132,7 @@ export class TicketTreeProvider {
         }
 
         if (element.kind === 'stage') {
-            return this.groups[element.stage].map((ticket) => this.toTicketNode(ticket));
+            return this.groups[element.group].map((ticket) => this.toTicketNode(ticket));
         }
 
         return [];
@@ -117,9 +143,9 @@ export class TicketTreeProvider {
         this.emitter.fire(undefined);
     }
 
-    private load(): Record<TicketStage, TicketRecord[]> {
+    private load(): Record<TicketGroup, TicketRecord[]> {
         if (!this.rootPath) {
-            return { READY: [], DONE: [] };
+            return { READY: [], IN_PROGRESS: [], DONE: [] };
         }
         return loadTicketGroups(this.rootPath);
     }
@@ -127,19 +153,21 @@ export class TicketTreeProvider {
     private createStageNodes(): StageNode[] {
         return [
             this.toStageNode('READY'),
+            this.toStageNode('IN_PROGRESS'),
             this.toStageNode('DONE')
         ];
     }
 
-    private toStageNode(stage: TicketStage): StageNode {
-        const count = this.groups[stage].length;
+    private toStageNode(group: TicketGroup): StageNode {
+        const count = this.groups[group].length;
         return {
             kind: 'stage',
-            label: stage,
-            stage,
+            label: group,
+            group,
             collapsibleState: count > 0 ? 1 : 0,
             description: `${count}`,
-            contextValue: 'vibecoding.stage'
+            contextValue: 'vibecoding.stage',
+            iconId: group === 'DONE' ? 'check' : group === 'IN_PROGRESS' ? 'sync' : 'clock'
         };
     }
 
@@ -152,7 +180,8 @@ export class TicketTreeProvider {
             collapsibleState: 0,
             description: ticket.title,
             tooltip: `${ticket.id}: ${ticket.title}`,
-            contextValue: 'vibecoding.ticket'
+            contextValue: 'vibecoding.ticket',
+            iconId: ticket.stage === 'DONE' ? 'pass' : ticket.stage === 'READY' ? 'circle-large-outline' : 'play-circle'
         };
     }
 }
