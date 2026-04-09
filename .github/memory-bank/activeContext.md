@@ -835,3 +835,8 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** extension/package.json, extension/package-lock.json, agent-output/Backend/TASK-VIB-010.md, tickets/TASK-VIB-010.json, ticket-state/QA/TASK-VIB-010.json
 - **Decisions:** Applied npm overrides for lodash (^4.18.1) and brace-expansion (^1.1.13) to remediate transitive vulnerabilities from extension toolchain and regenerated lockfile to enforce secure resolution.
 - **Timestamp:** 2026-04-09T16:40:08Z
+
+### [TASK-VIB-012] — Validation Summary (Rework #3)
+- **Artifacts:** agent-output/Validator/TASK-VIB-012.md
+- **Decisions:** REJECTED — QA stage and CI stage bypassed in third BACKEND cycle. Code quality gates independently verified as PASS (25/25 tests, 98%+ coverage, lint exit 0, tsc exit 0). Protocol violation: no QA work commit or QA summary in third cycle; QA→SECURITY in 8 seconds indicates automated bypass. No CI work commit in third cycle. DoD Cross-Verification: QA verdict MISSING, CI verdict STALE (first cycle 2026-03-27). Remediation: dispatch QA then CI before re-submitting to VALIDATION.
+- **Timestamp:** 2026-04-09T16:50:00Z
