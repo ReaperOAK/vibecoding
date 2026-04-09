@@ -151,3 +151,15 @@ _None_
 - **Mitigation:** Backend agent must verify commits exist before marking stage complete.
 - **Status:** Open (REWORK in progress)
 - **Evidence:** agent-output/QA/TASK-VIB-009.md
+
+### RISK-007: Transitive Lodash Advisory in Extension Toolchain
+- **Date Identified:** 2026-04-09
+- **Identified By:** Security
+- **Severity:** High
+- **Likelihood:** Medium
+- **Category:** Security
+- **Description:** `npm audit --audit-level=high` in `extension/` reports a high-severity transitive lodash advisory (GHSA-r5fr-rjxr-66jc / CWE-94) in the development dependency graph.
+- **Impact:** Potential code-injection exposure in affected tooling contexts if vulnerable code paths are invoked.
+- **Mitigation:** Update/override transitive dependency chain to a patched lodash version in a dedicated dependency-hardening ticket; rerun audit to verify zero high/critical findings.
+- **Status:** Open
+- **Evidence:** Security stage audit output during TASK-VIB-012 review (2026-04-09).

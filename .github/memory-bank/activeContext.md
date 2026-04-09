@@ -804,3 +804,13 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** extension/src/ticketTreeProvider.ts, extension/src/extension.ts, extension/package.json, extension/src/ticketTreeProvider.test.ts, agent-output/Backend/TASK-VIB-012.md
 - **Decisions:** Implemented READY/IN_PROGRESS/DONE grouping with IN_PROGRESS aggregation across active stage directories and aligned tree view IDs (`vibecoding.tickets` in `vibecoding-sidebar`) for consistent sidebar registration and refresh behavior.
 - **Timestamp:** 2026-04-09T16:21:46Z
+
+### [TASK-VIB-010] — Summary
+- **Artifacts:** extension/src/extension.ts, extension/package.json, agent-output/Backend/TASK-VIB-010.md
+- **Decisions:** Registered extension MCP server definition provider (`vibecoding.ticket-server`) and wired `vscode.lm.registerMcpServerDefinitionProvider` to launch `.github/mcp-servers/ticket-server/server.py` via `python3` with workspace-root cwd so ticket-server tools/resources/prompts are exposed through extension activation.
+- **Timestamp:** 2026-04-09T16:28:46Z
+
+### [TASK-VIB-012] — Security Review
+- **Artifacts:** agent-output/Security/TASK-VIB-012.md
+- **Decisions:** PASS for ticket-scoped ingestion review (no exploitable path traversal/injection/secrets findings in scope); logged transitive dependency advisory as tracked risk.
+- **Timestamp:** 2026-04-09T16:29:00Z
