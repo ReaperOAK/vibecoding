@@ -26,3 +26,5 @@ Documented TreeView provider behavior updates for READY/IN_PROGRESS/DONE groupin
 
 ## Confidence
 HIGH
+
+Updated at: 2026-04-09
