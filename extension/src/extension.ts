@@ -7,6 +7,9 @@ import { TicketTreeProvider } from './ticketTreeProvider';
 export function activate(context: vscode.ExtensionContext): void {
     const config = vscode.workspace.getConfiguration('vibecoding');
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+
+    registerTicketMcpServerProvider(context, workspaceRoot);
+
     const provider = new TicketTreeProvider(workspaceRoot);
     const ticketTreeView = vscode.window.createTreeView('vibecoding.tickets', {
         treeDataProvider: provider
@@ -104,4 +107,37 @@ async function syncTickets(): Promise<void> {
     const terminal = vscode.window.createTerminal('Vibecoding');
     terminal.sendText('python3 tickets.py --sync');
     terminal.show();
+}
+
+function registerTicketMcpServerProvider(
+    context: vscode.ExtensionContext,
+    workspaceRoot: string | undefined
+): void {
+    if (!workspaceRoot) {
+        return;
+    }
+
+    const providerId = 'vibecoding.ticket-server';
+    const serverScriptPath = path.join(workspaceRoot, '.github', 'mcp-servers', 'ticket-server', 'server.py');
+
+    const registration = vscode.lm.registerMcpServerDefinitionProvider(providerId, {
+        provideMcpServerDefinitions: () => {
+            const server = new vscode.McpStdioServerDefinition(
+                'Vibecoding Ticket Server',
+                'python3',
+                [serverScriptPath],
+                {
+                    VIBECODING_WORKSPACE_ROOT: workspaceRoot,
+                    PYTHONUNBUFFERED: '1'
+                }
+            );
+
+            // The MCP server process should execute from the workspace root.
+            server.cwd = vscode.Uri.file(workspaceRoot);
+
+            return [server];
+        }
+    });
+
+    context.subscriptions.push(registration);
 }

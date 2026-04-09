@@ -59,6 +59,12 @@
         }
       ]
     },
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "vibecoding.ticket-server",
+        "label": "Vibecoding Ticket Server"
+      }
+    ],
     "configuration": {
       "title": "Vibecoding",
       "properties": {
