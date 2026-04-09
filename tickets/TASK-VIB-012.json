@@ -4,7 +4,7 @@
   "description": "The VS Code extension has no UI for ticket state. A TreeView provider showing tickets grouped by stage directory provides visual feedback on the pipeline.\n\nFix:\n1. Create `extension/src/ticketTreeProvider.ts` implementing `vscode.TreeDataProvider<TicketTreeItem>`\n2. The tree root shows stage groups: READY, IN_PROGRESS (all active stages), DONE\n3. Each group expands to show individual ticket items (ticket ID + title, with type icon)\n4. Register the provider with `vscode.window.createTreeView('vibecoding.tickets', {...})`\n5. Update `extension/package.json` with `contributes.viewsContainers` (sidebar) and `contributes.views.vibecoding-sidebar`\n6. Add a `vibecoding.refreshTickets` command that calls `provider.refresh()`",
   "type": "backend",
   "priority": "medium",
-  "stage": "QA",
+  "stage": "SECURITY",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -34,10 +34,10 @@
     "Given `extension/package.json`, When audited, Then it contains valid `contributes.viewsContainers` and `contributes.views` entries for the sidebar panel"
   ],
   "rework_count": 2,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "Security",
+  "machine_id": "dispatcher",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-04-09T16:55:57.096039Z",
   "lease_duration_minutes": 30,
   "history": [
     {
