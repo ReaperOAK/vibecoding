@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Distributed Ticket Board</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+header{background:#1e293b;border-bottom:1px solid #334155;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:10px}
+header h1{font-size:1.4rem;color:#38bdf8;white-space:nowrap}
+.stats-bar{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.stat{text-align:center;min-width:48px}
+.stat-value{font-size:1.4rem;font-weight:bold}
+.stat-label{font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px}
+.controls{display:flex;gap:6px}
+.controls button{background:#334155;color:#e2e8f0;border:1px solid #475569;border-radius:6px;padding:5px 11px;cursor:pointer;font-size:1rem;transition:background .15s}
+.controls button:hover{background:#475569}
+.stage-pipeline{display:flex;gap:4px;padding:10px 24px;background:#1e293b;border-bottom:1px solid #334155;overflow-x:auto;flex-wrap:nowrap}
+.stage-chip{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:8px;background:#334155;border:1px solid #475569;font-size:.8rem;white-space:nowrap;cursor:pointer;transition:all .15s}
+.stage-chip:hover{border-color:#38bdf8;background:#1e3a5f}
+.stage-chip .stage-emoji{font-size:1rem}
+.stage-chip .stage-name{color:#94a3b8;font-weight:500}
+.stage-chip .stage-count{background:#475569;color:#e2e8f0;padding:1px 7px;border-radius:10px;font-weight:bold;font-size:.75rem}
+.tabs{display:flex;border-bottom:1px solid #334155;background:#1e293b}
+.tab{padding:11px 22px;cursor:pointer;border-bottom:2px solid transparent;color:#94a3b8;font-size:.9rem;user-select:none;transition:color .15s}
+.tab.active{color:#38bdf8;border-bottom-color:#38bdf8}
+.tab:hover{color:#e2e8f0}
+#graph-container{overflow:hidden;height:calc(100vh - 200px);position:relative;cursor:grab;display:block}
+#graph-container:active{cursor:grabbing}
+#graph-inner{transform-origin:0 0;padding:40px;display:inline-block;min-width:100%}
+#task-table-container{display:none;padding:0}
+#filter-bar{padding:10px 16px;background:#1e293b;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid #334155;align-items:center}
+.filter-btn{background:#334155;color:#e2e8f0;border:1px solid #475569;border-radius:20px;padding:4px 14px;cursor:pointer;font-size:.8rem;transition:all .15s}
+.filter-btn.active{background:#38bdf8;color:#0f172a;border-color:#38bdf8}
+.filter-btn:hover{border-color:#38bdf8}
+.table-scroll{overflow-x:auto;max-height:calc(100vh - 260px);overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+th{background:#1e293b;padding:9px 12px;text-align:left;position:sticky;top:0;border-bottom:2px solid #38bdf8;color:#38bdf8;z-index:2;cursor:pointer}
+th:hover{color:#22d3ee}
+td{padding:7px 12px;border-bottom:1px solid #1e293b}
+tr:hover td{background:rgba(56,189,248,.06)}
+.badge{padding:2px 8px;border-radius:4px;font-size:.73rem;font-weight:600;white-space:nowrap;display:inline-block;margin:1px 2px}
+.badge.done{background:#166534;color:#dcfce7}
+.badge.ready{background:#059669;color:#d1fae5}
+.badge.active{background:#d97706;color:#fef3c7}
+.badge.expired{background:#9d174d;color:#fce7f3}
+.badge.blocked-tag{background:#991b1b;color:#fee2e2}
+.deps{color:#64748b;font-size:.73rem;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.prio-critical{color:#ef4444;font-weight:bold}
+.prio-high{color:#eab308}
+.prio-medium{color:#94a3b8}
+.prio-low{color:#64748b}
+.progress-bar{width:180px;height:7px;background:#334155;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#22d3ee);border-radius:4px}
+.search-box{background:#334155;border:1px solid #475569;border-radius:6px;padding:5px 12px;color:#e2e8f0;font-size:.85rem;width:220px;outline:none;transition:border-color .15s}
+.search-box:focus{border-color:#38bdf8}
+.search-box::placeholder{color:#64748b}
+footer{background:#1e293b;border-top:1px solid #334155;padding:8px 24px;text-align:center;font-size:.7rem;color:#64748b}
+@media(max-width:768px){header{flex-direction:column;gap:8px}.stats-bar{gap:10px}.search-box{width:100%}.stage-pipeline{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Distributed Ticket Board</h1>
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-value" style="color:#22c55e">9</div><div class="stat-label">Done</div></div>
+    <div class="stat"><div class="stat-value" style="color:#eab308">2</div><div class="stat-label">Active</div></div>
+    <div class="stat"><div class="stat-value" style="color:#22c55e">0</div><div class="stat-label">Ready</div></div>
+    <div class="stat"><div class="stat-value" style="color:#ef4444">1</div><div class="stat-label">Blocked</div></div>
+    <div class="stat"><div class="stat-value" style="color:#3b82f6">2</div><div class="stat-label">Claimed</div></div>
+    <div class="stat"><div class="stat-value" style="color:#ec4899">0</div><div class="stat-label">Expired</div></div>
+    <div class="stat">
+      <div class="stat-value">75.0%</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:75.0%;max-width:100%"></div></div>
+    </div>
+  </div>
+  <div class="controls">
+    <button onclick="zoomIn()" title="Zoom In">+</button>
+    <button onclick="zoomOut()" title="Zoom Out">-</button>
+    <button onclick="resetView()" title="Reset View">R</button>
+    <button onclick="fitView()" title="Fit to Screen">F</button>
+  </div>
+</header>
+<div class="stage-pipeline">
+    <div class="stage-chip" data-stage="READY"><span class="stage-emoji">🟢</span><span class="stage-name">READY</span><span class="stage-count">0</span></div>
+    <div class="stage-chip" data-stage="RESEARCH"><span class="stage-emoji">🔍</span><span class="stage-name">RESEARCH</span><span class="stage-count">0</span></div>
+    <div class="stage-chip" data-stage="PM"><span class="stage-emoji">📋</span><span class="stage-name">PM</span><span class="stage-count">0</span></div>
+    <div class="stage-chip" data-stage="ARCHITECT"><span class="stage-emoji">📐</span><span class="stage-name">ARCHITECT</span><span class="stage-count">0</span></div>
+    <div class="stage-chip" data-stage="DEVOPS"><span class="stage-emoji">🛠️</span><span class="stage-name">DEVOPS</span><span class="stage-count">0</span></div>
+    <div class="stage-chip" data-stage="BACKEND"><span class="stage-emoji">⚙️</span><span class="stage-name">BACKEND</span><span class="stage-count">1</span></div>
+    <div class="stage-chip" data-stage="UIDESIGNER"><span class="stage-emoji">🎨</span><span class="stage-name">UIDESIGNER</span><span class="stage-count">0</span></div>
+    <div class="stage-chip" data-stage="FRONTEND"><span class="stage-emoji">🖥️</span><span class="stage-name">FRONTEND</span><span class="stage-count">0</span></div>
+    <div class="stage-chip" data-stage="QA"><span class="stage-emoji">🧪</span><span class="stage-name">QA</span><span class="stage-count">0</span></div>
+    <div class="stage-chip" data-stage="SECURITY"><span class="stage-emoji">🔒</span><span class="stage-name">SECURITY</span><span class="stage-count">0</span></div>
+    <div class="stage-chip" data-stage="CI"><span class="stage-emoji">🔄</span><span class="stage-name">CI</span><span class="stage-count">0</span></div>
+    <div class="stage-chip" data-stage="DOCS"><span class="stage-emoji">📝</span><span class="stage-name">DOCS</span><span class="stage-count">0</span></div>
+    <div class="stage-chip" data-stage="VALIDATION"><span class="stage-emoji">✅</span><span class="stage-name">VALIDATION</span><span class="stage-count">1</span></div>
+    <div class="stage-chip" data-stage="DONE"><span class="stage-emoji">🏁</span><span class="stage-name">DONE</span><span class="stage-count">9</span></div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="showView('graph')">Dependency Graph</div>
+  <div class="tab" onclick="showView('table')">Ticket List (12)</div>
+</div>
+<div id="graph-container">
+  <div id="graph-inner">
+    <pre class="mermaid">
+graph TD
+    subgraph BACKEND["⚙️ BACKEND (1)"]
+        TASK_VIB_012["P2 TASK-VIB-012<br/>Add TreeView Provider for Ticket State<br/>@reaperoak"]:::claimed
+    end
+    subgraph VALIDATION["✅ VALIDATION (1)"]
+        TASK_VIB_009["P2 TASK-VIB-009<br/>Add MCP Prompts to Ticket Server<br/>@reaperoak"]:::claimed
+    end
+    subgraph DONE["🏁 DONE (9)"]
+        TASK_VIB_001["P0 TASK-VIB-001<br/>Fix Catalog Path — Create .github/vibecoding/ Dire"]:::done
+        TASK_VIB_002["P0 TASK-VIB-002<br/>Enable All Governance Hooks"]:::done
+        TASK_VIB_003["P0 TASK-VIB-003<br/>Rewrite MCP Ticket Server with FastMCP Transport"]:::done
+        TASK_VIB_004["P1 TASK-VIB-004<br/>Wire Tool-Sets to All Agent Frontmatter"]:::done
+        TASK_VIB_005["P1 TASK-VIB-005<br/>Add Agents Property to Coordinator Agent Files"]:::done
+        TASK_VIB_006["P2 TASK-VIB-006<br/>Set user-invocable:false on All Worker Agents"]:::done
+        TASK_VIB_007["P2 TASK-VIB-007<br/>Update Review-Chain Agent Models to Cost-Efficient"]:::done
+        TASK_VIB_008["P1 TASK-VIB-008<br/>Add MCP Resources to Ticket Server"]:::done
+        TASK_VIB_011["P2 TASK-VIB-011<br/>Add @vibecoding Chat Participant to VS Code Extens"]:::done
+    end
+
+    TASK_VIB_001 --> TASK_VIB_012
+    TASK_VIB_003 --> TASK_VIB_008
+    TASK_VIB_001 --> TASK_VIB_011
+    TASK_VIB_003 --> TASK_VIB_009
+    TASK_VIB_008 --> TASK_VIB_010
+    TASK_VIB_009 --> TASK_VIB_010
+
+    classDef done fill:#dcfce7,stroke:#166534,stroke-width:2px,color:#14532d
+    classDef ready fill:#d1fae5,stroke:#059669,stroke-width:2px,color:#065f46
+    classDef active fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
+    classDef claimed fill:#dbeafe,stroke:#1e40af,stroke-width:2px,color:#1e3a8a
+    classDef blocked fill:#fee2e2,stroke:#991b1b,stroke-width:2px,color:#7f1d1d
+    classDef expired fill:#fce7f3,stroke:#9d174d,stroke-width:2px,color:#831843
+    classDef missing fill:#f3f4f6,stroke:#6b7280,stroke-width:1px,stroke-dasharray:5,color:#374151
+    </pre>
+  </div>
+</div>
+<div id="task-table-container">
+  <div id="filter-bar">
+    <input class="search-box" type="text" placeholder="Search tickets..." oninput="filterTable()">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter(this)">All (12)</button>
+    <button class="filter-btn" data-filter="READY" onclick="setFilter(this)">Ready (0)</button>
+    <button class="filter-btn" data-filter="critical" onclick="setFilter(this)">Critical (0)</button>
+    <button class="filter-btn" data-filter="high" onclick="setFilter(this)">High (0)</button>
+    <button class="filter-btn" data-filter="blocked" onclick="setFilter(this)">Blocked (1)</button>
+    <button class="filter-btn" data-filter="DONE" onclick="setFilter(this)">Done (9)</button>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead><tr>
+        <th onclick="sortTable(0)">Ticket ID</th>
+        <th onclick="sortTable(1)">Title</th>
+        <th onclick="sortTable(2)">Priority</th>
+        <th onclick="sortTable(3)">Stage</th>
+        <th onclick="sortTable(4)">Type</th>
+        <th onclick="sortTable(5)">Operator</th>
+        <th onclick="sortTable(6)">Agent</th>
+        <th>Deps</th>
+      </tr></thead>
+      <tbody>
+            <tr data-priority='critical' data-stage='DONE' data-type='infra'><td><b>TASK-VIB-001</b></td><td>Fix Catalog Path — Create .github/vibecoding/ Directory</td><td class='prio-critical'>critical</td><td><span class="badge done">Done</span></td><td>infra</td><td>---</td><td>---</td><td class='deps'>---</td></tr>
+            <tr data-priority='critical' data-stage='DONE' data-type='infra'><td><b>TASK-VIB-002</b></td><td>Enable All Governance Hooks</td><td class='prio-critical'>critical</td><td><span class="badge done">Done</span></td><td>infra</td><td>---</td><td>---</td><td class='deps'>---</td></tr>
+            <tr data-priority='critical' data-stage='DONE' data-type='backend'><td><b>TASK-VIB-003</b></td><td>Rewrite MCP Ticket Server with FastMCP Transport</td><td class='prio-critical'>critical</td><td><span class="badge done">Done</span></td><td>backend</td><td>---</td><td>---</td><td class='deps'>---</td></tr>
+            <tr data-priority='high' data-stage='DONE' data-type='infra'><td><b>TASK-VIB-004</b></td><td>Wire Tool-Sets to All Agent Frontmatter</td><td class='prio-high'>high</td><td><span class="badge done">Done</span></td><td>infra</td><td>---</td><td>---</td><td class='deps'>---</td></tr>
+            <tr data-priority='high' data-stage='DONE' data-type='infra'><td><b>TASK-VIB-005</b></td><td>Add Agents Property to Coordinator Agent Files</td><td class='prio-high'>high</td><td><span class="badge done">Done</span></td><td>infra</td><td>---</td><td>---</td><td class='deps'>---</td></tr>
+            <tr data-priority='high' data-stage='DONE' data-type='backend'><td><b>TASK-VIB-008</b></td><td>Add MCP Resources to Ticket Server</td><td class='prio-high'>high</td><td><span class="badge done">Done</span></td><td>backend</td><td>---</td><td>---</td><td class='deps'>TASK-VIB-003</td></tr>
+            <tr data-priority='medium' data-stage='BACKEND' data-type='backend'><td><b>TASK-VIB-012</b></td><td>Add TreeView Provider for Ticket State</td><td class='prio-medium'>medium</td><td><span class="badge active">⚙️ BACKEND</span></td><td>backend</td><td>reaperoak</td><td>Backend</td><td class='deps'>TASK-VIB-001</td></tr>
+            <tr data-priority='medium' data-stage='VALIDATION' data-type='backend'><td><b>TASK-VIB-009</b></td><td>Add MCP Prompts to Ticket Server</td><td class='prio-medium'>medium</td><td><span class="badge active">✅ VALIDATION</span></td><td>backend</td><td>reaperoak</td><td>Validator</td><td class='deps'>TASK-VIB-003</td></tr>
+            <tr data-priority='medium' data-stage='DONE' data-type='infra'><td><b>TASK-VIB-006</b></td><td>Set user-invocable:false on All Worker Agents</td><td class='prio-medium'>medium</td><td><span class="badge done">Done</span></td><td>infra</td><td>---</td><td>---</td><td class='deps'>---</td></tr>
+            <tr data-priority='medium' data-stage='DONE' data-type='infra'><td><b>TASK-VIB-007</b></td><td>Update Review-Chain Agent Models to Cost-Efficient Arrays</td><td class='prio-medium'>medium</td><td><span class="badge done">Done</span></td><td>infra</td><td>---</td><td>---</td><td class='deps'>---</td></tr>
+            <tr data-priority='medium' data-stage='DONE' data-type='backend'><td><b>TASK-VIB-011</b></td><td>Add @vibecoding Chat Participant to VS Code Extension</td><td class='prio-medium'>medium</td><td><span class="badge done">Done</span></td><td>backend</td><td>---</td><td>---</td><td class='deps'>TASK-VIB-001</td></tr>
+            <tr data-priority='medium' data-stage='BLOCKED' data-type='backend'><td><b>TASK-VIB-010</b></td><td>Register MCP Ticket Server as MCP App via Extension</td><td class='prio-medium'>medium</td><td><span class="badge">BLOCKED</span> <span class="badge blocked-tag">BLOCKED</span></td><td>backend</td><td>---</td><td>---</td><td class='deps'>TASK-VIB-008, TASK-VIB-009</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<footer>Distributed Ticket Board -- Read-only snapshot from ticket-state/ -- Ticket files untouched</footer>
+<script>
+mermaid.initialize({startOnLoad:true,theme:'dark',flowchart:{useMaxWidth:false,htmlLabels:true,curve:'basis',padding:15},securityLevel:'loose',maxTextSize:500000});
+function showView(v){
+  var g=document.getElementById('graph-container'),t=document.getElementById('task-table-container'),tabs=document.querySelectorAll('.tab');
+  if(v==='graph'){g.style.display='block';t.style.display='none';tabs[0].classList.add('active');tabs[1].classList.remove('active')}
+  else{g.style.display='none';t.style.display='block';tabs[0].classList.remove('active');tabs[1].classList.add('active')}
+}
+var container=document.getElementById('graph-container'),inner=document.getElementById('graph-inner');
+var scale=1,tx=0,ty=0,drag=false,sx,sy;
+function upd(){inner.style.transform='translate('+tx+'px,'+ty+'px) scale('+scale+')'}
+function zoomIn(){scale=Math.min(scale*1.25,6);upd()}
+function zoomOut(){scale=Math.max(scale/1.25,.05);upd()}
+function resetView(){scale=1;tx=0;ty=0;upd()}
+function fitView(){var svg=inner.querySelector('svg');if(!svg)return;var r=svg.getBoundingClientRect();scale=Math.min(container.clientWidth/(r.width||1),container.clientHeight/(r.height||1),.95);tx=10;ty=10;upd()}
+container.addEventListener('wheel',function(e){e.preventDefault();scale=Math.max(.05,Math.min(6,scale*(e.deltaY>0?.88:1.12)));upd()},{passive:false});
+container.addEventListener('mousedown',function(e){drag=true;sx=e.clientX-tx;sy=e.clientY-ty});
+container.addEventListener('mousemove',function(e){if(!drag)return;tx=e.clientX-sx;ty=e.clientY-sy;upd()});
+container.addEventListener('mouseup',function(){drag=false});
+container.addEventListener('mouseleave',function(){drag=false});
+document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT')return;if(e.key==='+'||e.key==='=')zoomIn();if(e.key==='-')zoomOut();if(e.key==='0')resetView()});
+setTimeout(fitView,1500);
+var activeFilter='all';
+function setFilter(btn){
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');activeFilter=btn.dataset.filter;filterTable();
+}
+function filterTable(){
+  var q=(document.querySelector('.search-box')||{}).value||'';q=q.toLowerCase();
+  document.querySelectorAll('tbody tr').forEach(function(tr){
+    var mf=true;
+    if(activeFilter!=='all'){
+      if(activeFilter==='blocked'){mf=tr.innerHTML.indexOf('BLOCKED')!==-1}
+      else if(activeFilter==='critical'||activeFilter==='high'){mf=tr.dataset.priority===activeFilter}
+      else{mf=tr.dataset.stage===activeFilter}
+    }
+    var ms=!q||tr.textContent.toLowerCase().indexOf(q)!==-1;
+    tr.style.display=(mf&&ms)?'':'none';
+  });
+}
+var sortDir={};
+function sortTable(col){
+  var tbody=document.querySelector('tbody'),rows=Array.from(tbody.querySelectorAll('tr'));
+  sortDir[col]=!sortDir[col];var dir=sortDir[col]?1:-1;
+  rows.sort(function(a,b){var av=a.children[col].textContent.trim(),bv=b.children[col].textContent.trim();return av<bv?-dir:av>bv?dir:0});
+  rows.forEach(function(r){tbody.appendChild(r)});
+}
+document.querySelectorAll('.stage-chip').forEach(function(chip){
+  chip.addEventListener('click',function(){
+    var stage=chip.dataset.stage;
+    showView('table');
+    document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')});
+    activeFilter=stage;filterTable();
+  });
+});
+</script>
+</body>
+</html>

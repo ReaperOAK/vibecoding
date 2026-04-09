@@ -865,3 +865,9 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** extension/src/extension.ts, README.md, docs/guides/org-agent-deployment.md, CHANGELOG.md, agent-output/Documentation/TASK-VIB-010.md
 - **Decisions:** Documented extension-based MCP provider registration and removed stale manual `.vscode/mcp.json` requirement from deployment guidance. Added JSDoc coverage for activation and MCP provider registration helper.
 - **Timestamp:** 2026-04-09T17:10:23Z
+
+### [TASK-VIB-010] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-VIB-010.md
+- **Decisions:** REJECTED — DoD fail on changed-file coverage evidence for extension/src/extension.ts and unhandled promise in activation path.
+- **Timestamp:** 2026-04-09T17:15:37Z
+- **Agent:** Validator
