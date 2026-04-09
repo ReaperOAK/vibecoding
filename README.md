@@ -1,5 +1,7 @@
 # Vibecoding
 
+last_reviewed: 2026-04-09
+
 A ticket-driven multi-agent SDLC system for GitHub Copilot. Decomposes work into tickets, routes them through 14 specialized agents (Research → Architect → Backend → Frontend → QA → Security → CI → Docs → Validator), and enforces scoped git commits at every stage.
 
 ---
@@ -148,6 +150,20 @@ python3 todo_visual.py
 - VS Code with GitHub Copilot (Agent Mode enabled)
 - Git with commit permissions on the target repo
 - Python 3 (for `tickets.py`)
+
+---
+
+## VS Code Ticket Tree
+
+The extension contributes a sidebar view named `Vibecoding Tickets` (view id: `vibecoding.tickets`).
+
+It renders three root groups:
+
+- `READY` — tickets from `ticket-state/READY/`
+- `IN_PROGRESS` — aggregated tickets from active stage directories (`RESEARCH`, `PM`, `ARCHITECT`, `DEVOPS`, `BACKEND`, `UIDESIGNER`, `FRONTEND`, `QA`, `SECURITY`, `CI`, `DOCS`, `VALIDATION`)
+- `DONE` — tickets from `ticket-state/DONE/`
+
+Run `vibecoding.refreshTickets` from the Command Palette to reload all groups from disk.
 
 ---
 

@@ -103,6 +103,12 @@ function sortTickets(tickets: TicketRecord[]): TicketRecord[] {
     return tickets;
 }
 
+/**
+ * Loads ticket groups for the sidebar tree view.
+ *
+ * READY and DONE are read from their matching state directories.
+ * IN_PROGRESS aggregates all active SDLC stage directories.
+ */
 export function loadTicketGroups(rootPath: string): Record<TicketGroup, TicketRecord[]> {
     const inProgress = ACTIVE_STAGES.flatMap((stage) => readTicketStage(rootPath, stage));
     return {
@@ -112,6 +118,9 @@ export function loadTicketGroups(rootPath: string): Record<TicketGroup, TicketRe
     };
 }
 
+/**
+ * Tree data provider for the `vibecoding.tickets` sidebar view.
+ */
 export class TicketTreeProvider {
     private readonly emitter = new SimpleEmitter<TicketTreeNode>();
     private groups: Record<TicketGroup, TicketRecord[]>;
@@ -138,6 +147,9 @@ export class TicketTreeProvider {
         return [];
     }
 
+    /**
+     * Re-reads grouped ticket data from disk and emits a tree refresh event.
+     */
     public refresh(): void {
         this.groups = this.load();
         this.emitter.fire(undefined);
