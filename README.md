@@ -171,7 +171,10 @@ Run `vibecoding.refreshTickets` from the Command Palette to reload all groups fr
 
 An MCP server wraps `tickets.py` for typed access via the Model Context Protocol. Located at `.github/mcp-servers/ticket-server/server.py`, it provides 7 tools and 3 resources over stdio transport.
 
-Last reviewed: 2026-03-27
+Last reviewed: 2026-04-09
+
+When the VS Code extension is installed, the ticket MCP server is auto-registered through `contributes.mcpServerDefinitionProviders` and `vscode.lm.registerMcpServerDefinitionProvider`.
+You do not need to manually create `.vscode/mcp.json` for this server in normal usage.
 
 ### Tools
 
@@ -196,6 +199,14 @@ Last reviewed: 2026-03-27
 Invalid ticket resource IDs return a not-found error. Ticket IDs are validated against the server allowlist format before file access.
 
 Setup: `pip install -r .github/mcp-servers/ticket-server/requirements.txt`
+
+Server registration details:
+
+- Provider ID: `vibecoding.ticket-server`
+- Command: `python3`
+- Script path: `.github/mcp-servers/ticket-server/server.py`
+- Working directory: workspace root
+- Environment: `VIBECODING_WORKSPACE_ROOT` and `PYTHONUNBUFFERED=1`
 
 ---
 

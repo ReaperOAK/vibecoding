@@ -4,6 +4,11 @@ last_reviewed: 2026-04-09
 
 ## 2026-04-09
 
+- Feature: Registered the ticket MCP server as a VS Code MCP app using `contributes.mcpServerDefinitionProviders` and `vscode.lm.registerMcpServerDefinitionProvider`.
+- Behavior: The ticket server is now available workspace-wide without manual `.vscode/mcp.json` setup.
+- Runtime config: Extension provider now launches `.github/mcp-servers/ticket-server/server.py` with `python3`, workspace-root cwd, and `VIBECODING_WORKSPACE_ROOT` environment context.
+- Related ticket: TASK-VIB-010.
+
 - Feature: VS Code ticket tree now shows READY, IN_PROGRESS, and DONE root groups in the sidebar.
 - Behavior: IN_PROGRESS now aggregates active SDLC directories (`RESEARCH`, `PM`, `ARCHITECT`, `DEVOPS`, `BACKEND`, `UIDESIGNER`, `FRONTEND`, `QA`, `SECURITY`, `CI`, `DOCS`, `VALIDATION`) and sorts tickets by ID.
 - UX: `vibecoding.refreshTickets` now re-reads all grouped state directories on refresh.

@@ -4,6 +4,9 @@ import * as fs from 'fs';
 import { VibecodingParticipant } from './chatParticipant';
 import { TicketTreeProvider } from './ticketTreeProvider';
 
+/**
+ * Activates the extension and registers commands, views, and MCP providers.
+ */
 export function activate(context: vscode.ExtensionContext): void {
     const config = vscode.workspace.getConfiguration('vibecoding');
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
@@ -109,6 +112,9 @@ async function syncTickets(): Promise<void> {
     terminal.show();
 }
 
+/**
+ * Registers the ticket server as an MCP app provider for the current workspace.
+ */
 function registerTicketMcpServerProvider(
     context: vscode.ExtensionContext,
     workspaceRoot: string | undefined

@@ -1,5 +1,7 @@
 # Organization-Level Agent Deployment Guide
 
+last_reviewed: 2026-04-09
+
 ## Prerequisites
 
 - VS Code **1.100+** (Insiders recommended for latest agent features)
@@ -127,8 +129,10 @@ python3 tickets.py --sync
 
 ### MCP Server Not Connecting
 
-- Verify `.vscode/mcp.json` exists with correct server path
+- Confirm the Vibecoding extension is installed and enabled
+- Confirm the extension contributes provider ID `vibecoding.ticket-server`
 - Check Python is available: `which python3`
+- Verify server script exists: `.github/mcp-servers/ticket-server/server.py`
 - Test server manually: `echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | python3 .github/mcp-servers/ticket-server/server.py`
 
 ### Git Push Conflicts

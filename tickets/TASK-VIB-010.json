@@ -4,7 +4,7 @@
   "description": "The MCP ticket server should be registered as an MCP App using the VS Code extension's `contributes.mcpServerDefinitionProviders` mechanism so it is available workspace-wide without requiring users to manually edit `.vscode/mcp.json`.\n\nFix:\n1. In `extension/package.json`, add `contributes.mcpServerDefinitionProviders` with a unique provider ID\n2. In `extension/src/extension.ts`, import and call `vscode.lm.registerMcpServerDefinitionProvider` to register the ticket server with its Python script path and environment\n\nThe server definition should point to `.github/mcp-servers/ticket-server/server.py`, use `python3` as the command, and set the workspace root as the cwd.",
   "type": "backend",
   "priority": "medium",
-  "stage": "DOCS",
+  "stage": "VALIDATION",
   "sdlc_flow": [
     "READY",
     "BACKEND",
@@ -33,10 +33,10 @@
     "Given the registered MCP server, When a MCP client connects, Then all 7 tools plus Resources and Prompts from TASK-VIB-008 and TASK-VIB-009 are accessible"
   ],
   "rework_count": 1,
-  "claimed_by": "Documentation",
-  "machine_id": "dispatcher",
-  "operator": "reaperoak",
-  "lease_expiry": "2026-04-09T17:37:33.634163Z",
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -106,6 +106,15 @@
       "from_stage": "CI",
       "to_stage": "DOCS",
       "details": "Advanced from CI to DOCS"
+    },
+    {
+      "timestamp": "2026-04-09T17:11:01.993936+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Documentation",
+      "machine_id": "system",
+      "from_stage": "DOCS",
+      "to_stage": "VALIDATION",
+      "details": "Advanced from DOCS to VALIDATION"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",

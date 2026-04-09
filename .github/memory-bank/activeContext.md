@@ -860,3 +860,8 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** agent-output/CIReviewer/TASK-VIB-010.md, agent-output/CIReviewer/TASK-VIB-010.sarif
 - **Decisions:** PASS — Score 83/100, 0 critical, 3 warnings
 - **Timestamp:** 2026-04-09T17:06:39.422960Z
+
+### [TASK-VIB-010] — Documentation Summary
+- **Artifacts:** extension/src/extension.ts, README.md, docs/guides/org-agent-deployment.md, CHANGELOG.md, agent-output/Documentation/TASK-VIB-010.md
+- **Decisions:** Documented extension-based MCP provider registration and removed stale manual `.vscode/mcp.json` requirement from deployment guidance. Added JSDoc coverage for activation and MCP provider registration helper.
+- **Timestamp:** 2026-04-09T17:10:23Z
