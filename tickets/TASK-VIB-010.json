@@ -33,10 +33,10 @@
     "Given the registered MCP server, When a MCP client connects, Then all 7 tools plus Resources and Prompts from TASK-VIB-008 and TASK-VIB-009 are accessible"
   ],
   "rework_count": 1,
-  "claimed_by": null,
-  "machine_id": null,
-  "operator": null,
-  "lease_expiry": null,
+  "claimed_by": "QA",
+  "machine_id": "dispatcher",
+  "operator": "reaperoak",
+  "lease_expiry": "2026-04-09T17:25:01.022679Z",
   "lease_duration_minutes": 30,
   "history": [
     {
