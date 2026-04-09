@@ -793,3 +793,14 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Decisions:** REJECT in QA. Lint and changed-file coverage evidence are valid, but TreeView does not implement IN_PROGRESS/all-active-stage aggregation required by ticket behavior.
 - **Timestamp:** 2026-03-27T10:00:10Z
 - **Agent:** QA
+
+### [TASK-VIB-009] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-VIB-009.md, ticket-state/DONE/TASK-VIB-009.json
+- **Decisions:** APPROVED — Prior blockers resolved (Security stage evidence present in git commit chain and Python docstring escape warning fixed). Independent validation confirmed AC behavior, prompt regression tests pass, docs/memory gates satisfied.
+- **Timestamp:** 2026-04-09T16:21:43Z
+- **Agent:** Validator
+
+### [TASK-VIB-012] — Summary
+- **Artifacts:** extension/src/ticketTreeProvider.ts, extension/src/extension.ts, extension/package.json, extension/src/ticketTreeProvider.test.ts, agent-output/Backend/TASK-VIB-012.md
+- **Decisions:** Implemented READY/IN_PROGRESS/DONE grouping with IN_PROGRESS aggregation across active stage directories and aligned tree view IDs (`vibecoding.tickets` in `vibecoding-sidebar`) for consistent sidebar registration and refresh behavior.
+- **Timestamp:** 2026-04-09T16:21:46Z
