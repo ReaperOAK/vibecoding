@@ -34,7 +34,7 @@
   "claimed_by": "Validator",
   "machine_id": "dispatcher",
   "operator": "reaperoak",
-  "lease_expiry": "2026-03-27T10:32:25.661749Z",
+  "lease_expiry": "2026-04-09T16:48:23.532725Z",
   "lease_duration_minutes": 30,
   "history": [
     {
@@ -156,6 +156,13 @@
       "from_stage": "DOCS",
       "to_stage": "VALIDATION",
       "details": "Advanced from DOCS to VALIDATION"
+    },
+    {
+      "timestamp": "2026-04-09T16:17:34.001902+00:00",
+      "event": "CLAIM_RELEASED",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Released claim from Validator: Lease expired at 2026-03-27T10:32:25.661749Z"
     }
   ],
   "source_task_file": "TODO/tasks/L3-vibecoding-improvements.md",
