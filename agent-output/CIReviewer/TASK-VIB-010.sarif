@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "CIReviewer-TASK-VIB-010",
+          "informationUri": "https://docs.github.com/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning",
+          "rules": [
+            {
+              "id": "CI-MAX-DEPTH",
+              "name": "max-depth",
+              "shortDescription": { "text": "Object calisthenics proxy: one-level indentation preferred." },
+              "defaultConfiguration": { "level": "warning" }
+            },
+            {
+              "id": "CI-COVERAGE-SCOPE",
+              "name": "coverage-scope",
+              "shortDescription": { "text": "Changed-file coverage should be explicitly measured." },
+              "defaultConfiguration": { "level": "warning" }
+            },
+            {
+              "id": "CI-DEADCODE-CHECK",
+              "name": "dead-code-check",
+              "shortDescription": { "text": "Additional noUnused* probe found candidates outside baseline tsconfig gating." },
+              "defaultConfiguration": { "level": "note" }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "CI-MAX-DEPTH",
+          "level": "warning",
+          "message": { "text": "Nesting depth 2 exceeds proxy target 1 for object-calisthenics style check." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "extension/src/extension.ts" },
+                "region": { "startLine": 59 }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CI-MAX-DEPTH",
+          "level": "warning",
+          "message": { "text": "Nesting depth 2 exceeds proxy target 1 for object-calisthenics style check." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "extension/src/extension.ts" },
+                "region": { "startLine": 83 }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CI-COVERAGE-SCOPE",
+          "level": "warning",
+          "message": { "text": "Coverage report currently collects chatParticipant and ticketTreeProvider only; changed file extension.ts is not in collectCoverageFrom." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "jest.config.js" },
+                "region": { "startLine": 15 }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CI-DEADCODE-CHECK",
+          "level": "note",
+          "message": { "text": "Strict noUnused* probe surfaced TS6133 candidates at extension.ts lines 36, 65, 97; baseline project typecheck remains passing." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "extension/src/extension.ts" },
+                "region": { "startLine": 36 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
