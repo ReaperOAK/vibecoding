@@ -163,3 +163,11 @@ _None_
 - **Mitigation:** Update/override transitive dependency chain to a patched lodash version in a dedicated dependency-hardening ticket; rerun audit to verify zero high/critical findings.
 - **Status:** Open
 - **Evidence:** Security stage audit output during TASK-VIB-012 review (2026-04-09).
+
+### [TASK-VIB-010] Dependency Risk Escalation
+- **Timestamp:** 2026-04-09T16:34:30Z
+- **Agent:** Security
+- **Risk:** High severity vulnerable component in extension dependency graph
+- **Details:** npm audit reports lodash GHSA-r5fr-rjxr-66jc (CWE-94, CVSS 8.1) and brace-expansion GHSA-f886-m6hf-6m8v (CWE-400)
+- **Severity:** HIGH
+- **Recommended Fix:** Upgrade/override transitive dependencies to patched versions and re-run npm audit with zero high/critical findings
