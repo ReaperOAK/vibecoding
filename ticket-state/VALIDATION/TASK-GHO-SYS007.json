@@ -1,0 +1,160 @@
+{
+  "ticket_id": "TASK-GHO-SYS007",
+  "title": "Remove tool-sets directory",
+  "description": "Delete `.github/tool-sets/` directory containing `universal.jsonc`, `code-editing.jsonc`, and `research.jsonc`. These files define custom tool groupings using `#shorthand` references that VS Code and Copilot cannot resolve \u2014 they are dead configuration. Before deletion, grep the codebase for any `#universal`, `#research`, or `#code-editing` references and remove them from any files that contain them.",
+  "type": "infra",
+  "priority": "medium",
+  "stage": "VALIDATION",
+  "sdlc_flow": [
+    "READY",
+    "DEVOPS",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-04-09T17:48:59.736381+00:00",
+  "created_by": "TODO",
+  "dependencies": [],
+  "blocked_by": [],
+  "file_paths": [
+    ".github/tool-sets/universal.jsonc",
+    ".github/tool-sets/code-editing.jsonc",
+    ".github/tool-sets/research.jsonc"
+  ],
+  "acceptance_criteria": [
+    "Given the `.github/` directory, when I list its contents, then `tool-sets/` does not exist",
+    "Given a grep for `#universal` or `tool-sets` across the repo, when I check results, then zero references remain",
+    "Given agent files, when I inspect their frontmatter, then no `tool-sets:` property references `#universal`, `#research`, or `#code-editing`"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-04-09T17:48:59.736384+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-github-optimization.md"
+    },
+    {
+      "timestamp": "2026-04-09T17:48:59.743237+00:00",
+      "event": "MOVED_TO_READY",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Dependencies resolved, moved to READY"
+    },
+    {
+      "timestamp": "2026-04-10T16:19:07.507784+00:00",
+      "event": "CLAIMED",
+      "agent": "DevOps",
+      "machine_id": "dispatcher",
+      "from_stage": "READY",
+      "to_stage": "READY",
+      "details": "Claimed by reaperoak@dispatcher via DevOps, lease until 2026-04-10T16:49:07.507766+00:00"
+    },
+    {
+      "timestamp": "2026-04-10T16:25:12.884339+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "DevOps",
+      "machine_id": "system",
+      "from_stage": "READY",
+      "to_stage": "DEVOPS",
+      "details": "Advanced from READY to DEVOPS"
+    },
+    {
+      "timestamp": "2026-04-10T16:25:21.428724+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "DevOps",
+      "machine_id": "system",
+      "from_stage": "DEVOPS",
+      "to_stage": "QA",
+      "details": "Advanced from DEVOPS to QA"
+    },
+    {
+      "timestamp": "2026-04-10T16:44:17.948207+00:00",
+      "event": "CLAIMED",
+      "agent": "QA",
+      "machine_id": "pop-os",
+      "from_stage": "QA",
+      "to_stage": "QA",
+      "details": "Claimed by reaperoak@pop-os via QA, lease until 2026-04-10T17:14:17.948187+00:00"
+    },
+    {
+      "timestamp": "2026-04-10T16:48:50.505178+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "QA",
+      "machine_id": "system",
+      "from_stage": "QA",
+      "to_stage": "SECURITY",
+      "details": "Advanced from QA to SECURITY"
+    },
+    {
+      "timestamp": "2026-04-10T16:57:22.451341+00:00",
+      "event": "CLAIMED",
+      "agent": "Security",
+      "machine_id": "pop-os",
+      "from_stage": "SECURITY",
+      "to_stage": "SECURITY",
+      "details": "Claimed by reaperoak@pop-os via Security, lease until 2026-04-10T17:27:22.451324+00:00"
+    },
+    {
+      "timestamp": "2026-04-10T17:06:42.019553+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Security",
+      "machine_id": "system",
+      "from_stage": "SECURITY",
+      "to_stage": "CI",
+      "details": "Advanced from SECURITY to CI"
+    },
+    {
+      "timestamp": "2026-04-10T17:15:44.680406+00:00",
+      "event": "CLAIMED",
+      "agent": "CIReviewer",
+      "machine_id": "pop-os",
+      "from_stage": "CI",
+      "to_stage": "CI",
+      "details": "Claimed by reaperoak@pop-os via CIReviewer, lease until 2026-04-10T17:45:44.680389+00:00"
+    },
+    {
+      "timestamp": "2026-04-10T17:24:20.231252+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "CIReviewer",
+      "machine_id": "system",
+      "from_stage": "CI",
+      "to_stage": "DOCS",
+      "details": "Advanced from CI to DOCS"
+    },
+    {
+      "timestamp": "2026-04-10T17:30:28.004829+00:00",
+      "event": "CLAIMED",
+      "agent": "Documentation",
+      "machine_id": "pop-os",
+      "from_stage": "DOCS",
+      "to_stage": "DOCS",
+      "details": "Claimed by reaperoak@pop-os via Documentation, lease until 2026-04-10T18:00:28.004812+00:00"
+    },
+    {
+      "timestamp": "2026-04-10T17:35:55.155536+00:00",
+      "event": "STAGE_COMPLETED",
+      "agent": "Documentation",
+      "machine_id": "system",
+      "from_stage": "DOCS",
+      "to_stage": "VALIDATION",
+      "details": "Advanced from DOCS to VALIDATION"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-github-optimization.md",
+  "tags": [
+    "p2",
+    "cleanup",
+    "tool-sets",
+    "dead-config"
+  ]
+}
