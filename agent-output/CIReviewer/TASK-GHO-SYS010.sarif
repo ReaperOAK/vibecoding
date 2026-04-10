@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "CIReviewer",
+          "version": "1.0.0",
+          "informationUri": "https://github.com/reaperoak/vibecoding",
+          "rules": []
+        }
+      },
+      "results": [],
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "properties": {
+            "ticketId": "TASK-GHO-SYS010",
+            "verdict": "PASS",
+            "qualityScore": 100,
+            "criticalCount": 0,
+            "warningCount": 0,
+            "suggestionCount": 0,
+            "upstreamQA": "PASS",
+            "upstreamSecurity": "PASS",
+            "timestamp": "2026-04-10T18:05:00Z"
+          }
+        }
+      ]
+    }
+  ]
+}
