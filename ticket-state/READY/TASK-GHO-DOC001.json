@@ -1,0 +1,76 @@
+{
+  "ticket_id": "TASK-GHO-DOC001",
+  "title": "Audit and consolidate shallow skills",
+  "description": "Audit all 20 skill directories under `.github/skills/`. For each skill: (1) count lines in SKILL.md, (2) check for real procedures, scripts, templates, or checklists. Skills with less than 40 lines and no actionable procedures should be converted to `.instructions.md` files under `.github/instructions/` with proper description-based discovery frontmatter. Skills with real workflows over 40 lines with procedures should be kept. Update `.github/vibecoding/catalog.yml` to reflect any moves. Document the audit results.",
+  "type": "docs",
+  "priority": "medium",
+  "stage": "READY",
+  "sdlc_flow": [
+    "READY",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-04-09T17:48:59.736692+00:00",
+  "created_by": "TODO",
+  "dependencies": [],
+  "blocked_by": [],
+  "file_paths": [
+    ".github/skills/a11y/SKILL.md",
+    ".github/skills/agent-protocols/SKILL.md",
+    ".github/skills/ai-safety/SKILL.md",
+    ".github/skills/architecture/SKILL.md",
+    ".github/skills/boot-sequence/SKILL.md",
+    ".github/skills/ci-cd/SKILL.md",
+    ".github/skills/containerization/SKILL.md",
+    ".github/skills/cto-playbook/SKILL.md",
+    ".github/skills/design/SKILL.md",
+    ".github/skills/git-protocol/SKILL.md",
+    ".github/skills/implementation/SKILL.md",
+    ".github/skills/orchestration/SKILL.md",
+    ".github/skills/performance/SKILL.md",
+    ".github/skills/planning/SKILL.md",
+    ".github/skills/qa/SKILL.md",
+    ".github/skills/sdlc/SKILL.md",
+    ".github/skills/sdlc-lifecycle/SKILL.md",
+    ".github/skills/security/SKILL.md",
+    ".github/skills/testing/SKILL.md",
+    ".github/skills/ticket-system/SKILL.md",
+    ".github/vibecoding/catalog.yml"
+  ],
+  "acceptance_criteria": [
+    "Given the skills audit, when I review it, then each of the 20 skills has a documented disposition (keep or convert or merge)",
+    "Given skills converted to instructions, when I check their new `.instructions.md` files, then they have proper description-based frontmatter",
+    "Given the catalog, when I verify references, then all entries point to files that exist on disk",
+    "Given remaining skill directories, when I count SKILL.md lines, then all are over 40 lines with actionable procedures"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-04-09T17:48:59.736694+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-github-optimization.md"
+    },
+    {
+      "timestamp": "2026-04-09T17:48:59.740787+00:00",
+      "event": "MOVED_TO_READY",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Dependencies resolved, moved to READY"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-github-optimization.md",
+  "tags": [
+    "p2",
+    "skills",
+    "documentation",
+    "consolidation"
+  ]
+}

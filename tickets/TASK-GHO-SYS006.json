@@ -1,0 +1,71 @@
+{
+  "ticket_id": "TASK-GHO-SYS006",
+  "title": "Trim agent files to 80 lines",
+  "description": "Update all 15 agent `.agent.md` files to remove duplicated cross-cutting sections (boot sequence, forbidden actions, execution SOP, universal tool loadout table) and replace with a single reference line to `agent-shared.instructions.md`. Each agent file should retain ONLY: (1) role description, (2) stage ownership, (3) scope (included/excluded), (4) role-specific tools, (5) role-specific rules, (6) evidence requirements unique to the role. Target \u226480 lines body per agent file. Current average is 204 lines; target reduction is ~60%.",
+  "type": "infra",
+  "priority": "high",
+  "stage": "BLOCKED",
+  "sdlc_flow": [
+    "READY",
+    "DEVOPS",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-04-09T17:48:59.736264+00:00",
+  "created_by": "TODO",
+  "dependencies": [
+    "TASK-GHO-SYS005"
+  ],
+  "blocked_by": [
+    "TASK-GHO-SYS005"
+  ],
+  "file_paths": [
+    ".github/agents/Architect.agent.md",
+    ".github/agents/Backend.agent.md",
+    ".github/agents/CIReviewer.agent.md",
+    ".github/agents/CTO.agent.md",
+    ".github/agents/DevOps.agent.md",
+    ".github/agents/Documentation.agent.md",
+    ".github/agents/Frontend.agent.md",
+    ".github/agents/ProductManager.agent.md",
+    ".github/agents/QA.agent.md",
+    ".github/agents/Research.agent.md",
+    ".github/agents/Security.agent.md",
+    ".github/agents/TODO.agent.md",
+    ".github/agents/Ticketer.agent.md",
+    ".github/agents/UIDesigner.agent.md",
+    ".github/agents/Validator.agent.md"
+  ],
+  "acceptance_criteria": [
+    "Given any agent `.agent.md` file, when I count its body lines excluding frontmatter, then it is \u226480 lines",
+    "Given any agent file, when I search for Boot Sequence sections, then none contain the full 6-step boot sequence",
+    "Given any agent file, when I search for Forbidden Actions, then the section contains only role-specific prohibitions",
+    "Given all 15 agent files combined, when I sum their line counts, then total is \u22641500 lines down from 3062"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-04-09T17:48:59.736266+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-github-optimization.md"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-github-optimization.md",
+  "tags": [
+    "p1",
+    "agent-optimization",
+    "context-reduction",
+    "dry"
+  ]
+}

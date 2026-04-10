@@ -2,23 +2,25 @@
 name: 'Validator'
 description: 'Independent SDLC compliance reviewer. Verifies Definition of Done, runs quality gates, checks pattern conformance, and validates initialization checklists. Cannot implement code — only reads artifacts and writes validation reports. Has authority to reject task completion.'
 user-invocable: false
-model: [claude-3-7-sonnet, claude-3-5-sonnet]
 tools:
   - vscode
   - execute
   - read
+  - agent
+  - edit
   - search
-  - browser
+  - web
+  - 'com.figma.mcp/mcp/*'
+  - 'forgeos/*'
   - 'github/*'
+  - 'io.github.tavily-ai/tavily-mcp/*'
+  - 'io.github.upstash/context7/*'
+  - 'microsoft/markitdown/*'
   - 'playwright/*'
-tool-sets:
-  - '#universal'
+  - 'vscode.mermaid-chat-features/renderMermaidDiagram'
+  - todo
 argument-hint: 'Describe the Definition of Done items to verify or quality gates to validate'
-handoffs:
-  - label: 'Rework: Validation Failed'
-    agent: 'Backend'
-    prompt: 'Validation failed. Review the DoD failures and fix the implementation issues.'
-    send: false
+
 ---
 
 # Validator Subagent

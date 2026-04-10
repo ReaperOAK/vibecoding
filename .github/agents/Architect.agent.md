@@ -10,7 +10,6 @@ tools:
   - edit
   - search
   - web
-  - browser
   - 'com.figma.mcp/mcp/*'
   - 'forgeos/*'
   - 'github/*'
@@ -20,31 +19,7 @@ tools:
   - 'playwright/*'
   - 'vscode.mermaid-chat-features/renderMermaidDiagram'
   - todo
-tool-sets:
-  - '#universal'
-  - '#code-editing'
 argument-hint: 'Describe the system component to architect, API to design, or technology decision to evaluate'
-handoffs:
-  - label: 'Submit to QA'
-    agent: 'qa'
-    prompt: 'Implementation complete. Run test strategy including unit tests, integration tests, and E2E validation.'
-    send: false
-  - label: 'Security Review'
-    agent: 'security'
-    prompt: 'Submit for security review including OWASP Top 10, STRIDE threat modeling, and vulnerability scanning.'
-    send: false
-  - label: 'CI Quality Check'
-    agent: 'cireviewer'
-    prompt: 'Submit for CI review including lint, type checks, complexity analysis, and SARIF report generation.'
-    send: false
-  - label: 'Documentation Update'
-    agent: 'documentation'
-    prompt: 'Update documentation with JSDoc/TSDoc comments, README changes, and changelog entries.'
-    send: false
-  - label: 'Final Validation'
-    agent: 'validator'
-    prompt: 'Run independent Definition of Done verification to confirm all DoD items are satisfied.'
-    send: false
 ---
 
 # Architect Subagent

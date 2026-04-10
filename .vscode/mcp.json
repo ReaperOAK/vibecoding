@@ -1,9 +1,0 @@
-{
-  "servers": {
-    "tickets": {
-      "command": "python3",
-      "args": [".github/mcp-servers/ticket-server/server.py"],
-      "cwd": "${workspaceFolder}"
-    }
-  }
-}

@@ -2,27 +2,24 @@
 name: 'QA'
 description: 'Designs and executes test strategies: TDD, mutation testing, property-based testing, E2E browser testing, and performance benchmarking.'
 user-invocable: false
-model: [claude-3-7-sonnet, claude-3-5-sonnet]
 tools:
   - vscode
   - execute
   - read
+  - agent
+  - edit
   - search
-  - browser
+  - web
+  - 'com.figma.mcp/mcp/*'
+  - 'forgeos/*'
   - 'github/*'
+  - 'io.github.tavily-ai/tavily-mcp/*'
+  - 'io.github.upstash/context7/*'
+  - 'microsoft/markitdown/*'
   - 'playwright/*'
-tool-sets:
-  - '#universal'
+  - 'vscode.mermaid-chat-features/renderMermaidDiagram'
+  - todo
 argument-hint: 'Describe what to test, test strategy to implement, or quality gates to verify'
-handoffs:
-  - label: 'Security Review'
-    agent: 'Security'
-    prompt: 'QA tests passed. Perform security review including OWASP Top 10, STRIDE threat modeling, and vulnerability scanning.'
-    send: false
-  - label: 'Rework: QA Failed'
-    agent: 'Backend'
-    prompt: 'QA tests failed. Review the failure evidence and fix the implementation issues identified in the QA report.'
-    send: false
 ---
 
 # QA Engineer Subagent

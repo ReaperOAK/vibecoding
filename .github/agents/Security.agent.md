@@ -6,21 +6,20 @@ tools:
   - vscode
   - execute
   - read
+  - agent
+  - edit
   - search
-  - browser
+  - web
+  - 'com.figma.mcp/mcp/*'
+  - 'forgeos/*'
   - 'github/*'
-tool-sets:
-  - '#universal'
+  - 'io.github.tavily-ai/tavily-mcp/*'
+  - 'io.github.upstash/context7/*'
+  - 'microsoft/markitdown/*'
+  - 'playwright/*'
+  - 'vscode.mermaid-chat-features/renderMermaidDiagram'
+  - todo
 argument-hint: 'Describe the security review scope, vulnerability to analyze, or threat model to perform'
-handoffs:
-  - label: 'CI Quality Check'
-    agent: 'CIReviewer'
-    prompt: 'Security review passed. Run lint, type checks, complexity analysis, and generate SARIF report.'
-    send: false
-  - label: 'Rework: Security Failed'
-    agent: 'Backend'
-    prompt: 'Security vulnerabilities found. Fix the critical/high severity issues before proceeding.'
-    send: false
 ---
 
 # Security Engineer Subagent
