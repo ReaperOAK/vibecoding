@@ -893,3 +893,9 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Decisions:** PASS — Deletion of unenforced tool-acl.yaml eliminates false security. Tool restrictions maintained via VS Code tools: frontmatter (runtime) + Assigned Tool Loadout sections (prompt-level) across all 15 agents. ~10% gap (file-path globs, structured approval) is LOW risk with no exploitable surface. Zero SARIF findings.
 - **Timestamp:** 2026-04-10T12:00:00Z
 - **Agent:** Security
+
+### [TASK-GHO-SYS009] — Security Review
+- **Artifacts:** agent-output/Security/TASK-GHO-SYS009.md
+- **Decisions:** PASS — Fix of toolNames in policy-enforcement.json is a security improvement. Removed phantom `execute/runInTerminal`, retained correct `run_in_terminal`. Zero critical/high SARIF findings. Advisory: `send_to_terminal` bypass gap is pre-existing, not introduced by this change.
+- **Timestamp:** 2026-04-10T17:05:00Z
+- **Agent:** Security
