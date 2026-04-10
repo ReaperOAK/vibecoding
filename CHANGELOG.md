@@ -1,6 +1,11 @@
 # Changelog
 
-last_reviewed: 2026-04-09
+last_reviewed: 2026-04-10
+
+## 2026-04-10
+
+- Fix: Removed phantom tool ID `execute/runInTerminal` from `toolNames` in `.github/hooks/policy-enforcement.json`; only the valid VS Code tool ID `run_in_terminal` remains.
+- Related ticket: TASK-GHO-SYS009.
 
 ## 2026-04-09
 
