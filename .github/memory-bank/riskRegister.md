@@ -171,3 +171,15 @@ _None_
 - **Details:** npm audit reports lodash GHSA-r5fr-rjxr-66jc (CWE-94, CVSS 8.1) and brace-expansion GHSA-f886-m6hf-6m8v (CWE-400)
 - **Severity:** HIGH
 - **Recommended Fix:** Upgrade/override transitive dependencies to patched versions and re-run npm audit with zero high/critical findings
+
+### RISK-008: Orchestration Boot Path Drift
+- **Date Identified:** 2026-04-10
+- **Identified By:** Security
+- **Severity:** Low
+- **Likelihood:** Medium
+- **Category:** Operational
+- **Description:** `.github/instructions/agent-orchestration.instructions.md` references `.github/vibecoding/chunks/` in required boot sequence, but that path is not present in the current repository layout.
+- **Impact:** Agents can be forced into ambiguous boot-sequence behavior (strict-fail vs implicit skip), reducing governance consistency and audit repeatability.
+- **Mitigation:** Update the boot-sequence step to point to existing chunk/reference sources used by the current catalog and skills layout.
+- **Status:** Accepted
+- **Evidence:** `agent-output/Security/TASK-GHO-SYS002.md` SARIF finding `SEC-ORCH-001`.
