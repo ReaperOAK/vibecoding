@@ -899,3 +899,19 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Decisions:** PASS — Fix of toolNames in policy-enforcement.json is a security improvement. Removed phantom `execute/runInTerminal`, retained correct `run_in_terminal`. Zero critical/high SARIF findings. Advisory: `send_to_terminal` bypass gap is pre-existing, not introduced by this change.
 - **Timestamp:** 2026-04-10T17:05:00Z
 - **Agent:** Security
+
+### [TASK-GHO-SYS008] — CI Review
+- **Artifacts:** agent-output/CIReviewer/TASK-GHO-SYS008.md, agent-output/CIReviewer/TASK-GHO-SYS008.sarif
+- **Decisions:** PASS — Score 100/100, 0 critical, 0 warnings. Documentation/analysis ticket with no code artifacts; all lint/type/complexity checks N/A. File deletion confirmed, upstream QA+Security both PASS.
+- **Timestamp:** 2026-04-10T17:50:00Z
+- **Agent:** CIReviewer
+
+### [TASK-GHO-SYS009] — CI Review
+- **Artifacts:** agent-output/CIReviewer/TASK-GHO-SYS009.md, agent-output/CIReviewer/TASK-GHO-SYS009.sarif
+- **Decisions:** PASS — Score 100/100, 0 critical, 0 warnings. JSON valid, hook structure intact, sole toolNames entry `run_in_terminal` correct.
+- **Timestamp:** 2026-04-10T17:50:00Z
+
+### [TASK-GHO-SYS010] — CI Review
+- **Artifacts:** agent-output/CIReviewer/TASK-GHO-SYS010.md, agent-output/CIReviewer/TASK-GHO-SYS010.sarif
+- **Decisions:** PASS — Score 100/100, 0 critical, 0 warnings. Infra-only deletion of empty `.github/proposals/`, observability/ and tasks/ preserved. File integrity verified, no dangling references.
+- **Timestamp:** 2026-04-10T18:05:00Z
