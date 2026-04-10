@@ -67,6 +67,11 @@ compaction_threshold: 50
 
 <!-- Reverse chronological log of significant changes -->
 
+### [TASK-GHO-SYS003] — Documentation Summary
+- **Artifacts:** `agent-output/Documentation/TASK-GHO-SYS003.md`, `.github/memory-bank/activeContext.md`
+- **Decisions:** Verified `.github/vibecoding/catalog.yml` is already self-documenting through its category keys and grouped paths. No README, changelog, or catalog edits were needed because live docs did not describe the removed ghost entries.
+- **Timestamp:** 2026-04-10T18:02:48Z
+
 ### [TASK-VIB-001..007] — Documentation Review (Batch)
 - **Artifacts:** `README.md`, `.github/hooks/scripts/README.md`, `docs/adr/mcp-ticket-server.md`, `agent-output/Documentation/TASK-VIB-001-007.md`
 - **Decisions:** Updated README with MCP server section, agent configuration conventions (tool-sets, agents, user-invocable, model arrays), and corrected repo structure. Fixed stale hooks README (disabled→enabled). Updated MCP ADR from Proposed→Accepted with correct file paths. Server.py docstrings already adequate — no changes.
@@ -530,7 +535,7 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 
 ### [TASK-VIB-001] — Fix Catalog Path — Create .github/vibecoding/ Directory
 - **Artifacts:** .github/vibecoding/catalog.yml
-- **Decisions:** Copied content from .github/skills/catalog.yml and added 6 missing top-level keys (boot-sequence, git-protocol, sdlc-lifecycle, ticket-system, agent-protocols, orchestration) to ensure all skill directories are indexed. Used content copy over symlink for portability per ticket spec.
+- **Decisions:** Copied content from .github/vibecoding/catalog.yml and added 6 missing top-level keys (boot-sequence, git-protocol, sdlc-lifecycle, ticket-system, agent-protocols, orchestration) to ensure all skill directories are indexed. Used content copy over symlink for portability per ticket spec.
 - **Timestamp:** 2026-03-27T00:00:00Z
 
 ---
@@ -872,7 +877,7 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Agent:** Validator
 
 ### [TASK-GHO-DOC001] — Documentation Summary
-- **Artifacts:** .github/skills/qa/SKILL.md, .github/skills/security/SKILL.md, .github/skills/implementation/SKILL.md, .github/skills/architecture/SKILL.md, .github/skills/a11y/SKILL.md, .github/skills/catalog.yml, agent-output/Documentation/TASK-GHO-DOC001.md
+- **Artifacts:** .github/skills/qa/SKILL.md, .github/skills/security/SKILL.md, .github/skills/implementation/SKILL.md, .github/skills/architecture/SKILL.md, .github/skills/a11y/SKILL.md, .github/vibecoding/catalog.yml, agent-output/Documentation/TASK-GHO-DOC001.md
 - **Decisions:** Audited 20 skills; enriched 5 to >100 lines with procedures; deleted 7 duplicates (boot-sequence, git-protocol, orchestration, sdlc, sdlc-lifecycle, ticket-system, testing); merged testing→qa
 - **Timestamp:** 2026-04-10T22:30:00Z
 - **Agent:** Documentation
@@ -945,3 +950,69 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Artifacts:** CHANGELOG.md, agent-output/Documentation/TASK-GHO-SYS009.md
 - **Decisions:** Minimal docs change — added CHANGELOG entry for toolNames fix. Hook file and hooks README already accurate.
 - **Timestamp:** 2026-04-10T18:20:00Z
+
+### [TASK-GHO-SYS003] — CI Review
+- **Artifacts:** agent-output/CIReviewer/TASK-GHO-SYS003.md, agent-output/CIReviewer/TASK-GHO-SYS003.sarif
+- **Decisions:** PASS — Score 100/100, 0 critical, 0 warnings. YAML valid, 72/72 paths exist, all acceptance criteria met.
+- **Timestamp:** 2026-04-10T18:15:00Z
+
+### [TASK-GHO-SYS001] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-GHO-SYS001.md
+- **Decisions:** APPROVED — all 8 DoD items passed, full SDLC chain verified (DevOps→QA→Security→CI→Docs), zero defects
+- **Timestamp:** 2026-04-10T18:05:00Z
+
+### [TASK-GHO-SYS007] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-GHO-SYS007.md
+- **Decisions:** APPROVED — all 3 ACs pass, zero tool-sets refs remain, all SDLC stages completed
+- **Timestamp:** 2026-04-10T18:15:00Z
+
+### [TASK-GHO-SYS008] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-GHO-SYS008.md
+- **Decisions:** APPROVED — tool-acl.yaml confirmed absent, gap analysis clear and complete (~90% rule coverage), full SDLC chain verified
+- **Timestamp:** 2026-04-10T18:30:00Z
+
+### [TASK-GHO-SYS009] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-GHO-SYS009.md
+- **Decisions:** APPROVED — toolNames fix verified (sole entry `run_in_terminal` is valid VS Code tool ID, `execute/runInTerminal` removed). Full SDLC chain verified (DevOps→QA→Security→CI→Docs). Advisory: stale comment in block-git-add-all.sh line 3 (out of scope).
+- **Timestamp:** 2026-04-10T18:35:00Z
+
+### [TASK-GHO-SYS010] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-GHO-SYS010.md
+- **Decisions:** APPROVED — proposals/ confirmed deleted, observability/ and tasks/ preserved with content. Full SDLC chain verified (DevOps→QA→Security→CI→Docs). All upstream verdicts PASS. Infra-only ticket, code DoD items N/A.
+- **Timestamp:** 2026-04-10T18:50:00Z
+
+### [TASK-VIB-010] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-VIB-010.md
+- **Decisions:** REJECTED — required ticket artifacts are missing at current HEAD (`extension/src/extension.ts`, `extension/package.json`, `.github/mcp-servers/ticket-server/server.py`). Independent gates fail (`npm test -- --coverage` exit 254, `npx eslint . --max-warnings=0` exit 2, `npx tsc --noEmit` exit 1). Sent to rework with evidence.
+- **Timestamp:** 2026-04-10T18:21:58Z
+- **Agent:** Validator
+
+### [TASK-GHO-SYS003] — Validation Summary
+- **Artifacts:** agent-output/Validator/TASK-GHO-SYS003.md
+- **Decisions:** APPROVED — `.github/vibecoding/catalog.yml` has 72/72 existing paths and zero forbidden ghost references (`_cross-cutting-protocols`, `governance`, `VALIDATION-REPORT`, `ARCHITECTURE.instructions`). Stage chain verified through VALIDATION.
+- **Timestamp:** 2026-04-10T18:26:00Z
+
+### [TASK-GHO-SYS004] — DevOps Summary
+- **Artifacts:** .github/skills/catalog.yml (deleted), agent-output/DevOps/TASK-GHO-SYS004.md, ticket-state/READY/TASK-GHO-SYS004.json, tickets/TASK-GHO-SYS004.json
+- **Decisions:** Removed duplicate skills catalog and normalized repository references so `.github/vibecoding/catalog.yml` is the sole catalog path used in boot sequences. Verified zero `skills/catalog.yml` references across repo.
+- **Timestamp:** 2026-04-10T18:29:48Z
+
+### [TASK-GHO-SYS002] — QA Summary
+- **Artifacts:** agent-output/QA/TASK-GHO-SYS002.md
+- **Decisions:** PASS — acceptance criteria verified for instruction consolidation. Line limits satisfied (`.github/copilot-instructions.md`=24, `AGENTS.md`=19), orchestration rules file contains required sections, frontmatter has `description` and no `applyTo`. Ticket CLI integrity checks (`tickets.py --validate`, `--status --json`) passed.
+- **Timestamp:** 2026-04-10T18:35:16Z
+- **Agent:** QA
+
+### [TASK-GHO-SYS004] — QA Summary
+- **Artifacts:** agent-output/QA/TASK-GHO-SYS004.md, tickets/TASK-GHO-SYS004.json, ticket-state/DEVOPS/TASK-GHO-SYS004.json
+- **Decisions:** FAIL — duplicate file deletion and boot-path consistency passed, but full-repo legacy-path scan still found references in historical artifacts (`.github/memory-bank/activeContext.md` and prior stage summary content). Ticket moved to rework with explicit evidence.
+- **Mutation Score:** N/A (no business logic changes)
+- **Coverage:** N/A (path/reference cleanup only)
+- **Timestamp:** 2026-04-10T18:36:21Z
+- **Agent:** QA
+
+### [TASK-GHO-SYS002] — Security Review
+- **Artifacts:** agent-output/Security/TASK-GHO-SYS002.md
+- **Decisions:** PASS — no critical/high findings across STRIDE/OWASP review for instruction/governance file changes. Informational note recorded: boot-sequence path reference in `.github/instructions/agent-orchestration.instructions.md` points to `.github/vibecoding/chunks/` which is absent in current layout.
+- **Timestamp:** 2026-04-10T18:42:14Z
+- **Agent:** Security
