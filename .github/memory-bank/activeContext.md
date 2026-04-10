@@ -238,7 +238,6 @@ compaction_threshold: 50
 - `.github/agents/UIDesigner.agent.md`
 - `.github/vibecoding/chunks/UIDesigner.agent/chunk-01.yaml`
 - `.github/vibecoding/chunks/UIDesigner.agent/chunk-02.yaml`
-- `.github/proposals/.gitkeep`
 - `.github/memory-bank/workflow-state.json`
 - `.github/memory-bank/artifacts-manifest.json`
 - `.github/memory-bank/feedback-log.md`
@@ -871,3 +870,26 @@ Completed 7-part structural hardening upgrade: unlimited elastic workers, govern
 - **Decisions:** REJECTED — DoD fail on changed-file coverage evidence for extension/src/extension.ts and unhandled promise in activation path.
 - **Timestamp:** 2026-04-09T17:15:37Z
 - **Agent:** Validator
+
+### [TASK-GHO-DOC001] — Documentation Summary
+- **Artifacts:** .github/skills/qa/SKILL.md, .github/skills/security/SKILL.md, .github/skills/implementation/SKILL.md, .github/skills/architecture/SKILL.md, .github/skills/a11y/SKILL.md, .github/skills/catalog.yml, agent-output/Documentation/TASK-GHO-DOC001.md
+- **Decisions:** Audited 20 skills; enriched 5 to >100 lines with procedures; deleted 7 duplicates (boot-sequence, git-protocol, orchestration, sdlc, sdlc-lifecycle, ticket-system, testing); merged testing→qa
+- **Timestamp:** 2026-04-10T22:30:00Z
+- **Agent:** Documentation
+
+### [TASK-GHO-DOC001] — Validation Summary (Rework #1)
+- **Artifacts:** agent-output/Validator/TASK-GHO-DOC001.md
+- **Decisions:** REJECTED — catalog.yml has 31+ dangling refs to 7 deleted skills despite Documentation claiming cleanup was done. AC#3 and DoD#3 violated. Sent back to DOCS for rework.
+- **Timestamp:** 2026-04-10T22:45:00Z
+
+### [TASK-GHO-SYS007] — Security Review
+- **Artifacts:** agent-output/Security/TASK-GHO-SYS007.md
+- **Decisions:** PASS — Removal of dead `.github/tool-sets/` directory does not weaken security. Agent tool restrictions enforced via Assigned Tool Loadout in all 15 `.agent.md` files. Zero SARIF findings.
+- **Timestamp:** 2026-04-10T17:30:00Z
+- **Agent:** Security
+
+### [TASK-GHO-SYS008] — Security Review
+- **Artifacts:** agent-output/Security/TASK-GHO-SYS008.md
+- **Decisions:** PASS — Deletion of unenforced tool-acl.yaml eliminates false security. Tool restrictions maintained via VS Code tools: frontmatter (runtime) + Assigned Tool Loadout sections (prompt-level) across all 15 agents. ~10% gap (file-path globs, structured approval) is LOW risk with no exploitable surface. Zero SARIF findings.
+- **Timestamp:** 2026-04-10T12:00:00Z
+- **Agent:** Security
