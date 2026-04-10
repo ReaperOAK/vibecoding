@@ -6,24 +6,21 @@ tools:
   - vscode
   - execute
   - read
+  - agent
   - edit
   - search
-  - browser
-  - 'github/*'
+  - web
   - 'com.figma.mcp/mcp/*'
+  - 'forgeos/*'
+  - 'github/*'
+  - 'io.github.tavily-ai/tavily-mcp/*'
+  - 'io.github.upstash/context7/*'
+  - 'microsoft/markitdown/*'
   - 'playwright/*'
-tool-sets:
-  - '#universal'
+  - 'vscode.mermaid-chat-features/renderMermaidDiagram'
+  - todo
 argument-hint: 'Describe the UI components to design, mockups to create, or design tokens to define'
-handoffs:
-  - label: 'Implement Frontend'
-    agent: 'Frontend'
-    prompt: 'UI design and mockups approved. Begin implementing the frontend components according to the design specs, component specifications, and design tokens.'
-    send: false
-  - label: 'Iterate Design'
-    agent: 'UIDesigner'
-    prompt: 'Design needs iteration. Review the feedback and generate updated mockups with the requested changes.'
-    send: false
+
 ---
 
 # UIDesigner Subagent

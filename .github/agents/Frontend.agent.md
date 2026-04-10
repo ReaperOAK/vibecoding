@@ -6,37 +6,20 @@ tools:
   - vscode
   - execute
   - read
+  - agent
   - edit
   - search
-  - browser
-  - 'github/*'
+  - web
   - 'com.figma.mcp/mcp/*'
+  - 'forgeos/*'
+  - 'github/*'
+  - 'io.github.tavily-ai/tavily-mcp/*'
+  - 'io.github.upstash/context7/*'
+  - 'microsoft/markitdown/*'
   - 'playwright/*'
-tool-sets:
-  - '#universal'
-  - '#code-editing'
+  - 'vscode.mermaid-chat-features/renderMermaidDiagram'
+  - todo
 argument-hint: 'Describe the UI component, page layout, or frontend feature to implement'
-handoffs:
-  - label: 'Submit to QA'
-    agent: 'QA'
-    prompt: 'Implementation complete. Run test strategy including unit tests, integration tests, and E2E validation.'
-    send: false
-  - label: 'Security Review'
-    agent: 'Security'
-    prompt: 'Submit for security review including OWASP Top 10, STRIDE threat modeling, and vulnerability scanning.'
-    send: false
-  - label: 'CI Quality Check'
-    agent: 'CIReviewer'
-    prompt: 'Submit for CI review including lint, type checks, complexity analysis, and SARIF report generation.'
-    send: false
-  - label: 'Documentation Update'
-    agent: 'Documentation'
-    prompt: 'Update documentation with JSDoc/TSDoc comments, README changes, and changelog entries.'
-    send: false
-  - label: 'Final Validation'
-    agent: 'Validator'
-    prompt: 'Run independent Definition of Done verification to confirm all DoD items are satisfied.'
-    send: false
 ---
 
 # Frontend Engineer Subagent

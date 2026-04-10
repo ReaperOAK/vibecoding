@@ -2,7 +2,6 @@
 name: 'Documentation'
 description: 'Technical documentation engineer. Produces readable docs with Flesch-Kincaid scoring, freshness tracking, and doc-as-code CI.'
 user-invocable: false
-model: [claude-3-7-sonnet, claude-3-5-sonnet]
 tools:
   - vscode
   - execute
@@ -11,7 +10,6 @@ tools:
   - edit
   - search
   - web
-  - browser
   - 'com.figma.mcp/mcp/*'
   - 'forgeos/*'
   - 'github/*'
@@ -21,14 +19,7 @@ tools:
   - 'playwright/*'
   - 'vscode.mermaid-chat-features/renderMermaidDiagram'
   - todo
-tool-sets:
-  - '#universal'
 argument-hint: 'Describe the documentation to create, update, or the API docs to generate'
-handoffs:
-  - label: 'Final Validation'
-    agent: 'Validator'
-    prompt: 'Documentation complete. Run independent Definition of Done verification to confirm all DoD items are satisfied.'
-    send: false
 ---
 
 # Documentation Specialist

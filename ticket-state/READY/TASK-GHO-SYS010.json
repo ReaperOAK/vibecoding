@@ -1,0 +1,65 @@
+{
+  "ticket_id": "TASK-GHO-SYS010",
+  "title": "Remove unused infrastructure directories",
+  "description": "Delete empty or stub-only infrastructure directories that serve no functional purpose: (1) `.github/observability/` contains only `agent-trace-schema.json` with no consumers, (2) `.github/tasks/` contains template files not connected to any workflow, (3) `.github/proposals/` contains only `.gitkeep`. Before deletion, verify no file in the repo references these directories. If `agent-trace-schema.json` has potential value, relocate to `.github/docs/schemas/` or document intent.",
+  "type": "infra",
+  "priority": "low",
+  "stage": "READY",
+  "sdlc_flow": [
+    "READY",
+    "DEVOPS",
+    "QA",
+    "SECURITY",
+    "CI",
+    "DOCS",
+    "VALIDATION",
+    "DONE"
+  ],
+  "created_at": "2026-04-09T17:48:59.736796+00:00",
+  "created_by": "TODO",
+  "dependencies": [],
+  "blocked_by": [],
+  "file_paths": [
+    ".github/observability/agent-trace-schema.json",
+    ".github/tasks/claim-schema.json",
+    ".github/tasks/definition-of-done-template.md",
+    ".github/tasks/delegation-packet-schema.json",
+    ".github/tasks/initialization-checklist-template.md",
+    ".github/tasks/merge-protocol.md",
+    ".github/proposals/.gitkeep"
+  ],
+  "acceptance_criteria": [
+    "Given the `.github/` directory, when I list its contents, then `observability/`, `tasks/`, and `proposals/` do not exist",
+    "Given a grep for `observability` or `tasks/claim-schema` across the repo, when I check results, then zero functional references remain",
+    "Given any valuable content like schemas, when I check, then it has been relocated to an appropriate location before deletion"
+  ],
+  "rework_count": 0,
+  "claimed_by": null,
+  "machine_id": null,
+  "operator": null,
+  "lease_expiry": null,
+  "lease_duration_minutes": 30,
+  "history": [
+    {
+      "timestamp": "2026-04-09T17:48:59.736798+00:00",
+      "event": "CREATED",
+      "agent": "TODO",
+      "machine_id": "system",
+      "details": "Ticket created from TODO/tasks/L3-github-optimization.md"
+    },
+    {
+      "timestamp": "2026-04-09T17:48:59.742450+00:00",
+      "event": "MOVED_TO_READY",
+      "agent": "tickets.py",
+      "machine_id": "system",
+      "details": "Dependencies resolved, moved to READY"
+    }
+  ],
+  "source_task_file": "TODO/tasks/L3-github-optimization.md",
+  "tags": [
+    "p3",
+    "cleanup",
+    "unused-directories",
+    "hygiene"
+  ]
+}

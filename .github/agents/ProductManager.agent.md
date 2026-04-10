@@ -10,7 +10,6 @@ tools:
   - edit
   - search
   - web
-  - browser
   - 'com.figma.mcp/mcp/*'
   - 'forgeos/*'
   - 'github/*'
@@ -20,22 +19,7 @@ tools:
   - 'playwright/*'
   - 'vscode.mermaid-chat-features/renderMermaidDiagram'
   - todo
-tool-sets:
-  - '#universal'
 argument-hint: 'Describe the business requirements, feature to specify, or user stories to create'
-handoffs:
-  - label: 'Design Architecture'
-    agent: 'Architect'
-    prompt: 'PRD complete. Design the system architecture based on the requirements, user stories, and non-functional requirements defined in the PRD.'
-    send: false
-  - label: 'Research Technologies'
-    agent: 'Research'
-    prompt: 'Research the technology options needed for the PRD requirements. Evaluate frameworks, libraries, and services with scored comparison matrices.'
-    send: false
-  - label: 'Decompose Tasks'
-    agent: 'TODO'
-    prompt: 'PRD and user stories complete. Decompose the requirements into L0→L1→L2→L3 tickets for implementation planning.'
-    send: false
 ---
 
 # Product Manager Subagent

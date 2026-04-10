@@ -11,7 +11,6 @@ tools:
   - edit
   - search
   - web
-  - browser
   - 'com.figma.mcp/mcp/*'
   - 'forgeos/*'
   - 'github/*'
@@ -21,8 +20,6 @@ tools:
   - 'playwright/*'
   - 'vscode.mermaid-chat-features/renderMermaidDiagram'
   - todo
-tool-sets:
-  - '#universal'
 argument-hint: 'Describe the decomposition mode (Strategic/Planning/Execution) and the vision or capability to decompose'
 ---
 

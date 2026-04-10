@@ -7,20 +7,20 @@ tools:
   - vscode
   - execute
   - read
+  - agent
+  - edit
   - search
+  - web
+  - 'com.figma.mcp/mcp/*'
+  - 'forgeos/*'
   - 'github/*'
-tool-sets:
-  - '#universal'
+  - 'io.github.tavily-ai/tavily-mcp/*'
+  - 'io.github.upstash/context7/*'
+  - 'microsoft/markitdown/*'
+  - 'playwright/*'
+  - 'vscode.mermaid-chat-features/renderMermaidDiagram'
+  - todo
 argument-hint: 'Describe the code quality checks to run, complexity analysis to perform, or quality gates to verify'
-handoffs:
-  - label: 'Documentation Update'
-    agent: 'Documentation'
-    prompt: 'CI review passed. Update documentation with JSDoc/TSDoc comments, README changes, and changelog.'
-    send: false
-  - label: 'Rework: CI Failed'
-    agent: 'Backend'
-    prompt: 'CI quality check failed. Fix lint errors, type errors, and complexity violations.'
-    send: false
 ---
 
 # CI Reviewer Subagent

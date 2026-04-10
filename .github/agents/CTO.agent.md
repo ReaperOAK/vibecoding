@@ -10,7 +10,6 @@ tools:
   - edit
   - search
   - web
-  - 'tickets/*'
   - 'com.figma.mcp/mcp/*'
   - 'forgeos/*'
   - 'github/*'
@@ -20,8 +19,6 @@ tools:
   - 'playwright/*'
   - 'vscode.mermaid-chat-features/renderMermaidDiagram'
   - todo
-tool-sets:
-  - '#universal'
 argument-hint: 'Describe the project to initialize, vision to plan, or strategic decision to make'
 disable-model-invocation: true
 agents:
@@ -31,13 +28,13 @@ agents:
   - ProductManager
   - Architect
 handoffs:
+  - label: 'Launch TODO Decomposition'
+    agent: 'CTO'
+    prompt: 'Project initialization complete. Run TODO agent (L1>L2>L3) to decompose the plan into actionable tickets. Use `python3 tickets.py --parse TODO/tasks/` to parse the TODO output, then `python3 tickets.py --sync` to sync with the ticket system. Once tickets are in READY state, hand off to Ticketer for execution.'
+    send: false
   - label: 'Execute Ticket Backlog'
     agent: 'Ticketer'
-    prompt: 'Scan READY tickets and begin dispatching workers. Run python3 tickets.py --sync first, then dispatch one subagent per READY ticket following the SDLC pipeline.'
-    send: false
-  - label: 'Research Gaps'
-    agent: 'Research'
-    prompt: 'Discovery identified knowledge gaps. Research the following topics with evidence-based analysis and provide recommendations with confidence levels.'
+    prompt: '/continue Scan READY tickets and begin dispatching workers. Run python3 tickets.py --sync first, then dispatch one subagent per READY ticket following the SDLC pipeline.'
     send: false
 ---
 
