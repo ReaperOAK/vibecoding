@@ -44,8 +44,8 @@ Execute the following orchestration pipeline with ruthless precision:
 4. No hardcoded color, spacing, typography, radius, or shadow values in markup if an existing project token, variant, or component already covers that requirement.
 5. If Storybook already contains a component specimen visually aligned with the Figma node, treat that as the preferred implementation anchor.
 
-### Phase 3: Implementation Delegation (Agent: Frontend Engineer)
-Draft a strict instruction packet for the `Frontend Engineer` agent. The packet MUST mandate the following production standards:
+### Phase 3: Implementation Delegation (Agent: Frontend )
+Draft a strict instruction packet for the `Frontend ` agent. The packet MUST mandate the following production standards:
 - **Reuse First:** Search existing components and stories before writing new ones. Reuse existing components, compose them, or extend them with narrowly-scoped variants whenever they match the design.
 - **Icon Reuse First:** Use the existing icon registry and Figma-backed SVG assets first. Only introduce a new SVG if no equivalent exists; when needed, export/download it from Figma and register it in the shared icon system.
 - **No Duplicate Components:** Do not create a new component when a Storybook-backed or production component already satisfies the same semantic and visual role.
@@ -58,7 +58,7 @@ Draft a strict instruction packet for the `Frontend Engineer` agent. The packet 
 - **Sanitization:** Ensure zero tolerance for XSS and unsafe markup or asset handling.
 
 ### Phase 4: Screenshot Parity Validation (Agent: UIDesigner + QA + Validator)
-Once the `Frontend Engineer` agent returns the implementation:
+Once the `Frontend ` agent returns the implementation:
 1. Capture the canonical Figma screenshot for the target node/frame.
 2. Capture a matching Playwright screenshot of the implemented UI at the same viewport, scale, and state. Prefer Storybook screenshots for isolated components; use app-level screenshots when the design is page-level.
 3. Compare the Figma screenshot and Playwright screenshot directly. Validation is not complete until the implementation is visually 1:1 for layout, spacing, type scale, icon geometry, color, radius, and alignment.

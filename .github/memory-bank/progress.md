@@ -113,7 +113,7 @@ append_only: true
 | Schema extensions (delegation + memory bank) | DONE | Backend | 2025-07-25 |
 | Ticketer upgrade (RETROSPECTIVE, state, proposals) | DONE | Architect | 2025-07-25 |
 | ARCHITECTURE.instructions.md v4.0.0 + copilot-instructions | DONE | Documentation | 2025-07-25 |
-| QA + Security + CI validation | DONE | QA, Security, CI Reviewer | 2025-07-25 |
+| QA + Security + CI validation | DONE | QA, Security, CIReviewer | 2025-07-25 |
 | Fix loop (6 findings resolved) | DONE | Backend | 2025-07-25 |
 
 ### System Now Has
@@ -142,8 +142,8 @@ append_only: true
 | BUILD — DoD + init templates | DONE | Backend | 2026-02-26 |
 | BUILD — Validator chunks + catalog + schema | DONE | Backend | 2026-02-26 |
 | BUILD — AGENTS.md + copilot + tool-acl | DONE | Backend | 2026-02-26 |
-| VALIDATE — QA review (FAIL → fix → PASS) | DONE | QA Engineer | 2026-02-26 |
-| VALIDATE — Security review (PASS_WITH_FINDINGS) | DONE | Security Engineer | 2026-02-26 |
+| VALIDATE — QA review (FAIL → fix → PASS) | DONE | QA | 2026-02-26 |
+| VALIDATE — Security review (PASS_WITH_FINDINGS) | DONE | Security | 2026-02-26 |
 | FIX LOOP — 8 findings resolved (3C + 2H + 2M + 1L) | DONE | Backend | 2026-02-26 |
 | DOCUMENT — ARCHITECTURE.instructions.md v5.0.0 | DONE | Documentation | 2026-02-26 |
 
@@ -176,7 +176,7 @@ append_only: true
 ### System Now Has (Session 13)
 - **Ticket-driven event-based engine** replaces phase-based batch orchestration
 - **9-state ticket machine:** BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE
-- **Mandatory per-ticket post-execution chain:** QA → Validator → Doc → CI Reviewer → Commit (3 combined rework budget)
+- **Mandatory per-ticket post-execution chain:** QA → Validator → Doc → CIReviewer → Commit (3 combined rework budget)
 - **Event emission protocol:** 9 structured event types routed through Ticketer
 - **Anti-one-shot guardrails:** scope enforcement, 2-pass minimum, anti-batch detection
 - **Commit enforcement:** every ticket gets its own `git commit` with ticket ID + CHANGELOG

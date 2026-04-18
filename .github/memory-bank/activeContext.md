@@ -309,7 +309,7 @@ compaction_threshold: 50
 - **Focus:** SDLC Enforcement Upgrade — production-grade task lifecycle
 - **Status:** COMPLETE
 - **Pipeline:** DECOMPOSE → SPEC → BUILD (4 cycles) → VALIDATE → GATE → FIX LOOP (1 iter) → RE-VALIDATE → DOCUMENT
-- **Agents Used:** TODO, Architect, Backend (×5), QA Engineer, Security Engineer, Documentation Specialist
+- **Agents Used:** TODO, Architect, Backend (×5), QA, Security, Documentation Specialist
 
 ### Problem Statement
 6 identified weaknesses: no strict test→validate loop, bugs caught late, no initialization enforcement, Frontend bypassing UIDesigner, no Definition of Done, no mandatory validation gates.
@@ -360,7 +360,7 @@ compaction_threshold: 50
 - **Scope:** TDSA-BE001 through TDSA-DOC001 (7 tasks, all DONE)
 
 ### Key Changes
-- **Ticketer.agent.md** — COMPLETE REWRITE (833→810 lines). 20 sections. Ticket-driven event loop replaces phased model. 9-state machine: BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE. Mandatory per-ticket post-execution chain: QA → Validator → Doc → CI Reviewer → Commit. Event emission protocol (9 types). Anti-one-shot guardrails. Commit enforcement per ticket.
+- **Ticketer.agent.md** — COMPLETE REWRITE (833→810 lines). 20 sections. Ticket-driven event loop replaces phased model. 9-state machine: BACKLOG → READY → LOCKED → IMPLEMENTING → REVIEW → VALIDATED → DOCUMENTED → COMMITTED → DONE. Mandatory per-ticket post-execution chain: QA → Validator → Doc → CIReviewer → Commit. Event emission protocol (9 types). Anti-one-shot guardrails. Commit enforcement per ticket.
 - **TODO.agent.md** — Updated (133→175 lines). Ticket Compatibility section added. L3 tasks = tickets entering BACKLOG. 9-state backward compat mapping.
 - **_cross-cutting-protocols.md** — Updated (102→209 lines). Section 8: Event Emission Protocol (9 event types, structured payloads). Section 9: Anti-One-Shot Guardrails (scope enforcement, 2-pass minimum, anti-batch detection).
 - **AGENTS.md** — Updated (200→191 lines). Boot protocol references ticket-driven event loop, 9-state machine, post-execution chain, event emission §8, anti-one-shot §9.

@@ -63,15 +63,15 @@ Max 3 rework attempts (shared across QA/Security/CI/Validator) before escalation
 | Ticketer | dispatcher | Scans READY tickets, performs CLAIM commits, dispatches subagents |
 | TODO | pre-SDLC | Decomposes vision → L1 capabilities → L2 blocks → L3 tickets |
 | Research Analyst | RESEARCH | Evidence-based research, PoC, tech comparison |
-| Product Manager | PM | PRD, user stories, acceptance criteria |
+| ProductManager | PM | PRD, user stories, acceptance criteria |
 | Architect | ARCHITECT | System design, ADRs, API contracts, DB schema |
-| DevOps Engineer | BACKEND (infra) | IaC, CI/CD, Docker, monitoring |
+| DevOps | BACKEND (infra) | IaC, CI/CD, Docker, monitoring |
 | Backend | BACKEND | APIs, business logic, database operations |
 | UIDesigner | UIDesigner | Stitch mockups, design tokens, component specs |
-| Frontend Engineer | FRONTEND | UI components, WCAG 2.2 AA, Core Web Vitals |
-| QA Engineer | QA | Tests ≥80% coverage, mutation testing, E2E |
-| Security Engineer | SECURITY | STRIDE, OWASP Top 10, SBOM |
-| CI Reviewer | CI | Lint, type checks, complexity, SARIF findings |
+| Frontend  | FRONTEND | UI components, WCAG 2.2 AA, Core Web Vitals |
+| QA | QA | Tests ≥80% coverage, mutation testing, E2E |
+| Security | SECURITY | STRIDE, OWASP Top 10, SBOM |
+| CIReviewer | CI | Lint, type checks, complexity, SARIF findings |
 | Documentation | DOCS | JSDoc/TSDoc, README, Diataxis structure |
 | Validator | VALIDATION | Independent 10-item Definition of Done verification |
 
@@ -131,7 +131,7 @@ bash scripts/sync-vibecoding.sh
 #
 # CTO will:
 #   - Read existing docs/code
-#   - Delegate to Research Analyst, Product Manager, Architect
+#   - Delegate to Research Analyst, ProductManager, Architect
 #   - Run TODO agent to generate tickets
 #   - Sync ticket state: python3 tickets.py --sync
 #

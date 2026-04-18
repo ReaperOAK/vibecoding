@@ -14,7 +14,7 @@ metadata:
 Security best practices including STRIDE threat modeling, OWASP Top 10, agentic guardrails, and vulnerability assessment guidelines.
 
 
-# Security Engineering
+# Securitying
 
 ## When to Use
 - Performing security reviews on code
