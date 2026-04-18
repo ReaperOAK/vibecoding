@@ -148,7 +148,7 @@ To clear this rejection:
    - Update `agent-output/CIReviewer/TASK-VIB-012.md` with current verdict
    - Make CI WORK commit
 
-3. **Dispatch Documentation Agent** (if CI reviewer modifies artifacts) — Confirm docs are current
+3. **Dispatch Documentation Agent** (if CIReviewer modifies artifacts) — Confirm docs are current
 
 4. **Re-submit to VALIDATION**
 

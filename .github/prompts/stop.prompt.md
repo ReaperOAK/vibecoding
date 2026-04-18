@@ -36,9 +36,9 @@ Do NOT skip any stage. Use the correct post-implementation chain order:
 2. Then run the full post-implementation chain (strict order):
 
 ```
-runSubagent("QA Engineer", prompt="Review ticket {TICKET-ID}. Run tests, verify coverage ≥80%...")
-runSubagent("Security Engineer", prompt="Security review for ticket {TICKET-ID}. STRIDE + OWASP scan...")
-runSubagent("CI Reviewer", prompt="Check lint, types, complexity for ticket {TICKET-ID}...")
+runSubagent("QA", prompt="Review ticket {TICKET-ID}. Run tests, verify coverage ≥80%...")
+runSubagent("Security", prompt="Security review for ticket {TICKET-ID}. STRIDE + OWASP scan...")
+runSubagent("CIReviewer", prompt="Check lint, types, complexity for ticket {TICKET-ID}...")
 runSubagent("Documentation Specialist", prompt="Update docs for ticket {TICKET-ID}...")
 runSubagent("Validator", prompt="Verify DoD compliance for ticket {TICKET-ID}. Check all 10 items...")
 ```
@@ -169,9 +169,9 @@ Checklist:
 - [ ] All agents operated within their Assigned Tool Loadout (no out-of-scope tool usage in agent summaries)
 
 If any violation found, spawn the appropriate agent to fix it:
-- Missing QA → `runSubagent("QA Engineer", ...)`
-- Missing Security → `runSubagent("Security Engineer", ...)`
-- Missing CI → `runSubagent("CI Reviewer", ...)`
+- Missing QA → `runSubagent("QA", ...)`
+- Missing Security → `runSubagent("Security", ...)`
+- Missing CI → `runSubagent("CIReviewer", ...)`
 - Missing docs → `runSubagent("Documentation Specialist", ...)`
 - Missing validation → `runSubagent("Validator", ...)`
 

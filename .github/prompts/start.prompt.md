@@ -79,7 +79,7 @@ runSubagent("CTO", prompt="
   Execute your full 6-phase pipeline:
   1. Discovery & Context Gathering (expand on the brief above)
   2. Research (delegate to Research Analyst for unknowns)
-  3. Product Definition (delegate to Product Manager for PRD)
+  3. Product Definition (delegate to ProductManager for PRD)
   4. Architecture Design (delegate to Architect)
   5. Ticket Decomposition (delegate to TODO agent for L0→L1→L2→L3)
   6. Handoff preparation (verify tickets in READY state)

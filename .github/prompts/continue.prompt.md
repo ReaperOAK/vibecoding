@@ -92,7 +92,7 @@ appropriate agents to complete the chain. Use EXACT agent names.
 **Example: Ticket stuck at QA (Security not yet run):**
 
 ```
-runSubagent("Security Engineer", prompt="
+runSubagent("Security", prompt="
   Ticket ID: {TICKET-ID}
   Objective: Security review for ticket {TICKET-ID}.
   Run STRIDE threat analysis + OWASP Top 10 scan.
@@ -102,7 +102,7 @@ runSubagent("Security Engineer", prompt="
 ```
 
 ```
-runSubagent("CI Reviewer", prompt="
+runSubagent("CIReviewer", prompt="
   Ticket ID: {TICKET-ID}
   Objective: Verify lint, type-check, and complexity for ticket {TICKET-ID}.
   Report: PASS or REJECT with specific findings.
@@ -170,7 +170,7 @@ runSubagent("Backend", prompt="
 ")
 
 # Example: Frontend ticket
-runSubagent("Frontend Engineer", prompt="
+runSubagent("Frontend ", prompt="
   Ticket ID: {TICKET-ID}
   Objective: {task description}
   ...same delegation structure...
@@ -182,16 +182,16 @@ runSubagent("Frontend Engineer", prompt="
 | Role | runSubagent name |
 |------|-----------------|
 | Backend | `"Backend"` |
-| Frontend | `"Frontend Engineer"` |
-| QA | `"QA Engineer"` |
-| Security | `"Security Engineer"` |
-| DevOps | `"DevOps Engineer"` |
+| Frontend | `"Frontend "` |
+| QA | `"QA"` |
+| Security | `"Security"` |
+| DevOps | `"DevOps"` |
 | Documentation | `"Documentation Specialist"` |
 | Validator | `"Validator"` |
-| CI Review | `"CI Reviewer"` |
+| CI Review | `"CIReviewer"` |
 | Architecture | `"Architect"` |
 | Research | `"Research Analyst"` |
-| Product | `"Product Manager"` |
+| Product | `"ProductManager"` |
 | UI Design | `"UIDesigner"` |
 | Task Decomposition | `"TODO"` |
 
@@ -211,21 +211,21 @@ post-implementation chain using these exact calls (strict order):
 
 ```
 # Step 1: QA Review
-runSubagent("QA Engineer", prompt="
+runSubagent("QA", prompt="
   Review ticket {TICKET-ID}. Verify test coverage ≥80%.
   Run test suite. Check for console errors, unhandled promises.
   Verdict: PASS or REJECT.
 ")
 
 # Step 2: Security Review
-runSubagent("Security Engineer", prompt="
+runSubagent("Security", prompt="
   Security review for ticket {TICKET-ID}.
   STRIDE + OWASP Top 10 scan.
   Verdict: PASS or REJECT.
 ")
 
 # Step 3: CI Review
-runSubagent("CI Reviewer", prompt="
+runSubagent("CIReviewer", prompt="
   Check lint, types, complexity for ticket {TICKET-ID}.
   Verdict: PASS or REJECT.
 ")

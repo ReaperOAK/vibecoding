@@ -55,13 +55,13 @@ Spawn agents in parallel for read-only analysis:
 - Detect circular dependencies and missing abstraction layers.
 - Detect scaling risks and missing infra components.
 
-**QA Engineer:**
+**QA:**
 - Detect test presence and coverage gaps.
 - Detect missing test harness.
 - Identify critical untested flows.
 - Detect failing tests (if runnable).
 
-**Security Engineer:**
+**Security:**
 - Scan for OWASP Top 10 vulnerabilities.
 - Detect exposed secrets and unsafe patterns.
 - Detect missing auth flows and insecure configs.
@@ -70,7 +70,7 @@ Spawn agents in parallel for read-only analysis:
 - Scan README, compare docs vs code.
 - Detect outdated docs and missing setup steps.
 
-**DevOps Engineer:**
+**DevOps:**
 - Detect CI/CD, Docker, deployment configs.
 - Detect environment variable usage.
 - Detect missing staging config.
@@ -90,7 +90,7 @@ Deliverables:
 
 If no PRD exists:
 
-**Product Manager** must:
+**ProductManager** must:
 - Infer product intent from code.
 - Identify user flows and implemented features.
 - Identify half-built and missing features implied by code.
@@ -157,9 +157,9 @@ Each ticket must:
 - Read upstream summary from previous stage agent before starting
 
 Post-implementation chain for every ticket (strict order):
-1. **QA Engineer** — test coverage, functional verification
-2. **Security Engineer** — vulnerability scan, security review
-3. **CI Reviewer** — lint, types, complexity checks
+1. **QA** — test coverage, functional verification
+2. **Security** — vulnerability scan, security review
+3. **CIReviewer** — lint, types, complexity checks
 4. **Documentation Specialist** — JSDoc/TSDoc, README updates
 5. **Validator** — Definition of Done verification
 
