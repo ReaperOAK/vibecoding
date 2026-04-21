@@ -56,6 +56,7 @@ SYNC_DIRECTORIES=(
 SYNC_FILES=(
   "AGENTS.md"
   "todo_visual.py"
+  "tickets.py"
   "scripts/sync-vibecoding.sh"
 )
 
@@ -70,6 +71,7 @@ REQUIRED_SOURCE_PATHS=(
   ".github"
   "AGENTS.md"
   "todo_visual.py"
+  "tickets.py"
 )
 
 contains_item() {
