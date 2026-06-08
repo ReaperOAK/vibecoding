@@ -73,3 +73,25 @@ For complete system rules, see:
 - `.github/instructions/ticket-system.instructions.md` — State machine, dependencies
 - `.github/instructions/git-protocol.instructions.md` — Commit protocol, scoped git
 - `.github/instructions/agent-behavior.instructions.md` — Worker model, scope enforcement
+
+## Operating This System (Claude Code)
+
+This repo's multi-agent infrastructure lives in `.github/` and is mirrored for
+Claude Code by a thin bridge in `.claude/` (see `.claude/README.md`). When acting
+on this system:
+
+- **Boot first.** Before any agent work, read `.github/guardian/STOP_ALL` (halt if
+  it contains `STOP`), then `AGENTS.md` and the `.github/instructions/*.instructions.md`
+  files. `AGENTS.md` is the machine-priority execution contract.
+- **Agents are subagents.** The 15 roles are Claude subagents in `.claude/agents/`.
+  Dispatch one with the Task tool (`subagent_type` = lowercase name, e.g. `backend`,
+  `cto`, `ticketer`). Each subagent reads its authoritative `.github/agents/<Name>.agent.md`
+  contract at runtime — that file, not the wrapper, is the source of truth.
+- **Slash commands** in `.claude/commands/` mirror `.github/prompts/`: `/start`,
+  `/continue`, `/stop`, `/takeover`, `/figma-to-code`, `/expensify`,
+  `/weekly-history`, `/ui-ux-pro-max`.
+- **Tool loadouts.** Agent files list tools in Copilot MCP namespaces. Translate
+  them to Claude-native tools with `.claude/TOOL_MAPPING.md`; stay within the loadout.
+- **Hooks** (`.claude/settings.json`) enforce the guardian STOP and scoped-git policy
+  as hard blocks, and surface the memory/evidence gates as reminders.
+- **Skills** are auto-discovered via the `.claude/skills` → `.github/skills` symlink.
