@@ -4,7 +4,7 @@
   "description": "Consolidate `copilot-instructions.md` and `AGENTS.md` into a single lean workspace instruction pattern. (1) Trim `.github/copilot-instructions.md` to \u226450 lines containing only project identity, tech stack, and key conventions. (2) Create `.github/instructions/agent-orchestration.instructions.md` with description-based discovery containing the orchestration rules currently in AGENTS.md (boot sequence, tool loadout table, dispatcher contract, evidence rules). (3) Trim `AGENTS.md` to \u226430 lines as a human-readable pointer that references the instruction file for agent details.",
   "type": "infra",
   "priority": "critical",
-  "stage": "CI",
+  "stage": "BLOCKED",
   "sdlc_flow": [
     "READY",
     "DEVOPS",
@@ -20,7 +20,9 @@
   "dependencies": [
     "TASK-GHO-SYS001"
   ],
-  "blocked_by": [],
+  "blocked_by": [
+    "TASK-GHO-SYS001"
+  ],
   "file_paths": [
     ".github/copilot-instructions.md",
     "AGENTS.md",
