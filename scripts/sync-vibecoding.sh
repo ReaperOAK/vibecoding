@@ -51,6 +51,7 @@ TMPDIR="$(mktemp -d)"
 # Add/remove entries here to control sync behavior.
 SYNC_DIRECTORIES=(
   ".github"
+  ".claude"
 )
 
 SYNC_FILES=(
